@@ -1,12 +1,14 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.google.auto.service.AutoService;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 
+@JBossLog
 @AutoService(RealmResourceProviderFactory.class)
 public class CustomResourceProviderFactory implements RealmResourceProviderFactory {
 
@@ -29,7 +31,7 @@ public class CustomResourceProviderFactory implements RealmResourceProviderFacto
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-        // NOOP
+        log.info("Initialize");
     }
 
     @Override
