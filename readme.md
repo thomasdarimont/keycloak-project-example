@@ -8,7 +8,7 @@ In addition to that, the project also shows how to write integration tests via [
 custom docker image.
 
 The example contains the following Keycloak extensions:
-- Custom REST Endpoint the can expose additional custom APIs: `AcmeResource`
+- Custom REST Endpoint the can expose additional custom APIs: `CustomResource`
 
 # Some Highlights
 - Support for deploying extensions to running Keycloak container
