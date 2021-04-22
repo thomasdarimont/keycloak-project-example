@@ -1,4 +1,3 @@
-
 embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone.xml} --std-out=echo
 
 echo Using server configuration file:

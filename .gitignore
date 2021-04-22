@@ -16,7 +16,6 @@ src/test/e2e/cypress/screenshots
 ### Eclipse ###
 
 .metadata
-bin/
 tmp/
 *.tmp
 *.bak

@@ -37,7 +37,11 @@ mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
 
 # Run
 
-## Start Keycloak container with docker-compose
+## Start Keycloak Container with docker-compose
+
+To speed up development we can mount the keycloak-extensions class-folder and keycloak-themes folder into
+a Keycloak container that is started via docker-compose. This allows for quick turnarounds while working on themes
+and extensions.
 
 Keycloak will be available on http://localhost:8080/auth.
 The default Keycloak admin username is `admin` with password `admin`.
@@ -76,12 +80,12 @@ The demo app can be started by running `etc/runDemoApp.sh` and will be accessibl
 
 # Scripts
 
-## Manually trigger Extension Deployment
+## Manually Trigger Extension Deployment
 ```
-etc/triggerDockerExtensionDeploy.sh
+bin/triggerDockerExtensionDeploy.sh
 ```
 
-## Exporting the 'Acme' Realm
+## Exporting the 'custom' Realm
 ```
-etc/exportRealm.sh
+bin/exportRealm.sh
 ```
