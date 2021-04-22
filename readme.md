@@ -103,13 +103,12 @@ bin/exportRealm.sh
 
 Instead of running the deployment trigger script yourself, you can register it as an external tool in IntelliJ as shown below.
 
-Name: `kc-ext-deploy-docker`
-Description: `Deploy Extensions to Keycloak Docker`
-Program: `bash`
-Arguments: `$ProjectFileDir$/bin/triggerDockerExtensionDeploy.sh`
-Working directory: `$ProjectFileDir$`
-
-Only select: Synchronize files after execution.
+- Name: `kc-ext-deploy-docker`
+- Description: `Deploy Extensions to Keycloak Docker`
+- Program: `bash`
+- Arguments: `$ProjectFileDir$/bin/triggerDockerExtensionDeploy.sh`
+- Working directory: `$ProjectFileDir$`
+- Only select: `Synchronize files after execution.`
 
 ![IntelliJ External Tool](docs/ide/intellij-external-tool.png)
 
