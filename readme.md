@@ -51,7 +51,11 @@ You can start the Keycloak container via:
 docker-compose --env-file custom-keycloak.env up
 ```
 
-## Run custom Docker Image
+Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger
+a redeployment of the custom extension by Keycloak. 
+
+## Running the custom Docker Image
+
 The custom docker image created during the build can be stared with the following command:
 ```
 docker run \
@@ -81,6 +85,8 @@ The demo app can be started by running `etc/runDemoApp.sh` and will be accessibl
 # Scripts
 
 ## Manually Trigger Extension Deployment
+
+To manually trigger an extension redeployment after extension code changes / build, you can run the following script:
 ```
 bin/triggerDockerExtensionDeploy.sh
 ```
@@ -89,3 +95,22 @@ bin/triggerDockerExtensionDeploy.sh
 ```
 bin/exportRealm.sh
 ```
+
+
+# Misc
+
+## Add Trigger extension deployment script as external tool in IntelliJ.
+
+Instead of running the deployment trigger script yourself, you can register it as an external tool in IntelliJ as shown below.
+
+Name: `kc-ext-deploy-docker`
+Description: `Deploy Extensions to Keycloak Docker`
+Program: `bash`
+Arguments: `$ProjectFileDir$/bin/triggerDockerExtensionDeploy.sh`
+Working directory: `$ProjectFileDir$`
+
+Only select: Synchronize files after execution.
+
+![IntelliJ External Tool](docs/ide/intellij-external-tool.png)
+
+The extensions can now be redeployed by running `Tools -> External Tools -> kc-ext-deploy-docker`
