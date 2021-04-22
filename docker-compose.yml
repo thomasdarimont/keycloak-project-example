@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  custom-keycloak:
+    image: quay.io/keycloak/keycloak:12.0.4
+    user: "1000:1000"
+    environment:
+      KEYCLOAK_USER: "admin"
+      KEYCLOAK_PASSWORD: "admin"
+      KEYCLOAK_THEME_CACHING: "false"
+      KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
+      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
+    # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
+    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE" ]
+    ports:
+      - "8080:8080"
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ./keycloak-extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/keycloak-extensions.jar:z
+      - ./keycloak-themes/target/classes/theme/custom:/opt/jboss/keycloak/themes/custom:z
+      - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
+      - ./imex:/opt/jboss/imex:z
+      - ./cli:/opt/jboss/startup-scripts:z
+  custom-demoapp:
+    image: python:3.7-alpine
+    command: [ "sh", "run.sh" ]
+    working_dir: "/demoapp"
+    volumes:
+      - ./demoapp:/demoapp:z
+    ports:
+      - "4000:4000"

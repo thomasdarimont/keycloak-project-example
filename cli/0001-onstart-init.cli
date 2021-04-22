@@ -1,0 +1,42 @@
+
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone.xml})
+
+echo SETUP: Begin Keycloak custom configuration...
+
+#### EVENT LISTENERS SPI Configuration
+echo SETUP: Customize Keycloak Event Listener configuration
+# Add dedicated eventsListener config element to allow configuring elements.
+if (outcome == failed) of /subsystem=keycloak-server/spi=eventsListener/:read-resource
+  echo SETUP: Add missing eventsListener SPI
+  /subsystem=keycloak-server/spi=eventsListener:add()
+  echo
+end-if
+
+echo SETUP: Configure built-in "jboss-logging" event listener
+if (outcome == failed) of /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging/:read-resource
+  echo SETUP: Add missing "jboss-logging" event listener
+  /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:add(enabled=true)
+  echo
+end-if
+
+# Propagate success events to INFO instead of DEBUG
+# This allows to track successful logins in log analysis
+/subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.success-level,value=info)
+/subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.error-level,value=warn)
+
+
+### Theme Configuration ###
+
+echo SETUP: Configure theme caching
+/subsystem=keycloak-server/theme=defaults:write-attribute(name=cacheThemes,value=${env.KEYCLOAK_THEME_CACHING:true})
+/subsystem=keycloak-server/theme=defaults:write-attribute(name=cacheTemplates,value=${env.KEYCLOAK_THEME_TEMPLATE_CACHING:true})
+/subsystem=keycloak-server/theme=defaults:write-attribute(name=welcomeTheme,value=${env.KEYCLOAK_WELCOME_THEME:keycloak})
+/subsystem=keycloak-server/theme=defaults:write-attribute(name=default,value=${env.KEYCLOAK_DEFAULT_THEME:keycloak})
+
+
+echo SETUP: Finished Keycloak custom configuration.
+
+stop-embedded-server

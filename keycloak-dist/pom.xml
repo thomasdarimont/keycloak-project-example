@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.github.thomasdarimont.keycloak</groupId>
+        <artifactId>keycloak-project</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>keycloak-dist</artifactId>
+    <packaging>pom</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker-maven-plugin.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>docker-build-100</id>
+                        <phase>docker</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <verbose>true</verbose>
+                    <logStdout>true</logStdout>
+
+                    <images>
+                        <image>
+                            <name>${docker-image}</name>
+                            <build>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <!-- <tag>${git.commit.id}</tag> -->
+                                </tags>
+
+                                <dockerFileDir>keycloak</dockerFileDir>
+
+                                <assembly>
+                                    <inline>
+
+                                        <fileSet>
+                                            <directory>../keycloak-extensions/target</directory>
+                                            <includes>
+                                                <include>keycloak-extensions-${project.version}.jar</include>
+                                            </includes>
+                                            <outputDirectory>keycloak-extensions</outputDirectory>
+                                        </fileSet>
+
+                                        <fileSet>
+                                            <directory>../keycloak-themes/target/classes/theme/custom</directory>
+                                            <outputDirectory>keycloak-theme</outputDirectory>
+                                        </fileSet>
+
+                                        <fileSet>
+                                            <directory>../cli</directory>
+                                            <outputDirectory>cli</outputDirectory>
+                                        </fileSet>
+                                    </inline>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
