@@ -19,6 +19,7 @@ services:
       - ./keycloak-extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/keycloak-extensions.jar:z
       - ./keycloak-themes/src/main/resources/theme/custom:/opt/jboss/keycloak/themes/custom:z
       - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
+      - ./keycloak-docker/src/main/docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
       - ./imex:/opt/jboss/imex:z
       - ./cli:/opt/jboss/startup-scripts:z
   custom-demoapp:

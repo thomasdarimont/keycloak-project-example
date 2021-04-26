@@ -12,7 +12,7 @@
     <modules>
         <module>keycloak-themes</module>
         <module>keycloak-extensions</module>
-        <module>keycloak-dist</module>
+        <module>keycloak-docker</module>
     </modules>
 
     <properties>

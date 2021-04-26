@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>keycloak-dist</artifactId>
+    <artifactId>keycloak-docker</artifactId>
     <packaging>pom</packaging>
 
     <build>
