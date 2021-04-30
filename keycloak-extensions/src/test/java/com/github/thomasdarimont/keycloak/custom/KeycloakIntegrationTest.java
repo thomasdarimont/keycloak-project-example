@@ -7,7 +7,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.AccessTokenResponse;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.SelinuxContext;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -28,25 +32,31 @@ public class KeycloakIntegrationTest {
 
     public static final String TEST_USER_PASSWORD = "test";
 
-    public static final String REALM_IMPORT_FILE = "custom-realm.json";
-
     public static KeycloakContainer keycloak;
 
-    static boolean keycloakLocal = false;
+    public static GenericContainer<?> keycloakConfigCli;
 
     @BeforeAll
     public static void beforeAll() {
 
-        keycloak = KeycloakTestSupport.createKeycloakContainer(keycloakLocal, REALM_IMPORT_FILE);
+        keycloak = KeycloakTestSupport.createKeycloakContainer();
         keycloak.withReuse(true);
         keycloak.start();
         keycloak.followOutput(new Slf4jLogConsumer(log));
+
+        keycloakConfigCli = KeycloakTestSupport.createKeycloakConfigCliContainer(keycloak);
+        keycloakConfigCli.start();
+        keycloakConfigCli.followOutput(new Slf4jLogConsumer(log));
     }
 
     @AfterAll
     public static void afterAll() {
         if (keycloak != null) {
             keycloak.stop();
+        }
+
+        if (keycloakConfigCli != null) {
+            keycloakConfigCli.stop();
         }
     }
 

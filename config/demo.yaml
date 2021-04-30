@@ -1,0 +1,78 @@
+realm: demo
+enabled: true
+displayName: Demo
+displayNameHtml: <div class="kc-logo-text"><span>Demo</span></div>
+loginWithEmailAllowed: false
+loginTheme: custom
+accountTheme: keycloak
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+browserFlow: "Browser Identity First"
+
+clientScopes:
+  - name: demo
+    description: Demo scope
+    protocol: openid-connect
+
+authenticationFlows:
+  - alias: "Browser Identity First"
+    description: "This flow implements the Identity First pattern"
+    providerId: basic-flow
+    builtIn: false
+    topLevel: true
+    authenticationExecutions:
+      - authenticator: auth-cookie
+        requirement: ALTERNATIVE
+        priority: 1010
+      - authenticator: identity-provider-redirector
+        requirement: ALTERNATIVE
+        priority: 1020
+      - requirement: ALTERNATIVE
+        priority: 1030
+        flowAlias: "Identity Forms"
+        autheticatorFlow: true
+
+  - alias: "Identity Forms"
+    description: "Sub-Flow to ask user for username an password"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - requirement: REQUIRED
+        authenticator: auth-username-form
+        priority: 2010
+      - requirement: REQUIRED
+        authenticator: auth-password-form
+        priority: 2020
+      - requirement: CONDITIONAL
+        autheticatorFlow: true
+        flowAlias: "2FA Forms"
+        priority: 2030
+
+  - alias: "2FA Forms"
+    description: "Sub-Flow to ask user for 2FA"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: conditional-user-configured
+        requirement: REQUIRED
+        priority: 3010
+      - authenticator: auth-otp-form
+        requirement: REQUIRED
+        priority: 3020
+
+users:
+  - username: demo
+    enabled: true
+    email: demo@local
+    firstName: Demo
+    lastName: User
+    attributes:
+      locale:
+        - "de"
+    credentials:
+      - type: password
+        value: test
+        temporary: false

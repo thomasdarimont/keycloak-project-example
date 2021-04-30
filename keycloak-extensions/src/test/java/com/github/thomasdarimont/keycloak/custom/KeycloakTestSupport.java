@@ -12,7 +12,12 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.SelinuxContext;
 import org.testcontainers.containers.output.OutputFrame;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 
 import javax.ws.rs.core.Response;
@@ -31,17 +36,17 @@ public class KeycloakTestSupport {
 
     public static final String ADMIN_CLI = "admin-cli";
 
-    public static KeycloakContainer createKeycloakContainer(boolean keycloakLocal) {
-        return createKeycloakContainer(keycloakLocal, null);
+    public static KeycloakContainer createKeycloakContainer() {
+        return createKeycloakContainer(null, null);
     }
 
-    public static KeycloakContainer createKeycloakContainer(boolean keycloakLocal, String realmImportFileName) {
+    public static KeycloakContainer createKeycloakContainer(String realmImportFileName) {
+        return createKeycloakContainer(null, realmImportFileName);
+    }
 
-        if (keycloakLocal) {
-            return new LocalKeycloak("http://localhost:8080/auth", "admin", "admin");
-        }
+    public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
 
-        KeycloakContainer keycloakContainer = new KeycloakContainer("quay.io/keycloak/keycloak:12.0.4");
+        KeycloakContainer keycloakContainer = imageName == null ? new KeycloakContainer() : new KeycloakContainer(imageName);
 
         if (realmImportFileName != null) {
             addRealmImportFile(realmImportFileName, keycloakContainer);
@@ -49,6 +54,10 @@ public class KeycloakTestSupport {
         addStartupCliFilesIfPresent(keycloakContainer);
 
         return keycloakContainer.withExtensionClassesFrom("target/classes");
+    }
+
+    public static KeycloakContainer createLocalKeycloakContainer() {
+        return new LocalKeycloak("http://localhost:8080/auth", "admin", "admin");
     }
 
     private static void addRealmImportFile(String realmImportFileName, KeycloakContainer keycloakContainer) {
@@ -111,6 +120,24 @@ public class KeycloakTestSupport {
         realm.users().get(userId).resetPassword(passwordRep);
 
         return new UserRef(userId, username);
+    }
+
+    public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
+
+        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("adorsys/keycloak-config-cli:v3.3.0-12.0.4");
+        keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
+        keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "120s");
+        keycloakConfigCli.addEnv("IMPORT_PATH", "/config");
+        keycloakConfigCli.addEnv("IMPORT_FORCE", "false");
+        keycloakConfigCli.addEnv("IMPORT_VARSUBSTITUTION", "true");
+        keycloakConfigCli.addEnv("KEYCLOAK_USER", keycloakContainer.getAdminUsername());
+        keycloakConfigCli.addEnv("KEYCLOAK_PASSWORD", keycloakContainer.getAdminPassword());
+        keycloakConfigCli.addEnv("KEYCLOAK_URL", keycloakContainer.getAuthServerUrl());
+
+        keycloakConfigCli.addFileSystemBind("../config", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
+        keycloakConfigCli.setWaitStrategy(Wait.forLogMessage(".*keycloak-config-cli running in.*", 1));
+        keycloakConfigCli.setNetworkMode("host");
+        return keycloakConfigCli;
     }
 
     @Data

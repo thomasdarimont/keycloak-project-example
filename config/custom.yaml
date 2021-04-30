@@ -1,0 +1,85 @@
+realm: custom
+enabled: true
+displayName: Custom
+displayNameHtml: <div class="kc-logo-text"><span>Custom</span></div>
+loginWithEmailAllowed: false
+loginTheme: custom
+accountTheme: keycloak
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+browserFlow: "browser"
+
+clientScopes:
+  - name: custom.profile
+    description: Custom Profile Access
+    protocol: openid-connect
+  - name: custom.api
+    description: Custom API Access
+    protocol: openid-connect
+  - name: custom.ageinfo
+    description: Age Information
+    protocol: openid-connect
+
+clients:
+  - clientId: app-minispa
+    protocol: openid-connect
+    name: App Mini SPA
+    description: "App Mini SPA Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+#    attributes: { }
+    fullScopeAllowed: false
+    rootUrl: "http://localhost:4000"
+    baseUrl: "/?realm=custom"
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "custom.profile"
+      - "custom.ageinfo"
+      - "phone"
+
+  - clientId: test-client
+    protocol: openid-connect
+    name: Test Client
+    description: "App Mini SPA Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    rootUrl: "http://localhost:4000"
+    baseUrl: "/?realm=custom"
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "custom.profile"
+      - "custom.ageinfo"
+      - "custom.api"
+      - "phone"
+
+users:
+  - username: tester
+    email: tester@local
+    firstName: Theo
+    lastName: Tester
+    enabled: true
+    attributes:
+      locale:
+        - "de"
+    credentials:
+      - type: password
+        value: test
+        temporary: false
