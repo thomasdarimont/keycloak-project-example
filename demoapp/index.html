@@ -207,10 +207,11 @@
 
 
 <script defer>
-    let baseUrl = "http://localhost:8080";
-    let keycloakUrl = baseUrl + "/auth";
 
     let searchParams = new URLSearchParams(window.location.search);
+    let baseUrl = searchParams.get("base_url") || "http://localhost:8080";
+    let keycloakUrl = baseUrl + (searchParams.get("path") || "/auth");
+
     let realm = searchParams.get("realm") || 'custom';
     let clientId = searchParams.get("client_id") || 'app-minispa';
 
