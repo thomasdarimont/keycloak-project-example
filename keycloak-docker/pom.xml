@@ -42,6 +42,10 @@
                                     <!-- <tag>${git.commit.id}</tag> -->
                                 </tags>
 
+                                <args>
+                                    <KEYCLOAK_VERSION>${keycloak.version}</KEYCLOAK_VERSION>
+                                </args>
+
                                 <dockerFileDir>keycloak</dockerFileDir>
 
                                 <assembly>
@@ -56,8 +60,8 @@
                                         </fileSet>
 
                                         <fileSet>
-                                            <directory>../keycloak-themes/target/classes/theme/custom</directory>
-                                            <outputDirectory>keycloak-theme</outputDirectory>
+                                            <directory>../keycloak-themes/target/classes/theme</directory>
+                                            <outputDirectory>keycloak-themes</outputDirectory>
                                         </fileSet>
 
                                         <fileSet>
