@@ -1,0 +1,17 @@
+{
+  "tester": {
+    "username": "tester",
+    "password": "test",
+    "email": "tester@local"
+  },
+  "testerInvalidPass": {
+    "username": "tester",
+    "password": "invalid",
+    "email": "tester@local"
+  },
+  "unknown": {
+    "username": "unknown",
+    "password": "unknown",
+    "email": "unknown@local"
+  }
+}
