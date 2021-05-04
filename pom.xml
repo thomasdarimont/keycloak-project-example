@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.thomasdarimont.keycloak</groupId>
-    <artifactId>keycloak-project</artifactId>
+    <artifactId>keycloak-project-template</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
 
