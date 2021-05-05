@@ -105,11 +105,9 @@ Instead of running the deployment trigger script yourself, you can register it a
 - Name: `kc-deploy-extensions`
 - Description: `Deploy Extensions to Keycloak Docker Container`
 - Program: `bash`
-- Arguments: `$ProjectFileDir$/bin/triggerDockerExtensionDeploy.sh`
+- Arguments: `$ProjectFileDir$/bin/deployExtensions.sh`
 - Working directory: `$ProjectFileDir$`
 - Only select: `Synchronize files after execution.`
-
-![IntelliJ External Tool](docs/ide/intellij-external-tool.png)
 
 The extensions can now be redeployed by running `Tools -> External Tools -> kc-deploy-extensions`
 
@@ -120,7 +118,7 @@ Instead of running the Keycloak Config CLI script yourself, you can register it 
 - Name: `kc-deploy-config`
 - Description: `Deploy Realm Config to Keycloak Docker Container`
 - Program: `bash`
-- Arguments: `$ProjectFileDir$/bin/triggerKeycloakConfigCli.sh`
+- Arguments: `$ProjectFileDir$/bin/runKeycloakConfigCli.sh`
 - Working directory: `$ProjectFileDir$`
 - Only select: `Synchronize files after execution.`
 
