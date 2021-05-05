@@ -39,8 +39,6 @@ services:
       IMPORT_VARSUBSTITUTION: "true"
     volumes:
       - ./config:/config:z
-    links:
-      - "custom-keycloak:keycloak"
 
   mailhog:
     # Web Interface: http://localhost:1080/#
