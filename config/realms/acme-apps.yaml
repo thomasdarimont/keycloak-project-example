@@ -2,13 +2,16 @@ realm: acme-apps
 enabled: true
 displayName: Acme Apps
 displayNameHtml: Acme Apps
-loginWithEmailAllowed: false
+loginWithEmailAllowed: true
+registrationAllowed: true
+registrationEmailAsUsername: true
 loginTheme: apps
 accountTheme: keycloak
 adminTheme: keycloak
 emailTheme: keycloak
 sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
 browserFlow: "browser"
+registrationFlow: "Custom Registration"
 
 clientScopes:
   - name: acme.profile
@@ -124,3 +127,39 @@ identityProviderMappers:
       user.attribute: firstName
       attributes: "[]"
       attribute.friendly.name: givenName
+
+authenticationFlows:
+  ## Custom User Registration Flow
+  - alias: "Custom Registration"
+    description: "Custom User Registration"
+    providerId: "basic-flow"
+    topLevel: true
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: "registration-page-form"
+        requirement: REQUIRED
+        flowAlias: "Custom Registration Forms"
+        autheticatorFlow: true
+        priority: 1010
+
+  - alias: "Custom Registration Forms"
+    description: "registration form"
+    providerId: "form-flow"
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: "custom-registration-user-creation"
+        requirement: "REQUIRED"
+        priority: 2020
+        userSetupAllowed: false
+        autheticatorFlow: false
+      - authenticator: "registration-profile-action"
+        requirement: "REQUIRED"
+        priority: 2040
+        userSetupAllowed: false
+        autheticatorFlow: false
+      - authenticator: "registration-password-action"
+        requirement: "REQUIRED"
+        priority: 2050
+        userSetupAllowed: false
+        autheticatorFlow: false

@@ -76,6 +76,7 @@ clients:
       - "phone"
 
 authenticationFlows:
+## Identity First Browser Login Flow
   - alias: "Browser Identity First"
     description: "This flow implements the Identity First pattern"
     providerId: basic-flow
