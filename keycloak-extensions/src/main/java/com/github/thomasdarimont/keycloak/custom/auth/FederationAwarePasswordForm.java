@@ -5,7 +5,10 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-public class LdapAwarePasswordForm extends PasswordForm {
+/**
+ * Augments {@link PasswordForm} with additional handling of federated users.
+ */
+public class FederationAwarePasswordForm extends PasswordForm {
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {

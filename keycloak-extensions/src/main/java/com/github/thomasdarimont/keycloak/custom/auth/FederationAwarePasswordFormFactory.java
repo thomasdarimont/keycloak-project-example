@@ -10,9 +10,9 @@ import org.keycloak.models.KeycloakSessionFactory;
 
 @JBossLog
 @AutoService(AuthenticatorFactory.class)
-public class LdapAwarePasswordFormFactory extends PasswordFormFactory {
+public class FederationAwarePasswordFormFactory extends PasswordFormFactory {
 
-    private static final LdapAwarePasswordForm INSTANCE = new LdapAwarePasswordForm();
+    private static final FederationAwarePasswordForm INSTANCE = new FederationAwarePasswordForm();
 
     @Override
     public Authenticator create(KeycloakSession session) {
