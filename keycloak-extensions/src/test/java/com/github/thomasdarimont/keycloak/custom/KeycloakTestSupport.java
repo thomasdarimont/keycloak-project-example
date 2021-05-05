@@ -126,7 +126,7 @@ public class KeycloakTestSupport {
 
         GenericContainer<?> keycloakConfigCli = new GenericContainer<>("adorsys/keycloak-config-cli:v3.3.0-12.0.4");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
-        keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "120s");
+        keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
         keycloakConfigCli.addEnv("IMPORT_PATH", "/config");
         keycloakConfigCli.addEnv("IMPORT_FORCE", "false");
         keycloakConfigCli.addEnv("IMPORT_VARSUBSTITUTION", "true");
@@ -134,7 +134,7 @@ public class KeycloakTestSupport {
         keycloakConfigCli.addEnv("KEYCLOAK_PASSWORD", keycloakContainer.getAdminPassword());
         keycloakConfigCli.addEnv("KEYCLOAK_URL", keycloakContainer.getAuthServerUrl());
 
-        keycloakConfigCli.addFileSystemBind("../config", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
+        keycloakConfigCli.addFileSystemBind("../config/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
         keycloakConfigCli.setWaitStrategy(Wait.forLogMessage(".*keycloak-config-cli running in.*", 1));
         keycloakConfigCli.setNetworkMode("host");
         return keycloakConfigCli;

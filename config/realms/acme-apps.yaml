@@ -1,0 +1,126 @@
+realm: acme-apps
+enabled: true
+displayName: Acme Apps
+displayNameHtml: Acme Apps
+loginWithEmailAllowed: false
+loginTheme: apps
+accountTheme: keycloak
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+browserFlow: "browser"
+
+clientScopes:
+  - name: acme.profile
+    description: Acme Profile Access
+    protocol: openid-connect
+  - name: acme.api
+    description: Acme API Access
+    protocol: openid-connect
+
+clients:
+  - clientId: app-minispa
+    protocol: openid-connect
+    name: App Mini SPA
+    description: "App Mini SPA Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: false
+    rootUrl: "http://localhost:4000"
+    baseUrl: "/?realm=acme-apps"
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "acme.profile"
+      - "phone"
+
+identityProviders:
+  - alias: "idp-acme-internal"
+    displayName: "Acme Employee Login"
+    providerId: "oidc"
+    enabled: true
+    updateProfileFirstLoginMode: on
+    trustEmail: false
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: "first broker login"
+#    postBrokerLoginFlowAlias: "Custom Post Broker Login"
+    config:
+      issuer: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal"
+      tokenUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/token"
+      jwksUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/certs"
+      userInfoUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/userinfo"
+      authorizationUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/auth"
+      logoutUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/logout"
+      clientId: "acme_internal_idp_broker"
+      clientSecret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET}"
+      clientAuthMethod: "client_secret_post"
+      defaultScope: "openid"
+      loginHint: "true"
+      backchannelSupported: "true"
+      validateSignature: "true"
+      useJwksUrl: "true"
+      syncMode: "FORCE"
+
+  - alias: idp-acme-saml
+    displayName: Acme SAML Login
+    providerId: saml
+    enabled: true
+    updateProfileFirstLoginMode: 'on'
+    trustEmail: false
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: first broker login
+    config:
+# FIXME the acme-saml realm certificate changes on every deployment, disabling the certificate validation for now
+#      validateSignature: 'true'
+      validateSignature: 'false'
+      signingCertificate: "MIICoTCCAYkCBgF5PnCbNTANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlhY21lLXNhbWwwHhcNMjEwNTA1MjEyODU3WhcNMzEwNTA1MjEzMDM3WjAUMRIwEAYDVQQDDAlhY21lLXNhbWwwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwYJ+z47Xsll8pptApv8qhbVeCG6pA3/hX45fVPnNlnpXv9AeQNDBTptluoRw3OOsBdZ+jp7j7xfkJIsaGwMbcIM0gMVRFVnWImDXZT+3IeQZbZHQ/Jx0NrfmU7Cj7TR/PvK9o+hNVlyxMH5YgitHbbZwhx0Y0bJ3TuTkiAYORfPmaZ7j7sdl8RIOnnMUmSrx5JOj5Sc08OY2HHsLy0W33w0ix6Elw8sxzMIEL6Zepkw4Z5XsID0dvsbv7mlAcpsXe6aKu7amYDwbjt6pr6sbYi/PbxBlcNaP3YH0si6bTFnpBuRK52mxpv6xzDhycbQLC0H3MYyBRhXsliCNCCRxDAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAF5Nquu6FYl6AiKfVMZlbJfzr+S80uiYXf7pZM4Z6n0U7oMHzd2WH8orlWF1698Bksi83Wtlsl89fXtP5/vUOtaZn4GNEP0BQqXdATgGU9KirJG4ISSdq2xbLYcXSVXEmR5fEFsZQhUkuq5it6pu2oFMiJcEJ2IMzX9KPcnQrK+tuujAr/t8Te7IcAyqMuQGvy/OCd4ErdA+u31vetkeG+kTeFj9fYmJprZTVkSEiVNrJI86ON1xeB8ltcKLH3/UxJBPCX6noppBICEZHcPSUBw5BOATC8BCRd02zebPfJZTrB8G3siL7FwzWEl1NNoxse/VjRJIjhKP3EM005ad4FM="
+      postBindingLogout: 'true'
+      nameIDPolicyFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
+      postBindingResponse: 'true'
+      principalAttribute: "username"
+      singleLogoutServiceUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-saml/protocol/saml"
+      entityId: acme_saml_idp_broker
+      backchannelSupported: 'true'
+      signatureAlgorithm: RSA_SHA256
+      xmlSigKeyInfoKeyNameTransformer: KEY_ID
+      loginHint: 'true'
+      authnContextComparisonType: exact
+      postBindingAuthnRequest: 'true'
+      syncMode: FORCE
+      singleSignOnServiceUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-saml/protocol/saml"
+      wantAuthnRequestsSigned: 'true'
+      addExtensionsElementWithKeyInfo: 'false'
+      principalType: SUBJECT
+
+identityProviderMappers:
+  - name: lastname-importer
+    identityProviderAlias: idp-acme-saml
+    identityProviderMapper: saml-user-attribute-idp-mapper
+    config:
+      syncMode: FORCE
+      user.attribute: lastName
+      attributes: "[]"
+      attribute.friendly.name: surname
+  - name: firstname-importer
+    identityProviderAlias: idp-acme-saml
+    identityProviderMapper: saml-user-attribute-idp-mapper
+    config:
+      syncMode: FORCE
+      user.attribute: firstName
+      attributes: "[]"
+      attribute.friendly.name: givenName

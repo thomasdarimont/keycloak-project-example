@@ -3,6 +3,6 @@
   "viewportHeight": 1080,
   "env": {
     "keycloak_host": "http://localhost:8080",
-    "test_realm": "custom"
+    "test_realm": "acme-internal"
   }
 }

@@ -10,7 +10,6 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>keycloak-themes</module>
         <module>keycloak-extensions</module>
         <module>keycloak-docker</module>
     </modules>

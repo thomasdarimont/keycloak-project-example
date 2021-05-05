@@ -1,0 +1,3057 @@
+version: 1
+
+dn: ou=Accounting,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Accounting
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Product Development
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Product Testing
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Human Resources
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Payroll
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Janitorial
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Management
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Administrative
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Peons
+objectClass: top
+objectClass: organizationalUnit
+
+dn: ou=Planning,dc=corp,dc=acme,dc=local
+changetype: add
+ou: Planning
+objectClass: top
+objectClass: organizationalUnit
+
+dn: cn=Redgie Fleugel,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Redgie Fleugel
+sn: Fleugel
+description: This is Redgie Fleugel's description
+facsimileTelephoneNumber: +1 510 315-3162
+l: Sunnyvale
+ou: Janitorial
+postalAddress: Janitorial$Sunnyvale
+telephoneNumber: +1 510 408-1538
+title: Chief Janitorial Admin
+userPassword: Password1
+uid: FleugelR
+givenName: Redgie
+mail: FleugelR@ns-mail8.com
+carLicense: BDGU31
+departmentNumber: 9222
+employeeType: Employee
+homePhone: +1 510 464-1671
+initials: R. F.
+mobile: +1 510 180-1685
+pager: +1 510 699-9122
+roomNumber: 8640
+
+dn: cn=Anica Kakuta,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Anica Kakuta
+sn: Kakuta
+description: This is Anica Kakuta's description
+facsimileTelephoneNumber: +1 818 449-2614
+l: Armonk
+ou: Janitorial
+postalAddress: Janitorial$Armonk
+telephoneNumber: +1 818 748-7509
+title: Master Janitorial Mascot
+userPassword: Password1
+uid: KakutaA
+givenName: Anica
+mail: KakutaA@ns-mail4.com
+carLicense: VU6HIV
+departmentNumber: 3490
+employeeType: Employee
+homePhone: +1 818 483-2264
+initials: A. K.
+mobile: +1 818 787-1089
+pager: +1 818 972-7280
+roomNumber: 8483
+manager: cn=Redgie Fleugel,ou=Janitorial,dc=corp,dc=acme,dc=local
+
+dn: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Evvy Gattrell
+sn: Gattrell
+description: This is Evvy Gattrell's description
+facsimileTelephoneNumber: +1 818 219-8955
+l: Palo Alto
+ou: Management
+postalAddress: Management$Palo Alto
+telephoneNumber: +1 818 156-4431
+title: Associate Management Director
+userPassword: Password1
+uid: GattrelE
+givenName: Evvy
+mail: GattrelE@ns-mail6.com
+carLicense: 39WWKF
+departmentNumber: 6424
+employeeType: Employee
+homePhone: +1 818 284-8958
+initials: E. G.
+mobile: +1 818 531-5583
+pager: +1 818 813-3201
+roomNumber: 9817
+secretary: cn=Anica Kakuta,ou=Janitorial,dc=corp,dc=acme,dc=local
+manager: cn=Redgie Fleugel,ou=Janitorial,dc=corp,dc=acme,dc=local
+
+dn: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Tilly Pilote
+sn: Pilote
+description: This is Tilly Pilote's description
+facsimileTelephoneNumber: +1 804 640-1719
+l: San Mateo
+ou: Peons
+postalAddress: Peons$San Mateo
+telephoneNumber: +1 804 399-6208
+title: Associate Peons Admin
+userPassword: Password1
+uid: PiloteT
+givenName: Tilly
+mail: PiloteT@ns-mail9.com
+carLicense: PPRWB5
+departmentNumber: 7000
+employeeType: Contract
+homePhone: +1 804 515-6885
+initials: T. P.
+mobile: +1 804 112-4703
+pager: +1 804 758-8153
+roomNumber: 9573
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+manager: cn=Redgie Fleugel,ou=Janitorial,dc=corp,dc=acme,dc=local
+
+dn: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Nashir Shiffer
+sn: Shiffer
+description: This is Nashir Shiffer's description
+facsimileTelephoneNumber: +1 804 395-7794
+l: Armonk
+ou: Management
+postalAddress: Management$Armonk
+telephoneNumber: +1 804 654-9736
+title: Associate Management Warrior
+userPassword: Password1
+uid: ShifferN
+givenName: Nashir
+mail: ShifferN@ns-mail7.com
+carLicense: D1MVLI
+departmentNumber: 1436
+employeeType: Contract
+homePhone: +1 804 994-7078
+initials: N. S.
+mobile: +1 804 897-9748
+pager: +1 804 111-1942
+roomNumber: 8672
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+
+dn: cn=Joy Hilton,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Joy Hilton
+sn: Hilton
+description: This is Joy Hilton's description
+facsimileTelephoneNumber: +1 415 295-3430
+l: San Mateo
+ou: Peons
+postalAddress: Peons$San Mateo
+telephoneNumber: +1 415 791-7686
+title: Associate Peons President
+userPassword: Password1
+uid: HiltonJ
+givenName: Joy
+mail: HiltonJ@ns-mail5.com
+carLicense: YV34JP
+departmentNumber: 7074
+employeeType: Employee
+homePhone: +1 415 858-4150
+initials: J. H.
+mobile: +1 415 695-7685
+pager: +1 415 309-8363
+roomNumber: 9755
+secretary: cn=Anica Kakuta,ou=Janitorial,dc=corp,dc=acme,dc=local
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Christel Basmadjian,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Christel Basmadjian
+sn: Basmadjian
+description: This is Christel Basmadjian's description
+facsimileTelephoneNumber: +1 415 556-4046
+l: Palo Alto
+ou: Product Testing
+postalAddress: Product Testing$Palo Alto
+telephoneNumber: +1 415 279-4634
+title: Master Product Testing Visionary
+userPassword: Password1
+uid: BasmadjC
+givenName: Christel
+mail: BasmadjC@ns-mail8.com
+carLicense: EYSLAE
+departmentNumber: 5127
+employeeType: Normal
+homePhone: +1 415 198-1452
+initials: C. B.
+mobile: +1 415 424-9664
+pager: +1 415 186-2950
+roomNumber: 9934
+secretary: cn=Anica Kakuta,ou=Janitorial,dc=corp,dc=acme,dc=local
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Roselin Charney,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Roselin Charney
+sn: Charney
+description: This is Roselin Charney's description
+facsimileTelephoneNumber: +1 415 174-5083
+l: Cupertino
+ou: Payroll
+postalAddress: Payroll$Cupertino
+telephoneNumber: +1 415 306-9466
+title: Supreme Payroll Warrior
+userPassword: Password1
+uid: CharneyR
+givenName: Roselin
+mail: CharneyR@ns-mail8.com
+carLicense: BTH7XQ
+departmentNumber: 8954
+employeeType: Contract
+homePhone: +1 415 990-7114
+initials: R. C.
+mobile: +1 415 276-4723
+pager: +1 415 592-8003
+roomNumber: 8791
+manager: cn=Redgie Fleugel,ou=Janitorial,dc=corp,dc=acme,dc=local
+
+dn: cn=Lorita Bittenbender,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Lorita Bittenbender
+sn: Bittenbender
+description: This is Lorita Bittenbender's description
+facsimileTelephoneNumber: +1 510 750-5365
+l: San Mateo
+ou: Payroll
+postalAddress: Payroll$San Mateo
+telephoneNumber: +1 510 101-8577
+title: Junior Payroll Director
+userPassword: Password1
+uid: BittenbL
+givenName: Lorita
+mail: BittenbL@ns-mail9.com
+carLicense: MR2Q3H
+departmentNumber: 8654
+employeeType: Normal
+homePhone: +1 510 791-2621
+initials: L. B.
+mobile: +1 510 802-3579
+pager: +1 510 485-1258
+roomNumber: 9594
+secretary: cn=Anica Kakuta,ou=Janitorial,dc=corp,dc=acme,dc=local
+manager: cn=Roselin Charney,ou=Payroll,dc=corp,dc=acme,dc=local
+
+dn: cn=Kimihiko Fujiwara,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Kimihiko Fujiwara
+sn: Fujiwara
+description: This is Kimihiko Fujiwara's description
+facsimileTelephoneNumber: +1 804 721-1544
+l: Fremont
+ou: Administrative
+postalAddress: Administrative$Fremont
+telephoneNumber: +1 804 802-2024
+title: Associate Administrative Stooge
+userPassword: Password1
+uid: FujiwarK
+givenName: Kimihiko
+mail: FujiwarK@ns-mail5.com
+carLicense: 9X8M99
+departmentNumber: 8753
+employeeType: Employee
+homePhone: +1 804 593-7870
+initials: K. F.
+mobile: +1 804 556-6289
+pager: +1 804 172-2546
+roomNumber: 9634
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Pas Linder,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Pas Linder
+sn: Linder
+description: This is Pas Linder's description
+facsimileTelephoneNumber: +1 804 634-3333
+l: San Francisco
+ou: Janitorial
+postalAddress: Janitorial$San Francisco
+telephoneNumber: +1 804 213-3375
+title: Master Janitorial Consultant
+userPassword: Password1
+uid: LinderP
+givenName: Pas
+mail: LinderP@ns-mail9.com
+carLicense: HVHA6S
+departmentNumber: 2743
+employeeType: Contract
+homePhone: +1 804 384-9662
+initials: P. L.
+mobile: +1 804 102-5670
+pager: +1 804 197-1463
+roomNumber: 8958
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Helge Blumenfeld,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Helge Blumenfeld
+sn: Blumenfeld
+description: This is Helge Blumenfeld's description
+facsimileTelephoneNumber: +1 804 169-5952
+l: San Francisco
+ou: Product Testing
+postalAddress: Product Testing$San Francisco
+telephoneNumber: +1 804 351-9054
+title: Associate Product Testing Stooge
+userPassword: Password1
+uid: BlumenfH
+givenName: Helge
+mail: BlumenfH@ns-mail9.com
+carLicense: IOP72I
+departmentNumber: 5084
+employeeType: Employee
+homePhone: +1 804 160-2700
+initials: H. B.
+mobile: +1 804 532-3761
+pager: +1 804 246-6956
+roomNumber: 8401
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Joete Lough,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Joete Lough
+sn: Lough
+description: This is Joete Lough's description
+facsimileTelephoneNumber: +1 510 916-2579
+l: Milpitas
+ou: Payroll
+postalAddress: Payroll$Milpitas
+telephoneNumber: +1 510 225-4178
+title: Chief Payroll Director
+userPassword: Password1
+uid: LoughJ
+givenName: Joete
+mail: LoughJ@ns-mail4.com
+carLicense: 7X8DSV
+departmentNumber: 5497
+employeeType: Employee
+homePhone: +1 510 227-4121
+initials: J. L.
+mobile: +1 510 269-9216
+pager: +1 510 155-8420
+roomNumber: 8072
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Pak-Jong Marouchos,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Pak-Jong Marouchos
+sn: Marouchos
+description: This is Pak-Jong Marouchos's description
+facsimileTelephoneNumber: +1 408 634-3839
+l: Armonk
+ou: Administrative
+postalAddress: Administrative$Armonk
+telephoneNumber: +1 408 515-7189
+title: Master Administrative Artist
+userPassword: Password1
+uid: MarouchP
+givenName: Pak-Jong
+mail: MarouchP@ns-mail5.com
+carLicense: WTDP4S
+departmentNumber: 8014
+employeeType: Employee
+homePhone: +1 408 781-3799
+initials: P. M.
+mobile: +1 408 616-6286
+pager: +1 408 124-2046
+roomNumber: 9840
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Dat Mejia,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Dat Mejia
+sn: Mejia
+description: This is Dat Mejia's description
+facsimileTelephoneNumber: +1 804 240-2269
+l: Santa Clara
+ou: Human Resources
+postalAddress: Human Resources$Santa Clara
+telephoneNumber: +1 804 418-3946
+title: Supreme Human Resources Architect
+userPassword: Password1
+uid: MejiaD
+givenName: Dat
+mail: MejiaD@ns-mail2.com
+carLicense: UDR1CH
+departmentNumber: 8839
+employeeType: Contract
+homePhone: +1 804 501-1284
+initials: D. M.
+mobile: +1 804 940-7166
+pager: +1 804 777-9199
+roomNumber: 9353
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Goldy Jankowski,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Goldy Jankowski
+sn: Jankowski
+description: This is Goldy Jankowski's description
+facsimileTelephoneNumber: +1 415 686-7962
+l: Palo Alto
+ou: Janitorial
+postalAddress: Janitorial$Palo Alto
+telephoneNumber: +1 415 543-8028
+title: Chief Janitorial Warrior
+userPassword: Password1
+uid: JankowsG
+givenName: Goldy
+mail: JankowsG@ns-mail3.com
+carLicense: CLM0YH
+departmentNumber: 4684
+employeeType: Employee
+homePhone: +1 415 764-6176
+initials: G. J.
+mobile: +1 415 621-7063
+pager: +1 415 411-2427
+roomNumber: 9062
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Hiroki Morelli,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Hiroki Morelli
+sn: Morelli
+description: This is Hiroki Morelli's description
+facsimileTelephoneNumber: +1 213 217-2091
+l: Cambridge
+ou: Human Resources
+postalAddress: Human Resources$Cambridge
+telephoneNumber: +1 213 182-4690
+title: Master Human Resources Engineer
+userPassword: Password1
+uid: MorelliH
+givenName: Hiroki
+mail: MorelliH@ns-mail7.com
+carLicense: KCVRCT
+departmentNumber: 4254
+employeeType: Normal
+homePhone: +1 213 211-7773
+initials: H. M.
+mobile: +1 213 408-9383
+pager: +1 213 467-7822
+roomNumber: 8730
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Hadria Adam,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Hadria Adam
+sn: Adam
+description: This is Hadria Adam's description
+facsimileTelephoneNumber: +1 804 832-1956
+l: Cupertino
+ou: Management
+postalAddress: Management$Cupertino
+telephoneNumber: +1 804 954-5484
+title: Chief Management Mascot
+userPassword: Password1
+uid: AdamH
+givenName: Hadria
+mail: AdamH@ns-mail9.com
+carLicense: UE3K6W
+departmentNumber: 8391
+employeeType: Employee
+homePhone: +1 804 362-3145
+initials: H. A.
+mobile: +1 804 851-4844
+pager: +1 804 633-9866
+roomNumber: 9008
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Loella Tibi,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Loella Tibi
+sn: Tibi
+description: This is Loella Tibi's description
+facsimileTelephoneNumber: +1 804 993-8020
+l: Orem
+ou: Janitorial
+postalAddress: Janitorial$Orem
+telephoneNumber: +1 804 370-7549
+title: Associate Janitorial Sales Rep
+userPassword: Password1
+uid: TibiL
+givenName: Loella
+mail: TibiL@ns-mail5.com
+carLicense: A4B7L4
+departmentNumber: 8654
+employeeType: Employee
+homePhone: +1 804 820-5702
+initials: L. T.
+mobile: +1 804 780-6560
+pager: +1 804 885-3920
+roomNumber: 8674
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Sharri McElligott,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Sharri McElligott
+sn: McElligott
+description: This is Sharri McElligott's description
+facsimileTelephoneNumber: +1 206 824-3652
+l: Palo Alto
+ou: Management
+postalAddress: Management$Palo Alto
+telephoneNumber: +1 206 552-6740
+title: Associate Management Figurehead
+userPassword: Password1
+uid: McElligS
+givenName: Sharri
+mail: McElligS@ns-mail8.com
+carLicense: VVG7V6
+departmentNumber: 6125
+employeeType: Normal
+homePhone: +1 206 922-3353
+initials: S. M.
+mobile: +1 206 298-4265
+pager: +1 206 629-7792
+roomNumber: 8106
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Yovonnda Van Veen,ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Yovonnda Van Veen
+sn: Van Veen
+description: This is Yovonnda Van Veen's description
+facsimileTelephoneNumber: +1 408 774-9961
+l: Cambridge
+ou: Product Development
+postalAddress: Product Development$Cambridge
+telephoneNumber: +1 408 170-9652
+title: Supreme Product Development Admin
+userPassword: Password1
+uid: Van VeeY
+givenName: Yovonnda
+mail: Van VeeY@ns-mail2.com
+carLicense: IDQN19
+departmentNumber: 3630
+employeeType: Normal
+homePhone: +1 408 700-8967
+initials: Y. V.
+mobile: +1 408 846-3931
+pager: +1 408 645-3212
+roomNumber: 9081
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Aura Quinn,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Aura Quinn
+sn: Quinn
+description: This is Aura Quinn's description
+facsimileTelephoneNumber: +1 206 116-6507
+l: Redmond
+ou: Janitorial
+postalAddress: Janitorial$Redmond
+telephoneNumber: +1 206 821-1850
+title: Junior Janitorial Manager
+userPassword: Password1
+uid: QuinnA
+givenName: Aura
+mail: QuinnA@ns-mail4.com
+carLicense: MVTGED
+departmentNumber: 2308
+employeeType: Normal
+homePhone: +1 206 154-5641
+initials: A. Q.
+mobile: +1 206 747-4585
+pager: +1 206 933-5036
+roomNumber: 9706
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Faina Michalos,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Faina Michalos
+sn: Michalos
+description: This is Faina Michalos's description
+facsimileTelephoneNumber: +1 206 824-7047
+l: Redmond
+ou: Management
+postalAddress: Management$Redmond
+telephoneNumber: +1 206 617-6467
+title: Supreme Management Stooge
+userPassword: Password1
+uid: MichaloF
+givenName: Faina
+mail: MichaloF@ns-mail8.com
+carLicense: N9NUVE
+departmentNumber: 5205
+employeeType: Contract
+homePhone: +1 206 747-8261
+initials: F. M.
+mobile: +1 206 370-6675
+pager: +1 206 337-9183
+roomNumber: 9679
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Weitzel Piasecki,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Weitzel Piasecki
+sn: Piasecki
+description: This is Weitzel Piasecki's description
+facsimileTelephoneNumber: +1 415 369-9640
+l: Redwood Shores
+ou: Product Testing
+postalAddress: Product Testing$Redwood Shores
+telephoneNumber: +1 415 227-6210
+title: Supreme Product Testing Czar
+userPassword: Password1
+uid: PiaseckW
+givenName: Weitzel
+mail: PiaseckW@ns-mail7.com
+carLicense: EK7JWG
+departmentNumber: 5750
+employeeType: Contract
+homePhone: +1 415 631-4536
+initials: W. P.
+mobile: +1 415 969-6594
+pager: +1 415 324-9946
+roomNumber: 9567
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Roseanna Goh,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Roseanna Goh
+sn: Goh
+description: This is Roseanna Goh's description
+facsimileTelephoneNumber: +1 415 451-4260
+l: Redmond
+ou: Human Resources
+postalAddress: Human Resources$Redmond
+telephoneNumber: +1 415 353-8360
+title: Master Human Resources Punk
+userPassword: Password1
+uid: GohR
+givenName: Roseanna
+mail: GohR@ns-mail3.com
+carLicense: VQYVKH
+departmentNumber: 8527
+employeeType: Normal
+homePhone: +1 415 970-6225
+initials: R. G.
+mobile: +1 415 649-3386
+pager: +1 415 997-5556
+roomNumber: 9852
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Jenifer Wortman,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jenifer Wortman
+sn: Wortman
+description: This is Jenifer Wortman's description
+facsimileTelephoneNumber: +1 510 219-4967
+l: San Jose
+ou: Payroll
+postalAddress: Payroll$San Jose
+telephoneNumber: +1 510 616-5746
+title: Junior Payroll Engineer
+userPassword: Password1
+uid: WortmanJ
+givenName: Jenifer
+mail: WortmanJ@ns-mail3.com
+carLicense: TUQTBU
+departmentNumber: 6294
+employeeType: Normal
+homePhone: +1 510 584-1622
+initials: J. W.
+mobile: +1 510 235-2091
+pager: +1 510 202-3776
+roomNumber: 9299
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Tania Everitt,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Tania Everitt
+sn: Everitt
+description: This is Tania Everitt's description
+facsimileTelephoneNumber: +1 818 126-1680
+l: Cambridge
+ou: Management
+postalAddress: Management$Cambridge
+telephoneNumber: +1 818 969-1227
+title: Master Management Vice President
+userPassword: Password1
+uid: EverittT
+givenName: Tania
+mail: EverittT@ns-mail5.com
+carLicense: MEA23G
+departmentNumber: 8855
+employeeType: Employee
+homePhone: +1 818 835-6339
+initials: T. E.
+mobile: +1 818 568-6942
+pager: +1 818 132-5780
+roomNumber: 9993
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Arlina Erkel,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Arlina Erkel
+sn: Erkel
+description: This is Arlina Erkel's description
+facsimileTelephoneNumber: +1 818 969-5292
+l: Redwood Shores
+ou: Peons
+postalAddress: Peons$Redwood Shores
+telephoneNumber: +1 818 833-2593
+title: Junior Peons Warrior
+userPassword: Password1
+uid: ErkelA
+givenName: Arlina
+mail: ErkelA@ns-mail3.com
+carLicense: XTF35K
+departmentNumber: 9345
+employeeType: Contract
+homePhone: +1 818 103-1672
+initials: A. E.
+mobile: +1 818 263-4930
+pager: +1 818 558-8339
+roomNumber: 9679
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Yvet ENG,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Yvet ENG
+sn: ENG
+description: This is Yvet ENG's description
+facsimileTelephoneNumber: +1 415 669-5280
+l: Fremont
+ou: Product Testing
+postalAddress: Product Testing$Fremont
+telephoneNumber: +1 415 389-8020
+title: Master Product Testing Czar
+userPassword: Password1
+uid: ENGY
+givenName: Yvet
+mail: ENGY@ns-mail6.com
+carLicense: OLCDLR
+departmentNumber: 7534
+employeeType: Normal
+homePhone: +1 415 519-1854
+initials: Y. E.
+mobile: +1 415 773-2475
+pager: +1 415 164-6343
+roomNumber: 8398
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Sherrye Buttrey,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Sherrye Buttrey
+sn: Buttrey
+description: This is Sherrye Buttrey's description
+facsimileTelephoneNumber: +1 415 754-6746
+l: Sunnyvale
+ou: Janitorial
+postalAddress: Janitorial$Sunnyvale
+telephoneNumber: +1 415 190-2648
+title: Associate Janitorial Consultant
+userPassword: Password1
+uid: ButtreyS
+givenName: Sherrye
+mail: ButtreyS@ns-mail9.com
+carLicense: QCVKJ2
+departmentNumber: 7404
+employeeType: Employee
+homePhone: +1 415 651-1536
+initials: S. B.
+mobile: +1 415 304-1250
+pager: +1 415 447-8041
+roomNumber: 9797
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Alida Nahmias,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Alida Nahmias
+sn: Nahmias
+description: This is Alida Nahmias's description
+facsimileTelephoneNumber: +1 415 492-1662
+l: Redwood Shores
+ou: Janitorial
+postalAddress: Janitorial$Redwood Shores
+telephoneNumber: +1 415 377-7650
+title: Chief Janitorial Stooge
+userPassword: Password1
+uid: NahmiasA
+givenName: Alida
+mail: NahmiasA@ns-mail3.com
+carLicense: GW837I
+departmentNumber: 4549
+employeeType: Contract
+homePhone: +1 415 598-7345
+initials: A. N.
+mobile: +1 415 244-3718
+pager: +1 415 929-7865
+roomNumber: 9919
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Jerrilyn Ruddle,ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Jerrilyn Ruddle
+sn: Ruddle
+description: This is Jerrilyn Ruddle's description
+facsimileTelephoneNumber: +1 804 830-8298
+l: Redwood Shores
+ou: Product Development
+postalAddress: Product Development$Redwood Shores
+telephoneNumber: +1 804 180-7934
+title: Chief Product Development Madonna
+userPassword: Password1
+uid: RuddleJ
+givenName: Jerrilyn
+mail: RuddleJ@ns-mail4.com
+carLicense: PHDM53
+departmentNumber: 4570
+employeeType: Contract
+homePhone: +1 804 474-7271
+initials: J. R.
+mobile: +1 804 374-3735
+pager: +1 804 386-8771
+roomNumber: 8389
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Alev Boucouris,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Alev Boucouris
+sn: Boucouris
+description: This is Alev Boucouris's description
+facsimileTelephoneNumber: +1 408 146-7711
+l: Cupertino
+ou: Management
+postalAddress: Management$Cupertino
+telephoneNumber: +1 408 759-2449
+title: Junior Management Artist
+userPassword: Password1
+uid: BoucourA
+givenName: Alev
+mail: BoucourA@ns-mail7.com
+carLicense: V8GELA
+departmentNumber: 2840
+employeeType: Employee
+homePhone: +1 408 808-1395
+initials: A. B.
+mobile: +1 408 308-6826
+pager: +1 408 653-4290
+roomNumber: 8194
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Hazem Hagan,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Hazem Hagan
+sn: Hagan
+description: This is Hazem Hagan's description
+facsimileTelephoneNumber: +1 818 360-8313
+l: Cambridge
+ou: Management
+postalAddress: Management$Cambridge
+telephoneNumber: +1 818 255-1352
+title: Associate Management Evangelist
+userPassword: Password1
+uid: HaganH
+givenName: Hazem
+mail: HaganH@ns-mail8.com
+carLicense: BBN1Y6
+departmentNumber: 8167
+employeeType: Contract
+homePhone: +1 818 904-1676
+initials: H. H.
+mobile: +1 818 264-6149
+pager: +1 818 910-9009
+roomNumber: 9320
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Romano IEM,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Romano IEM
+sn: IEM
+description: This is Romano IEM's description
+facsimileTelephoneNumber: +1 818 888-4612
+l: Cambridge
+ou: Administrative
+postalAddress: Administrative$Cambridge
+telephoneNumber: +1 818 267-4274
+title: Chief Administrative Technician
+userPassword: Password1
+uid: IEMR
+givenName: Romano
+mail: IEMR@ns-mail3.com
+carLicense: QBXXAK
+departmentNumber: 1326
+employeeType: Employee
+homePhone: +1 818 158-2704
+initials: R. I.
+mobile: +1 818 477-8860
+pager: +1 818 104-3298
+roomNumber: 8784
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Floria Hoagland,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Floria Hoagland
+sn: Hoagland
+description: This is Floria Hoagland's description
+facsimileTelephoneNumber: +1 213 619-7948
+l: San Jose
+ou: Product Testing
+postalAddress: Product Testing$San Jose
+telephoneNumber: +1 213 641-6481
+title: Master Product Testing Madonna
+userPassword: Password1
+uid: HoaglanF
+givenName: Floria
+mail: HoaglanF@ns-mail2.com
+carLicense: 63S8FA
+departmentNumber: 2429
+employeeType: Normal
+homePhone: +1 213 754-1997
+initials: F. H.
+mobile: +1 213 445-7805
+pager: +1 213 586-2690
+roomNumber: 8063
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Ray Preston,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Ray Preston
+sn: Preston
+description: This is Ray Preston's description
+facsimileTelephoneNumber: +1 213 838-9375
+l: San Mateo
+ou: Product Testing
+postalAddress: Product Testing$San Mateo
+telephoneNumber: +1 213 125-3426
+title: Supreme Product Testing Consultant
+userPassword: Password1
+uid: PrestonR
+givenName: Ray
+mail: PrestonR@ns-mail3.com
+carLicense: RNFK4Y
+departmentNumber: 8204
+employeeType: Employee
+homePhone: +1 213 446-4465
+initials: R. P.
+mobile: +1 213 507-2929
+pager: +1 213 373-6534
+roomNumber: 8894
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Veronike Vodicka,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Veronike Vodicka
+sn: Vodicka
+description: This is Veronike Vodicka's description
+facsimileTelephoneNumber: +1 213 657-1189
+l: Orem
+ou: Janitorial
+postalAddress: Janitorial$Orem
+telephoneNumber: +1 213 311-1925
+title: Junior Janitorial Consultant
+userPassword: Password1
+uid: VodickaV
+givenName: Veronike
+mail: VodickaV@ns-mail8.com
+carLicense: OFTAVH
+departmentNumber: 3879
+employeeType: Contract
+homePhone: +1 213 516-5523
+initials: V. V.
+mobile: +1 213 280-7666
+pager: +1 213 976-8415
+roomNumber: 8848
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Genovera Smulders,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Genovera Smulders
+sn: Smulders
+description: This is Genovera Smulders's description
+facsimileTelephoneNumber: +1 415 897-4784
+l: Redmond
+ou: Payroll
+postalAddress: Payroll$Redmond
+telephoneNumber: +1 415 200-1690
+title: Supreme Payroll Dictator
+userPassword: Password1
+uid: SmulderG
+givenName: Genovera
+mail: SmulderG@ns-mail4.com
+carLicense: J1Q44M
+departmentNumber: 8659
+employeeType: Employee
+homePhone: +1 415 400-1612
+initials: G. S.
+mobile: +1 415 799-3144
+pager: +1 415 910-6380
+roomNumber: 9866
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Fritz Stachowiak,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Fritz Stachowiak
+sn: Stachowiak
+description: This is Fritz Stachowiak's description
+facsimileTelephoneNumber: +1 213 388-3488
+l: Cambridge
+ou: Janitorial
+postalAddress: Janitorial$Cambridge
+telephoneNumber: +1 213 342-6961
+title: Junior Janitorial Evangelist
+userPassword: Password1
+uid: StachowF
+givenName: Fritz
+mail: StachowF@ns-mail7.com
+carLicense: QCL57L
+departmentNumber: 8997
+employeeType: Normal
+homePhone: +1 213 409-7064
+initials: F. S.
+mobile: +1 213 291-7561
+pager: +1 213 395-9221
+roomNumber: 8839
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Gordon Hitchcock,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Gordon Hitchcock
+sn: Hitchcock
+description: This is Gordon Hitchcock's description
+facsimileTelephoneNumber: +1 510 820-9805
+l: Cupertino
+ou: Administrative
+postalAddress: Administrative$Cupertino
+telephoneNumber: +1 510 147-8695
+title: Master Administrative Director
+userPassword: Password1
+uid: HitchcoG
+givenName: Gordon
+mail: HitchcoG@ns-mail8.com
+carLicense: TXKDC4
+departmentNumber: 9897
+employeeType: Normal
+homePhone: +1 510 168-7227
+initials: G. H.
+mobile: +1 510 546-4843
+pager: +1 510 326-8101
+roomNumber: 9854
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Piero MacLean,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Piero MacLean
+sn: MacLean
+description: This is Piero MacLean's description
+facsimileTelephoneNumber: +1 818 689-3101
+l: Menlo Park
+ou: Janitorial
+postalAddress: Janitorial$Menlo Park
+telephoneNumber: +1 818 156-9471
+title: Associate Janitorial Warrior
+userPassword: Password1
+uid: MacLeanP
+givenName: Piero
+mail: MacLeanP@ns-mail8.com
+carLicense: 9SH30R
+departmentNumber: 7221
+employeeType: Normal
+homePhone: +1 818 927-2826
+initials: P. M.
+mobile: +1 818 702-4365
+pager: +1 818 559-6404
+roomNumber: 8204
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Kass Belcher,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Kass Belcher
+sn: Belcher
+description: This is Kass Belcher's description
+facsimileTelephoneNumber: +1 206 507-6876
+l: Redwood Shores
+ou: Peons
+postalAddress: Peons$Redwood Shores
+telephoneNumber: +1 206 563-4349
+title: Associate Peons President
+userPassword: Password1
+uid: BelcherK
+givenName: Kass
+mail: BelcherK@ns-mail3.com
+carLicense: XJG74B
+departmentNumber: 3411
+employeeType: Contract
+homePhone: +1 206 251-4208
+initials: K. B.
+mobile: +1 206 517-9175
+pager: +1 206 423-2595
+roomNumber: 8891
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Geoff Petrick,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Geoff Petrick
+sn: Petrick
+description: This is Geoff Petrick's description
+facsimileTelephoneNumber: +1 206 931-4080
+l: Menlo Park
+ou: Management
+postalAddress: Management$Menlo Park
+telephoneNumber: +1 206 408-8873
+title: Junior Management Warrior
+userPassword: Password1
+uid: PetrickG
+givenName: Geoff
+mail: PetrickG@ns-mail4.com
+carLicense: QRS2IV
+departmentNumber: 5946
+employeeType: Employee
+homePhone: +1 206 606-3394
+initials: G. P.
+mobile: +1 206 212-4321
+pager: +1 206 520-1109
+roomNumber: 8565
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Lynna Klebsch,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Lynna Klebsch
+sn: Klebsch
+description: This is Lynna Klebsch's description
+facsimileTelephoneNumber: +1 804 708-1163
+l: San Jose
+ou: Human Resources
+postalAddress: Human Resources$San Jose
+telephoneNumber: +1 804 848-5944
+title: Junior Human Resources Engineer
+userPassword: Password1
+uid: KlebschL
+givenName: Lynna
+mail: KlebschL@ns-mail2.com
+carLicense: JPRMHP
+departmentNumber: 5330
+employeeType: Employee
+homePhone: +1 804 885-1229
+initials: L. K.
+mobile: +1 804 190-7759
+pager: +1 804 825-4457
+roomNumber: 8905
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Sibley Frederick,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Sibley Frederick
+sn: Frederick
+description: This is Sibley Frederick's description
+facsimileTelephoneNumber: +1 818 844-7037
+l: San Mateo
+ou: Janitorial
+postalAddress: Janitorial$San Mateo
+telephoneNumber: +1 818 651-3340
+title: Associate Janitorial Warrior
+userPassword: Password1
+uid: FrederiS
+givenName: Sibley
+mail: FrederiS@ns-mail2.com
+carLicense: SC6Q2I
+departmentNumber: 4175
+employeeType: Employee
+homePhone: +1 818 645-2860
+initials: S. F.
+mobile: +1 818 684-3673
+pager: +1 818 846-2402
+roomNumber: 8013
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Coord Reddington,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Coord Reddington
+sn: Reddington
+description: This is Coord Reddington's description
+facsimileTelephoneNumber: +1 408 655-4629
+l: Sunnyvale
+ou: Product Testing
+postalAddress: Product Testing$Sunnyvale
+telephoneNumber: +1 408 820-2555
+title: Master Product Testing President
+userPassword: Password1
+uid: ReddingC
+givenName: Coord
+mail: ReddingC@ns-mail8.com
+carLicense: AVBLSP
+departmentNumber: 2194
+employeeType: Employee
+homePhone: +1 408 411-7466
+initials: C. R.
+mobile: +1 408 965-4472
+pager: +1 408 723-5928
+roomNumber: 9944
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Graham Pereira,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Graham Pereira
+sn: Pereira
+description: This is Graham Pereira's description
+facsimileTelephoneNumber: +1 408 526-6291
+l: Palo Alto
+ou: Payroll
+postalAddress: Payroll$Palo Alto
+telephoneNumber: +1 408 437-3512
+title: Supreme Payroll Mascot
+userPassword: Password1
+uid: PereiraG
+givenName: Graham
+mail: PereiraG@ns-mail7.com
+carLicense: 82L3RI
+departmentNumber: 7186
+employeeType: Normal
+homePhone: +1 408 193-1306
+initials: G. P.
+mobile: +1 408 452-6149
+pager: +1 408 196-8079
+roomNumber: 9882
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Angy Cuthbert,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Angy Cuthbert
+sn: Cuthbert
+description: This is Angy Cuthbert's description
+facsimileTelephoneNumber: +1 804 408-1630
+l: Orem
+ou: Product Testing
+postalAddress: Product Testing$Orem
+telephoneNumber: +1 804 351-5903
+title: Chief Product Testing Technician
+userPassword: Password1
+uid: CuthberA
+givenName: Angy
+mail: CuthberA@ns-mail5.com
+carLicense: IOA2HP
+departmentNumber: 5746
+employeeType: Employee
+homePhone: +1 804 165-7245
+initials: A. C.
+mobile: +1 804 744-5515
+pager: +1 804 705-5980
+roomNumber: 8201
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Feodora Hoehn,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Feodora Hoehn
+sn: Hoehn
+description: This is Feodora Hoehn's description
+facsimileTelephoneNumber: +1 206 780-2856
+l: Sunnyvale
+ou: Payroll
+postalAddress: Payroll$Sunnyvale
+telephoneNumber: +1 206 346-1250
+title: Chief Payroll Manager
+userPassword: Password1
+uid: HoehnF
+givenName: Feodora
+mail: HoehnF@ns-mail2.com
+carLicense: MSSAMG
+departmentNumber: 9626
+employeeType: Normal
+homePhone: +1 206 141-7389
+initials: F. H.
+mobile: +1 206 148-3534
+pager: +1 206 869-5278
+roomNumber: 9504
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Misti Sinanan,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Misti Sinanan
+sn: Sinanan
+description: This is Misti Sinanan's description
+facsimileTelephoneNumber: +1 206 327-3723
+l: San Jose
+ou: Product Testing
+postalAddress: Product Testing$San Jose
+telephoneNumber: +1 206 731-8974
+title: Junior Product Testing Artist
+userPassword: Password1
+uid: SinananM
+givenName: Misti
+mail: SinananM@ns-mail2.com
+carLicense: GVY0L2
+departmentNumber: 9439
+employeeType: Normal
+homePhone: +1 206 678-8995
+initials: M. S.
+mobile: +1 206 738-2238
+pager: +1 206 176-7878
+roomNumber: 9975
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Ilya Routhier,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Ilya Routhier
+sn: Routhier
+description: This is Ilya Routhier's description
+facsimileTelephoneNumber: +1 213 661-8820
+l: Santa Clara
+ou: Peons
+postalAddress: Peons$Santa Clara
+telephoneNumber: +1 213 823-7498
+title: Junior Peons Czar
+userPassword: Password1
+uid: RouthieI
+givenName: Ilya
+mail: RouthieI@ns-mail3.com
+carLicense: K9SNHF
+departmentNumber: 7574
+employeeType: Contract
+homePhone: +1 213 459-1487
+initials: I. R.
+mobile: +1 213 397-2381
+pager: +1 213 825-7583
+roomNumber: 9542
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Megen Thibeault,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Megen Thibeault
+sn: Thibeault
+description: This is Megen Thibeault's description
+facsimileTelephoneNumber: +1 408 409-2882
+l: San Francisco
+ou: Management
+postalAddress: Management$San Francisco
+telephoneNumber: +1 408 859-9279
+title: Associate Management Fellow
+userPassword: Password1
+uid: ThibeauM
+givenName: Megen
+mail: ThibeauM@ns-mail9.com
+carLicense: 9HH3AN
+departmentNumber: 8743
+employeeType: Employee
+homePhone: +1 408 836-9082
+initials: M. T.
+mobile: +1 408 309-6861
+pager: +1 408 557-6378
+roomNumber: 8929
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Wannell Regimbald,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Wannell Regimbald
+sn: Regimbald
+description: This is Wannell Regimbald's description
+facsimileTelephoneNumber: +1 818 521-3130
+l: Milpitas
+ou: Human Resources
+postalAddress: Human Resources$Milpitas
+telephoneNumber: +1 818 113-7120
+title: Associate Human Resources Technician
+userPassword: Password1
+uid: RegimbaW
+givenName: Wannell
+mail: RegimbaW@ns-mail9.com
+carLicense: 2THDCT
+departmentNumber: 6395
+employeeType: Employee
+homePhone: +1 818 776-4063
+initials: W. R.
+mobile: +1 818 231-9431
+pager: +1 818 171-8300
+roomNumber: 9927
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Odele Rosser,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Odele Rosser
+sn: Rosser
+description: This is Odele Rosser's description
+facsimileTelephoneNumber: +1 213 277-4724
+l: Cupertino
+ou: Product Testing
+postalAddress: Product Testing$Cupertino
+telephoneNumber: +1 213 467-1891
+title: Supreme Product Testing Mascot
+userPassword: Password1
+uid: RosserO
+givenName: Odele
+mail: RosserO@ns-mail4.com
+carLicense: SM50GM
+departmentNumber: 7376
+employeeType: Employee
+homePhone: +1 213 759-1876
+initials: O. R.
+mobile: +1 213 473-5144
+pager: +1 213 233-3151
+roomNumber: 8120
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Mariska Chauhan,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Mariska Chauhan
+sn: Chauhan
+description: This is Mariska Chauhan's description
+facsimileTelephoneNumber: +1 510 686-8071
+l: Armonk
+ou: Human Resources
+postalAddress: Human Resources$Armonk
+telephoneNumber: +1 510 385-5509
+title: Chief Human Resources Janitor
+userPassword: Password1
+uid: ChauhanM
+givenName: Mariska
+mail: ChauhanM@ns-mail7.com
+carLicense: LJT2HS
+departmentNumber: 3740
+employeeType: Employee
+homePhone: +1 510 470-1535
+initials: M. C.
+mobile: +1 510 959-6649
+pager: +1 510 690-3046
+roomNumber: 9630
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Witold Blesi,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Witold Blesi
+sn: Blesi
+description: This is Witold Blesi's description
+facsimileTelephoneNumber: +1 818 360-1222
+l: San Mateo
+ou: Product Testing
+postalAddress: Product Testing$San Mateo
+telephoneNumber: +1 818 283-2462
+title: Master Product Testing Warrior
+userPassword: Password1
+uid: BlesiW
+givenName: Witold
+mail: BlesiW@ns-mail4.com
+carLicense: CK96BA
+departmentNumber: 3674
+employeeType: Employee
+homePhone: +1 818 341-8860
+initials: W. B.
+mobile: +1 818 512-8782
+pager: +1 818 164-4350
+roomNumber: 8828
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Claudelle Oman,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Claudelle Oman
+sn: Oman
+description: This is Claudelle Oman's description
+facsimileTelephoneNumber: +1 415 217-2238
+l: San Mateo
+ou: Management
+postalAddress: Management$San Mateo
+telephoneNumber: +1 415 141-7796
+title: Associate Management Artist
+userPassword: Password1
+uid: OmanC
+givenName: Claudelle
+mail: OmanC@ns-mail8.com
+carLicense: TG2R5U
+departmentNumber: 1027
+employeeType: Contract
+homePhone: +1 415 496-8846
+initials: C. O.
+mobile: +1 415 367-7841
+pager: +1 415 926-2000
+roomNumber: 8004
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Liz LeClair,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Liz LeClair
+sn: LeClair
+description: This is Liz LeClair's description
+facsimileTelephoneNumber: +1 818 436-9079
+l: Alameda
+ou: Administrative
+postalAddress: Administrative$Alameda
+telephoneNumber: +1 818 890-8136
+title: Associate Administrative Technician
+userPassword: Password1
+uid: LeClairL
+givenName: Liz
+mail: LeClairL@ns-mail2.com
+carLicense: 5D50MG
+departmentNumber: 3922
+employeeType: Employee
+homePhone: +1 818 895-3646
+initials: L. L.
+mobile: +1 818 815-1759
+pager: +1 818 737-8568
+roomNumber: 8020
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Linette Kessler,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Linette Kessler
+sn: Kessler
+description: This is Linette Kessler's description
+facsimileTelephoneNumber: +1 804 135-2670
+l: San Mateo
+ou: Administrative
+postalAddress: Administrative$San Mateo
+telephoneNumber: +1 804 609-6227
+title: Master Administrative Writer
+userPassword: Password1
+uid: KesslerL
+givenName: Linette
+mail: KesslerL@ns-mail7.com
+carLicense: HWNP8T
+departmentNumber: 8941
+employeeType: Normal
+homePhone: +1 804 596-8015
+initials: L. K.
+mobile: +1 804 910-8981
+pager: +1 804 715-3786
+roomNumber: 9285
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Cang Coverdale,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Cang Coverdale
+sn: Coverdale
+description: This is Cang Coverdale's description
+facsimileTelephoneNumber: +1 804 877-2698
+l: Sunnyvale
+ou: Peons
+postalAddress: Peons$Sunnyvale
+telephoneNumber: +1 804 250-8301
+title: Chief Peons Writer
+userPassword: Password1
+uid: CoverdaC
+givenName: Cang
+mail: CoverdaC@ns-mail3.com
+carLicense: 0LT7LC
+departmentNumber: 2554
+employeeType: Normal
+homePhone: +1 804 958-9840
+initials: C. C.
+mobile: +1 804 271-5714
+pager: +1 804 265-1282
+roomNumber: 8314
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Luella Scheffler,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Luella Scheffler
+sn: Scheffler
+description: This is Luella Scheffler's description
+facsimileTelephoneNumber: +1 804 584-9027
+l: Armonk
+ou: Janitorial
+postalAddress: Janitorial$Armonk
+telephoneNumber: +1 804 913-6978
+title: Chief Janitorial Artist
+userPassword: Password1
+uid: SchefflL
+givenName: Luella
+mail: SchefflL@ns-mail6.com
+carLicense: L426VC
+departmentNumber: 6083
+employeeType: Normal
+homePhone: +1 804 456-5925
+initials: L. S.
+mobile: +1 804 159-8096
+pager: +1 804 810-4962
+roomNumber: 9005
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Ginny Mattiussi,ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Ginny Mattiussi
+sn: Mattiussi
+description: This is Ginny Mattiussi's description
+facsimileTelephoneNumber: +1 804 914-9991
+l: San Francisco
+ou: Product Development
+postalAddress: Product Development$San Francisco
+telephoneNumber: +1 804 519-9515
+title: Master Product Development Grunt
+userPassword: Password1
+uid: MattiusG
+givenName: Ginny
+mail: MattiusG@ns-mail9.com
+carLicense: HW15SO
+departmentNumber: 3687
+employeeType: Employee
+homePhone: +1 804 213-5427
+initials: G. M.
+mobile: +1 804 160-1741
+pager: +1 804 461-9969
+roomNumber: 9539
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Aline Parham,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Aline Parham
+sn: Parham
+description: This is Aline Parham's description
+facsimileTelephoneNumber: +1 510 706-8345
+l: Alameda
+ou: Administrative
+postalAddress: Administrative$Alameda
+telephoneNumber: +1 510 690-4531
+title: Chief Administrative Mascot
+userPassword: Password1
+uid: ParhamA
+givenName: Aline
+mail: ParhamA@ns-mail9.com
+carLicense: XXVJPS
+departmentNumber: 7990
+employeeType: Contract
+homePhone: +1 510 255-3374
+initials: A. P.
+mobile: +1 510 423-9519
+pager: +1 510 352-3609
+roomNumber: 9652
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Nahum Rozumna,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Nahum Rozumna
+sn: Rozumna
+description: This is Nahum Rozumna's description
+facsimileTelephoneNumber: +1 415 362-5910
+l: Orem
+ou: Administrative
+postalAddress: Administrative$Orem
+telephoneNumber: +1 415 587-5000
+title: Supreme Administrative Fellow
+userPassword: Password1
+uid: RozumnaN
+givenName: Nahum
+mail: RozumnaN@ns-mail4.com
+carLicense: 9X3JU6
+departmentNumber: 5771
+employeeType: Contract
+homePhone: +1 415 332-4469
+initials: N. R.
+mobile: +1 415 851-6778
+pager: +1 415 744-7717
+roomNumber: 9069
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Teresa Standel,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Teresa Standel
+sn: Standel
+description: This is Teresa Standel's description
+facsimileTelephoneNumber: +1 510 909-8353
+l: Fremont
+ou: Human Resources
+postalAddress: Human Resources$Fremont
+telephoneNumber: +1 510 574-8221
+title: Master Human Resources Writer
+userPassword: Password1
+uid: StandelT
+givenName: Teresa
+mail: StandelT@ns-mail4.com
+carLicense: SO745H
+departmentNumber: 6921
+employeeType: Employee
+homePhone: +1 510 224-9306
+initials: T. S.
+mobile: +1 510 767-9421
+pager: +1 510 480-4823
+roomNumber: 8868
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Linn Chaintreuil,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Linn Chaintreuil
+sn: Chaintreuil
+description: This is Linn Chaintreuil's description
+facsimileTelephoneNumber: +1 408 158-6711
+l: Redmond
+ou: Peons
+postalAddress: Peons$Redmond
+telephoneNumber: +1 408 385-8391
+title: Junior Peons Janitor
+userPassword: Password1
+uid: ChaintrL
+givenName: Linn
+mail: ChaintrL@ns-mail4.com
+carLicense: J8LFWI
+departmentNumber: 9011
+employeeType: Normal
+homePhone: +1 408 691-2236
+initials: L. C.
+mobile: +1 408 400-5967
+pager: +1 408 572-7014
+roomNumber: 9973
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Annmarie Howe-Patterson,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Annmarie Howe-Patterson
+sn: Howe-Patterson
+description: This is Annmarie Howe-Patterson's description
+facsimileTelephoneNumber: +1 206 563-7538
+l: Fremont
+ou: Product Testing
+postalAddress: Product Testing$Fremont
+telephoneNumber: +1 206 870-8715
+title: Junior Product Testing Madonna
+userPassword: Password1
+uid: Howe-PaA
+givenName: Annmarie
+mail: Howe-PaA@ns-mail9.com
+carLicense: 8TG5CO
+departmentNumber: 6432
+employeeType: Normal
+homePhone: +1 206 644-3679
+initials: A. H.
+mobile: +1 206 252-3374
+pager: +1 206 984-3849
+roomNumber: 9630
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Idaline Sentner,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Idaline Sentner
+sn: Sentner
+description: This is Idaline Sentner's description
+facsimileTelephoneNumber: +1 213 603-9938
+l: Redwood Shores
+ou: Peons
+postalAddress: Peons$Redwood Shores
+telephoneNumber: +1 213 227-4437
+title: Junior Peons Manager
+userPassword: Password1
+uid: SentnerI
+givenName: Idaline
+mail: SentnerI@ns-mail7.com
+carLicense: G1SYEB
+departmentNumber: 4382
+employeeType: Contract
+homePhone: +1 213 447-1918
+initials: I. S.
+mobile: +1 213 530-8298
+pager: +1 213 507-7988
+roomNumber: 9144
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Debbi Coriaty,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Debbi Coriaty
+sn: Coriaty
+description: This is Debbi Coriaty's description
+facsimileTelephoneNumber: +1 206 128-8898
+l: Palo Alto
+ou: Peons
+postalAddress: Peons$Palo Alto
+telephoneNumber: +1 206 700-7016
+title: Supreme Peons Madonna
+userPassword: Password1
+uid: CoriatyD
+givenName: Debbi
+mail: CoriatyD@ns-mail3.com
+carLicense: HU3C3K
+departmentNumber: 1018
+employeeType: Contract
+homePhone: +1 206 430-4177
+initials: D. C.
+mobile: +1 206 967-3108
+pager: +1 206 680-2262
+roomNumber: 8654
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Freek Centeno,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Freek Centeno
+sn: Centeno
+description: This is Freek Centeno's description
+facsimileTelephoneNumber: +1 804 692-5003
+l: San Francisco
+ou: Product Testing
+postalAddress: Product Testing$San Francisco
+telephoneNumber: +1 804 296-3073
+title: Associate Product Testing Warrior
+userPassword: Password1
+uid: CentenoF
+givenName: Freek
+mail: CentenoF@ns-mail7.com
+carLicense: KO19MC
+departmentNumber: 9433
+employeeType: Normal
+homePhone: +1 804 934-4523
+initials: F. C.
+mobile: +1 804 920-5665
+pager: +1 804 162-5559
+roomNumber: 9852
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Open O Karina,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Open O Karina
+sn: O Karina
+description: This is Open O Karina's description
+facsimileTelephoneNumber: +1 408 356-5158
+l: Menlo Park
+ou: Management
+postalAddress: Management$Menlo Park
+telephoneNumber: +1 408 708-3880
+title: Supreme Management Sales Rep
+userPassword: Password1
+uid: O KarinO
+givenName: Open
+mail: O KarinO@ns-mail8.com
+carLicense: 9TYDV7
+departmentNumber: 6655
+employeeType: Employee
+homePhone: +1 408 789-7498
+initials: O. O.
+mobile: +1 408 342-4421
+pager: +1 408 159-1587
+roomNumber: 8636
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Rajani Ciochon,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Rajani Ciochon
+sn: Ciochon
+description: This is Rajani Ciochon's description
+facsimileTelephoneNumber: +1 408 395-6771
+l: Cupertino
+ou: Human Resources
+postalAddress: Human Resources$Cupertino
+telephoneNumber: +1 408 603-7449
+title: Associate Human Resources President
+userPassword: Password1
+uid: CiochonR
+givenName: Rajani
+mail: CiochonR@ns-mail4.com
+carLicense: 2V9ICI
+departmentNumber: 5209
+employeeType: Employee
+homePhone: +1 408 686-6963
+initials: R. C.
+mobile: +1 408 468-1043
+pager: +1 408 806-7145
+roomNumber: 9276
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Perla Chilton,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Perla Chilton
+sn: Chilton
+description: This is Perla Chilton's description
+facsimileTelephoneNumber: +1 408 360-5565
+l: Fremont
+ou: Product Testing
+postalAddress: Product Testing$Fremont
+telephoneNumber: +1 408 236-1743
+title: Associate Product Testing Consultant
+userPassword: Password1
+uid: ChiltonP
+givenName: Perla
+mail: ChiltonP@ns-mail8.com
+carLicense: AN68BN
+departmentNumber: 3054
+employeeType: Contract
+homePhone: +1 408 571-6456
+initials: P. C.
+mobile: +1 408 574-9687
+pager: +1 408 908-1256
+roomNumber: 9168
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Viviene Caruth,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Viviene Caruth
+sn: Caruth
+description: This is Viviene Caruth's description
+facsimileTelephoneNumber: +1 408 285-5896
+l: Sunnyvale
+ou: Janitorial
+postalAddress: Janitorial$Sunnyvale
+telephoneNumber: +1 408 430-7660
+title: Chief Janitorial Figurehead
+userPassword: Password1
+uid: CaruthV
+givenName: Viviene
+mail: CaruthV@ns-mail4.com
+carLicense: 2WJGYG
+departmentNumber: 9174
+employeeType: Normal
+homePhone: +1 408 954-7152
+initials: V. C.
+mobile: +1 408 795-6215
+pager: +1 408 803-2110
+roomNumber: 9951
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Quyen Witzman,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Quyen Witzman
+sn: Witzman
+description: This is Quyen Witzman's description
+facsimileTelephoneNumber: +1 408 968-6635
+l: Menlo Park
+ou: Janitorial
+postalAddress: Janitorial$Menlo Park
+telephoneNumber: +1 408 506-5945
+title: Chief Janitorial Mascot
+userPassword: Password1
+uid: WitzmanQ
+givenName: Quyen
+mail: WitzmanQ@ns-mail5.com
+carLicense: 53VMR1
+departmentNumber: 4066
+employeeType: Employee
+homePhone: +1 408 602-4608
+initials: Q. W.
+mobile: +1 408 541-6494
+pager: +1 408 880-8573
+roomNumber: 9964
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Bevvy Xmssupport,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Bevvy Xmssupport
+sn: Xmssupport
+description: This is Bevvy Xmssupport's description
+facsimileTelephoneNumber: +1 206 454-8695
+l: Armonk
+ou: Management
+postalAddress: Management$Armonk
+telephoneNumber: +1 206 671-2556
+title: Chief Management Grunt
+userPassword: Password1
+uid: XmssuppB
+givenName: Bevvy
+mail: XmssuppB@ns-mail9.com
+carLicense: S4OOKY
+departmentNumber: 1644
+employeeType: Normal
+homePhone: +1 206 231-8140
+initials: B. X.
+mobile: +1 206 159-4420
+pager: +1 206 947-5096
+roomNumber: 8586
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Dulsea Norment,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Dulsea Norment
+sn: Norment
+description: This is Dulsea Norment's description
+facsimileTelephoneNumber: +1 213 576-4550
+l: Sunnyvale
+ou: Peons
+postalAddress: Peons$Sunnyvale
+telephoneNumber: +1 213 729-4103
+title: Master Peons Dictator
+userPassword: Password1
+uid: NormentD
+givenName: Dulsea
+mail: NormentD@ns-mail3.com
+carLicense: VV4JV4
+departmentNumber: 2104
+employeeType: Contract
+homePhone: +1 213 852-3212
+initials: D. N.
+mobile: +1 213 749-3759
+pager: +1 213 934-6464
+roomNumber: 9412
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Dinny Golshan,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Dinny Golshan
+sn: Golshan
+description: This is Dinny Golshan's description
+facsimileTelephoneNumber: +1 408 391-3392
+l: San Jose
+ou: Human Resources
+postalAddress: Human Resources$San Jose
+telephoneNumber: +1 408 196-2264
+title: Associate Human Resources Architect
+userPassword: Password1
+uid: GolshanD
+givenName: Dinny
+mail: GolshanD@ns-mail2.com
+carLicense: N22U7C
+departmentNumber: 8809
+employeeType: Normal
+homePhone: +1 408 690-7616
+initials: D. G.
+mobile: +1 408 699-7377
+pager: +1 408 657-3991
+roomNumber: 9134
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Gnni Leone,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Gnni Leone
+sn: Leone
+description: This is Gnni Leone's description
+facsimileTelephoneNumber: +1 408 994-6226
+l: San Francisco
+ou: Janitorial
+postalAddress: Janitorial$San Francisco
+telephoneNumber: +1 408 813-6244
+title: Associate Janitorial Technician
+userPassword: Password1
+uid: LeoneG
+givenName: Gnni
+mail: LeoneG@ns-mail2.com
+carLicense: LNVD7N
+departmentNumber: 8886
+employeeType: Employee
+homePhone: +1 408 574-4642
+initials: G. L.
+mobile: +1 408 499-5496
+pager: +1 408 803-2909
+roomNumber: 9374
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Kambhampati Hutson,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Kambhampati Hutson
+sn: Hutson
+description: This is Kambhampati Hutson's description
+facsimileTelephoneNumber: +1 408 621-9746
+l: Santa Clara
+ou: Peons
+postalAddress: Peons$Santa Clara
+telephoneNumber: +1 408 181-1729
+title: Junior Peons Artist
+userPassword: Password1
+uid: HutsonK
+givenName: Kambhampati
+mail: HutsonK@ns-mail3.com
+carLicense: 924O92
+departmentNumber: 8427
+employeeType: Contract
+homePhone: +1 408 583-4543
+initials: K. H.
+mobile: +1 408 657-3416
+pager: +1 408 798-3429
+roomNumber: 9495
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Vallier Jarchow,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Vallier Jarchow
+sn: Jarchow
+description: This is Vallier Jarchow's description
+facsimileTelephoneNumber: +1 818 662-8472
+l: Fremont
+ou: Peons
+postalAddress: Peons$Fremont
+telephoneNumber: +1 818 511-8166
+title: Chief Peons Fellow
+userPassword: Password1
+uid: JarchowV
+givenName: Vallier
+mail: JarchowV@ns-mail6.com
+carLicense: SU0SYE
+departmentNumber: 9398
+employeeType: Employee
+homePhone: +1 818 369-7976
+initials: V. J.
+mobile: +1 818 983-6860
+pager: +1 818 982-1894
+roomNumber: 9228
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Dalila Acree,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Dalila Acree
+sn: Acree
+description: This is Dalila Acree's description
+facsimileTelephoneNumber: +1 510 124-6912
+l: Cupertino
+ou: Management
+postalAddress: Management$Cupertino
+telephoneNumber: +1 510 891-1960
+title: Supreme Management Architect
+userPassword: Password1
+uid: AcreeD
+givenName: Dalila
+mail: AcreeD@ns-mail7.com
+carLicense: HV6DTG
+departmentNumber: 4869
+employeeType: Normal
+homePhone: +1 510 560-5075
+initials: D. A.
+mobile: +1 510 919-7847
+pager: +1 510 886-9892
+roomNumber: 9876
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Akemi Brosselard,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Akemi Brosselard
+sn: Brosselard
+description: This is Akemi Brosselard's description
+facsimileTelephoneNumber: +1 804 319-8418
+l: Orem
+ou: Administrative
+postalAddress: Administrative$Orem
+telephoneNumber: +1 804 642-5991
+title: Supreme Administrative Writer
+userPassword: Password1
+uid: BrosselA
+givenName: Akemi
+mail: BrosselA@ns-mail3.com
+carLicense: 8G6K6F
+departmentNumber: 5657
+employeeType: Employee
+homePhone: +1 804 435-1410
+initials: A. B.
+mobile: +1 804 844-6239
+pager: +1 804 983-8937
+roomNumber: 8980
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Katsunori Soong,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Katsunori Soong
+sn: Soong
+description: This is Katsunori Soong's description
+facsimileTelephoneNumber: +1 804 155-1859
+l: Armonk
+ou: Administrative
+postalAddress: Administrative$Armonk
+telephoneNumber: +1 804 786-3820
+title: Junior Administrative Manager
+userPassword: Password1
+uid: SoongK
+givenName: Katsunori
+mail: SoongK@ns-mail4.com
+carLicense: WL605T
+departmentNumber: 2495
+employeeType: Normal
+homePhone: +1 804 425-3905
+initials: K. S.
+mobile: +1 804 666-4430
+pager: +1 804 562-1815
+roomNumber: 8364
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Lai Vezina,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Lai Vezina
+sn: Vezina
+description: This is Lai Vezina's description
+facsimileTelephoneNumber: +1 818 329-2142
+l: San Francisco
+ou: Product Testing
+postalAddress: Product Testing$San Francisco
+telephoneNumber: +1 818 250-4180
+title: Chief Product Testing Engineer
+userPassword: Password1
+uid: VezinaL
+givenName: Lai
+mail: VezinaL@ns-mail4.com
+carLicense: NTMMT2
+departmentNumber: 2673
+employeeType: Normal
+homePhone: +1 818 143-3010
+initials: L. V.
+mobile: +1 818 779-1783
+pager: +1 818 816-1789
+roomNumber: 8787
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Erdem Kelleher,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Erdem Kelleher
+sn: Kelleher
+description: This is Erdem Kelleher's description
+facsimileTelephoneNumber: +1 804 221-1664
+l: Palo Alto
+ou: Peons
+postalAddress: Peons$Palo Alto
+telephoneNumber: +1 804 131-4472
+title: Junior Peons Admin
+userPassword: Password1
+uid: KelleheE
+givenName: Erdem
+mail: KelleheE@ns-mail5.com
+carLicense: 4G7QOA
+departmentNumber: 8901
+employeeType: Employee
+homePhone: +1 804 370-6448
+initials: E. K.
+mobile: +1 804 758-6068
+pager: +1 804 638-7576
+roomNumber: 9797
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Huyen Gebhart,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Huyen Gebhart
+sn: Gebhart
+description: This is Huyen Gebhart's description
+facsimileTelephoneNumber: +1 818 535-4968
+l: Sunnyvale
+ou: Human Resources
+postalAddress: Human Resources$Sunnyvale
+telephoneNumber: +1 818 512-1598
+title: Associate Human Resources Sales Rep
+userPassword: Password1
+uid: GebhartH
+givenName: Huyen
+mail: GebhartH@ns-mail7.com
+carLicense: 6T55R9
+departmentNumber: 4076
+employeeType: Employee
+homePhone: +1 818 457-6466
+initials: H. G.
+mobile: +1 818 348-4167
+pager: +1 818 722-2918
+roomNumber: 9844
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Wendye Deligdisch,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Wendye Deligdisch
+sn: Deligdisch
+description: This is Wendye Deligdisch's description
+facsimileTelephoneNumber: +1 804 722-9859
+l: Milpitas
+ou: Janitorial
+postalAddress: Janitorial$Milpitas
+telephoneNumber: +1 804 760-1413
+title: Master Janitorial Visionary
+userPassword: Password1
+uid: DeligdiW
+givenName: Wendye
+mail: DeligdiW@ns-mail4.com
+carLicense: S877EF
+departmentNumber: 9328
+employeeType: Employee
+homePhone: +1 804 983-7072
+initials: W. D.
+mobile: +1 804 619-9717
+pager: +1 804 426-7794
+roomNumber: 8975
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Gerrard Rosko,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Gerrard Rosko
+sn: Rosko
+description: This is Gerrard Rosko's description
+facsimileTelephoneNumber: +1 206 183-8561
+l: San Mateo
+ou: Management
+postalAddress: Management$San Mateo
+telephoneNumber: +1 206 246-1483
+title: Master Management Figurehead
+userPassword: Password1
+uid: RoskoG
+givenName: Gerrard
+mail: RoskoG@ns-mail3.com
+carLicense: K96SWS
+departmentNumber: 5059
+employeeType: Normal
+homePhone: +1 206 444-5411
+initials: G. R.
+mobile: +1 206 248-5523
+pager: +1 206 442-1788
+roomNumber: 9685
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Alanah Thornber,ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Alanah Thornber
+sn: Thornber
+description: This is Alanah Thornber's description
+facsimileTelephoneNumber: +1 206 643-4551
+l: Armonk
+ou: Product Development
+postalAddress: Product Development$Armonk
+telephoneNumber: +1 206 420-8668
+title: Associate Product Development Pinhead
+userPassword: Password1
+uid: ThornbeA
+givenName: Alanah
+mail: ThornbeA@ns-mail5.com
+carLicense: 0N330J
+departmentNumber: 2333
+employeeType: Employee
+homePhone: +1 206 864-8920
+initials: A. T.
+mobile: +1 206 629-1327
+pager: +1 206 959-6612
+roomNumber: 8068
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Peggie Environment,ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Peggie Environment
+sn: Environment
+description: This is Peggie Environment's description
+facsimileTelephoneNumber: +1 415 742-7965
+l: Milpitas
+ou: Product Development
+postalAddress: Product Development$Milpitas
+telephoneNumber: +1 415 464-8729
+title: Master Product Development Architect
+userPassword: Password1
+uid: EnvironP
+givenName: Peggie
+mail: EnvironP@ns-mail8.com
+carLicense: E1X5Y4
+departmentNumber: 7482
+employeeType: Normal
+homePhone: +1 415 922-9682
+initials: P. E.
+mobile: +1 415 361-2591
+pager: +1 415 773-5529
+roomNumber: 9573
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Darcey McMahon,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Darcey McMahon
+sn: McMahon
+description: This is Darcey McMahon's description
+facsimileTelephoneNumber: +1 510 767-7263
+l: Palo Alto
+ou: Janitorial
+postalAddress: Janitorial$Palo Alto
+telephoneNumber: +1 510 403-4704
+title: Master Janitorial Fellow
+userPassword: Password1
+uid: McMahonD
+givenName: Darcey
+mail: McMahonD@ns-mail4.com
+carLicense: XKRJSW
+departmentNumber: 3382
+employeeType: Employee
+homePhone: +1 510 944-1203
+initials: D. M.
+mobile: +1 510 438-2676
+pager: +1 510 375-9906
+roomNumber: 8696
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Sallyanne Efland,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Sallyanne Efland
+sn: Efland
+description: This is Sallyanne Efland's description
+facsimileTelephoneNumber: +1 818 696-2230
+l: San Jose
+ou: Administrative
+postalAddress: Administrative$San Jose
+telephoneNumber: +1 818 536-5370
+title: Supreme Administrative Janitor
+userPassword: Password1
+uid: EflandS
+givenName: Sallyanne
+mail: EflandS@ns-mail9.com
+carLicense: A3DRW4
+departmentNumber: 2649
+employeeType: Normal
+homePhone: +1 818 923-4868
+initials: S. E.
+mobile: +1 818 963-2769
+pager: +1 818 623-2612
+roomNumber: 8464
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Ginevra Adamson,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Ginevra Adamson
+sn: Adamson
+description: This is Ginevra Adamson's description
+facsimileTelephoneNumber: +1 408 351-9104
+l: Menlo Park
+ou: Management
+postalAddress: Management$Menlo Park
+telephoneNumber: +1 408 367-8946
+title: Chief Management Dictator
+userPassword: Password1
+uid: AdamsonG
+givenName: Ginevra
+mail: AdamsonG@ns-mail2.com
+carLicense: R9T589
+departmentNumber: 1042
+employeeType: Employee
+homePhone: +1 408 567-7901
+initials: G. A.
+mobile: +1 408 269-6573
+pager: +1 408 196-2973
+roomNumber: 8699
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Oralia Winlow,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Oralia Winlow
+sn: Winlow
+description: This is Oralia Winlow's description
+facsimileTelephoneNumber: +1 818 498-6469
+l: Milpitas
+ou: Peons
+postalAddress: Peons$Milpitas
+telephoneNumber: +1 818 363-5209
+title: Chief Peons Madonna
+userPassword: Password1
+uid: WinlowO
+givenName: Oralia
+mail: WinlowO@ns-mail4.com
+carLicense: X8N9Y4
+departmentNumber: 1787
+employeeType: Employee
+homePhone: +1 818 733-3917
+initials: O. W.
+mobile: +1 818 472-3442
+pager: +1 818 842-7463
+roomNumber: 9394
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Syyed O Karina,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Syyed O Karina
+sn: O Karina
+description: This is Syyed O Karina's description
+facsimileTelephoneNumber: +1 206 685-4339
+l: Redmond
+ou: Management
+postalAddress: Management$Redmond
+telephoneNumber: +1 206 165-3305
+title: Junior Management Stooge
+userPassword: Password1
+uid: O KarinS
+givenName: Syyed
+mail: O KarinS@ns-mail5.com
+carLicense: 79HD2M
+departmentNumber: 5833
+employeeType: Contract
+homePhone: +1 206 359-4285
+initials: S. O.
+mobile: +1 206 300-5317
+pager: +1 206 776-7090
+roomNumber: 8148
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Kazuo Rintoul,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Kazuo Rintoul
+sn: Rintoul
+description: This is Kazuo Rintoul's description
+facsimileTelephoneNumber: +1 510 457-4969
+l: San Mateo
+ou: Administrative
+postalAddress: Administrative$San Mateo
+telephoneNumber: +1 510 687-8512
+title: Supreme Administrative Engineer
+userPassword: Password1
+uid: RintoulK
+givenName: Kazuo
+mail: RintoulK@ns-mail2.com
+carLicense: H4ALP9
+departmentNumber: 4549
+employeeType: Contract
+homePhone: +1 510 881-3861
+initials: K. R.
+mobile: +1 510 771-5475
+pager: +1 510 238-3485
+roomNumber: 9965
+manager: cn=Nashir Shiffer,ou=Management,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Kaile Klingsporn,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Kaile Klingsporn
+sn: Klingsporn
+description: This is Kaile Klingsporn's description
+facsimileTelephoneNumber: +1 415 324-2082
+l: Fremont
+ou: Human Resources
+postalAddress: Human Resources$Fremont
+telephoneNumber: +1 415 639-4326
+title: Supreme Human Resources Sales Rep
+userPassword: Password1
+uid: KlingspK
+givenName: Kaile
+mail: KlingspK@ns-mail3.com
+carLicense: 3I7UOR
+departmentNumber: 7954
+employeeType: Contract
+homePhone: +1 415 607-7030
+initials: K. K.
+mobile: +1 415 947-1280
+pager: +1 415 876-4511
+roomNumber: 8027
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Ext Askins,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Ext Askins
+sn: Askins
+description: This is Ext Askins's description
+facsimileTelephoneNumber: +1 415 741-9451
+l: San Mateo
+ou: Janitorial
+postalAddress: Janitorial$San Mateo
+telephoneNumber: +1 415 481-4962
+title: Supreme Janitorial Figurehead
+userPassword: Password1
+uid: AskinsE
+givenName: Ext
+mail: AskinsE@ns-mail4.com
+carLicense: YIJATP
+departmentNumber: 4834
+employeeType: Normal
+homePhone: +1 415 820-1417
+initials: E. A.
+mobile: +1 415 665-9922
+pager: +1 415 381-9637
+roomNumber: 9532
+manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
+secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local

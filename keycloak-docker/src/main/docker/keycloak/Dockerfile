@@ -11,4 +11,5 @@ COPY --chown=jboss:root profile.properties /opt/jboss/keycloak/standalone/config
 COPY --chown=jboss:root maven/keycloak-extensions/ /opt/jboss/keycloak/standalone/deployments
 
 # Add custom Theme
-COPY --chown=jboss:root maven/keycloak-themes/custom/ /opt/jboss/keycloak/themes/custom
+COPY --chown=jboss:root maven/keycloak-themes/apps/ /opt/jboss/keycloak/themes/apps
+COPY --chown=jboss:root maven/keycloak-themes/internal/ /opt/jboss/keycloak/themes/internal

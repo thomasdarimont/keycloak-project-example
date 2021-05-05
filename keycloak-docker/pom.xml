@@ -60,7 +60,7 @@
                                         </fileSet>
 
                                         <fileSet>
-                                            <directory>../keycloak-themes/target/classes/theme</directory>
+                                            <directory>../keycloak-themes/themes</directory>
                                             <outputDirectory>keycloak-themes</outputDirectory>
                                         </fileSet>
 

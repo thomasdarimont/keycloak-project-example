@@ -13,14 +13,16 @@ services:
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
-    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE" ]
+    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0" ]
     ports:
       - "8080:8080"
       - "127.0.0.1:9990:9990"
       - "127.0.0.1:8787:8787"
     volumes:
       - ./keycloak-extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/keycloak-extensions.jar:z
-      - ./keycloak-themes/src/main/resources/theme/custom:/opt/jboss/keycloak/themes/custom:z
+      - ./keycloak-themes/themes/apps:/opt/jboss/keycloak/themes/apps:z
+      - ./keycloak-themes/themes/internal:/opt/jboss/keycloak/themes/internal:z
+      - ./keycloak-themes/themes/keycloak.v2-fix:/opt/jboss/keycloak/themes/keycloak.v2-fix:z
       - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
       - ./keycloak-docker/src/main/docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
       - ./imex:/opt/jboss/imex:z
@@ -28,7 +30,7 @@ services:
 
   custom-keycloak-provisioning:
     # adorsys/keycloak-config-cli:v3.3.0-12.0.4
-    image: adorsys/keycloak-config-cli@sha256:fc8051e8d097e869dfbb442c4045d450306725a0825bb1571bef96ad3cafe19c
+    image: adorsys/keycloak-config-cli:v3.3.0-12.0.4
     env_file:
       - ./custom-keycloak.env
     environment:
@@ -38,7 +40,7 @@ services:
       IMPORT_FORCE: "false"
       IMPORT_VARSUBSTITUTION: "true"
     volumes:
-      - ./config:/config:z
+      - ./config/realms:/config:z
 
   mailhog:
     # Web Interface: http://localhost:1080/#
@@ -51,11 +53,64 @@ services:
       - "1080:8025"
       - "1025:1025"
 
-  custom-demoapp:
-    image: python:3.7-alpine
-    command: [ "sh", "run.sh" ]
-    working_dir: "/demoapp"
+  openldap:
+    image: osixia/openldap:1.5.0
+    environment:
+      LDAP_LOG_LEVEL: "256"
+      LDAP_ORGANISATION: "Acme Inc."
+      LDAP_DOMAIN: "corp.acme.local"
+      LDAP_BASE_DN: ""
+      # admin User: cn=admin,dc=corp,dc=acme,dc=local
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_CONFIG_PASSWORD: "config"
+      LDAP_READONLY_USER: "false"
+      #LDAP_READONLY_USER_USERNAME: "readonly"
+      #LDAP_READONLY_USER_PASSWORD: "readonly"
+      LDAP_RFC2307BIS_SCHEMA: "false"
+      LDAP_BACKEND: "mdb"
+      LDAP_TLS: "true"
+      LDAP_TLS_CRT_FILENAME: "ldap.crt"
+      LDAP_TLS_KEY_FILENAME: "ldap.key"
+      LDAP_TLS_DH_PARAM_FILENAME: "dhparam.pem"
+      LDAP_TLS_CA_CRT_FILENAME: "ca.crt"
+      LDAP_TLS_ENFORCE: "false"
+      LDAP_TLS_CIPHER_SUITE: "SECURE256:-VERS-SSL3.0"
+      LDAP_TLS_VERIFY_CLIENT: "demand"
+      LDAP_REPLICATION: "false"
+      #LDAP_REPLICATION_CONFIG_SYNCPROV: 'binddn="cn=admin,cn=config" bindmethod=simple credentials="$$LDAP_CONFIG_PASSWORD" searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1 starttls=critical'
+      #LDAP_REPLICATION_DB_SYNCPROV: 'binddn="cn=admin,$$LDAP_BASE_DN" bindmethod=simple credentials="$$LDAP_ADMIN_PASSWORD" searchbase="$$LDAP_BASE_DN" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1 starttls=critical'
+      #LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
+      KEEP_EXISTING_CONFIG: "true"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
+      LDAP_SSL_HELPER_PREFIX: "ldap"
+    tty: true
+    stdin_open: true
     volumes:
-      - ./demoapp:/demoapp:z
+      - /var/lib/ldap
+      - /etc/ldap/slapd.d
+      - /container/service/slapd/assets/certs/
     ports:
-      - "4000:4000"
+      - "1389:389"
+      - "1636:636"
+    # For replication to work correctly, domainname and hostname must be
+    # set correctly so that "hostname"."domainname" equates to the
+    # fully-qualified domain name for the host.
+    domainname: "demo.local"
+    hostname: "ldap1"
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "17080:80"
+    depends_on:
+      - openldap
+
+  custom-demo-oidc-js-spa:
+    image: httpd:2.4
+    volumes:
+      - ./demos/oidc-js-spa:/usr/local/apache2/htdocs/:z
+    ports:
+      - "4000:80"
