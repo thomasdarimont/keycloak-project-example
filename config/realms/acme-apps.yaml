@@ -13,6 +13,14 @@ sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
 browserFlow: "browser"
 registrationFlow: "Custom Registration"
 
+smtpServer:
+  replyToDisplayName: "Acme APPS Support"
+  port: 1025
+  host: mailhog
+  replyTo: "no-reply@localhost"
+  from: "acme-apps-sso@local"
+  fromDisplayName: "Acme APPS Account"
+
 clientScopes:
   - name: acme.profile
     description: Acme Profile Access

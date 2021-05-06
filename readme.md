@@ -130,6 +130,19 @@ The export will create a file like `acme-apps-realm.json` in the `./imex` folder
 bin/exportRealm.sh acme-apps
 ```
 
+# Tools
+
+## Mailhog
+
+Web Interface: http://localhost:1080/#
+Web API: http://localhost:1080/api/v2/messages
+
+## phpldapadmin
+
+Web Interface: http://localhost:17080
+Username: cn=admin,dc=corp,dc=acme,dc=local
+Password: admin
+
 # Misc
 
 ## Add external tool in IntelliJ to trigger extension deployment

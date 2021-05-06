@@ -4,12 +4,21 @@ displayName: Acme Internal
 displayNameHtml: Acme Internal
 loginWithEmailAllowed: true
 loginTheme: internal
+resetPasswordAllowed: true
 # accountTheme: keycloak.v2
 accountTheme: "keycloak.v2-fix"
 adminTheme: keycloak
 emailTheme: keycloak
 sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
 browserFlow: "Browser Identity First"
+
+smtpServer:
+  replyToDisplayName: "Acme Employee Support"
+  port: 1025
+  host: mailhog
+  replyTo: "no-reply@localhost"
+  from: "acme-internal-sso@local"
+  fromDisplayName: "Acme Employee Account"
 
 clients:
   - clientId: app-minispa
