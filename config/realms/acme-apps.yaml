@@ -67,7 +67,7 @@ identityProviders:
       authorizationUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/auth"
       logoutUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/logout"
       clientId: "acme_internal_idp_broker"
-      clientSecret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET}"
+      clientSecret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret}"
       clientAuthMethod: "client_secret_post"
       defaultScope: "openid"
       loginHint: "true"

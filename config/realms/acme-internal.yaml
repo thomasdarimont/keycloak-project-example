@@ -44,7 +44,7 @@ clients:
     standardFlowEnabled: true
     directAccessGrantsEnabled: false
     fullScopeAllowed: false
-    secret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET}"
+    secret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret}"
     redirectUris:
       - "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-apps/broker/idp-acme-internal/endpoint/*"
     webOrigins:
@@ -243,7 +243,7 @@ components:
               "membership.user.ldap.attribute":
                 - "uid"
               "groups.dn":
-                - ${env:ACME_LDAP_GROUP_DN}
+                - ${env:ACME_LDAP_GROUP_DN:-dc=corp,dc=acme,dc=local}
               mode:
                 - "READ_ONLY"
               "user.roles.retrieve.strategy":
@@ -272,7 +272,7 @@ components:
         useTruststoreSpi:
           - ldapsOnly
         usersDn:
-          - ${env:ACME_LDAP_USERS_DN}
+          - ${env:ACME_LDAP_USERS_DN:-dc=corp,dc=acme,dc=local}
         maxLifespan:
           - "3600000"
         connectionPooling:
@@ -292,13 +292,13 @@ components:
         userObjectClasses:
           - "inetOrgPerson, organizationalPerson"
         bindDn:
-          - ${env:LDAP_USER}
+          - ${env:LDAP_USER:-ldap_user}
         usernameLDAPAttribute:
           - uid
         changedSyncPeriod:
           - "-1"
         bindCredential:
-          - ${env:LDAP_PASSWORD}
+          - ${env:LDAP_PASSWORD:-ldap_password}
         rdnLDAPAttribute:
           - uid
         vendor:
@@ -308,7 +308,7 @@ components:
         uuidLDAPAttribute:
           - entryUUID
         connectionUrl:
-          - ${env:LDAP_URL}
+          - ${env:LDAP_URL:-ldap://localhost:389}
         syncRegistrations:
           - "false"
         authType:
