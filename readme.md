@@ -123,3 +123,13 @@ Instead of running the Keycloak Config CLI script yourself, you can register it 
 - Only select: `Synchronize files after execution.`
 
 The extensions can now be redeployed by running `Tools -> External Tools -> kc-deploy-config`
+
+## Scan Image for Vulnerabilities
+
+```
+docker run \
+  --privileged \
+  --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock:z aquasec/trivy:0.17.2 \
+  thomasdarimont/custom-keycloak:1.0.0-SNAPSHOT
+```

@@ -1,5 +1,79 @@
 ARG KEYCLOAK_VERSION=12.0.4
-FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+ARG ALPINE_VERSION=3.13.5
+
+FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as keycloak
+
+# alpine:3.13.5
+# see https://hub.docker.com/layers/alpine/library/alpine/3.13.5/images/sha256-827525365ff718681b0688621e09912af49a17611701ee4d421ba50d57c13f7e?context=explore
+FROM alpine:$ALPINE_VERSION as java
+
+ENV OPENJDK_VERSION=11.0.9_p11-r1
+
+RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.13/community/x86_64/openjdk11-jdk-${OPENJDK_VERSION}.apk
+RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.13/community/x86_64/openjdk11-jmods-${OPENJDK_VERSION}.apk
+
+RUN apk add binutils --no-cache --allow-untrusted --no-cache openjdk11-jdk-${OPENJDK_VERSION}.apk openjdk11-jmods-${OPENJDK_VERSION}.apk
+
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
+ENV JAVA_TARGET /opt/java/java-runtime
+
+RUN   echo "Create trimmed down JDK" && \
+      $JAVA_HOME/bin/jlink \
+      --no-header-files \
+      --strip-debug \
+      --no-man-pages \
+      --compress=2 \
+      --vm=server \
+      --exclude-files="**/bin/rmiregistry,**/bin/jrunscript,**/bin/rmid" \
+      --module-path "$JAVA_HOME/jmods" \
+      --add-modules java.base,java.instrument,java.logging,java.management,java.se,java.naming,java.security.jgss,java.security.sasl,java.sql,java.transaction.xa,java.xml,java.xml.crypto,jdk.security.auth,jdk.xml.dom,jdk.naming.dns,jdk.unsupported,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.jcmd,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.internal.vm.ci,jdk.internal.vm.compiler,jdk.internal.vm.compiler.management \
+      --output $JAVA_TARGET && \
+      echo "Add Java Debugging tools from JDK" && \
+      cp $JAVA_HOME/lib/libjdwp.so $JAVA_TARGET/lib/ && \
+      cp $JAVA_HOME/lib/libdt_socket.so $JAVA_TARGET/lib/ && \
+      cp $JAVA_HOME/lib/*management*.so $JAVA_TARGET/lib/ && \
+      echo "Remove debug symbols from JDK" && \
+      strip -p --strip-unneeded $JAVA_TARGET/lib/server/libjvm.so
+
+# Custom Image
+FROM alpine:$ALPINE_VERSION
+
+# Versions are determined by alpline base version
+RUN apk add -U --no-cache tzdata bash coreutils openssl
+
+# Java
+ENV JAVA_HOME /opt/java
+ENV PATH $PATH:$JAVA_HOME/bin
+
+# Copy customized JDK into this image
+COPY --from=java /opt/java/java-runtime /opt/java
+
+# Temporarily elevate permissions
+USER root
+
+# Keycloak
+
+ENV JBOSS_HOME /opt/jboss/keycloak
+ENV JBOSS_TOOLS /opt/jboss/tools
+
+# add dedicated group / user (jboss) to run keycloak instance
+RUN   addgroup -S jboss -g 1000 && \
+      adduser -u 1000 -S -G jboss -h $JBOSS_HOME -s /sbin/nologin jboss
+
+# Copy Keycloak into this image
+COPY --from=keycloak --chown=jboss:jboss /opt/jboss /opt/jboss
+
+ADD ./custom-docker-entrypoint.sh $JBOSS_TOOLS/
+
+# Make tools executable by jboss user
+RUN   chown jboss:jboss $JBOSS_TOOLS/custom-docker-entrypoint.sh && \
+      chmod 755 $JBOSS_TOOLS/custom-docker-entrypoint.sh
+
+# Switch to jboss user
+USER jboss
+
+CMD ["-b", "0.0.0.0"]
 
 # Add custom Startup-Scripts
 COPY --chown=jboss:root maven/cli/ /opt/jboss/startup-scripts
@@ -13,3 +87,8 @@ COPY --chown=jboss:root maven/keycloak-extensions/ /opt/jboss/keycloak/standalon
 # Add custom Theme
 COPY --chown=jboss:root maven/keycloak-themes/apps/ /opt/jboss/keycloak/themes/apps
 COPY --chown=jboss:root maven/keycloak-themes/internal/ /opt/jboss/keycloak/themes/internal
+
+EXPOSE 8080
+EXPOSE 8443
+
+ENTRYPOINT [ "/opt/jboss/tools/custom-docker-entrypoint.sh" ]
