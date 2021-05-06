@@ -15,7 +15,10 @@ The example contains the following Keycloak extensions:
 - Support for instant reloading of theme and extension code changes
 - Support Keycloak configuration customization via CLI scripts
 - Examples for Integration Tests with Keycloak-Testcontainers
-
+- Example for End to End Tests with Cypress
+- Realm configuration as Configuration as Code via keycloak-config-cli scripts 
+- Multi-realm setup example with OpenID Connect and SAML based Identity Brokering
+- LDAP based User Federation
 
 # Build
 The example can be build with the following maven command:
@@ -52,7 +55,7 @@ docker-compose --env-file custom-keycloak.env up --remove-orphans
 ```
 
 Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger
-a redeployment of the custom extension by Keycloak. 
+a redeployment of the custom extension by Keycloak.
 
 ## Running the custom Docker Image
 
@@ -73,8 +76,35 @@ thomasdarimont/custom-keycloak:latest
 
 # Example environment
 
-The example environment contains a Keycloak realm named `custom`, which contains a simple demo application as well as a test user.
-The test user has the username `tester` and password `test`.
+## Realms
+
+The example environment contains several realms to illustrate the interaction of different realms.
+
+### Acme-Apps Realm
+
+The `acme-apps` realm contains a simple demo application and provides integration with the `acme-internal`
+and `acme-saml` realm via Identity Brokering. The idea behind this setup is to provide a global
+`acme-apps` realm for applications that are shared between internal and external users.
+
+The `acme-internal` realm provides applications that are only intended for internal users and employees.
+The `acme-internal` realm serves as an OpenID Connect based Identity Provider for the `acme-apps` realm.
+The `acme-saml` realm provides applications is similar to the `acme-internal` and serves as 
+a SAML based Identity Provider for the `acme-apps` realm.
+
+### Acme-Internal Realm
+
+The `acme-internal` realm contains a test user and is connected to a federated user store (LDAP directory) provided via openldap.
+
+Users:
+- Username `tester` and password `test` (from database)
+- Username `FleugelR` and password `Password1` (from LDAP federation)
+
+### Acme-SAML Realm
+
+The `acme-saml` realm contains a test user and stores the users in the Keycloak database.
+
+Users:
+- Username `acmesaml` and password `test` (from database)
 
 ### Example App
 
@@ -88,12 +118,16 @@ The demo app can be started by running `etc/runDemoApp.sh` and will be accessibl
 
 To manually trigger an extension redeployment after extension code changes / build, you can run the following script:
 ```
-bin/triggerDockerExtensionDeploy.sh
+bin/deployExtensions.sh
 ```
 
-## Exporting the 'custom' Realm
+## Exporting a Realm
+
+To export an existing realm as JSON start the docker-compose infrastructure and run the following script.
+The export will create a file like `acme-apps-realm.json` in the `./imex` folder.
+
 ```
-bin/exportRealm.sh
+bin/exportRealm.sh acme-apps
 ```
 
 # Misc
