@@ -30,7 +30,7 @@ services:
 
   custom-keycloak-provisioning:
     # adorsys/keycloak-config-cli:v3.3.0-12.0.4
-    image: adorsys/keycloak-config-cli:v3.3.0-12.0.4
+    image: adorsys/keycloak-config-cli:v3.3.1-12.0.4
     env_file:
       - ./custom-keycloak.env
     environment:
@@ -41,6 +41,7 @@ services:
       IMPORT_VARSUBSTITUTION: "true"
     volumes:
       - ./config/realms:/config:z
+
 
   mailhog:
     # Web Interface: http://localhost:1080/#
