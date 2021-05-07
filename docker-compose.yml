@@ -13,10 +13,10 @@ services:
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
-    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0" ]
+    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0", "-bmanagement" , "0.0.0.0", "-Dwildfly.statistics-enabled=true"]
     ports:
       - "8080:8080"
-      - "127.0.0.1:9990:9990"
+      - "9990:9990"
       - "127.0.0.1:8787:8787"
     volumes:
       - ./keycloak-extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/keycloak-extensions.jar:z
