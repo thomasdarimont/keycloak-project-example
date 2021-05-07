@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * {@code
- * curl -v http://localhost:8080/auth/realms/custom/custom-resources/ping | jq -C .
+ * curl -v http://localhost:8080/auth/realms/acme-apps/custom-resources/ping | jq -C .
  * }
  */
 public class CustomResource {
