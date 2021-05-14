@@ -51,6 +51,8 @@ The default Keycloak admin username is `admin` with password `admin`.
 
 You can start the Keycloak container via:
 ```
+mkdir -p testrun/data
+
 docker-compose --env-file custom-keycloak.env up --remove-orphans
 ```
 
