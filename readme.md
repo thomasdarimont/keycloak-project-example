@@ -1,4 +1,4 @@
-Keycloak Project Template
+Keycloak Project Example
 ---
 
 This repository contains an easy to use project setup for custom Keycloak projects.
