@@ -11,6 +11,7 @@ services:
       DB_VENDOR: "h2"
       KEYCLOAK_THEME_CACHING: "false"
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
+      PROXY_ADDRESS_FORWARDING: "true"
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
     command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0", "-bmanagement" , "0.0.0.0", "-Dwildfly.statistics-enabled=true"]
@@ -41,7 +42,6 @@ services:
       IMPORT_VARSUBSTITUTION: "true"
     volumes:
       - ./config/realms:/config:z
-
 
   mailhog:
     # Web Interface: http://localhost:1080/#
