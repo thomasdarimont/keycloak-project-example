@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   custom-keycloak:
-    image: quay.io/keycloak/keycloak:12.0.4
+    image: quay.io/keycloak/keycloak:13.0.0
     user: "1000:1000"
     env_file:
       - ./custom-keycloak.env
@@ -30,8 +30,7 @@ services:
       - ./cli:/opt/jboss/startup-scripts:z
 
   custom-keycloak-provisioning:
-    # adorsys/keycloak-config-cli:v3.3.0-12.0.4
-    image: adorsys/keycloak-config-cli:v3.3.1-12.0.4
+    image: adorsys/keycloak-config-cli:v3.4.0-13.0.0
     env_file:
       - ./custom-keycloak.env
     environment:
