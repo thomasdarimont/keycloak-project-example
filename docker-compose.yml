@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   custom-keycloak:
-    image: quay.io/keycloak/keycloak:13.0.0
+    image: quay.io/keycloak/keycloak:13.0.1
     user: "1000:1000"
     env_file:
       - ./custom-keycloak.env
@@ -80,15 +80,17 @@ services:
       #LDAP_REPLICATION_CONFIG_SYNCPROV: 'binddn="cn=admin,cn=config" bindmethod=simple credentials="$$LDAP_CONFIG_PASSWORD" searchbase="cn=config" type=refreshAndPersist retry="60 +" timeout=1 starttls=critical'
       #LDAP_REPLICATION_DB_SYNCPROV: 'binddn="cn=admin,$$LDAP_BASE_DN" bindmethod=simple credentials="$$LDAP_ADMIN_PASSWORD" searchbase="$$LDAP_BASE_DN" type=refreshAndPersist interval=00:00:00:10 retry="60 +" timeout=1 starttls=critical'
       #LDAP_REPLICATION_HOSTS: "#PYTHON2BASH:['ldap://ldap.example.org','ldap://ldap2.example.org']"
-      KEEP_EXISTING_CONFIG: "true"
+      KEEP_EXISTING_CONFIG: "false"
       LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
       LDAP_SSL_HELPER_PREFIX: "ldap"
+      LDAP_SEED_INTERNAL_LDIF_PATH: "/acme/openldap/ldif/10-bootstrap.ldif"
     tty: true
     stdin_open: true
     volumes:
       - /var/lib/ldap
       - /etc/ldap/slapd.d
       - /container/service/slapd/assets/certs/
+      - ./config/openldap/demo.ldif:/acme/openldap/ldif/10-bootstrap.ldif:z
     ports:
       - "1389:389"
       - "1636:636"
@@ -97,6 +99,7 @@ services:
     # fully-qualified domain name for the host.
     domainname: "demo.local"
     hostname: "ldap1"
+    command: [ "--copy-service", "--loglevel", "debug" ]
 
   phpldapadmin:
     image: osixia/phpldapadmin:latest

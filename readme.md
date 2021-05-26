@@ -84,21 +84,27 @@ The example environment contains several realms to illustrate the interaction of
 
 ### Acme-Apps Realm
 
-The `acme-apps` realm contains a simple demo application and provides integration with the `acme-internal`
+The `acme-apps` realm contains a simple demo application and provides integration with the `acme-internal`, `acme-ldap`
 and `acme-saml` realm via Identity Brokering. The idea behind this setup is to provide a global
 `acme-apps` realm for applications that are shared between internal and external users.
 
-The `acme-internal` realm provides applications that are only intended for internal users and employees.
-The `acme-internal` realm serves as an OpenID Connect based Identity Provider for the `acme-apps` realm.
+The `acme-internal` realm provides applications that are only intended for internal users.
+The `acme-ldap` realm provides applications that are only intended for employees.
+The `acme-internal` and `acme-ldap` realms serve as an OpenID Connect based Identity Provider for the `acme-apps` realm.
 The `acme-saml` realm provides applications is similar to the `acme-internal` and serves as 
 a SAML based Identity Provider for the `acme-apps` realm.
 
 ### Acme-Internal Realm
 
-The `acme-internal` realm contains a test user and is connected to a federated user store (LDAP directory) provided via openldap.
+The `acme-internal` realm contains a test users which are stored in the Keycloak database.
 
 Users:
 - Username `tester` and password `test` (from database)
+
+### Acme-LDAP Realm
+
+The `acme-ldap` realm contains a test user and is connected to a federated user store (LDAP directory) provided via openldap.
+
 - Username `FleugelR` and password `Password1` (from LDAP federation)
 
 ### Acme-SAML Realm

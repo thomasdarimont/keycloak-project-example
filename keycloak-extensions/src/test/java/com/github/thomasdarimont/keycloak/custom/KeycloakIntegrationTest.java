@@ -1,14 +1,18 @@
 package com.github.thomasdarimont.keycloak.custom;
 
-import dasniko.testcontainers.keycloak.KeycloakContainer;
+import com.github.thomasdarimont.keycloak.custom.KeycloakTestSupport.UserRef;
+import com.github.thomasdarimont.keycloak.custom.profile.ageinfo.AgeInfoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.keycloak.TokenVerifier;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.AccessTokenResponse;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.keycloak.representations.IDToken;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,6 +20,8 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,38 +35,59 @@ public class KeycloakIntegrationTest {
 
     public static final String TEST_USER_PASSWORD = "test";
 
-    public static KeycloakContainer keycloak;
-
-    public static GenericContainer<?> keycloakConfigCli;
+    public static final KeycloakEnvironment KEYCLOAK_ENVIRONMENT = new KeycloakEnvironment();
 
     @BeforeAll
     public static void beforeAll() {
-
-        keycloak = KeycloakTestSupport.createKeycloakContainer();
-        keycloak.withReuse(true);
-        keycloak.start();
-        keycloak.followOutput(new Slf4jLogConsumer(log));
-
-        keycloakConfigCli = KeycloakTestSupport.createKeycloakConfigCliContainer(keycloak);
-        keycloakConfigCli.start();
-        keycloakConfigCli.followOutput(new Slf4jLogConsumer(log));
+        KEYCLOAK_ENVIRONMENT.start();
     }
 
     @AfterAll
     public static void afterAll() {
-        if (keycloak != null) {
-            keycloak.stop();
-        }
+        KEYCLOAK_ENVIRONMENT.stop();
+    }
 
-        if (keycloakConfigCli != null) {
-            keycloakConfigCli.stop();
-        }
+    @Test
+    public void ageInfoMapperShouldAddAgeClassClaim() throws Exception {
+
+        Keycloak adminClient = KEYCLOAK_ENVIRONMENT.getAdminClient();
+
+        RealmResource acmeRealm = adminClient.realm(TEST_REALM);
+
+        UserRef user22Years = KeycloakTestSupport.createOrUpdateTestUser(acmeRealm, "test-user-age22", TEST_USER_PASSWORD, user -> {
+            user.setFirstName("Firstname");
+            user.setLastName("Lastname");
+            user.setAttributes(ImmutableMap.of("birthdate", List.of(LocalDate.now().minusYears(22).toString())));
+        });
+
+        TokenService tokenService = KEYCLOAK_ENVIRONMENT.getTokenService();
+
+        AccessTokenResponse accessTokenResponse = tokenService.grantToken(TEST_REALM, new Form()
+                .param("grant_type", "password")
+                .param("username", user22Years.getUsername())
+                .param("password", TEST_USER_PASSWORD)
+                .param("client_id", TEST_CLIENT)
+                .param("scope", "openid acme.profile acme.ageinfo")
+                .asMap());
+
+//            System.out.println("Token: " + accessTokenResponse.getToken());
+
+        // parse the received id-token
+        TokenVerifier<IDToken> verifier = TokenVerifier.create(accessTokenResponse.getIdToken(), IDToken.class);
+        verifier.parse();
+
+        // check for the custom claim
+        IDToken accessToken = verifier.getToken();
+        String ageInfoClaim = (String) accessToken.getOtherClaims().get(AgeInfoMapper.AGE_CLASS_CLAIM);
+
+        assertThat(ageInfoClaim).isNotNull();
+        assertThat(ageInfoClaim).isEqualTo("over21");
     }
 
     @Test
     public void pingResourceShouldBeAccessibleForUser() {
 
-        TokenService tokenService = KeycloakTestSupport.getTokenService(keycloak);
+        TokenService tokenService = KEYCLOAK_ENVIRONMENT.getTokenService();
 
         AccessTokenResponse accessTokenResponse = tokenService.grantToken(TEST_REALM, new Form()
                 .param("grant_type", "password")
@@ -73,7 +100,7 @@ public class KeycloakIntegrationTest {
         String accessToken = accessTokenResponse.getToken();
         System.out.println("Token: " + accessToken);
 
-        CustomResources customResources = KeycloakTestSupport.getResteasyWebTarget(keycloak).proxy(CustomResources.class);
+        CustomResources customResources = KEYCLOAK_ENVIRONMENT.getClientProxy(CustomResources.class);
         Map<String, Object> response = customResources.ping(TEST_REALM, "Bearer " + accessToken);
         System.out.println(response);
 

@@ -8,6 +8,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.keycloak.admin.client.CreatedResponseUtil;
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -16,7 +17,6 @@ import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.SelinuxContext;
 import org.testcontainers.containers.output.OutputFrame;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 
@@ -46,7 +46,9 @@ public class KeycloakTestSupport {
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
 
-        KeycloakContainer keycloakContainer = imageName == null ? new KeycloakContainer() : new KeycloakContainer(imageName);
+        KeycloakContainer keycloakContainer = imageName == null
+                ? new KeycloakContainer("quay.io/keycloak/keycloak:13.0.1")
+                : new KeycloakContainer(imageName);
 
         if (realmImportFileName != null) {
             addRealmImportFile(realmImportFileName, keycloakContainer);
@@ -57,7 +59,7 @@ public class KeycloakTestSupport {
     }
 
     public static KeycloakContainer createLocalKeycloakContainer() {
-        return new LocalKeycloak("http://localhost:8080/auth", "admin", "admin");
+        return new CustomKeycloak("http://localhost:8080/auth", "admin", "admin");
     }
 
     private static void addRealmImportFile(String realmImportFileName, KeycloakContainer keycloakContainer) {
@@ -124,7 +126,7 @@ public class KeycloakTestSupport {
 
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
-        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("adorsys/keycloak-config-cli:v3.3.1-12.0.4");
+        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("adorsys/keycloak-config-cli:v3.4.0-13.0.0");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
         keycloakConfigCli.addEnv("IMPORT_PATH", "/config");
@@ -141,6 +143,12 @@ public class KeycloakTestSupport {
         return keycloakConfigCli;
     }
 
+    public static Keycloak getKeycloakAdminClient(KeycloakContainer keycloak) {
+        return Keycloak.getInstance(keycloak.getAuthServerUrl(), MASTER_REALM,
+                keycloak.getAdminUsername(), keycloak.getAdminPassword(), ADMIN_CLI);
+    }
+
+
     @Data
     @AllArgsConstructor
     public static class UserRef {
@@ -151,7 +159,7 @@ public class KeycloakTestSupport {
 
     @Data
     @AllArgsConstructor
-    public static class LocalKeycloak extends KeycloakContainer {
+    public static class CustomKeycloak extends KeycloakContainer {
 
         String authServerUrl;
         String adminUsername;

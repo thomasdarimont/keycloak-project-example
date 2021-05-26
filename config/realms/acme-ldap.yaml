@@ -1,0 +1,254 @@
+realm: acme-ldap
+enabled: true
+displayName: Acme LDAP
+displayNameHtml: Acme LDAP
+loginWithEmailAllowed: true
+loginTheme: internal
+resetPasswordAllowed: true
+# accountTheme: keycloak.v2
+accountTheme: "keycloak.v2-fix"
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+browserFlow: "Browser Identity First"
+
+smtpServer:
+  replyToDisplayName: "Acme Employee Support"
+  port: 1025
+  host: mailhog
+  replyTo: "no-reply@localhost"
+  from: "acme-internal-sso@local"
+  fromDisplayName: "Acme Employee Account"
+
+clientScopes:
+  - name: acme.profile
+    description: Acme Profile Access
+    protocol: openid-connect
+  - name: acme.ageinfo
+    description: Acme Profile AgeInfo
+    protocol: openid-connect
+    protocolMappers:
+      - name: "Acme: AgeInfo"
+        protocol: openid-connect
+        protocolMapper: oidc-acme-ageinfo-mapper
+        consentRequired: false
+        config:
+          userinfo.token.claim: "true"
+          id.token.claim: "true"
+          access.token.claim: "false"
+
+  - name: acme.api
+    description: Acme API Access
+    protocol: openid-connect
+
+clients:
+  - clientId: app-minispa
+    protocol: openid-connect
+    name: App Mini SPA
+    description: "App Mini SPA Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+#    attributes: { }
+    fullScopeAllowed: false
+    rootUrl: "http://localhost:4000"
+    baseUrl: "/?realm=acme-ldap"
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
+  - clientId: acme_ldap_idp_broker
+    protocol: openid-connect
+    name: Acme Internal Broker
+    description: "Acme LDAP IdP Broker Client"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    fullScopeAllowed: false
+    secret: "${env:ACME_APPS_LDAP_IDP_BROKER_SECRET:-secret}"
+    redirectUris:
+      - "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-apps/broker/idp-acme-ldap/endpoint/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
+authenticationFlows:
+## Identity First Browser Login Flow
+  - alias: "Browser Identity First"
+    description: "This flow implements the Identity First pattern"
+    providerId: basic-flow
+    builtIn: false
+    topLevel: true
+    authenticationExecutions:
+      - authenticator: auth-cookie
+        requirement: ALTERNATIVE
+        priority: 1010
+      - authenticator: identity-provider-redirector
+        requirement: ALTERNATIVE
+        priority: 1020
+      - requirement: ALTERNATIVE
+        priority: 1030
+        flowAlias: "Identity Forms"
+        autheticatorFlow: true
+
+  - alias: "Identity Forms"
+    description: "Sub-Flow to ask user for username an password"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - requirement: REQUIRED
+        authenticator: auth-username-form
+        priority: 2010
+      - requirement: REQUIRED
+        authenticator: auth-password-form
+        priority: 2020
+      - requirement: CONDITIONAL
+        autheticatorFlow: true
+        flowAlias: "2FA Forms"
+        priority: 2030
+
+  - alias: "2FA Forms"
+    description: "Sub-Flow to ask user for 2FA"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: conditional-user-configured
+        requirement: REQUIRED
+        priority: 3010
+      - authenticator: auth-otp-form
+        requirement: REQUIRED
+        priority: 3020
+
+components:
+  org.keycloak.storage.UserStorageProvider:
+    - name: Acme LDAP
+      providerId: ldap
+      subComponents:
+        org.keycloak.storage.ldap.mappers.LDAPStorageMapper:
+          - name: "creation date"
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute:
+                - createTimestamp
+              is.mandatory.in.ldap: ["false"]
+              read.only: ["true"]
+              always.read.value.from.ldap: ["true"]
+              user.model.attribute: [createTimestamp]
+          - name: "modify date"
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute: [modifyTimestamp]
+              is.mandatory.in.ldap: ["false"]
+              read.only: ["true"]
+              always.read.value.from.ldap: ["true"]
+              user.model.attribute: [modifyTimestamp]
+          - name: username
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute: [uid]
+              is.mandatory.in.ldap: ["true"]
+              always.read.value.from.ldap: ["false"]
+              read.only: ["true"]
+              user.model.attribute: [username]
+          - name: "first name"
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute: [givenName]
+              is.mandatory.in.ldap: ["true"]
+              always.read.value.from.ldap: ["true"]
+              read.only: ["true"]
+              user.model.attribute: ["firstName"]
+          - name: email
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute: [ "mail" ]
+              is.mandatory.in.ldap: [ "false" ]
+              read.only: [ "true" ]
+              always.read.value.from.ldap: [ "false" ]
+              user.model.attribute: [ "email" ]
+          - name: "last name"
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute: [ "sn" ]
+              is.mandatory.in.ldap: ["true"]
+              always.read.value.from.ldap: ["true"]
+              read.only: ["true"]
+              user.model.attribute: ["lastName"]
+          - name: "phone number"
+            providerId: user-attribute-ldap-mapper
+            subComponents: {}
+            config:
+              ldap.attribute: ["mobile"]
+              is.mandatory.in.ldap: ["false"]
+              attribute.default.value: ["0"]
+              always.read.value.from.ldap: ["true"]
+              read.only: ["true"]
+              user.model.attribute: ["phone_number"]
+          - name: "LDAP Group Mapper"
+            providerId: group-ldap-mapper
+            subComponents: {}
+            config:
+              membership.attribute.type: ["DN"]
+              "group.name.ldap.attribute": ["cn"]
+              "preserve.group.inheritance": ["false"]
+              "membership.user.ldap.attribute": ["uid"]
+              "groups.dn": ["${env:ACME_LDAP_GROUP_DN:-dc=corp,dc=acme,dc=local}"]
+              mode: ["READ_ONLY"]
+              "user.roles.retrieve.strategy": ["LOAD_GROUPS_BY_MEMBER_ATTRIBUTE"]
+              "ignore.missing.groups": ["true"]
+              "membership.ldap.attribute": ["member"]
+              "group.object.classes": ["groupOfNames"]
+              "memberof.ldap.attribute": ["memberOf"]
+              "groups.path": ["/"]
+              "drop.non.existing.groups.during.sync": ["false"]
+      config:
+        enabled: ["true"]
+        pagination: ["true"]
+        fullSyncPeriod: ["-1"]
+        searchScope: ["2"]
+        useTruststoreSpi: ["ldapsOnly"]
+        usersDn: ["${env:ACME_LDAP_USERS_DN:-dc=corp,dc=acme,dc=local}"]
+        maxLifespan: ["3600000"]
+        connectionPooling: ["true"]
+        cachePolicy: ["NO_CACHE"]
+        priority: ["0"]
+        importEnabled: ["true"]
+        useKerberosForPasswordAuthentication: ["false"]
+        usePasswordModifyExtendedOp: ["true"]
+        "trustEmail": ["false"]
+        userObjectClasses: ["inetOrgPerson, organizationalPerson"]
+        bindDn: ["${env:LDAP_USER:-ldap_user}"]
+        usernameLDAPAttribute: ["uid"]
+        changedSyncPeriod: ["-1"]
+        bindCredential: ["${env:LDAP_PASSWORD:-ldap_password}"]
+        rdnLDAPAttribute: ["uid"]
+        vendor: ["other"]
+        editMode: ["READ_ONLY"]
+        uuidLDAPAttribute: ["entryUUID"]
+        connectionUrl: ["${env:LDAP_URL:-ldap://localhost:389}"]
+        syncRegistrations: ["false"]
+        authType: ["simple"]
+        batchSizeForSync: ["1000"]
+        changedSyncEnabled: ["false"]
+        validatePasswordPolicy: ["false"]

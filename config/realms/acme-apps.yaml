@@ -118,6 +118,35 @@ identityProviders:
       addExtensionsElementWithKeyInfo: 'false'
       principalType: SUBJECT
 
+  - alias: "idp-acme-ldap"
+    displayName: "Acme LDAP Login"
+    providerId: "oidc"
+    enabled: true
+    updateProfileFirstLoginMode: on
+    trustEmail: false
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: "first broker login"
+    #    postBrokerLoginFlowAlias: "Custom Post Broker Login"
+    config:
+      issuer: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap"
+      tokenUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/token"
+      jwksUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/certs"
+      userInfoUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/userinfo"
+      authorizationUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/auth"
+      logoutUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/logout"
+      clientId: "acme_ldap_idp_broker"
+      clientSecret: "${env:ACME_APPS_LDAP_IDP_BROKER_SECRET:-secret}"
+      clientAuthMethod: "client_secret_post"
+      defaultScope: "openid"
+      loginHint: "true"
+      backchannelSupported: "true"
+      validateSignature: "true"
+      useJwksUrl: "true"
+      syncMode: "FORCE"
+
 identityProviderMappers:
   - name: lastname-importer
     identityProviderAlias: idp-acme-saml
