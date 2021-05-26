@@ -35,6 +35,8 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Test Dependencies -->
+
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
@@ -62,6 +64,8 @@
             <version>${testcontainers-keycloak.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Tooling Dependencies -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -103,6 +107,7 @@
                             </includes>
                             <forkMode>once</forkMode>
                             <environmentVariables>
+                                <!-- workaround for usupported RYUK on fedora linux-->
                                 <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
                             </environmentVariables>
                         </configuration>

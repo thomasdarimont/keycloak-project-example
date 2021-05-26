@@ -26,11 +26,11 @@ import java.util.List;
 @AutoService(ProtocolMapper.class)
 public class AgeInfoMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
 
-    static final String PROVIDER_ID = "oidc-acme-ageinfo-mapper";
-
-    static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
+    public static final String PROVIDER_ID = "oidc-acme-ageinfo-mapper";
 
     public static final String AGE_CLASS_CLAIM = "acme_age_class";
+
+    private static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
 
     static {
 
@@ -52,7 +52,7 @@ public class AgeInfoMapper extends AbstractOIDCProtocolMapper implements OIDCAcc
 
     @Override
     public String getHelpText() {
-        return "Exposes the user's age-class as claim";
+        return "Exposes the age-class of the user as claim. The age is computed from a birthdate user attribute.";
     }
 
     @Override

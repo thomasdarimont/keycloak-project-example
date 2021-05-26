@@ -12,6 +12,16 @@ emailTheme: keycloak
 sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
 browserFlow: "Browser Identity First"
 
+eventsListeners:
+  - "jboss-logging"
+  - "acme-audit-listener"
+eventsEnabled: true
+# 120 days
+eventsExpiration: 10368000
+# enabledEventTypes: [ "SEND_RESET_PASSWORD", "UPDATE_CONSENT_ERROR", "GRANT_CONSENT", ... ]
+adminEventsEnabled: false
+adminEventsDetailsEnabled: false
+
 smtpServer:
   replyToDisplayName: "Acme Employee Support"
   port: 1025
