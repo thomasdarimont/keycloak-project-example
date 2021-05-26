@@ -4,6 +4,7 @@ import com.github.thomasdarimont.keycloak.custom.KeycloakTestSupport.UserRef;
 import com.github.thomasdarimont.keycloak.custom.profile.ageinfo.AgeInfoMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.keycloak.TokenVerifier;
@@ -12,6 +13,7 @@ import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.IDToken;
+import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.ws.rs.Consumes;
@@ -23,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -82,6 +85,31 @@ public class KeycloakIntegrationTest {
 
         assertThat(ageInfoClaim).isNotNull();
         assertThat(ageInfoClaim).isEqualTo("over21");
+    }
+
+    @Test
+    public void auditListenerShouldPrintLogMessage() throws Exception {
+
+        Assumptions.assumeTrue(KEYCLOAK_ENVIRONMENT.getMode() == KeycloakEnvironment.Mode.TESTCONTAINERS);
+
+        ToStringConsumer consumer = new ToStringConsumer();
+        KEYCLOAK_ENVIRONMENT.getKeycloak().followOutput(consumer);
+
+        TokenService tokenService = KEYCLOAK_ENVIRONMENT.getTokenService();
+
+        // trigger user login via ROPC
+        tokenService.grantToken(TEST_REALM, new Form()
+                .param("grant_type", "password")
+                .param("username", "tester")
+                .param("password", TEST_USER_PASSWORD)
+                .param("client_id", TEST_CLIENT)
+                .param("scope", "openid acme.profile acme.ageinfo")
+                .asMap());
+
+        // Allow the container log to flush
+        TimeUnit.MILLISECONDS.sleep(750);
+
+        assertThat(consumer.toUtf8String()).contains("audit userEvent");
     }
 
     @Test
