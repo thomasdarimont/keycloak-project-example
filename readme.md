@@ -14,11 +14,12 @@ The example contains the following Keycloak extensions:
 - Support for deploying extensions to running Keycloak container
 - Support for instant reloading of theme and extension code changes
 - Support Keycloak configuration customization via CLI scripts
-- Examples for Integration Tests with Keycloak-Testcontainers
-- Example for End to End Tests with Cypress
-- Realm configuration as Configuration as Code via keycloak-config-cli scripts 
+- Examples for Integration Tests with [Keycloak-Testcontainers](https://github.com/dasniko/testcontainers-keycloak)
+- Example for End to End Tests with [Cypress](https://www.cypress.io/)
+- Realm configuration as Configuration as Code via [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) 
 - Multi-realm setup example with OpenID Connect and SAML based Identity Brokering
-- LDAP based User Federation
+- LDAP based User Federation backed by [Docker-OpenLDAP](https://github.com/osixia/docker-openldap)
+- Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
 
 # Build
 The example can be build with the following maven command:
@@ -75,6 +76,18 @@ docker run \
 -p 8080:8080 \
 thomasdarimont/custom-keycloak:latest
 ```
+
+## Run End to End Tests
+
+The [cypress](https://www.cypress.io/) based End to End tests can be found in the [keycloak-e2e](./keycloak-e2e) folder. 
+
+To run the e2e tests, start the Keycloak environment and run the following commands:
+```
+cd keycloak-e2e
+yarn run cypress:open
+# yarn run cypress:test
+```
+
 
 # Example environment
 
