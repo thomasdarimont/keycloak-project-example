@@ -22,7 +22,7 @@ public class AcmeAuditListenerFactory implements EventListenerProviderFactory {
         return INSTANCE;
     }
 
-    @Override // we could read settings from the provider config in standalone(-ha).xml
+    @Override // we could read settings from the provider config in standalone(-ha).xml or keycloak.properties
     public void init(Config.Scope config) {
         /* configure factory */
     }
