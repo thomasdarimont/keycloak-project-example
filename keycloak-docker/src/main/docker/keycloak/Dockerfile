@@ -1,4 +1,4 @@
-ARG KEYCLOAK_VERSION=12.0.4
+ARG KEYCLOAK_VERSION=13.0.1
 ARG ALPINE_VERSION=3.13.5
 
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as keycloak
@@ -27,7 +27,7 @@ RUN   echo "Create trimmed down JDK" && \
       --vm=server \
       --exclude-files="**/bin/rmiregistry,**/bin/jrunscript,**/bin/rmid" \
       --module-path "$JAVA_HOME/jmods" \
-      --add-modules java.base,java.instrument,java.logging,java.management,java.se,java.naming,java.security.jgss,java.security.sasl,java.sql,java.transaction.xa,java.xml,java.xml.crypto,jdk.security.auth,jdk.xml.dom,jdk.naming.dns,jdk.unsupported,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.jcmd,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.internal.vm.ci,jdk.internal.vm.compiler,jdk.internal.vm.compiler.management \
+      --add-modules java.base,java.instrument,java.logging,java.management,java.se,java.naming,java.security.jgss,java.security.sasl,java.sql,java.transaction.xa,java.xml,java.xml.crypto,jdk.security.auth,jdk.xml.dom,jdk.naming.dns,jdk.unsupported,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.jcmd,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.internal.vm.ci,jdk.internal.vm.compiler,jdk.internal.vm.compiler.management,jdk.sctp \
       --output $JAVA_TARGET && \
       echo "Add Java Debugging tools from JDK" && \
       cp $JAVA_HOME/lib/libjdwp.so $JAVA_TARGET/lib/ && \
