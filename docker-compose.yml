@@ -4,7 +4,8 @@ services:
     image: quay.io/keycloak/keycloak:13.0.1
     user: "1000:1000"
     env_file:
-      - ./custom-keycloak.env
+      - ./custom-keycloak-common.env
+      - ./custom-keycloak-http.env
     environment:
 #      KEYCLOAK_USER: "admin"
 #      KEYCLOAK_PASSWORD: "admin"
@@ -12,11 +13,16 @@ services:
       KEYCLOAK_THEME_CACHING: "false"
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
       PROXY_ADDRESS_FORWARDING: "true"
+
+# Exposes Metrics via http://localhost:9990/metrics
+      KEYCLOAK_STATISTICS: all
+
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
     command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0", "-bmanagement" , "0.0.0.0", "-Dwildfly.statistics-enabled=true"]
     ports:
       - "8080:8080"
+      - "8443:8443"
       - "9990:9990"
       - "127.0.0.1:8787:8787"
     volumes:
@@ -27,12 +33,14 @@ services:
       - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
       - ./keycloak-docker/src/main/docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
       - ./imex:/opt/jboss/imex:z
+# This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
       - ./cli:/opt/jboss/startup-scripts:z
 
   custom-keycloak-provisioning:
     image: adorsys/keycloak-config-cli:v3.4.0-13.0.0
     env_file:
-      - ./custom-keycloak.env
+      - ./custom-keycloak-common.env
+      - ./custom-keycloak-http.env
     environment:
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
@@ -55,6 +63,9 @@ services:
 
   openldap:
     image: osixia/openldap:1.5.0
+    env_file:
+      - ./custom-keycloak-common.env
+      - ./custom-keycloak-http.env
     environment:
       LDAP_LOG_LEVEL: "256"
       LDAP_ORGANISATION: "Acme Inc."
@@ -114,6 +125,7 @@ services:
   custom-demo-oidc-js-spa:
     image: httpd:2.4
     volumes:
-      - ./demos/oidc-js-spa:/usr/local/apache2/htdocs/:z
+      - ./demos/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
     ports:
       - "4000:80"
+      - "4443:443"

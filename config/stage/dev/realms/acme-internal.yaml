@@ -62,7 +62,7 @@ clients:
     serviceAccountsEnabled: false
 #    attributes: { }
     fullScopeAllowed: false
-    rootUrl: "http://localhost:4000"
+    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
     baseUrl: "/?realm=acme-internal"
     redirectUris:
       - "/*"
@@ -98,13 +98,13 @@ clients:
   - clientId: test-client
     protocol: openid-connect
     name: Test Client
-    description: "App Mini SPA Description"
+    description: "Test Client Description"
     enabled: true
     publicClient: true
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
-    rootUrl: "http://localhost:4000"
-    baseUrl: "/?realm=acme-internal"
+    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
+    baseUrl: "/?realm=acme-internal&client_id=test-client"
     redirectUris:
       - "/*"
     webOrigins:

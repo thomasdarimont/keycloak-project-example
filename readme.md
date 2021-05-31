@@ -41,21 +41,46 @@ mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
 
 # Run
 
+## Prepare
+
+Create a testrun folder to hold keycloak data.
+```
+mkdir -p testrun/data
+```
+
+Generate certificates for the example domain `acme.test` via [mkcert](https://github.com/FiloSottile/mkcert).
+```
+./bin/createTlsCerts.sh
+```
+This will generate a TLS certificate and key file in `.pem` format in `config/stage/dev/tls`. 
+
+Register map the following host names in your hosts configuration:
+```
+127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test
+```
+
 ## Start Keycloak Container with docker-compose
 
 To speed up development we can mount the keycloak-extensions class-folder and keycloak-themes folder into
 a Keycloak container that is started via docker-compose. This allows for quick turnarounds while working on themes
 and extensions.
 
-Keycloak will be available on http://localhost:8080/auth.
 The default Keycloak admin username is `admin` with password `admin`.
+
+### Start with plain HTTP
 
 You can start the Keycloak container via:
 ```
-mkdir -p testrun/data
-
-docker-compose --env-file custom-keycloak.env up --remove-orphans
+./start-http.sh
 ```
+Keycloak will be available on http://localhost:8080/auth.
+
+### Start with HTTPS
+
+```
+./start-tls.sh
+```
+Keycloak will be available on https://id.acme.test:8443/auth.
 
 Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger
 a redeployment of the custom extension by Keycloak.
@@ -87,7 +112,6 @@ cd keycloak-e2e
 yarn run cypress:open
 # yarn run cypress:test
 ```
-
 
 # Example environment
 
