@@ -137,7 +137,8 @@ public class KeycloakTestSupport {
         keycloakConfigCli.addEnv("KEYCLOAK_URL", keycloakContainer.getAuthServerUrl());
         keycloakConfigCli.addEnv("KEYCLOAK_FRONTEND_URL", keycloakContainer.getAuthServerUrl());
 
-        keycloakConfigCli.addFileSystemBind("../config/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
+        // TODO make the realm config folder parameterizable
+        keycloakConfigCli.addFileSystemBind("../config/stage/dev/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
         keycloakConfigCli.setWaitStrategy(Wait.forLogMessage(".*keycloak-config-cli running in.*", 1));
         keycloakConfigCli.setNetworkMode("host");
         return keycloakConfigCli;

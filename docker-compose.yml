@@ -40,7 +40,7 @@ services:
       IMPORT_FORCE: "false"
       IMPORT_VARSUBSTITUTION: "true"
     volumes:
-      - ./config/realms:/config:z
+      - ./config/stage/dev/realms:/config:z
 
   mailhog:
     # Web Interface: http://localhost:1080/#
@@ -90,7 +90,7 @@ services:
       - /var/lib/ldap
       - /etc/ldap/slapd.d
       - /container/service/slapd/assets/certs/
-      - ./config/openldap/demo.ldif:/acme/openldap/ldif/10-bootstrap.ldif:z
+      - ./config/stage/dev/openldap/demo.ldif:/acme/openldap/ldif/10-bootstrap.ldif:z
     ports:
       - "1389:389"
       - "1636:636"
