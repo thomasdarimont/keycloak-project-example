@@ -41,7 +41,7 @@ clients:
     serviceAccountsEnabled: false
     #    attributes: { }
     fullScopeAllowed: false
-    rootUrl: "http://localhost:4000"
+    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
     baseUrl: "/?realm=acme-apps"
     redirectUris:
       - "/*"
