@@ -84,10 +84,6 @@ public class KeycloakTestSupport {
         }
     }
 
-    public static TokenService getTokenService(KeycloakContainer keycloak) {
-        return getResteasyWebTarget(keycloak).proxy(TokenService.class);
-    }
-
     public static ResteasyWebTarget getResteasyWebTarget(KeycloakContainer keycloak) {
         ResteasyClient client = new ResteasyClientBuilder().build();
         return client.target(UriBuilder.fromPath(keycloak.getAuthServerUrl()));
@@ -136,6 +132,7 @@ public class KeycloakTestSupport {
         keycloakConfigCli.addEnv("KEYCLOAK_PASSWORD", keycloakContainer.getAdminPassword());
         keycloakConfigCli.addEnv("KEYCLOAK_URL", keycloakContainer.getAuthServerUrl());
         keycloakConfigCli.addEnv("KEYCLOAK_FRONTEND_URL", keycloakContainer.getAuthServerUrl());
+        keycloakConfigCli.addEnv("APPS_FRONTEND_URL_MINISPA", "http://localhost:4000");
 
         // TODO make the realm config folder parameterizable
         keycloakConfigCli.addFileSystemBind("../config/stage/dev/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
@@ -144,19 +141,12 @@ public class KeycloakTestSupport {
         return keycloakConfigCli;
     }
 
-    public static Keycloak getKeycloakAdminClient(KeycloakContainer keycloak) {
-        return Keycloak.getInstance(keycloak.getAuthServerUrl(), MASTER_REALM,
-                keycloak.getAdminUsername(), keycloak.getAdminPassword(), ADMIN_CLI);
-    }
-
-
     @Data
     @AllArgsConstructor
     public static class UserRef {
         String userId;
         String username;
     }
-
 
     @Data
     @AllArgsConstructor
