@@ -20,6 +20,7 @@ The example contains the following Keycloak extensions:
 - Multi-realm setup example with OpenID Connect and SAML based Identity Brokering
 - LDAP based User Federation backed by [Docker-OpenLDAP](https://github.com/osixia/docker-openldap)
 - Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
+- TLS Support
 
 # Build
 The example can be build with the following maven command:
@@ -48,7 +49,7 @@ Create a testrun folder to hold keycloak data.
 mkdir -p testrun/data
 ```
 
-Generate certificates for the example domain `acme.test` via [mkcert](https://github.com/FiloSottile/mkcert).
+Generate a certificate and Key for the example domain `acme.test` with [mkcert](https://github.com/FiloSottile/mkcert).
 ```
 ./bin/createTlsCerts.sh
 ```
