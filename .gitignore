@@ -4,6 +4,11 @@ testrun/
 scratch/
 *.jfr
 
+config/stage/dev/tls/*.pem
+config/stage/dev/tls/*.p12
+config/stage/dev/tls/*.crt
+config/stage/dev/tls/*.key
+
 # Exclude cypress resources
 node_modules
 src/test/e2e/cypress/reports
