@@ -8,10 +8,11 @@
     <artifactId>keycloak-project-template</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
+    <name>Acme Keycloak Project</name>
 
     <modules>
-        <module>keycloak-extensions</module>
-        <module>keycloak-docker</module>
+        <module>keycloak/extensions</module>
+        <module>keycloak/docker</module>
     </modules>
 
     <properties>

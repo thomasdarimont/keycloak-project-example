@@ -7,7 +7,7 @@ additionalOptions=${@:2}
 
 echo "Exporting $realmName"
 
-docker-compose exec custom-keycloak \
+docker-compose exec acme-keycloak \
   /opt/jboss/keycloak/bin/standalone.sh -c standalone.xml \
   -Djboss.socket.binding.port-offset=10000 \
   -Dkeycloak.migration.action=export \

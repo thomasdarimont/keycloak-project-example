@@ -1,10 +1,10 @@
 version: '3.8'
 services:
-  custom-keycloak:
+  acme-keycloak:
     env_file:
-      - ./custom-keycloak-common.env
-      - ./custom-keycloak-http.env
-      - ./custom-keycloak-tls.env
+      - ./keycloak-common.env
+      - ./keycloak-http.env
+      - ./keycloak-tls.env
     volumes:
 # This configures the key and certificate for HTTPS.
       - ./config/stage/dev/tls/acme.test+1.pem:/etc/x509/https/tls.crt:z
@@ -12,22 +12,22 @@ services:
 # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
       - ./config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
 
-  custom-keycloak-provisioning:
+  acme-keycloak-provisioning:
     env_file:
-      - ./custom-keycloak-common.env
-      - ./custom-keycloak-http.env
-      - ./custom-keycloak-tls.env
+      - ./keycloak-common.env
+      - ./keycloak-http.env
+      - ./keycloak-tls.env
 
   openldap:
     env_file:
-      - ./custom-keycloak-common.env
-      - ./custom-keycloak-http.env
-      - ./custom-keycloak-tls.env
+      - ./keycloak-common.env
+      - ./keycloak-http.env
+      - ./keycloak-tls.env
 
-  custom-demo-oidc-js-spa:
+  acme-app-oidc-js-spa:
     image: httpd:2.4
     volumes:
-      - ./demos/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
+      - ./apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
       - ./config/stage/dev/tls/acme.test+1.pem:/usr/local/apache2/conf/server.crt:z
       - ./config/stage/dev/tls/acme.test+1-key.pem:/usr/local/apache2/conf/server.key:z
     ports:
@@ -38,5 +38,3 @@ services:
              sed -i -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' conf/httpd.conf &&
              httpd-foreground"
-
-#

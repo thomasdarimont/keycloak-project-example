@@ -2,6 +2,6 @@
 
 set -eou pipefail
 
-docker-compose restart custom-keycloak-provisioning
+docker-compose restart acme-keycloak-provisioning
 
 echo "Provisioning triggered"
