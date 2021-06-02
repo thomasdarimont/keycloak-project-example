@@ -46,7 +46,7 @@
                                     <KEYCLOAK_VERSION>${keycloak.version}</KEYCLOAK_VERSION>
                                 </args>
 
-                                <dockerFileDir>keycloak</dockerFileDir>
+                                <dockerFile>keycloak/Dockerfile.alpine-slim</dockerFile>
 
                                 <assembly>
                                     <inline>

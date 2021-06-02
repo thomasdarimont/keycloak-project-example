@@ -1,11 +1,30 @@
 Keycloak Project Example
 ---
 
-This repository contains an easy to use project setup for custom Keycloak projects.
+This repository contains a project setup for keycloak based projects.
 
-This setup serves as a starting point to develop and deploy a set of Keycloak extensions, custom themens and configuration to a Keycloak docker container.
-In addition to that, the project also shows how to write integration tests via [Keycloak-Testcontainers](https://github.com/dasniko/testcontainers-keycloak) and how to package all extensions and themes as a
-custom docker image.
+This setup serves as a starting point to support the full lifecycle of development in a keycloak based project. 
+This may include develop and deploy a set of Keycloak extensions, custom themes and configuration into a customized keycloak docker container (or tar-ball).
+
+The project also shows how to write integration tests via [Keycloak-Testcontainers](https://github.com/dasniko/testcontainers-keycloak).
+After successful test-run package all extensions and themes as a custom docker image.
+This image is meant to be the project base image fulfilling the projects requirements in contrast to the general keycloak image.
+
+These requirements work in different contextes, roles and use-cases:
+
+a) Create a docker image for  
+
+1) Standard keycloak docker image with [extensions](./keycloak-extensions), themes und server config.
+2) Slim custom docker image with extensions, themes und server config (basis alpine) chose jdk version, base-os image version, base keycloak version.
+
+b) Developer for keycloak themes, extensions and image
+
+1) build, integration-test with test-containers (uses standard keycloak image) as a developer
+2) run external keycloak with hotdeploy (theme, extension, ...), run integrationtest, e2e testing
+
+c) acceptance/e2e testing with cypress as tester/developer
+
+d) realm and server configuration as keycloak operator
 
 The example contains the following Keycloak extensions:
 - Custom REST Endpoint the can expose additional custom APIs: `CustomResource`
