@@ -133,7 +133,7 @@ public class KeycloakTestSupport {
         keycloakConfigCli.addEnv("APPS_FRONTEND_URL_MINISPA", "http://localhost:4000");
 
         // TODO make the realm config folder parameterizable
-        keycloakConfigCli.addFileSystemBind("../config/stage/dev/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
+        keycloakConfigCli.addFileSystemBind("../../config/stage/dev/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
         keycloakConfigCli.setWaitStrategy(Wait.forLogMessage(".*keycloak-config-cli running in.*", 1));
         keycloakConfigCli.setNetworkMode("host");
         return keycloakConfigCli;

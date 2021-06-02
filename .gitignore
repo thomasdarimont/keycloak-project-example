@@ -3,6 +3,8 @@ testrun/
 !scratch/.gitkeep
 scratch/
 *.jfr
+!keycloak/imex/.gitkeep
+keycloak/imex/*
 
 config/stage/dev/tls/*.pem
 config/stage/dev/tls/*.p12

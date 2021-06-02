@@ -1,11 +1,11 @@
 version: '3.8'
 services:
-  custom-keycloak:
+  acme-keycloak:
     image: quay.io/keycloak/keycloak:13.0.1
     user: "1000:1000"
     env_file:
-      - ./custom-keycloak-common.env
-      - ./custom-keycloak-http.env
+      - ./keycloak-common.env
+      - ./keycloak-http.env
     environment:
 #      KEYCLOAK_USER: "admin"
 #      KEYCLOAK_PASSWORD: "admin"
@@ -26,21 +26,20 @@ services:
       - "9990:9990"
       - "127.0.0.1:8787:8787"
     volumes:
-      - ./keycloak-extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/keycloak-extensions.jar:z
-      - ./keycloak-themes/themes/apps:/opt/jboss/keycloak/themes/apps:z
-      - ./keycloak-themes/themes/internal:/opt/jboss/keycloak/themes/internal:z
-      - ./keycloak-themes/themes/keycloak.v2-fix:/opt/jboss/keycloak/themes/keycloak.v2-fix:z
-      - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
-      - ./keycloak-docker/src/main/docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
-      - ./imex:/opt/jboss/imex:z
+      - ./keycloak/extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
+      - ./keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
+      - ./keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
+      - ./keycloak/docker/src/main/docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
+      - ./keycloak/imex:/opt/jboss/imex:z
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
-      - ./cli:/opt/jboss/startup-scripts:z
+      - ./keycloak/cli:/opt/jboss/startup-scripts:z
+      - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
 
-  custom-keycloak-provisioning:
+  acme-keycloak-provisioning:
     image: adorsys/keycloak-config-cli:v3.4.0-13.0.0
     env_file:
-      - ./custom-keycloak-common.env
-      - ./custom-keycloak-http.env
+      - ./keycloak-common.env
+      - ./keycloak-http.env
     environment:
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
@@ -64,10 +63,10 @@ services:
   openldap:
     image: osixia/openldap:1.5.0
     env_file:
-      - ./custom-keycloak-common.env
-      - ./custom-keycloak-http.env
+      - ./keycloak-common.env
+      - ./keycloak-http.env
     environment:
-      LDAP_LOG_LEVEL: "256"
+#      LDAP_LOG_LEVEL: "256"
       LDAP_ORGANISATION: "Acme Inc."
       LDAP_DOMAIN: "corp.acme.local"
       LDAP_BASE_DN: ""
@@ -122,10 +121,10 @@ services:
     depends_on:
       - openldap
 
-  custom-demo-oidc-js-spa:
+  acme-app-oidc-js-spa:
     image: httpd:2.4
     volumes:
-      - ./demos/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
+      - ./apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
     ports:
       - "4000:80"
       - "4443:443"
