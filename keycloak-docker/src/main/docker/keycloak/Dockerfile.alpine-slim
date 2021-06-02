@@ -1,8 +1,12 @@
 ARG KEYCLOAK_VERSION=13.0.1
 ARG ALPINE_VERSION=3.13.5
 
+#####################################################
+# Base keycloak image with binary keycloak release
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as keycloak
 
+#####################################################
+# Prepare custom JDK with jlink
 # alpine:3.13.5
 # see https://hub.docker.com/layers/alpine/library/alpine/3.13.5/images/sha256-827525365ff718681b0688621e09912af49a17611701ee4d421ba50d57c13f7e?context=explore
 FROM alpine:$ALPINE_VERSION as java
@@ -36,24 +40,24 @@ RUN   echo "Create trimmed down JDK" && \
       echo "Remove debug symbols from JDK" && \
       strip -p --strip-unneeded $JAVA_TARGET/lib/server/libjvm.so
 
-# Custom Image
+#####################################################
+# Start of custom Keycloak-Image assembly
 FROM alpine:$ALPINE_VERSION
 
 # Versions are determined by alpline base version
 RUN apk add -U --no-cache tzdata bash coreutils openssl
 
+# Copy customized JDK into this image
+COPY --from=java /opt/java/java-runtime /opt/java
+
 # Java
 ENV JAVA_HOME /opt/java
 ENV PATH $PATH:$JAVA_HOME/bin
-
-# Copy customized JDK into this image
-COPY --from=java /opt/java/java-runtime /opt/java
 
 # Temporarily elevate permissions
 USER root
 
 # Keycloak
-
 ENV JBOSS_HOME /opt/jboss/keycloak
 ENV JBOSS_TOOLS /opt/jboss/tools
 
@@ -64,11 +68,10 @@ RUN   addgroup -S jboss -g 1000 && \
 # Copy Keycloak into this image
 COPY --from=keycloak --chown=jboss:jboss /opt/jboss /opt/jboss
 
-ADD ./custom-docker-entrypoint.sh $JBOSS_TOOLS/
+COPY --chown=jboss:jboss ./custom-docker-entrypoint.sh $JBOSS_TOOLS/
 
 # Make tools executable by jboss user
-RUN   chown jboss:jboss $JBOSS_TOOLS/custom-docker-entrypoint.sh && \
-      chmod 755 $JBOSS_TOOLS/custom-docker-entrypoint.sh
+RUN   chmod 755 $JBOSS_TOOLS/custom-docker-entrypoint.sh
 
 # Switch to jboss user
 USER jboss
