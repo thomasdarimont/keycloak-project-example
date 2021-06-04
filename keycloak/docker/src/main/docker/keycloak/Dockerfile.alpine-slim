@@ -82,7 +82,7 @@ CMD ["-b", "0.0.0.0"]
 COPY --chown=jboss:root maven/cli/ /opt/jboss/startup-scripts
 
 # Add feature configuration
-COPY --chown=jboss:root profile.properties /opt/jboss/keycloak/standalone/configuration/
+COPY --chown=jboss:root maven/config/ /opt/jboss/keycloak/standalone/configuration/
 
 # Add Keycloak Extensions
 COPY --chown=jboss:root maven/extensions/ /opt/jboss/keycloak/standalone/deployments
