@@ -238,10 +238,8 @@ The extensions can now be redeployed by running `Tools -> External Tools -> kc-d
 
 ## Scan Image for Vulnerabilities
 
+We use [aquasec/trivy](https://github.com/aquasecurity/trivy) to scan the generated docker image for vulnerabilities.
+
 ```
-docker run \
-  --privileged \
-  --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock:z aquasec/trivy:0.17.2 \
-  thomasdarimont/custom-keycloak:1.0.0-SNAPSHOT
+bin/scanImage.sh thomasdarimont/custom-keycloak:1.0.0-SNAPSHOT
 ```
