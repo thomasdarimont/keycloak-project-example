@@ -1,6 +1,17 @@
 ARG KEYCLOAK_VERSION=13.0.1
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 
+USER root
+
+# Update OS packages
+RUN true \
+    && microdnf clean all \
+    && microdnf update --nodocs \
+    && microdnf clean all \
+    && true
+
+USER jboss
+
 # Add custom Startup-Scripts
 COPY --chown=jboss:root maven/cli/ /opt/jboss/startup-scripts
 
