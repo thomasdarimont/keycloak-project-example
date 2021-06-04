@@ -67,6 +67,11 @@
                                         </fileSet>
 
                                         <fileSet>
+                                            <directory>../config</directory>
+                                            <outputDirectory>config</outputDirectory>
+                                        </fileSet>
+
+                                        <fileSet>
                                             <directory>../cli</directory>
                                             <outputDirectory>cli</outputDirectory>
                                         </fileSet>

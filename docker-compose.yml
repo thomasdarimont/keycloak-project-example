@@ -29,7 +29,7 @@ services:
       - ./keycloak/extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
       - ./keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
       - ./keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
-      - ./keycloak/docker/src/main/docker/keycloak/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
+      - ./keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
       - ./keycloak/imex:/opt/jboss/imex:z
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
       - ./keycloak/cli:/opt/jboss/startup-scripts:z
