@@ -1,7 +1,7 @@
 @echo off
 
 if "%DOMAIN%"=="" (
- DOMAIN=acme.test
+ SET DOMAIN=acme.test
 )
 
 echo "Generating TLS Certificate and Key for domain: %DOMAIN%"
