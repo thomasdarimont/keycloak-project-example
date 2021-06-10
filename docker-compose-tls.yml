@@ -32,4 +32,4 @@ services:
       sh -c "sed -i -e 's/^#\(Include .*httpd-ssl.conf\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' conf/httpd.conf &&
-             httpd-foreground"
+             exec httpd-foreground"

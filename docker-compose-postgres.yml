@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+
+  acme-keycloak-db:
+    image: postgres:11.12
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: keycloak
+    ports:
+      - "55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./testrun/postgres/data:/var/lib/postgresql/data:z
+
+  acme-keycloak:
+    env_file:
+      - ./keycloak-postgres.env
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: acme-keycloak-db
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+      DB_SCHEMA: public
+# IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+
+
+
