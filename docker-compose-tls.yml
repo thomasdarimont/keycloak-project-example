@@ -17,12 +17,7 @@ services:
       - ./keycloak-common.env
       - ./keycloak-http.env
       - ./keycloak-tls.env
-
-  openldap:
-    env_file:
-      - ./keycloak-common.env
-      - ./keycloak-http.env
-      - ./keycloak-tls.env
+      - ./keycloak-openldap.env
 
   acme-app-oidc-js-spa:
     image: httpd:2.4
