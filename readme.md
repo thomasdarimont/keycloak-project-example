@@ -40,7 +40,7 @@ d) **Operator** configuring realm and server for different stages
 - Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
 - TLS Support
 
-## Usage prerequisits
+## Usage prerequisites
 
 
 | Tool | Version
@@ -131,7 +131,7 @@ thomasdarimont/custom-keycloak:latest
 ## Use the custom Docker Image in integration-test or start?
 
 Replace the occurency of **quay.io/keycloak/keycloak:13.0.1** in docker-compose.yml for using the image with the start*-scripts. 
-A tester might
+A tester might want to use the final image.
 
 Replace the occurency of **quay.io/keycloak/keycloak:13.0.1** in KeycloakTestSupport.java for using the image during the integration-tests.
 Does not make much sense, but would work.
@@ -197,7 +197,7 @@ The demo app can be started by running `etc/runDemoApp.sh` and will be accessibl
 
 To manually check if all prequisits are fulfilled.
 ```
-bin/prerequisits.sh
+bin/prerequisites.sh
 ```
 
 ## Manually Trigger Extension Deployment
