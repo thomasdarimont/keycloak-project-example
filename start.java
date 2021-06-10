@@ -31,6 +31,12 @@ class start {
 
         System.out.println("### Starting Keycloak Environment with HTTP" + (useHttps ? "S" : ""));
 
+        System.out.printf("# Keycloak:       %s%n", useHttps ? "https://id.acme.test:8443/auth" : "http://localhost:8080/auth");
+        System.out.printf("# MailHog:        %s%n", "http://localhost:1080");
+        if (useOpenLdap) {
+            System.out.printf("# PhpMyLdapAdmin: %s%n", "http://localhost:17080");
+        }
+
         var dockerComposeCommandLine = new ArrayList<String>();
         dockerComposeCommandLine.add("docker-compose");
         dockerComposeCommandLine.add("--env-file");
