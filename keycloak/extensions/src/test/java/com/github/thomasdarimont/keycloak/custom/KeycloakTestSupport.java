@@ -53,6 +53,9 @@ public class KeycloakTestSupport {
         }
         addStartupCliFilesIfPresent(keycloakContainer);
 
+        // we use the standalone configuration file for integration tests
+        keycloakContainer.addEnv("KEYCLOAK_CONFIG_FILE", System.getProperty("keycloakConfigFile", "standalone.xml"));
+
         return keycloakContainer.withExtensionClassesFrom("target/classes");
     }
 
