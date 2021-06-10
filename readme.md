@@ -1,6 +1,6 @@
 Keycloak Project Example
 ---
-
+# Introduction
 This repository contains a project setup for keycloak based projects.
 
 This setup serves as a starting point to support the full lifecycle of development in a keycloak based project. 
@@ -10,26 +10,25 @@ The project also shows how to write integration tests via [Keycloak-Testcontaine
 After successful test-run package all extensions and themes as a custom docker image.
 This image is meant to be the project base image fulfilling the projects requirements in contrast to the general keycloak image.
 
+## Use-Cases
 These requirements work in different contextes, roles and use-cases:
 
-a) Create a docker image for  
+a) **Developer** for keycloak themes, extensions and image
+
+1) build and integration-test with test-containers (uses standard keycloak image)
+2) run external keycloak with hotdeploy (theme, extension, ...), run integrationtest, e2e testing
+
+a) **Developer** publishing an image:
 
 1) Standard keycloak docker image with [extensions](./keycloak-extensions), themes und server config.
 2) Slim custom docker image with extensions, themes und server config (basis alpine) chose jdk version, base-os image version, base keycloak version.
 
-b) Developer for keycloak themes, extensions and image
+c) **Tester/Developer** acceptance/e2e-testing with cypress
 
-1) build, integration-test with test-containers (uses standard keycloak image) as a developer
-2) run external keycloak with hotdeploy (theme, extension, ...), run integrationtest, e2e testing
+d) **Operator** configuring realm and server for different stages
 
-c) acceptance/e2e testing with cypress as tester/developer
-
-d) realm and server configuration as keycloak operator
-
-The example contains the following Keycloak extensions:
-- Custom REST Endpoint the can expose additional custom APIs: `CustomResource`
-
-# Some Highlights
+## Some Highlights
+- Extension: Custom REST Endpoint the can expose additional custom APIs: `CustomResource`
 - Support for deploying extensions to running Keycloak container
 - Support for instant reloading of theme and extension code changes
 - Support Keycloak configuration customization via CLI scripts
@@ -41,8 +40,25 @@ The example contains the following Keycloak extensions:
 - Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
 - TLS Support
 
+## Usage prerequisits
+
+
+| Tool | Version
+|------|--------
+| Java | 11
+| mvn  | 3.6
+| docker | 20.10
+| docker-composer | 1.29 
+
+Create a testrun folder to hold keycloak data.
+```
+mkdir -p testrun/data
+```
+
+Other required folders are created by build.
+
 # Build
-The example can be build with the following maven command:
+The project can be build with the following maven command:
 ```
 mvn clean verify
 ```
@@ -53,41 +69,15 @@ The example can be build with integration tests by running the following maven c
 mvn clean verify -Pwith-integration-tests
 ```
 
-## Build Docker Image
-To build a custom Keycloak Docker image that contains the custom extensions and themes, you can run the following command:
-```
-mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
-```
-
 # Run
 
-## Prepare
-
-Create a testrun folder to hold keycloak data.
-```
-mkdir -p testrun/data
-```
-
-Generate a certificate and Key for the example domain `acme.test` with [mkcert](https://github.com/FiloSottile/mkcert).
-```
-./bin/createTlsCerts.sh
-```
-This will generate a TLS certificate and key file in `.pem` format in `config/stage/dev/tls`. 
-
-Register map the following host names in your hosts configuration:
-```
-127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test
-```
-
-## Start Keycloak Container with docker-compose
-
 To speed up development we can mount the keycloak-extensions class-folder and keycloak-themes folder into
-a Keycloak container that is started via docker-compose. This allows for quick turnarounds while working on themes
+a Keycloak container that is started via docker-compose (see the start-scripts described below). This allows for quick turnarounds while working on themes
 and extensions.
 
 The default Keycloak admin username is `admin` with password `admin`.
 
-### Start with plain HTTP
+## Start with plain HTTP
 
 You can start the Keycloak container via:
 ```
@@ -95,15 +85,32 @@ You can start the Keycloak container via:
 ```
 Keycloak will be available on http://localhost:8080/auth.
 
-### Start with HTTPS
+## Start with HTTPS
 
+### Preparation
+Generate a certificate and Key for the example domain `acme.test` with [mkcert](https://github.com/FiloSottile/mkcert).
+```
+./bin/createTlsCerts.sh
+```
+This will generate a TLS certificate and key file in `.pem` format in `config/stage/dev/tls`.
+
+Register map the following host names in your hosts configuration:
+```
+127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test
+```
+#### Start
 ```
 ./start-tls.sh
 ```
 Keycloak will be available on https://id.acme.test:8443/auth.
 
-Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger
-a redeployment of the custom extension by Keycloak.
+Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger a redeployment of the custom extension by Keycloak.
+
+# Build Docker Image
+To build a custom Keycloak Docker image that contains the custom extensions and themes, you can run the following command:
+```
+mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
+```
 
 ## Running the custom Docker Image
 
@@ -121,8 +128,15 @@ docker run \
 -p 8080:8080 \
 thomasdarimont/custom-keycloak:latest
 ```
+## Use the custom Docker Image in integration-test or start?
 
-## Run End to End Tests
+Replace the occurency of **quay.io/keycloak/keycloak:13.0.1** in docker-compose.yml for using the image with the start*-scripts. 
+A tester might
+
+Replace the occurency of **quay.io/keycloak/keycloak:13.0.1** in KeycloakTestSupport.java for using the image during the integration-tests.
+Does not make much sense, but would work.
+
+# Run End to End Tests
 
 The [cypress](https://www.cypress.io/) based End to End tests can be found in the [keycloak-e2e](./keycloak-e2e) folder. 
 
@@ -178,6 +192,13 @@ A simple demo app can be used to show information from the Access-Token, ID-Toke
 The demo app can be started by running `etc/runDemoApp.sh` and will be accessible via http://localhost:4000.
 
 # Scripts
+
+## Check prequisits
+
+To manually check if all prequisits are fulfilled.
+```
+bin/prerequisits.sh
+```
 
 ## Manually Trigger Extension Deployment
 
