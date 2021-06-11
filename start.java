@@ -67,7 +67,7 @@ class start {
         dockerComposeCommandLine.add("--env-file");
         dockerComposeCommandLine.add("keycloak-common.env");
         dockerComposeCommandLine.add("--file");
-        dockerComposeCommandLine.add("docker-compose.yml");
+        dockerComposeCommandLine.add("deployments/local/dev/docker-compose.yml");
 
         if (useHttps) {
             dockerComposeCommandLine.add("--file");

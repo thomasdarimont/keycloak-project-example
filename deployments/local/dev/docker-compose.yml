@@ -1,0 +1,69 @@
+version: '3.8'
+services:
+  acme-keycloak:
+    image: quay.io/keycloak/keycloak:13.0.1
+    user: "1000:1000"
+    env_file:
+      - ./../../../keycloak-common.env
+      - ./../../../keycloak-http.env
+    environment:
+#      KEYCLOAK_USER: "admin"
+#      KEYCLOAK_PASSWORD: "admin"
+      DB_VENDOR: "h2"
+      KEYCLOAK_THEME_CACHING: "false"
+      KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
+      PROXY_ADDRESS_FORWARDING: "true"
+
+# Exposes Metrics via http://localhost:9990/metrics
+      KEYCLOAK_STATISTICS: all
+
+#      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
+# use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
+    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0", "-bmanagement" , "0.0.0.0", "-Dwildfly.statistics-enabled=true"]
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9990:9990"
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ./../../../keycloak/extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
+      - ./../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
+      - ./../../../keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
+      - ./../../../keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
+      - ./../../../keycloak/imex:/opt/jboss/imex:z
+# This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
+      - ./../../../keycloak/cli:/opt/jboss/startup-scripts:z
+      - ./../../../run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
+
+  acme-keycloak-provisioning:
+    image: adorsys/keycloak-config-cli:v3.4.0-13.0.0
+    env_file:
+      - ./../../../keycloak-common.env
+      - ./../../../keycloak-http.env
+    environment:
+      KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
+      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
+      IMPORT_PATH: "/config"
+      IMPORT_FORCE: "false"
+      IMPORT_VARSUBSTITUTION: "true"
+    volumes:
+      - ./../../../config/stage/dev/realms:/config:z
+
+  mailhog:
+    # Web Interface: http://localhost:1080/#
+    # Web API: http://localhost:1080/api/v2/messages
+    # mailhog/mailhog:v1.0.1
+    image: mailhog/mailhog@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
+    logging:
+      driver: none
+    ports:
+      - "1080:8025"
+      - "1025:1025"
+
+  acme-app-oidc-js-spa:
+    image: httpd:2.4
+    volumes:
+      - ./../../../apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
+    ports:
+      - "4000:80"
+      - "4443:443"
