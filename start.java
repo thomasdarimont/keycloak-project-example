@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * <h2>Run Keycloak with https, openldap and postgres database</h2>
  * <pre>{@code
- *  java start.java --https --openldap --postgres
+ *  java start.java --https --openldap --database=postgres
  * }</pre>
  *
  */
@@ -31,7 +31,7 @@ class start {
     static final String HELP_CMD = "help";
     static final String HTTPS_OPT = "--https";
     static final String OPENLDAP_OPT = "--openldap";
-    static final String POSTGRES_OPT = "--postgres";
+    static final String POSTGRES_OPT = "--database=postgres";
 
     public static void main(String[] args) {
 
@@ -39,7 +39,7 @@ class start {
 
         var useHttps = argList.contains(HTTPS_OPT) || argList.contains(HTTPS_OPT + "=true");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
-        var usePostgres = argList.contains(POSTGRES_OPT) || argList.contains(POSTGRES_OPT + "=true");
+        var usePostgres = argList.contains(POSTGRES_OPT);
 
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
@@ -48,7 +48,7 @@ class start {
             System.out.println("");
             System.out.printf("%s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) If not provided, plain HTTPS is used");
             System.out.printf("%s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
-            System.out.printf("%s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If not provided, H2 database is used");
+            System.out.printf("%s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If no other database is provided, H2 database is used");
             System.exit(0);
         }
 

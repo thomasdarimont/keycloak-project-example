@@ -57,37 +57,42 @@ mkdir -p testrun/data
 
 Other required folders are created by build.
 
-# Build
+# Development Environment
+
+## Build
 The project can be build with the following maven command:
 ```
 mvn clean verify
 ```
 
-## Build with Integration Tests
+### Build with Integration Tests
 The example can be build with integration tests by running the following maven command:
 ```
 mvn clean verify -Pwith-integration-tests
 ```
 
-# Run
+## Run
 
-To speed up development we can mount the keycloak-extensions class-folder and keycloak-themes folder into
-a Keycloak container that is started via docker-compose (see the start-scripts described below). This allows for quick turnarounds while working on themes
-and extensions.
+We provide a platform agnostic single-file source-code Java launcher [start.java](start.java) to start the Keycloak environment.
+
+To speed up development we can mount the [keycloak/extensions](keycloak/extensions) class-folder and [keycloak/themes](keycloak/themes) folder into
+a Keycloak container that is started via docker-compose (see below). This allows for quick turnarounds while working on themes and extensions.
 
 The default Keycloak admin username is `admin` with password `admin`.
 
-## Start with plain HTTP
+### Run with HTTP
 
 You can start the Keycloak container via:
 ```
-./start-http.sh
+java start.java
 ```
 Keycloak will be available on http://localhost:8080/auth.
 
-## Start with HTTPS
+### Enable HTTPS
 
-### Preparation
+The example environment can be configured with https via the `--https` flag.
+
+#### Preparation
 Generate a certificate and Key for the example domain `acme.test` with [mkcert](https://github.com/FiloSottile/mkcert).
 ```
 ./bin/createTlsCerts.sh
@@ -98,62 +103,39 @@ Register map the following host names in your hosts configuration:
 ```
 127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test
 ```
-#### Start
+#### Run with HTTPS
 ```
-./start-tls.sh
+java start.java --https
 ```
 Keycloak will be available on https://id.acme.test:8443/auth.
 
 Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger a redeployment of the custom extension by Keycloak.
 
-# Build Docker Image
-To build a custom Keycloak Docker image that contains the custom extensions and themes, you can run the following command:
+### Enable OpenLDAP
+
+The example environment can be configured with OpenLDAP via the `--openldap` flag.
+
+#### Run with OpenLDAP
 ```
-mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
-```
-
-## Running the custom Docker Image
-
-The custom docker image created during the build can be stared with the following command:
-```
-docker run \
---name custom-keycloak \
--e KEYCLOAK_USER=admin \
--e KEYCLOAK_PASSWORD=admin \
--e KEYCLOAK_CONFIG_FILE=standalone.xml \
--e KEYCLOAK_IMPORT=/opt/jboss/imex/custom-realm.json \
--v $PWD/imex:/opt/jboss/imex:z \
--it \
---rm \
--p 8080:8080 \
-thomasdarimont/custom-keycloak:latest
-```
-## Use the custom Docker Image in integration-test or start?
-
-Replace the occurency of **quay.io/keycloak/keycloak:13.0.1** in docker-compose.yml for using the image with the start*-scripts. 
-A tester might want to use the final image.
-
-Replace the occurency of **quay.io/keycloak/keycloak:13.0.1** in KeycloakTestSupport.java for using the image during the integration-tests.
-Does not make much sense, but would work.
-
-# Run End to End Tests
-
-The [cypress](https://www.cypress.io/) based End to End tests can be found in the [keycloak-e2e](./keycloak-e2e) folder. 
-
-To run the e2e tests, start the Keycloak environment and run the following commands:
-```
-cd keycloak-e2e
-yarn run cypress:open
-# yarn run cypress:test
+java start.java --openldap
 ```
 
-# Example environment
+### Enable PostgreSQL
 
-## Realms
+The example environment can be configured to use PostgreSQL as a database via the `--database=postgres` flag to override the default `h2` database.
+
+#### Run with PostgreSQL
+```
+java start.java --database=postgres
+```
+
+## Acme Example Realm Configuration
+
+### Realms
 
 The example environment contains several realms to illustrate the interaction of different realms.
 
-### Acme-Apps Realm
+#### Acme-Apps Realm
 
 The `acme-apps` realm contains a simple demo application and provides integration with the `acme-internal`, `acme-ldap`
 and `acme-saml` realm via Identity Brokering. The idea behind this setup is to provide a global
@@ -165,31 +147,74 @@ The `acme-internal` and `acme-ldap` realms serve as an OpenID Connect based Iden
 The `acme-saml` realm provides applications is similar to the `acme-internal` and serves as 
 a SAML based Identity Provider for the `acme-apps` realm.
 
-### Acme-Internal Realm
+#### Acme-Internal Realm
 
 The `acme-internal` realm contains a test users which are stored in the Keycloak database.
 
 Users:
 - Username `tester` and password `test` (from database)
 
-### Acme-LDAP Realm
+#### Acme-LDAP Realm
 
 The `acme-ldap` realm contains a test user and is connected to a federated user store (LDAP directory) provided via openldap.
 
 - Username `FleugelR` and password `Password1` (from LDAP federation)
 
-### Acme-SAML Realm
+#### Acme-SAML Realm
 
 The `acme-saml` realm contains a test user and stores the users in the Keycloak database.
 
 Users:
 - Username `acmesaml` and password `test` (from database)
 
-### Example App
+#### Example App
 
 A simple demo app can be used to show information from the Access-Token, ID-Token and UserInfo endpoint provided by Keycloak.
 
 The demo app can be started by running `etc/runDemoApp.sh` and will be accessible via http://localhost:4000.
+
+# Deployment
+
+## Custom Docker Image
+
+### Build a custom Docker Image 
+
+The dockerfile for the docker image build uses the [keycloak/Dockerfile.plain](keycloak/docker/src/main/docker/keycloak/Dockerfile.plain) by default.
+
+To build a custom Keycloak Docker image that contains the custom extensions and themes, you can run the following command:
+```bash
+mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
+```
+The dockerfile can be customized via `-Ddocker.image=keycloak/Dockerfile.plain` after `mvn clean verify`.
+It is also possible to configure the image name via `-Ddocker.image=acme/acme-keycloak2`.
+
+### Running the custom Docker Image locally
+
+The custom docker image created during the build can be stared with the following command:
+```
+docker run \
+--name acme-keycloak \
+-e KEYCLOAK_USER=admin \
+-e KEYCLOAK_PASSWORD=admin \
+-e KEYCLOAK_CONFIG_FILE=standalone-ha.xml \
+-v $PWD/imex:/opt/jboss/imex:z \
+-it \
+--rm \
+-p 8080:8080 \
+acme/acme-keycloak:latest
+```
+# Testing
+## Run End to End Tests
+
+The [cypress](https://www.cypress.io/) based End to End tests can be found in the [keycloak-e2e](./keycloak-e2e) folder. 
+
+To run the e2e tests, start the Keycloak environment and run the following commands:
+```
+cd keycloak-e2e
+yarn run cypress:open
+# yarn run cypress:test
+```
+
 
 # Scripts
 
