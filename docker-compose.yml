@@ -33,7 +33,7 @@ services:
       - ./keycloak/imex:/opt/jboss/imex:z
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
       - ./keycloak/cli:/opt/jboss/startup-scripts:z
-      - ./testrun/data:/opt/jboss/keycloak/standalone/data:z
+      - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
 
   acme-keycloak-provisioning:
     image: adorsys/keycloak-config-cli:v3.4.0-13.0.0

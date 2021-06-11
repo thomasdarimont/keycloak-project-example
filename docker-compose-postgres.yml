@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./testrun/postgres/data:/var/lib/postgresql/data:z
+      - ./run/postgres/data:/var/lib/postgresql/data:z
 
   acme-keycloak:
     env_file:
@@ -31,7 +31,3 @@ services:
     depends_on:
       acme-keycloak-db:
         condition: service_healthy
-
-
-
-

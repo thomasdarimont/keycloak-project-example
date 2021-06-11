@@ -52,7 +52,7 @@ class start {
             System.exit(0);
         }
 
-        createFolderIfMissing("testrun/data");
+        createFolderIfMissing("run/keycloak/data");
 
         System.out.println("### Starting Keycloak Environment with HTTP" + (useHttps ? "S" : ""));
 
@@ -83,7 +83,7 @@ class start {
             dockerComposeCommandLine.add("--file");
             dockerComposeCommandLine.add("docker-compose-postgres.yml");
 
-            createFolderIfMissing("testrun/postgres/data/");
+            createFolderIfMissing("run/postgres/data/");
         }
 
         dockerComposeCommandLine.add("up");

@@ -1,5 +1,8 @@
 !testrun/.gitkeep
 testrun/
+!trun/.gitkeep
+run/
+
 !scratch/.gitkeep
 scratch/
 *.jfr

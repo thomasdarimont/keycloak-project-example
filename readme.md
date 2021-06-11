@@ -42,20 +42,12 @@ d) **Operator** configuring realm and server for different stages
 
 ## Usage prerequisites
 
-
 | Tool | Version
 |------|--------
 | Java | 11
 | mvn  | 3.6
 | docker | 20.10
 | docker-composer | 1.29 
-
-Create a testrun folder to hold keycloak data.
-```
-mkdir -p testrun/data
-```
-
-Other required folders are created by build.
 
 # Development Environment
 
