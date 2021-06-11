@@ -62,7 +62,7 @@
                                         </fileSet>
 
                                         <fileSet>
-                                            <directory>../themes</directory>
+                                            <directory>../themes/target/classes/theme</directory>
                                             <outputDirectory>themes</outputDirectory>
                                         </fileSet>
 
