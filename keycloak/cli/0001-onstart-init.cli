@@ -1,7 +1,7 @@
-embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone.xml} --std-out=echo
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
 
 echo Using server configuration file:
-:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone.xml})
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
 
 echo SETUP: Begin Keycloak custom configuration...
 

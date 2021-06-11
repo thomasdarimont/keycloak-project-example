@@ -17,12 +17,7 @@ services:
       - ./keycloak-common.env
       - ./keycloak-http.env
       - ./keycloak-tls.env
-
-  openldap:
-    env_file:
-      - ./keycloak-common.env
-      - ./keycloak-http.env
-      - ./keycloak-tls.env
+      - ./keycloak-openldap.env
 
   acme-app-oidc-js-spa:
     image: httpd:2.4
@@ -37,4 +32,4 @@ services:
       sh -c "sed -i -e 's/^#\(Include .*httpd-ssl.conf\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' conf/httpd.conf &&
-             httpd-foreground"
+             exec httpd-foreground"
