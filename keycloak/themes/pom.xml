@@ -16,6 +16,7 @@
 
     <properties>
         <dir.login>src/main/resources/theme/apps/login</dir.login>
+        <dir.email>src/main/resources/theme/apps/email</dir.email>
     </properties>
 
     <build>
@@ -65,6 +66,30 @@
                         </configuration>
                     </execution>
 
+                    <!-- EMAIL THEME -->
+                    <execution>
+                        <id>emil theme - yarn install</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${dir.email}</workingDirectory>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>build email theme</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${dir.email}</workingDirectory>
+                            <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+
                 </executions>
 
                 <configuration>
@@ -79,6 +104,10 @@
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>theme/apps/login/resources/scss/**</exclude>
+
+                    <exclude>theme/apps/email/scripts/**</exclude>
+                    <exclude>theme/apps/email/mjml/**</exclude>
+                    <exclude>theme/apps/email/common/**</exclude>
 
                     <exclude>**/node_modules/**</exclude>
                     <exclude>**/package.json</exclude>
