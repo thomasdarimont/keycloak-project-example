@@ -14,4 +14,80 @@
     <packaging>jar</packaging>
     <name>${project.organization.name} Keycloak Themes</name>
 
+    <properties>
+        <dir.login>src/main/resources/theme/apps/login</dir.login>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+                <executions>
+
+                    <!-- Download NPM tools -->
+                    <execution>
+                        <id>setup node</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>install-node-and-yarn</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>v16.1.0</nodeVersion>
+                            <yarnVersion>v1.22.10</yarnVersion>
+                        </configuration>
+                    </execution>
+
+                    <!-- LOGIN THEME -->
+                    <!-- Download NPM packages -->
+                    <execution>
+                        <id>login theme - yarn install</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${dir.login}</workingDirectory>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <!-- Compile stuff -->
+                    <execution>
+                        <id>login theme - compile-scss</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>yarn</goal>
+                        </goals>
+                        <configuration>
+                            <workingDirectory>${dir.login}</workingDirectory>
+                            <arguments>compile</arguments>
+                        </configuration>
+                    </execution>
+
+                </executions>
+
+                <configuration>
+                    <installDirectory>${project.basedir}</installDirectory>
+                </configuration>
+
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>theme/apps/login/resources/scss/**</exclude>
+
+                    <exclude>**/node_modules/**</exclude>
+                    <exclude>**/package.json</exclude>
+                    <exclude>**/yarn.lock</exclude>
+                    <exclude>**/.gitignore</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+    </build>
+
 </project>

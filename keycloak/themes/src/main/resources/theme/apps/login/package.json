@@ -1,0 +1,11 @@
+{
+  "name": "keycloak-login-assets",
+  "version": "0.1.0",
+  "scripts": {
+    "compile": "node-sass -o resources/css resources/scss",
+    "compile:watch": "node-sass -r -w -o resources/css resources/scss"
+  },
+  "devDependencies": {
+    "node-sass": "^6.0.0"
+  }
+}
