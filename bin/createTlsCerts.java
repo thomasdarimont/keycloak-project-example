@@ -27,13 +27,14 @@ class createTlsCerts {
     static final String HELP_CMD = "--help";
 
     static final String DOMAIN_OPT = "--domain";
-    public static final String DOMAIN_ENV = "DOMAIN";
-    public static final String DOMAIN_DEFAULT = "acme.test";
+    static final String DOMAIN_ENV = "DOMAIN";
+    static final String DOMAIN_DEFAULT = "acme.test";
 
     static final String TARGET_DIR_OPT = "--target";
-    public static final String TARGET_DIR_ENV = "TARGET_DIR";
-    public static final String TARGET_DIR_DEFAULT = "./config/stage/dev/tls";
-    public static final String PEM_FILE_GLOB = "glob:**/*.pem";
+    static final String TARGET_DIR_ENV = "TARGET_DIR";
+    static final String TARGET_DIR_DEFAULT = "./config/stage/dev/tls";
+
+    static final String PEM_FILE_GLOB = "glob:**/*.pem";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var argList = Arrays.asList(args);

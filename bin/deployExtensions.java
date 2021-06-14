@@ -5,19 +5,20 @@ import java.util.ArrayList;
 class deployExtensions {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var dockerComposeCommandLine = new ArrayList<String>();
-        dockerComposeCommandLine.add("docker-compose");
-        dockerComposeCommandLine.add("exec");
-        dockerComposeCommandLine.add("-T");
-        dockerComposeCommandLine.add("acme-keycloak");
-        dockerComposeCommandLine.add("touch");
-        dockerComposeCommandLine.add("/opt/jboss/keycloak/standalone/deployments/extensions.jar.dodeploy");
+        var deployTriggerCommand = new ArrayList<String>();
+        deployTriggerCommand.add("docker-compose");
+        deployTriggerCommand.add("exec");
+        deployTriggerCommand.add("-T");
+        deployTriggerCommand.add("acme-keycloak");
+        deployTriggerCommand.add("touch");
+        deployTriggerCommand.add("/opt/jboss/keycloak/standalone/deployments/extensions.jar.dodeploy");
 
-        var pb = new ProcessBuilder(dockerComposeCommandLine);
+        var pb = new ProcessBuilder(deployTriggerCommand);
         pb.directory(new File("."));
         pb.inheritIO();
         var process = pb.start();
         var deployTriggerReturnCode = process.waitFor();
+
         System.out.println("Deployment triggered");
 
         System.exit(deployTriggerReturnCode);
