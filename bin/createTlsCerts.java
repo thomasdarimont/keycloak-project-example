@@ -2,13 +2,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Controller script to generate valid tls certs locally.
@@ -22,7 +19,7 @@ import java.util.stream.Collectors;
  * <pre>{@code
  *  java createTlsCerts.java --help
  * }</pre>
- *
+ * <p>
  * Hint:
  */
 
@@ -56,9 +53,9 @@ class createTlsCerts {
             System.exit(0);
         }
 
-        /* Set Options from env or default */
-        var domain =  Optional.ofNullable(System.getenv(DOMAIN_ENV)).orElse(DOMAIN_DEFAULT);
-        var targetDir = Optional.ofNullable(System.getenv(TARGET_DIR_ENV)).orElse(TARGET_DIR_DEFAULT);
+        /* Set options from env, commandline or default */
+        var domain = Optional.ofNullable(System.getenv(DOMAIN_ENV)).orElse(argList.stream().filter(s -> s.startsWith(DOMAIN_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(DOMAIN_DEFAULT));
+        var targetDir = Optional.ofNullable(System.getenv(TARGET_DIR_ENV)).orElse(argList.stream().filter(s -> s.startsWith(TARGET_DIR_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(TARGET_DIR_DEFAULT));
 
         /* Assure required folder exists */
         var folder = new File(targetDir);

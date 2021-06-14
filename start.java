@@ -28,7 +28,7 @@ import java.util.Arrays;
  */
 class start {
 
-    static final String HELP_CMD = "help";
+    static final String HELP_CMD = "--help";
     static final String HTTPS_OPT = "--https";
     static final String OPENLDAP_OPT = "--openldap";
     static final String POSTGRES_OPT = "--database=postgres";
