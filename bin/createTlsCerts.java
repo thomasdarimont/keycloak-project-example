@@ -18,10 +18,12 @@ import java.util.stream.Collectors;
  *  java createTlsCerts.java
  * }</pre>
  *
- * <h2>Generate certificates with custom domain</h2>
+ * <h2>Show help</h2>
  * <pre>{@code
- *  java start.java --domain=mydomain
+ *  java createTlsCerts.java --help
  * }</pre>
+ *
+ * Hint:
  */
 
 class createTlsCerts {
@@ -36,63 +38,9 @@ class createTlsCerts {
     public static final String TARGET_DIR_DEFAULT = "./config/stage/dev/tls";
     public static final String PEM_FILE_GLOB = "glob:**/*.pem";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         var argList = Arrays.asList(args);
 
-        showHelpIfInstructedToAndExitOrNothing(argList);
-
-        var tlsCertsOptions = buildMkCertOptions(argList);
-
-        createFolderIfMissing(tlsCertsOptions.getTargetDir());
-        cleanUpExistingPemFiles(tlsCertsOptions.getTargetDir());
-
-        var tlsCertCommand = buildMkCertCommand(tlsCertsOptions);
-
-        var commandResult = runCommand(tlsCertCommand, tlsCertsOptions.getTargetDir());
-
-        printResultFiles(tlsCertsOptions.getTargetDir());
-
-        System.exit(commandResult);
-    }
-
-    private static void cleanUpExistingPemFiles(String directory) {
-        runCommand(List.of("rm","-f", PEM_FILE_GLOB),directory);
-    }
-
-    private static void printResultFiles(String directory) {
-        PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB);
-        try {
-            Files.list(Paths.get(directory)).filter(pathMatcher::matches).forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Extract fromEnvironment and/or command-line
-     * @param argList
-     * @return
-     */
-    private static Options buildMkCertOptions(List<String> argList) {
-        Options options = new Options();
-
-        options.setDomain(Optional.ofNullable(System.getenv(DOMAIN_ENV)).orElse(DOMAIN_DEFAULT));
-
-        options.setTargetDir(Optional.ofNullable(System.getenv(TARGET_DIR_ENV)).orElse(TARGET_DIR_DEFAULT));
-
-        return options;
-    }
-
-    private static List<String> buildMkCertCommand(Options tlsCertsOptions) {
-        List<String> command = new ArrayList<String>();
-        command.add("mkcert");
-        command.add("-install");
-        command.add(tlsCertsOptions.getDomain());
-        command.add("*." + tlsCertsOptions.getDomain());
-        return command;
-    }
-
-    private static void showHelpIfInstructedToAndExitOrNothing(List<String> argList) {
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
             System.out.println("Certificates generator for keycloak environment");
@@ -106,50 +54,37 @@ class createTlsCerts {
             System.out.printf("Example: %s=%s %s=%s",DOMAIN_OPT, DOMAIN_DEFAULT, TARGET_DIR_OPT, TARGET_DIR_DEFAULT);
             System.exit(0);
         }
-    }
 
-    private static void createFolderIfMissing(String directory) {
-        var folder = new File(directory);
+        /* Set Options from env or default */
+        var domain =  Optional.ofNullable(System.getenv(DOMAIN_ENV)).orElse(DOMAIN_DEFAULT);
+        var targetDir = Optional.ofNullable(System.getenv(TARGET_DIR_ENV)).orElse(TARGET_DIR_DEFAULT);
+
+        /* Assure required folder exists */
+        var folder = new File(targetDir);
         if (!folder.exists()) {
             System.out.printf("Creating missing %s folder at %s success:%s%n"
-                    , directory, folder.getAbsolutePath(), folder.mkdirs());
+                    , targetDir, folder.getAbsolutePath(), folder.mkdirs());
         }
-    }
+        /* Delete existing cert-files */
+        Files.list(Paths.get(targetDir)).filter(p -> FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB).matches(p)).forEach(f -> f.toFile().delete());
 
-    private static int runCommand(List<String> command, String directory) {
-        var pb = new ProcessBuilder(command);
-        pb.directory(new File(directory));
+        /* Create mkcert command */
+        var command = new ArrayList<String>();
+        command.add("mkcerta    ");
+        command.add("-install");
+        command.add(domain);
+        command.add("*." + domain);
+
+        /* Execute mkcert command */
+        final var pb = new ProcessBuilder(command);
+        pb.directory(new File(targetDir));
         pb.inheritIO();
-        try {
-            var process = pb.start();
-            return process.waitFor();
-        } catch (Exception ex) {
-            System.err.printf("Could not execute command %s%n",command);
-            ex.printStackTrace();
-            System.exit(1);
-        }
-        return 0;
+        var process = pb.start();
+        var mkCertCommandsReturnCode = process.waitFor();
+
+        /* List created files */
+        Files.list(Paths.get(targetDir)).filter(p -> FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB).matches(p)).forEach(System.out::println);
+
+        System.exit(mkCertCommandsReturnCode);
     }
-}
-
-class Options {
-    private String domain;
-    private String targetDir;
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public void setTargetDir(String targetDir) {
-        this.targetDir = targetDir;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public String getTargetDir() {
-        return targetDir;
-    }
-
 }
