@@ -64,8 +64,6 @@ class exportRealm {
         }
 
         var pb = new ProcessBuilder(deployTriggerCommand);
-        pb.directory(new File("."));
-        //pb.inheritIO();
         pb.redirectErrorStream(true);
         var process = pb.start();
         InputStream stdIn = process.getInputStream();
