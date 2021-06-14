@@ -51,7 +51,8 @@ class createTlsCerts {
             System.out.printf("%s: %s%n", DOMAIN_OPT, "override the domain used for certificats");
             System.out.printf("%s: %s%n", TARGET_DIR_OPT, "override the target folder to place the certificates in");
             System.out.println("");
-            System.out.printf("Example: %s=%s %s=%s",DOMAIN_OPT, DOMAIN_DEFAULT, TARGET_DIR_OPT, TARGET_DIR_DEFAULT);
+            System.out.printf("Example: %s=%s %s=%s", DOMAIN_OPT, DOMAIN_DEFAULT, TARGET_DIR_OPT, TARGET_DIR_DEFAULT);
+            System.out.println("");
             System.exit(0);
         }
 
@@ -70,7 +71,7 @@ class createTlsCerts {
 
         /* Create mkcert command */
         var command = new ArrayList<String>();
-        command.add("mkcerta    ");
+        command.add("mkcert");
         command.add("-install");
         command.add(domain);
         command.add("*." + domain);
