@@ -29,6 +29,8 @@ import java.util.Arrays;
 class start {
 
     static final String HELP_CMD = "help";
+
+    static final String HTTP_OPT = "--http";
     static final String HTTPS_OPT = "--https";
     static final String OPENLDAP_OPT = "--openldap";
     static final String POSTGRES_OPT = "--database=postgres";
@@ -37,19 +39,33 @@ class start {
 
         var argList = Arrays.asList(args);
 
+        var useHttp = !argList.contains(HTTP_OPT + "=false"); // --http is implied by default
         var useHttps = argList.contains(HTTPS_OPT) || argList.contains(HTTPS_OPT + "=true");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
 
-        var showHelp = argList.contains(HELP_CMD);
+        var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
             System.out.println("Keycloak Environment starter");
-            System.out.printf("%s supports the following options: %n", "start.java");
+            System.out.printf("%n%s supports the following options: %n", "start.java");
             System.out.println("");
-            System.out.printf("%s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) If not provided, plain HTTPS is used");
-            System.out.printf("%s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
-            System.out.printf("%s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If no other database is provided, H2 database is used");
+            System.out.printf("  %s: %s%n", HTTP_OPT, "enables HTTP support.");
+            System.out.printf("  %s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) Implies --http. If not provided, plain HTTP is used");
+            System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
+            System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If no other database is provided, H2 database is used");
+
+            System.out.printf("%n%s supports the following commands: %n", "start.java");
+            System.out.println("");
+            System.out.printf("  %s: %s%n", HELP_CMD, "Shows this help message");
+
+            System.out.printf("%n Usage examples: %n");
+            System.out.println("");
+            System.out.printf("  %s %s%n", "java start.java", "# Start Keycloak Environment with http");
+            System.out.printf("  %s %s%n", "java start.java --https", "# Start Keycloak Environment with https");
+            System.out.printf("  %s %s%n", "java start.java --https --database=postgres", "# Start Keycloak Environment with PostgreSQL database");
+            System.out.printf("  %s %s%n", "java start.java --https --openldap --database=postgres", "# Start Keycloak Environment with PostgreSQL database and OpenLDAP");
             System.exit(0);
+            return;
         }
 
         createFolderIfMissing("run/keycloak/data");
@@ -62,43 +78,47 @@ class start {
             System.out.printf("# PhpMyLdapAdmin: %s%n", "http://localhost:17080");
         }
 
-        var dockerComposeCommandLine = new ArrayList<String>();
-        dockerComposeCommandLine.add("docker-compose");
-        dockerComposeCommandLine.add("--env-file");
-        dockerComposeCommandLine.add("keycloak-common.env");
-        dockerComposeCommandLine.add("--file");
-        dockerComposeCommandLine.add("docker-compose.yml");
+        var commandLine = new ArrayList<String>();
+        commandLine.add("docker-compose");
+        commandLine.add("--env-file");
+        commandLine.add("keycloak-common.env");
+        commandLine.add("--file");
+        commandLine.add("docker-compose.yml");
 
         if (useHttps) {
-            dockerComposeCommandLine.add("--file");
-            dockerComposeCommandLine.add("docker-compose-tls.yml");
+            commandLine.add("--file");
+            commandLine.add("docker-compose-tls.yml");
         }
 
         if (useOpenLdap) {
-            dockerComposeCommandLine.add("--file");
-            dockerComposeCommandLine.add("docker-compose-openldap.yml");
+            commandLine.add("--file");
+            commandLine.add("docker-compose-openldap.yml");
         }
 
         if (usePostgres) {
-            dockerComposeCommandLine.add("--file");
-            dockerComposeCommandLine.add("docker-compose-postgres.yml");
+            commandLine.add("--file");
+            commandLine.add("docker-compose-postgres.yml");
 
             createFolderIfMissing("run/postgres/data/");
         }
 
-        dockerComposeCommandLine.add("up");
-        dockerComposeCommandLine.add("--remove-orphans");
+        commandLine.add("up");
+        commandLine.add("--remove-orphans");
 
-        var pb = new ProcessBuilder(dockerComposeCommandLine);
+        System.exit(runCommandAndWait(commandLine));
+    }
+
+    private static int runCommandAndWait(ArrayList<String> commandLine) {
+        var pb = new ProcessBuilder(commandLine);
         pb.directory(new File("."));
         pb.inheritIO();
         try {
             var process = pb.start();
-            System.exit(process.waitFor());
+            return process.waitFor();
         } catch (Exception ex) {
-            System.err.println("Could not start docker-compose.");
+            System.err.printf("Could not run command: %s.", commandLine);
             ex.printStackTrace();
-            System.exit(1);
+            return 1;
         }
     }
 
