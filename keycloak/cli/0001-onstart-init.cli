@@ -5,8 +5,8 @@ echo Using server configuration file:
 
 echo SETUP: Begin Keycloak custom configuration...
 
-#### EVENT LISTENERS SPI Configuration
-echo SETUP: Customize Keycloak Event Listener configuration
+### Event Listeners SPI Configuration ###
+echo SETUP: Event Listeners configuration
 # Add dedicated eventsListener config element to allow configuring elements.
 if (outcome == failed) of /subsystem=keycloak-server/spi=eventsListener/:read-resource
   echo SETUP: Add missing eventsListener SPI
@@ -26,17 +26,26 @@ end-if
 /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.success-level,value=info)
 /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.error-level,value=warn)
 
-
 ### Theme Configuration ###
 
-echo SETUP: Configure theme caching
+echo SETUP: Theme configuration
 /subsystem=keycloak-server/theme=defaults:write-attribute(name=cacheThemes,value=${env.KEYCLOAK_THEME_CACHING:true})
 /subsystem=keycloak-server/theme=defaults:write-attribute(name=cacheTemplates,value=${env.KEYCLOAK_THEME_TEMPLATE_CACHING:true})
 /subsystem=keycloak-server/theme=defaults:write-attribute(name=welcomeTheme,value=${env.KEYCLOAK_WELCOME_THEME:keycloak})
 /subsystem=keycloak-server/theme=defaults:write-attribute(name=default,value=${env.KEYCLOAK_DEFAULT_THEME:keycloak})
 
+### Hostname SPI Configuration ###
+
+echo SETUP: Hostname configuration
 # Configure Keycloak to use the frontend-URL as the base URL for backend endpoints
 /subsystem=keycloak-server/spi=hostname/provider=default:write-attribute(name=properties.forceBackendUrlToFrontendUrl, value=${env.KEYCLOAK_FORCE_FRONTEND_TO_BACKEND_URL:true})
+
+### Datasource Configuration ###
+
+# echo SETUP: Database configuration
+# /subsystem=datasources/data-source=KeycloakDS:write-attribute(name=min-pool-size,value=30)
+# /subsystem=datasources/data-source=KeycloakDS:write-attribute(name=max-pool-size,value=30)
+
 
 echo SETUP: Finished Keycloak custom configuration.
 
