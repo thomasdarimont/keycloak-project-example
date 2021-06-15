@@ -1,7 +1,7 @@
 !testrun/.gitkeep
 testrun/
 !trun/.gitkeep
-run/
+deployments/local/dev/run/
 
 !scratch/.gitkeep
 scratch/

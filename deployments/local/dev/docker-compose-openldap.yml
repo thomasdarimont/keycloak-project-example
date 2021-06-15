@@ -41,7 +41,7 @@ services:
       - /var/lib/ldap
       - /etc/ldap/slapd.d
       - /container/service/slapd/assets/certs/
-      - ./config/stage/dev/openldap/demo.ldif:/acme/openldap/ldif/10-bootstrap.ldif:z
+      - ../../../config/stage/dev/openldap/demo.ldif:/acme/openldap/ldif/10-bootstrap.ldif:z
     ports:
       - "1389:389"
       - "1636:636"
