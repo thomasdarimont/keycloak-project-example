@@ -1,0 +1,22 @@
+realm: acme-test
+enabled: true
+displayName: Acme Test Realm
+displayNameHtml: Acme Test
+loginWithEmailAllowed: true
+registrationAllowed: true
+registrationEmailAsUsername: true
+loginTheme: apps
+accountTheme: keycloak
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+browserFlow: "browser"
+registrationFlow: "Custom Registration"
+
+clientScopes:
+  - name: acme.profile
+    description: Acme Profile Access
+    protocol: openid-connect
+  - name: acme.api
+    description: Acme API Access
+    protocol: openid-connect
