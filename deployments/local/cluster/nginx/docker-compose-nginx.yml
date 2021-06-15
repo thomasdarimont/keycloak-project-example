@@ -1,0 +1,45 @@
+services:
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:2443/auth
+    # IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:2443/auth
+    # IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-nginx-lb:
+    image: nginx:1.21.0-alpine
+#    logging:
+#      driver: none
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:z
+#      - ./dhparams:/etc/ssl/dhparams:z
+      - ../../../../config/stage/dev/tls/acme.test+1.pem:/etc/nginx/certs/id.acme.test.crt:z
+      - ../../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/nginx/certs/id.acme.test.key:z
+    ports:
+      - "2443:2443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2

@@ -1,7 +1,14 @@
 !testrun/.gitkeep
 testrun/
-!trun/.gitkeep
+!run/.gitkeep
+run/
 deployments/local/dev/run/
+
+!deployments/local/cluster/run/.gitkeep
+deployments/local/cluster/run/
+
+*.pem
+*-key.pem
 
 !scratch/.gitkeep
 scratch/

@@ -1,0 +1,44 @@
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
+
+echo SETUP: Begin Keycloak custom configuration...
+
+### Event Listeners SPI Configuration ###
+echo SETUP: Event Listeners configuration
+# Add dedicated eventsListener config element to allow configuring elements.
+if (outcome == failed) of /subsystem=keycloak-server/spi=eventsListener/:read-resource
+  echo SETUP: Add missing eventsListener SPI
+  /subsystem=keycloak-server/spi=eventsListener:add()
+  echo
+end-if
+
+echo SETUP: Configure built-in "jboss-logging" event listener
+if (outcome == failed) of /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging/:read-resource
+  echo SETUP: Add missing "jboss-logging" event listener
+  /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:add(enabled=true)
+  echo
+end-if
+
+# Propagate success events to INFO instead of DEBUG
+# This allows to track successful logins in log analysis
+/subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.success-level,value=info)
+/subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.error-level,value=warn)
+
+### Hostname SPI Configuration ###
+
+echo SETUP: Hostname configuration
+# Configure Keycloak to use the frontend-URL as the base URL for backend endpoints
+/subsystem=keycloak-server/spi=hostname/provider=default:write-attribute(name=properties.forceBackendUrlToFrontendUrl, value=${env.KEYCLOAK_FORCE_FRONTEND_TO_BACKEND_URL:true})
+
+### Hostname SPI Configuration ###
+
+echo SETUP: Stick Session configuration
+# The Keycloak Book recommends to always rely on the session affinity provided by the reverse proxy
+/subsystem=keycloak-server/spi=stickySessionEncoder:add
+/subsystem=keycloak-server/spi=stickySessionEncoder/provider=infinispan:add(enabled=true,properties={shouldAttachRoute=false})
+
+echo SETUP: Finished Keycloak custom configuration.
+
+stop-embedded-server
