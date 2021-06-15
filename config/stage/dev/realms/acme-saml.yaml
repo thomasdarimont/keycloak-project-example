@@ -88,6 +88,7 @@ clients:
     defaultClientScopes: []
     optionalClientScopes: []
 
+# Manual default realmRoles assigned due too keycloak-config-cli bug, remove when issue has been fixed https://github.com/adorsys/keycloak-config-cli/issues/451
 users:
   - username: acmesaml
     email: acmesaml@local
@@ -100,3 +101,5 @@ users:
       - type: password
         value: test
         temporary: false
+    realmRoles:
+      - default-roles-acme-internal
