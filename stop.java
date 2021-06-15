@@ -30,15 +30,15 @@ class start {
         var commandLine = new ArrayList<String>();
         commandLine.add("docker-compose");
         commandLine.add("--env-file");
-        commandLine.add("keycloak-common.env");
+        commandLine.add("deployments/local/dev/keycloak-common.env");
         commandLine.add("--file");
-        commandLine.add("docker-compose.yml");
+        commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("--file");
-        commandLine.add("docker-compose-tls.yml");
+        commandLine.add("deployments/local/dev/docker-compose-tls.yml");
         commandLine.add("--file");
-        commandLine.add("docker-compose-openldap.yml");
+        commandLine.add("deployments/local/dev/docker-compose-openldap.yml");
         commandLine.add("--file");
-        commandLine.add("docker-compose-postgres.yml");
+        commandLine.add("deployments/local/dev/docker-compose-postgres.yml");
         commandLine.add("down");
 
         var pb = new ProcessBuilder(commandLine);

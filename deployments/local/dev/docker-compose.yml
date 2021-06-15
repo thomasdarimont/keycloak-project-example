@@ -26,13 +26,13 @@ services:
       - "9990:9990"
       - "127.0.0.1:8787:8787"
     volumes:
-      - ./keycloak/extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
-      - ./keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
-      - ./keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
-      - ./keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
-      - ./keycloak/imex:/opt/jboss/imex:z
+      - ../../../keycloak/extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
+      - ../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
+      - ../../../keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
+      - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
+      - ../../../keycloak/imex:/opt/jboss/imex:z
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
-      - ./keycloak/cli:/opt/jboss/startup-scripts:z
+      - ../../../keycloak/cli:/opt/jboss/startup-scripts:z
       - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
 
   acme-keycloak-provisioning:
@@ -47,7 +47,7 @@ services:
       IMPORT_FORCE: "false"
       IMPORT_VARSUBSTITUTION: "true"
     volumes:
-      - ./config/stage/dev/realms:/config:z
+      - ../../../config/stage/dev/realms:/config:z
 
   mailhog:
     # Web Interface: http://localhost:1080/#
@@ -63,7 +63,7 @@ services:
   acme-app-oidc-js-spa:
     image: httpd:2.4
     volumes:
-      - ./apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
+      - ../../../apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
     ports:
       - "4000:80"
       - "4443:443"
