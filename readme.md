@@ -87,7 +87,7 @@ The example environment can be configured with https via the `--https` flag.
 #### Preparation
 Generate a certificate and Key for the example domain `acme.test` with [mkcert](https://github.com/FiloSottile/mkcert).
 ```
-./bin/createTlsCerts.sh
+java bin/createTlsCerts.java
 ```
 This will generate a TLS certificate and key file in `.pem` format in `config/stage/dev/tls`.
 
@@ -101,7 +101,7 @@ java start.java --https
 ```
 Keycloak will be available on https://id.acme.test:8443/auth.
 
-Note that after changing extensions code you need to run the `bin/triggerDockerExtensionDeploy.sh` script to trigger a redeployment of the custom extension by Keycloak.
+Note that after changing extensions code you need to run `java bin/deployExtensions.java` script to trigger a redeployment of the custom extension by Keycloak.
 
 ### Enable OpenLDAP
 
@@ -163,7 +163,7 @@ Users:
 
 A simple demo app can be used to show information from the Access-Token, ID-Token and UserInfo endpoint provided by Keycloak.
 
-The demo app can be started by running `etc/runDemoApp.sh` and will be accessible via http://localhost:4000.
+The demo app will be accessible via http://localhost:4000 or https://acme.test:4443 when https is in use.
 
 # Deployment
 
@@ -214,14 +214,14 @@ yarn run cypress:open
 
 To manually check if all prequisits are fulfilled.
 ```
-bin/prerequisites.sh
+java bin/prerequisites.java
 ```
 
 ## Manually Trigger Extension Deployment
 
 To manually trigger an extension redeployment after extension code changes / build, you can run the following script:
 ```
-bin/deployExtensions.sh
+java bin/deployExtensions.java
 ```
 
 ## Exporting a Realm
@@ -230,7 +230,7 @@ To export an existing realm as JSON start the docker-compose infrastructure and 
 The export will create a file like `acme-apps-realm.json` in the `./imex` folder.
 
 ```
-bin/exportRealm.sh acme-apps
+java bin/exportRealm.java --realm=acme-apps
 ```
 
 # Tools
@@ -254,8 +254,8 @@ Instead of running the deployment trigger script yourself, you can register it a
 
 - Name: `kc-deploy-extensions`
 - Description: `Deploy Extensions to Keycloak Docker Container`
-- Program: `bash`
-- Arguments: `$ProjectFileDir$/bin/deployExtensions.sh`
+- Program: `java`
+- Arguments: `$ProjectFileDir$/bin/deployExtensions.java`
 - Working directory: `$ProjectFileDir$`
 - Only select: `Synchronize files after execution.`
 
@@ -267,8 +267,8 @@ Instead of running the Keycloak Config CLI script yourself, you can register it 
 
 - Name: `kc-deploy-config`
 - Description: `Deploy Realm Config to Keycloak Docker Container`
-- Program: `bash`
-- Arguments: `$ProjectFileDir$/bin/runKeycloakConfigCli.sh`
+- Program: `java`
+- Arguments: `$ProjectFileDir$/bin/applyKeycloakConfigCli.java`
 - Working directory: `$ProjectFileDir$`
 - Only select: `Synchronize files after execution.`
 
@@ -279,5 +279,5 @@ The extensions can now be redeployed by running `Tools -> External Tools -> kc-d
 We use [aquasec/trivy](https://github.com/aquasecurity/trivy) to scan the generated docker image for vulnerabilities.
 
 ```
-bin/scanImage.sh thomasdarimont/custom-keycloak:1.0.0-SNAPSHOT
+java bin/scanImage.java --image-name=thomasdarimont/custom-keycloak:1.0.0-SNAPSHOT
 ```
