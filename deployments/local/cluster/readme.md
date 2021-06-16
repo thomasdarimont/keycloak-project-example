@@ -24,3 +24,12 @@ docker-compose --file nginx/docker-compose-nginx.yml up --remove-orphans
 ```
 
 Nginx Keycloak URL: https://id.acme.test:2443/auth
+
+# Cluster with Apache mod_proxy Load-Balancer
+
+## Run
+```
+docker-compose --file apache/docker-compose-apache.yml up --remove-orphans
+```
+
+Nginx Keycloak URL: https://id.acme.test:3443/auth
