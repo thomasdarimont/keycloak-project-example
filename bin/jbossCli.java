@@ -37,6 +37,8 @@ class cli {
 
         var commandLine = new ArrayList<String>();
         commandLine.add("docker-compose");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("exec");
         commandLine.add("acme-keycloak");
         commandLine.add("/opt/jboss/keycloak/bin/jboss-cli.sh");

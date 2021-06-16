@@ -9,10 +9,12 @@ import java.util.Arrays;
 class runKeycloakConfigCli {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        var rerunProvisioning = new ArrayList<String>();
-        rerunProvisioning.add("docker-compose");
-        rerunProvisioning.add("restart");
-        rerunProvisioning.add("acme-keycloak-provisioning");
+        var commandLine = new ArrayList<String>();
+        commandLine.add("docker-compose");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose.yml");
+        commandLine.add("restart");
+        commandLine.add("acme-keycloak-provisioning");
 
         var pb = new ProcessBuilder(rerunProvisioning);
         pb.inheritIO();
