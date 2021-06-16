@@ -16,7 +16,7 @@ class runKeycloakConfigCli {
         commandLine.add("restart");
         commandLine.add("acme-keycloak-provisioning");
 
-        var pb = new ProcessBuilder(rerunProvisioning);
+        var pb = new ProcessBuilder(commandLine);
         pb.inheritIO();
         var process = pb.start();
         System.exit(process.waitFor());
