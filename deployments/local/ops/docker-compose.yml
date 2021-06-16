@@ -1,0 +1,41 @@
+services:
+  acme-grafana:
+    image: grafana/grafana:8.0.2
+    ports:
+      - 3000:3000
+    user: "104:1000"
+    volumes:
+      - ./run/grafana:/var/lib/grafana
+      - ../../../config/stage/ops/grafana/defaults.ini:/usr/share/grafana/conf/defaults.ini
+
+  acme-prometheus:
+    image: prom/prometheus:v2.28.0
+    user: "65534:1000"
+    volumes:
+      - ../../../config/stage/ops/prometheus/:/etc/prometheus/
+      - ./run/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+
+  acme-loki:
+    image: grafana/loki:2.0.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+#    volumes:
+#      - ../../../config/stage/ops/loki/:/etc/loki/
+
+  acme-promtail:
+    image: grafana/promtail:2.0.0
+    volumes:
+      - ../../../config/stage/ops/promtail/:/etc/promtail/
+      - ../../../deployments/local/dev/run/keycloak/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+
+networks:
+  default:
+    external: true
+    name: dev_default

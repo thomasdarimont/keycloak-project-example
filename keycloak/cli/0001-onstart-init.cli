@@ -21,6 +21,11 @@ if (outcome == failed) of /subsystem=keycloak-server/spi=eventsListener/provider
   echo
 end-if
 
+# periodic rotating logging to file for filebeat or similar
+/subsystem=logging/size-rotating-file-handler=ACME-HANDLER:add(file={"path"=>"server-rotating.log", "relative-to"=>"jboss.server.log.dir"}, suffix=".yyyy.MM.dd", level="DEBUG")
+/subsystem=logging/size-rotating-file-handler=ACME-HANDLER:write-attribute(name="append", value="true")
+/subsystem=logging/root-logger=ROOT:add-handler(name="ACME-HANDLER")
+
 # Propagate success events to INFO instead of DEBUG
 # This allows to track successful logins in log analysis
 /subsystem=keycloak-server/spi=eventsListener/provider=jboss-logging:write-attribute(name=properties.success-level,value=info)

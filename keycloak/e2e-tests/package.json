@@ -18,5 +18,8 @@
         "cypress-xpath": "^1.6.2",
         "dotenv": "^10.0.0",
         "typescript": "^4.3.2"
+    },
+    "dependencies": {
+        "yarn": "^1.22.10"
     }
 }
