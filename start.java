@@ -28,7 +28,7 @@ import java.util.Arrays;
  */
 class start {
 
-    static final String HELP_CMD = "help";
+    static final String HELP_CMD = "--help";
 
     static final String HTTP_OPT = "--http";
     static final String HTTPS_OPT = "--https";
