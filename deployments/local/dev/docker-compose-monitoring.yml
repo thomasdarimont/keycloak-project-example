@@ -1,0 +1,31 @@
+services:
+  grafana:
+    image: grafana/grafana:7.5.8
+    env_file:
+      - ./keycloak-common.env
+      - ./keycloak-http.env
+    ports:
+      - 3000:3000
+    user: "104"
+    depends_on:
+      - acme-keycloak
+    environment:
+      GF_AUTH_GENERIC_OAUTH_ENABLED: 'True'
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: 'True'
+      GF_AUTH_GENERIC_OAUTH_ALLOWED_DOMAINS: 'local local.test'
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: resource_access.grafana.roles[0]
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT: 'True'
+      GF_SERVER_ENFORCE_DOMAIN: 'True'
+      GF_AUTH_GENERIC_OAUTH_NAME: acme-apps
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: grafana
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: 585a6c77-544e-4213-aac7-86b79c9c6b35
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email
+      KEYCLOAK_URL: http://acme-keycloak:8080/auth
+      KEYCLOAK_FRONTEND_URL: http://localhost:8080/auth
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: $KEYCLOAK_FRONTEND_URL/realms/acme-apps/protocol/openid-connect/auth
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: $KEYCLOAK_URL/realms/acme-apps/protocol/openid-connect/token
+      GF_AUTH_GENERIC_OAUTH_API_URL: $KEYCLOAK_URL/realms/acme-apps/protocol/openid-connect/userinfo
+    networks:
+      default:
+        aliases:
+          - apps.acme.test
