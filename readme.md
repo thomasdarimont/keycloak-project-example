@@ -254,8 +254,8 @@ Instead of running the deployment trigger script yourself, you can register it a
 
 - Name: `kc-deploy-extensions`
 - Description: `Deploy Extensions to Keycloak Docker Container`
-- Program: `bash`
-- Arguments: `$ProjectFileDir$/bin/deployExtensions.sh`
+- Program: `$JDKPath$/bin/java`
+- Arguments: `$ProjectFileDir$/bin/deployExtensions.java`
 - Working directory: `$ProjectFileDir$`
 - Only select: `Synchronize files after execution.`
 
@@ -267,8 +267,8 @@ Instead of running the Keycloak Config CLI script yourself, you can register it 
 
 - Name: `kc-deploy-config`
 - Description: `Deploy Realm Config to Keycloak Docker Container`
-- Program: `bash`
-- Arguments: `$ProjectFileDir$/bin/runKeycloakConfigCli.sh`
+- Program: `$JDKPath$/bin/java`
+- Arguments: `$ProjectFileDir$/bin/applyRealmConfig.java`
 - Working directory: `$ProjectFileDir$`
 - Only select: `Synchronize files after execution.`
 
