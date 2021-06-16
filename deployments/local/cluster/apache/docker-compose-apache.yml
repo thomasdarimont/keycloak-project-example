@@ -1,0 +1,58 @@
+services:
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:3443/auth
+    # IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:3443/auth
+    # IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-apache-lb:
+    image: httpd:2.4.48-alpine
+#    logging:
+#      driver: none
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./id.acme.test.conf:/etc/apache2/sites-enabled/id.acme.test.conf:z
+      - ../../../../config/stage/dev/tls/acme.test+1.pem:/usr/local/apache2/conf/server.crt:z
+      - ../../../../config/stage/dev/tls/acme.test+1-key.pem:/usr/local/apache2/conf/server.key:z
+    command: >
+      sh -c "sed -i -e 's/^#\(Include .*httpd-ssl.conf\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_slotmem_shm.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_watchdog.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_proxy.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_proxy_http.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_proxy_balancer.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_proxy_hcheck.so\)/\1/' conf/httpd.conf &&
+             sed -i -e 's/^#\(LoadModule .*mod_lbmethod_byrequests.so\)/\1/' conf/httpd.conf &&
+             sed -i 's/#*[Cc]ustom[Ll]og/#CustomLog/g' conf/httpd.conf &&
+             echo 'Include /etc/apache2/sites-enabled/id.acme.test.conf' >> conf/httpd.conf &&
+             exec httpd-foreground"
+    ports:
+      - "3443:443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2
