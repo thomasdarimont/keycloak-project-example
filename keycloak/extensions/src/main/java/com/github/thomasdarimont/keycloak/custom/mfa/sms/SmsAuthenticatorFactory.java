@@ -29,7 +29,7 @@ public class SmsAuthenticatorFactory implements AuthenticatorFactory, ServerInfo
                 .property().name(SmsAuthenticator.CONFIG_CODE_LENGTH)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Code length")
-                .defaultValue(8)
+                .defaultValue(6)
                 .helpText("The length of the generated Code.")
                 .add()
                 .property().name(SmsAuthenticator.CONFIG_CODE_TTL)

@@ -76,8 +76,6 @@ public class SmsAuthenticator implements Authenticator {
     }
 
     protected void sendCodeAndChallenge(AuthenticationFlowContext context, UserModel user, String phoneNumber, boolean resend) {
-
-
         log.infof("Sending code via SMS. resend=%s", resend);
 
         boolean codeSent = sendSmsWithCode(context, user, phoneNumber);
@@ -132,12 +130,13 @@ public class SmsAuthenticator implements Authenticator {
         return true;
     }
 
-    private String generateSmsText(int ttl, String code, String smsAuthText, String boundDomain) {
-        return String.format(smsAuthText, code, Math.floorDiv(ttl, 60), boundDomain);
+    private String generateSmsText(int ttlSeconds, String code, String smsAuthText, String boundDomain) {
+        int ttlMinutes = Math.floorDiv(ttlSeconds, 60);
+        return String.format(smsAuthText, code, ttlMinutes, boundDomain);
     }
 
-    private String computeExpireAt(int ttl) {
-        return Long.toString(System.currentTimeMillis() + (ttl * 1000));
+    private String computeExpireAt(int ttlSeconds) {
+        return Long.toString(System.currentTimeMillis() + (ttlSeconds * 1000));
     }
 
     protected String getConfigValue(AuthenticationFlowContext context, String key, String defaultValue) {
@@ -208,7 +207,9 @@ public class SmsAuthenticator implements Authenticator {
         int maxAttempts = Integer.parseInt(getConfigValue(context, CONFIG_MAX_ATTEMPTS, "5"));
         if (attempts >= maxAttempts) {
             log.info("To many invalid attempts.");
-            context.forkWithErrorMessage(new FormMessage(ERROR_SMS_AUTH_ATTEMPTS_EXCEEDED));
+            Response errorPage = generateErrorForm(context, ERROR_SMS_AUTH_ATTEMPTS_EXCEEDED)
+                    .createErrorPage(Response.Status.BAD_REQUEST);
+            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS, errorPage);
             return;
         }
 
