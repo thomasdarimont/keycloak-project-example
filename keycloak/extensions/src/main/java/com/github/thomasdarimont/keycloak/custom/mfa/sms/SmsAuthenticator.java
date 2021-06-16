@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.mfa.sms;
 
 import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClient;
 import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
@@ -11,39 +12,52 @@ import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.utils.FormMessage;
 import org.keycloak.representations.IDToken;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.theme.Theme;
 
 import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.security.SecureRandom;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
+@JBossLog
 public class SmsAuthenticator implements Authenticator {
 
-    private static final String TEMPLATE_LOGIN_SMS = "login-sms.ftl";
+    static final String TEMPLATE_LOGIN_SMS = "login-sms.ftl";
 
     static final String CONFIG_CODE_LENGTH = "length";
-
+    static final String CONFIG_MAX_ATTEMPTS = "attempts";
     static final String CONFIG_CODE_TTL = "ttl";
-
     static final String CONFIG_SENDER = "sender";
-
     static final String CONFIG_CLIENT = "client";
+    static final String CONFIG_PHONENUMBER_PATTERN = "phoneNumberPattern";
 
-    // TODO add configurable attempts
+    static final String AUTH_NOTE_CODE = "smsCode";
+    static final String AUTH_NOTE_ATTEMPTS = "smsAttempts";
 
-    public static final String ERROR_SMS_AUTH_INVALID_NUMBER = "smsAuthInvalidNumber";
-    public static final String ERROR_SMS_AUTH_CODE_EXPIRED = "smsAuthCodeExpired";
-    public static final String ERROR_SMS_AUTH_CODE_INVALID = "smsAuthCodeInvalid";
-    public static final String ERROR_SMS_AUTH_SMS_NOT_SENT = "smsAuthSmsNotSent";
+    static final String ERROR_SMS_AUTH_INVALID_NUMBER = "smsAuthInvalidNumber";
+    static final String ERROR_SMS_AUTH_CODE_EXPIRED = "smsAuthCodeExpired";
+    static final String ERROR_SMS_AUTH_CODE_INVALID = "smsAuthCodeInvalid";
+    static final String ERROR_SMS_AUTH_SMS_NOT_SENT = "smsAuthSmsNotSent";
+    static final String ERROR_SMS_AUTH_ATTEMPTS_EXCEEDED = "smsAuthAttemptsExceeded";
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
 
-        UserModel user = context.getUser();
+        if (context.getAuthenticationSession().getAuthNote(AUTH_NOTE_CODE) != null) {
+            // avoid sending resending code on reload
+            context.challenge(generateLoginForm(context, context.form()).createForm(TEMPLATE_LOGIN_SMS));
+            return;
+        }
 
-        String phoneNumber = user.getFirstAttribute(IDToken.PHONE_NUMBER);
-        boolean validPhoneNumberFormat = validatePhoneNumberFormat(phoneNumber);
+        UserModel user = context.getUser();
+        String phoneNumber = extractPhoneNumber(user);
+        boolean validPhoneNumberFormat = validatePhoneNumberFormat(phoneNumber, context);
         if (!validPhoneNumberFormat) {
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
                     generateErrorForm(context, ERROR_SMS_AUTH_INVALID_NUMBER)
@@ -54,66 +68,151 @@ public class SmsAuthenticator implements Authenticator {
         String phoneNumberVerified = user.getFirstAttribute(IDToken.PHONE_NUMBER_VERIFIED);
         // TODO check for phoneNumberVerified
 
+        sendCodeAndChallenge(context, user, phoneNumber, false);
+    }
+
+    protected String extractPhoneNumber(UserModel user) {
+        return user.getFirstAttribute(IDToken.PHONE_NUMBER);
+    }
+
+    protected void sendCodeAndChallenge(AuthenticationFlowContext context, UserModel user, String phoneNumber, boolean resend) {
+
+
+        log.infof("Sending code via SMS. resend=%s", resend);
+
+        boolean codeSent = sendSmsWithCode(context, user, phoneNumber);
+
+        if (!codeSent) {
+            Response errorPage = generateErrorForm(context, null)
+                    .setError(ERROR_SMS_AUTH_SMS_NOT_SENT, "Sms Client")
+                    .createErrorPage(Response.Status.INTERNAL_SERVER_ERROR);
+            context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR, errorPage);
+            return;
+        }
+
+        context.challenge(generateLoginForm(context, context.form())
+                .setAttribute("resend", resend)
+                .setInfo("smsSentInfo")
+                .createForm(TEMPLATE_LOGIN_SMS));
+    }
+
+    protected LoginFormsProvider generateLoginForm(AuthenticationFlowContext context, LoginFormsProvider form) {
+        return form.setAttribute("realm", context.getRealm());
+    }
+
+    protected boolean sendSmsWithCode(AuthenticationFlowContext context, UserModel user, String phoneNumber) {
+
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
-        int length = Integer.parseInt(config.getConfig().get(CONFIG_CODE_LENGTH));
-        int ttl = Integer.parseInt(config.getConfig().get(CONFIG_CODE_TTL));
+        int length = Integer.parseInt(getConfigValue(context, CONFIG_CODE_LENGTH, "6"));
+        int ttl = Integer.parseInt(getConfigValue(context, CONFIG_CODE_TTL, "300"));
 
         String code = generateCode(length);
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
-        authSession.setAuthNote("code", code);
-        authSession.setAuthNote("codeExpireAt", Long.toString(System.currentTimeMillis() + (ttl * 1000)));
+        authSession.setAuthNote(AUTH_NOTE_CODE, code);
+        authSession.setAuthNote("codeExpireAt", computeExpireAt(ttl));
 
         try {
             KeycloakSession session = context.getSession();
             Theme theme = session.theme().getTheme(Theme.Type.LOGIN);
             Locale locale = session.getContext().resolveLocale(user);
             String smsAuthText = theme.getMessages(locale).getProperty("smsAuthText");
-            String smsText = String.format(smsAuthText, code, Math.floorDiv(ttl, 60));
+            String boundDomain = resolveRealmDomain(context);
+            String smsText = generateSmsText(ttl, code, smsAuthText, boundDomain);
 
-            SmsClient smsClient = createSmsClient(config);
+            SmsClient smsClient = createSmsClient(config.getConfig());
 
-            String sender = resolveSender(context, config);
+            String sender = resolveSender(context);
             smsClient.send(sender, phoneNumber, smsText);
 
-            context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TEMPLATE_LOGIN_SMS));
         } catch (Exception e) {
-            context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
-                    generateErrorForm(context, null).setError(ERROR_SMS_AUTH_SMS_NOT_SENT, e.getMessage())
-                            .createErrorPage(Response.Status.INTERNAL_SERVER_ERROR));
+            log.errorf(e, "Could not send sms");
+            return false;
         }
+
+        return true;
     }
 
-    protected SmsClient createSmsClient(AuthenticatorConfigModel config) {
-        String smsClientName = config.getConfig().get(CONFIG_CLIENT);
-        return SmsClientFactory.createClient(smsClientName, config.getConfig());
+    private String generateSmsText(int ttl, String code, String smsAuthText, String boundDomain) {
+        return String.format(smsAuthText, code, Math.floorDiv(ttl, 60), boundDomain);
     }
 
-    protected String resolveSender(AuthenticationFlowContext context, AuthenticatorConfigModel config) {
+    private String computeExpireAt(int ttl) {
+        return Long.toString(System.currentTimeMillis() + (ttl * 1000));
+    }
+
+    protected String getConfigValue(AuthenticationFlowContext context, String key, String defaultValue) {
+
+        AuthenticatorConfigModel configModel = context.getAuthenticatorConfig();
+        if (configModel == null) {
+            return defaultValue;
+        }
+
+        Map<String, String> config = configModel.getConfig();
+        if (config == null) {
+            return defaultValue;
+        }
+
+        return config.getOrDefault(key, defaultValue);
+    }
+
+    protected String resolveRealmDomain(AuthenticationFlowContext context) {
+        return URI.create(System.getenv("KEYCLOAK_FRONTEND_URL")).getHost();
+    }
+
+    protected SmsClient createSmsClient(Map<String, String> config) {
+        String smsClientName = config.get(CONFIG_CLIENT);
+        return SmsClientFactory.createClient(smsClientName, config);
+    }
+
+    protected String resolveSender(AuthenticationFlowContext context) {
 
         RealmModel realm = context.getRealm();
-        String sender = config.getConfig().getOrDefault("sender", "keycloak");
+        String sender = getConfigValue(context, "sender", "keycloak");
         if ("$realmDisplayName".equals(sender.trim())) {
             sender = realm.getDisplayName();
         }
         return sender;
     }
 
-    protected boolean validatePhoneNumberFormat(String phoneNumber) {
-        // TODO validate phoneNumber
-        return true;
+    protected boolean validatePhoneNumberFormat(String phoneNumber, AuthenticationFlowContext context) {
+
+        if (phoneNumber == null) {
+            return false;
+        }
+
+        String pattern = getConfigValue(context, CONFIG_PHONENUMBER_PATTERN, ".*");
+        return phoneNumber.matches(pattern);
     }
 
     protected String generateCode(int length) {
-        return RandomString.randomCode(length);
+        return new RandomString(length, new SecureRandom(), RandomString.digits).nextString();
     }
 
     @Override
     public void action(AuthenticationFlowContext context) {
 
-        String codeInput = context.getHttpRequest().getDecodedFormParameters().getFirst("code");
+        var formParams = context.getHttpRequest().getDecodedFormParameters();
+
+        if (formParams.containsKey("resend")) {
+            UserModel user = context.getUser();
+            String phoneNumber = extractPhoneNumber(user);
+            sendCodeAndChallenge(context, user, phoneNumber, true);
+            return;
+        }
+
+        String codeInput = formParams.getFirst("code");
 
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
-        String codeExpected = authSession.getAuthNote("code");
+
+        int attempts = Integer.parseInt(Optional.ofNullable(authSession.getAuthNote(AUTH_NOTE_ATTEMPTS)).orElse("0"));
+        int maxAttempts = Integer.parseInt(getConfigValue(context, CONFIG_MAX_ATTEMPTS, "5"));
+        if (attempts >= maxAttempts) {
+            log.info("To many invalid attempts.");
+            context.forkWithErrorMessage(new FormMessage(ERROR_SMS_AUTH_ATTEMPTS_EXCEEDED));
+            return;
+        }
+
+        String codeExpected = authSession.getAuthNote(AUTH_NOTE_CODE);
         String codeExpireAt = authSession.getAuthNote("codeExpireAt");
 
         if (codeExpected == null || codeExpireAt == null) {
@@ -122,34 +221,47 @@ public class SmsAuthenticator implements Authenticator {
             return;
         }
 
-        boolean isValid = codeInput.equals(codeExpected);
-        if (!isValid) {
-            context.failureChallenge(AuthenticationFlowError.INVALID_CREDENTIALS,
-                    generateErrorForm(context, null)
-                            .setError("code", ERROR_SMS_AUTH_CODE_INVALID)
-                            .createForm(TEMPLATE_LOGIN_SMS));
+        boolean valid = codeInput.equals(codeExpected);
+        if (!valid) {
+            Response errorPage = generateErrorForm(context, null)
+                    .setErrors(List.of(new FormMessage("code", ERROR_SMS_AUTH_CODE_INVALID)))
+                    .setAttribute("showResend", "")
+                    .createForm(TEMPLATE_LOGIN_SMS);
+            handleFailure(context, AuthenticationFlowError.INVALID_CREDENTIALS, errorPage);
             return;
         }
 
         if (isCodeExpired(codeExpireAt)) {
             Response errorPage = generateErrorForm(context, null)
-                    .setError("code", ERROR_SMS_AUTH_CODE_EXPIRED)
+                    .setErrors(List.of(new FormMessage("code", ERROR_SMS_AUTH_CODE_EXPIRED)))
+                    .setAttribute("showResend", "")
                     .createErrorPage(Response.Status.BAD_REQUEST);
-            context.failureChallenge(AuthenticationFlowError.EXPIRED_CODE, errorPage);
+            handleFailure(context, AuthenticationFlowError.EXPIRED_CODE, errorPage);
             return;
         }
 
         context.success();
     }
 
-    private boolean isCodeExpired(String codeExpireAt) {
+    protected void handleFailure(AuthenticationFlowContext context, AuthenticationFlowError error, Response errorPage) {
+
+        AuthenticationSessionModel authSession = context.getAuthenticationSession();
+
+        int attempts = Integer.parseInt(Optional.ofNullable(authSession.getAuthNote(AUTH_NOTE_ATTEMPTS)).orElse("0"));
+        attempts++;
+        authSession.setAuthNote(AUTH_NOTE_ATTEMPTS, "" + attempts);
+
+        context.failureChallenge(error, errorPage);
+    }
+
+    protected boolean isCodeExpired(String codeExpireAt) {
         return Long.parseLong(codeExpireAt) < System.currentTimeMillis();
     }
 
-    private LoginFormsProvider generateErrorForm(AuthenticationFlowContext context, String error) {
+    protected LoginFormsProvider generateErrorForm(AuthenticationFlowContext context, String error) {
 
         LoginFormsProvider form = context.form();
-        form.setAttribute("realm", context.getRealm());
+        generateLoginForm(context, form);
 
         if (error == null) {
             form.setError(error);
@@ -165,7 +277,8 @@ public class SmsAuthenticator implements Authenticator {
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        return user.getFirstAttribute(IDToken.PHONE_NUMBER) != null;
+        // we only support 2FA with SMS for users with Phone Numbers
+        return extractPhoneNumber(user) != null;
     }
 
     @Override

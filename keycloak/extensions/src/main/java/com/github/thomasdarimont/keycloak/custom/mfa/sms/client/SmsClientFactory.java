@@ -10,13 +10,13 @@ import java.util.Set;
 
 public class SmsClientFactory {
 
-    public static final String MOCK_CLIENT = "mock";
+    public static final String MOCK_SMS_CLIENT = "mock";
 
     public static SmsClient createClient(String name, Map<String, String> config) {
         Objects.requireNonNull(name);
 
         switch (name) {
-            case MOCK_CLIENT:
+            case MOCK_SMS_CLIENT:
                 return new MockSmsClient(config);
             default:
                 throw new IllegalArgumentException("SMS Client " + name + " not supported.");
@@ -24,6 +24,6 @@ public class SmsClientFactory {
     }
 
     public static Set<String> getAvailableClientNames() {
-        return new LinkedHashSet<>(Arrays.asList(MOCK_CLIENT));
+        return new LinkedHashSet<>(Arrays.asList(MOCK_SMS_CLIENT));
     }
 }

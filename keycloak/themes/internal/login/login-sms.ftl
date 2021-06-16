@@ -1,5 +1,5 @@
 <#import "template.ftl" as layout>
-<@layout.registrationLayout displayInfo=true; displayMessage=!messagesPerField.existsError('code'); section>
+<@layout.registrationLayout displayInfo=true displayMessage=!messagesPerField.existsError('code'); section>
     <#if section = "header">
         ${msg("smsAuthTitle",realm.displayName)}
     <#elseif section = "form">
@@ -10,6 +10,7 @@
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus
+                           inputmode="numeric" pattern="\d{6,8}" autocomplete="one-time-code"
                            aria-invalid="<#if messagesPerField.existsError('code')>true</#if>"/>
 
                     <#if messagesPerField.existsError('code')>
@@ -28,7 +29,14 @@
                 </div>
 
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doSubmit")}"/>
+                    <div class="${properties.kcFormButtonsWrapperClass!}">
+                        <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
+                               type="submit" value="${msg("doSubmit")}"/>
+
+                        <input name="resend"
+                               class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!} <#if showResend??><#else>hidden</#if>"
+                               type="submit" value="${msg("smsResendCode")}"/>
+                    </div>
                 </div>
             </div>
         </form>

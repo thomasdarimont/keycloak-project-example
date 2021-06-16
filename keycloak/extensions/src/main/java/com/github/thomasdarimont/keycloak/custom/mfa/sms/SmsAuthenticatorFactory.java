@@ -12,7 +12,6 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +38,12 @@ public class SmsAuthenticatorFactory implements AuthenticatorFactory, ServerInfo
                 .defaultValue("300")
                 .helpText("The time to live in seconds for the code to be valid.")
                 .add()
+                .property().name(SmsAuthenticator.CONFIG_MAX_ATTEMPTS)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("Max Attempts")
+                .defaultValue("5")
+                .helpText("Max attempts for Code.")
+                .add()
                 .property().name(SmsAuthenticator.CONFIG_SENDER)
                 .type(ProviderConfigProperty.STRING_TYPE)
                 .label("Sender")
@@ -47,10 +52,16 @@ public class SmsAuthenticatorFactory implements AuthenticatorFactory, ServerInfo
                 .add()
                 .property().name(SmsAuthenticator.CONFIG_CLIENT)
                 .type(ProviderConfigProperty.LIST_TYPE)
-                .options(SmsClientFactory.MOCK_CLIENT)
+                .options(SmsClientFactory.MOCK_SMS_CLIENT)
                 .label("Client")
-                .defaultValue(SmsClientFactory.MOCK_CLIENT)
+                .defaultValue(SmsClientFactory.MOCK_SMS_CLIENT)
                 .helpText("Denotes the client to send the SMS")
+                .add()
+                .property().name(SmsAuthenticator.CONFIG_PHONENUMBER_PATTERN)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("Phone Number Pattern")
+                .defaultValue("\\+49.*")
+                .helpText("Regex Pattern for validation of Phone Numbers")
                 .add()
                 .build();
 
@@ -64,7 +75,7 @@ public class SmsAuthenticatorFactory implements AuthenticatorFactory, ServerInfo
 
     @Override
     public String getDisplayType() {
-        return "SMS Authentication";
+        return "Acme: SMS Authentication";
     }
 
     @Override

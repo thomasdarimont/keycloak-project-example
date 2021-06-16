@@ -15,7 +15,7 @@ public class MockSmsClient implements SmsClient {
     }
 
     @Override
-    public void send(String sender, String phoneNumber, String message) {
-        log.infof("##### Sending SMS.%nsender='%s' phoneNumber='%s' message='%s'", sender, phoneNumber, message);
+    public void send(String sender, String receiver, String message) {
+        log.infof("##### Sending SMS.%nsender='%s' phoneNumber='%s' message='%s'", sender, receiver, message);
     }
 }
