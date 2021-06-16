@@ -57,22 +57,22 @@ class keycloakConfigCli {
             fileOrDirectoryNameOfConfig = CONFIG_PATH_IN_CONTAINER + "/";
         }
 
-        var provisioningCommand = new ArrayList<String>();
-        provisioningCommand.add("docker");
-        provisioningCommand.add("run");
-        provisioningCommand.add("--rm");
-        provisioningCommand.add("--network");
-        provisioningCommand.add("host");
-        provisioningCommand.add("--env-file");
-        provisioningCommand.add(envFile);
-        provisioningCommand.add("-e");
-        provisioningCommand.add("IMPORT_PATH=" + fileOrDirectoryNameOfConfig);
-        provisioningCommand.add("-v");
-        provisioningCommand.add(pathToConfig + ":" + CONFIG_PATH_IN_CONTAINER);
+        var commandLine = new ArrayList<String>();
+        commandLine.add("docker");
+        commandLine.add("run");
+        commandLine.add("--rm");
+        commandLine.add("--network");
+        commandLine.add("host");
+        commandLine.add("--env-file");
+        commandLine.add(envFile);
+        commandLine.add("-e");
+        commandLine.add("IMPORT_PATH=" + fileOrDirectoryNameOfConfig);
+        commandLine.add("-v");
+        commandLine.add(pathToConfig + ":" + CONFIG_PATH_IN_CONTAINER);
 
-        provisioningCommand.add("adorsys/keycloak-config-cli:" + keycloakConfigCliVersion);
+        commandLine.add("adorsys/keycloak-config-cli:" + keycloakConfigCliVersion);
 
-        var pb = new ProcessBuilder(provisioningCommand);
+        var pb = new ProcessBuilder(commandLine);
         pb.inheritIO();
         var process = pb.start();
         System.exit(process.waitFor());

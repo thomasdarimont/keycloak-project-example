@@ -69,14 +69,14 @@ class createTlsCerts {
         Files.list(Paths.get(targetDir)).filter(p -> FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB).matches(p)).forEach(f -> f.toFile().delete());
 
         /* Create mkcert command */
-        var command = new ArrayList<String>();
-        command.add("mkcert");
-        command.add("-install");
-        command.add(domain);
-        command.add("*." + domain);
+        var commandLine = new ArrayList<String>();
+        commandLine.add("mkcert");
+        commandLine.add("-install");
+        commandLine.add(domain);
+        commandLine.add("*." + domain);
 
         /* Execute mkcert command */
-        final var pb = new ProcessBuilder(command);
+        final var pb = new ProcessBuilder(commandLine);
         pb.directory(new File(targetDir));
         pb.inheritIO();
         var process = pb.start();

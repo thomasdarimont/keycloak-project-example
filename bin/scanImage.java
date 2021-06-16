@@ -37,17 +37,17 @@ class scanImage {
         var trivyVersion = Optional.ofNullable(System.getenv(TRIVY_VERSION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(TRIVY_VERSION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(TRIVY_VERSION_DEFAULT));
         var imageName = Optional.ofNullable(System.getenv(IMAGE_NAME_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMAGE_NAME_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide image name to scan with "+IMAGE_NAME_OPT)));
 
-        var scanImageCommand = new ArrayList<String>();
-        scanImageCommand.add("docker");
-        scanImageCommand.add("run");
-        scanImageCommand.add("--privileged");
-        scanImageCommand.add("--rm");
-        scanImageCommand.add("-v");
-        scanImageCommand.add("/var/run/docker.sock:/var/run/docker.sock:z");
-        scanImageCommand.add("aquasec/trivy:" + trivyVersion);
-        scanImageCommand.add(imageName);
+        var commandLine = new ArrayList<String>();
+        commandLine.add("docker");
+        commandLine.add("run");
+        commandLine.add("--privileged");
+        commandLine.add("--rm");
+        commandLine.add("-v");
+        commandLine.add("/var/run/docker.sock:/var/run/docker.sock:z");
+        commandLine.add("aquasec/trivy:" + trivyVersion);
+        commandLine.add(imageName);
 
-        var pb = new ProcessBuilder(scanImageCommand);
+        var pb = new ProcessBuilder(commandLine);
         pb.inheritIO();
         var process = pb.start();
         System.exit(process.waitFor());
