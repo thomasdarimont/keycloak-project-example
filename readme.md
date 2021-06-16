@@ -163,7 +163,7 @@ Users:
 
 A simple demo app can be used to show information from the Access-Token, ID-Token and UserInfo endpoint provided by Keycloak.
 
-The demo app is started and will be accessible via http://localhost:4000 or https://apps.acme.local:4443.
+The demo app is started and will be accessible via http://localhost:4000/?realm=acme-internal or https://apps.acme.test:4443/?realm=acme-internal.
 
 # Deployment
 
