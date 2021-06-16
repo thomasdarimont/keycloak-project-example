@@ -43,27 +43,30 @@ class exportRealm {
         }
 
         var realmName = Optional.ofNullable(System.getenv(EXPORT_REALM_ENV)).orElse(argList.stream().filter(s -> s.startsWith(EXPORT_REALM_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXPORT_REALM_DEFAULT));
-        var additionalOptions = Optional.ofNullable(System.getenv(ADDITIONAL_OPTIONS_ENV)).orElse(argList.stream().filter(s -> s.startsWith(ADDITIONAL_OPTIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(ADDITIONAL_OPTIONS_DEFAULT));;
+        var additionalOptions = Optional.ofNullable(System.getenv(ADDITIONAL_OPTIONS_ENV)).orElse(argList.stream().filter(s -> s.startsWith(ADDITIONAL_OPTIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(ADDITIONAL_OPTIONS_DEFAULT));
+        ;
         var verbose = argList.contains(VERBOSE_CMD);
 
-        var deployTriggerCommand = new ArrayList<String>();
-        deployTriggerCommand.add("docker-compose");
-        deployTriggerCommand.add("exec");
-        deployTriggerCommand.add("-T");
-        deployTriggerCommand.add("acme-keycloak");
-        deployTriggerCommand.add("/opt/jboss/keycloak/bin/standalone.sh");
-        deployTriggerCommand.add("-c");
-        deployTriggerCommand.add("standalone.xml");
-        deployTriggerCommand.add("-Djboss.socket.binding.port-offset=10000");
-        deployTriggerCommand.add("-Dkeycloak.migration.action=export");
-        deployTriggerCommand.add("-Dkeycloak.migration.file=/opt/jboss/imex/" + realmName + "-realm.json");
-        deployTriggerCommand.add("-Dkeycloak.migration.provider=singleFile");
-        deployTriggerCommand.add("-Dkeycloak.migration.realmName="+realmName);
-        if(additionalOptions != null && !"".equals(additionalOptions.trim())) {
-            deployTriggerCommand.add(additionalOptions);
+        var commandLine = new ArrayList<String>();
+        commandLine.add("docker-compose");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose.yml");
+        commandLine.add("exec");
+        commandLine.add("-T");
+        commandLine.add("acme-keycloak");
+        commandLine.add("/opt/jboss/keycloak/bin/standalone.sh");
+        commandLine.add("-c");
+        commandLine.add("standalone.xml");
+        commandLine.add("-Djboss.socket.binding.port-offset=10000");
+        commandLine.add("-Dkeycloak.migration.action=export");
+        commandLine.add("-Dkeycloak.migration.file=/opt/jboss/imex/" + realmName + "-realm.json");
+        commandLine.add("-Dkeycloak.migration.provider=singleFile");
+        commandLine.add("-Dkeycloak.migration.realmName=" + realmName);
+        if (additionalOptions != null && !"".equals(additionalOptions.trim())) {
+            commandLine.add(additionalOptions);
         }
 
-        var pb = new ProcessBuilder(deployTriggerCommand);
+        var pb = new ProcessBuilder(commandLine);
         pb.redirectErrorStream(true);
         var process = pb.start();
         InputStream stdIn = process.getInputStream();
@@ -71,17 +74,17 @@ class exportRealm {
         BufferedReader br = new BufferedReader(isr);
 
         String line;
-        while ((line = br.readLine ()) != null) {
-            if(line.contains("KC-SERVICES0034")) {
+        while ((line = br.readLine()) != null) {
+            if (line.contains("KC-SERVICES0034")) {
                 System.out.println(line);
                 continue;
             }
-            if(line.contains("KC-SERVICES0035")) {
+            if (line.contains("KC-SERVICES0035")) {
                 System.out.println(line);
                 process.destroy();
                 System.exit(0);
             }
-            if(verbose) {
+            if (verbose) {
                 System.out.println(line);
             }
         }

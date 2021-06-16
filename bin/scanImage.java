@@ -8,7 +8,6 @@ class scanImage {
 
     static final String IMAGE_NAME_OPT = "--image-name";
     static final String IMAGE_NAME_ENV = "IMAGE_NAME";
-    static final String IMAGE_NAME_DEFAULT = "acme/acme-keycloak:13.0.1.0.0.1.0-SNAPSHOT";
 
     static final String TRIVY_VERSION_OPT = "--trivy-version";
     static final String TRIVY_VERSION_ENV = "TRIVY_VERSION";
@@ -16,7 +15,7 @@ class scanImage {
 
     static final String VERBOSE_CMD = "--verbose";
 
-    public static void main(String[] args) throws IOException, InterruptedException, IOException {
+    public static void main(String[] args) throws Exception {
         var argList = Arrays.asList(args);
 
         var showHelp = argList.contains(HELP_CMD);
@@ -30,13 +29,13 @@ class scanImage {
             System.out.printf("%s: %s%n", TRIVY_VERSION_OPT, "override the version of trivy use for scanning");
             System.out.printf("%s: %s%n", VERBOSE_CMD, "make the output of the export process visible on stdout");
             System.out.println("");
-            System.out.printf("Example: %s=%s %s=%s", IMAGE_NAME_OPT, IMAGE_NAME_DEFAULT, TRIVY_VERSION_OPT, TRIVY_VERSION_DEFAULT);
+            System.out.printf("Example: %s=%s %s=%s", IMAGE_NAME_OPT, "<some image>", TRIVY_VERSION_OPT, TRIVY_VERSION_DEFAULT);
             System.out.println("");
             System.exit(0);
         }
 
         var trivyVersion = Optional.ofNullable(System.getenv(TRIVY_VERSION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(TRIVY_VERSION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(TRIVY_VERSION_DEFAULT));
-        var imageName = Optional.ofNullable(System.getenv(IMAGE_NAME_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMAGE_NAME_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(IMAGE_NAME_DEFAULT));
+        var imageName = Optional.ofNullable(System.getenv(IMAGE_NAME_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMAGE_NAME_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide image name to scan with "+IMAGE_NAME_OPT)));
 
         var scanImageCommand = new ArrayList<String>();
         scanImageCommand.add("docker");

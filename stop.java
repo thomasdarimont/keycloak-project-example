@@ -10,7 +10,7 @@ import java.util.Arrays;
  *  java stop.java
  * }</pre>
  */
-class start {
+class stop {
 
     static final String HELP_CMD = "help";
 

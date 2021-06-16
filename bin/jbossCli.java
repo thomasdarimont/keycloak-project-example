@@ -7,7 +7,7 @@ import java.util.Arrays;
  *
  * <h2>Run jboss-cli in Keycloak container</h2>
  * <pre>{@code
- *  java bin/cli.java
+ *  java bin/jbossCli.java
  * }</pre>
  */
 class cli {
@@ -21,7 +21,7 @@ class cli {
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
             System.out.println("Runs jboss-cli.sh in the Keycloak container");
-            System.out.printf("%n%s supports the following options: %n", "cli.java");
+            System.out.printf("%n%s supports the following options: %n", "jbossCli.java");
             System.out.println("");
 
             System.out.printf("%n%s supports the following commands: %n", "start.java");
@@ -30,7 +30,7 @@ class cli {
 
             System.out.printf("%n Usage examples: %n");
             System.out.println("");
-            System.out.printf("  %s %s%n", "java cli.java", "# Start Keycloak jboss-cli in Environment");
+            System.out.printf("  %s %s%n", "java jbossCli.java", "# Start Keycloak jboss-cli in Environment");
             System.exit(0);
             return;
         }

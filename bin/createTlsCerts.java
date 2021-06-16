@@ -24,6 +24,7 @@ import java.util.Optional;
  */
 
 class createTlsCerts {
+
     static final String HELP_CMD = "--help";
 
     static final String DOMAIN_OPT = "--domain";

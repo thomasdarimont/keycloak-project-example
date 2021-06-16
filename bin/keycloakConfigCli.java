@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-class runDefinedKeycloakConfigCli {
+class keycloakConfigCli {
 
+    public static final String CONFIG_PATH_IN_CONTAINER = "/config";
     static final String HELP_CMD = "--help";
-
     static final String IMPORT_OPT = "--import";
     static final String IMPORT_ENV = "IMPORT";
     static final String IMPORT_DEFAULT = "config/stage/dev/realms";
     static final String ENV_FILE_OPT = "--env-file";
     static final String ENV_FILE_ENV = "ENV_FILE";
-    static final String ENV_FILE_DEFAULT = "bin/runDefinedKeycloakConfigCli.env";
-
-    public static final String CONFIG_PATH_IN_CONTAINER = "/config";
-
+    static final String ENV_FILE_DEFAULT = "bin/keycloakConfigCli.default.env";
+    static final String KEYCLOAOK_CONFIG_CLI_VERSION_OPT = "--cli-version";
+    static final String KEYCLOAOK_CONFIG_CLI_VERSION_ENV = "KEYCLOAOK_CONFIG_CLI_VERSION";
+    static final String KEYCLOAOK_CONFIG_CLI_VERSION_DEFAULT = "latest";
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var argList = Arrays.asList(args);
@@ -29,25 +29,27 @@ class runDefinedKeycloakConfigCli {
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
             System.out.println("Execute a defined keycloak-config-cli folder or file against a running keycloak instance");
-            System.out.printf("%s will support the following options as command line parameters: %n", "runDefinedKeycloakConfigCli.java");
+            System.out.printf("%s will support the following options as command line parameters: %n", "keycloakConfigCli.java");
             System.out.println("");
-            System.out.printf("Options can be set by environment-variables %s and %s", IMPORT_ENV, ENV_FILE_ENV);
+            System.out.printf("Options can be set by environment-variables %s, %s and %s", IMPORT_ENV, ENV_FILE_ENV, KEYCLOAOK_CONFIG_CLI_VERSION_ENV);
             System.out.println("");
             System.out.printf("%s: %s%n", IMPORT_OPT, "override file or folder (all files inside will be used) to import");
             System.out.printf("%s: %s%n", ENV_FILE_OPT, "override default env file for further options");
+            System.out.printf("%s: %s%n", KEYCLOAOK_CONFIG_CLI_VERSION_OPT, "override default version of keycloak-config-cli");
             System.out.println("");
-            System.out.printf("Example: %s=%s %s=%s", IMPORT_OPT, IMPORT_DEFAULT, ENV_FILE_OPT, ENV_FILE_DEFAULT);
+            System.out.printf("Example: %s=%s %s=%s %s=%s", IMPORT_OPT, IMPORT_DEFAULT, ENV_FILE_OPT, ENV_FILE_DEFAULT, KEYCLOAOK_CONFIG_CLI_VERSION_OPT, KEYCLOAOK_CONFIG_CLI_VERSION_DEFAULT);
             System.out.println("");
             System.exit(0);
         }
 
         var configFileOrFolder = Optional.ofNullable(System.getenv(IMPORT_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMPORT_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(IMPORT_DEFAULT));
         var envFile = Optional.ofNullable(System.getenv(ENV_FILE_ENV)).orElse(argList.stream().filter(s -> s.startsWith(ENV_FILE_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(ENV_FILE_DEFAULT));
+        var keycloakConfigCliVersion = Optional.ofNullable(System.getenv(KEYCLOAOK_CONFIG_CLI_VERSION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(KEYCLOAOK_CONFIG_CLI_VERSION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(KEYCLOAOK_CONFIG_CLI_VERSION_DEFAULT));
 
         var configFileOrFolderAsFile = Path.of(configFileOrFolder).toRealPath(LinkOption.NOFOLLOW_LINKS).toFile();
         final String pathToConfig;
         final String fileOrDirectoryNameOfConfig;
-        if(configFileOrFolderAsFile.isFile()) {
+        if (configFileOrFolderAsFile.isFile()) {
             pathToConfig = configFileOrFolderAsFile.getParent();
             fileOrDirectoryNameOfConfig = CONFIG_PATH_IN_CONTAINER + "/" + configFileOrFolderAsFile.getName();
         } else {
@@ -68,9 +70,7 @@ class runDefinedKeycloakConfigCli {
         provisioningCommand.add("-v");
         provisioningCommand.add(pathToConfig + ":" + CONFIG_PATH_IN_CONTAINER);
 
-        provisioningCommand.add("adorsys/keycloak-config-cli:latest");
-
-        System.out.println(provisioningCommand.toString());
+        provisioningCommand.add("adorsys/keycloak-config-cli:" + keycloakConfigCliVersion);
 
         var pb = new ProcessBuilder(provisioningCommand);
         pb.inheritIO();
