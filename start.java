@@ -40,6 +40,8 @@ class start {
     static final String OPENLDAP_OPT = "--openldap";
     static final String POSTGRES_OPT = "--database=postgres";
     static final String GRAYLOG_OPT = "--logging=graylog";
+    static final String GRAFANA_OPT = "--grafana";
+    static final String PROMETHEUS_OPT = "--metrics=prometheus";
     static final String EXTENSIONS_OPT = "--extensions=";
     static final String EXTENSIONS_OPT_CLASSES = "classes";
     static final String EXTENSIONS_OPT_JAR = "jar";
@@ -55,6 +57,8 @@ class start {
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
         var useGraylog = argList.contains(GRAYLOG_OPT);
+        var useGrafana = argList.contains(GRAFANA_OPT);
+        var usePrometheus = argList.contains(PROMETHEUS_OPT);
         var extension = argList.stream().filter(s -> s.startsWith(EXTENSIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXTENSIONS_OPT_CLASSES);
         var ci = argList.stream().filter(s -> s.startsWith(CI_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(null);
         var useDetach = argList.contains(DETACH_OPT);
@@ -160,6 +164,17 @@ class start {
             requiresBuild = true;
         }
 
+        if (useGrafana) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-grafana.yml");
+            createFolderIfMissing("deployments/local/dev/run/grafana");
+        }
+
+        if (usePrometheus) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-prometheus.yml");
+            createFolderIfMissing("deployments/local/dev/run/prometheus");
+        }
         if (useProvision) {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-provisioning.yml");

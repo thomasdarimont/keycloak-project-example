@@ -1,0 +1,12 @@
+services:
+  acme-prometheus:
+    image: prom/prometheus:v2.28.0
+    user: "65534:1000"
+    volumes:
+      - ../../../config/stage/dev/prometheus/:/etc/prometheus/
+      - ./run/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
