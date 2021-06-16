@@ -66,6 +66,7 @@ clients:
     baseUrl: "/?realm=acme-internal"
     redirectUris:
       - "/*"
+      - "http://localhost:4000/*"
     webOrigins:
       - "+"
     defaultClientScopes:

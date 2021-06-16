@@ -45,6 +45,7 @@ clients:
     baseUrl: "/?realm=acme-apps"
     redirectUris:
       - "/*"
+      - "http://localhost:4000/*"
     webOrigins:
       - "+"
     defaultClientScopes:

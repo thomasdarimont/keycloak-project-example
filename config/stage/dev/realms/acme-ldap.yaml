@@ -56,6 +56,7 @@ clients:
     baseUrl: "/?realm=acme-ldap"
     redirectUris:
       - "/*"
+      - "http://localhost:4000/*"
     webOrigins:
       - "+"
     defaultClientScopes:
