@@ -1,0 +1,71 @@
+realm: acme-ops
+enabled: true
+displayName: Acme Operations
+displayNameHtml: Acme Operations
+loginWithEmailAllowed: true
+loginTheme: internal
+internationalizationEnabled: true
+supportedLocales: ["en","de"]
+defaultLocale: "en"
+resetPasswordAllowed: true
+accountTheme: keycloak.v2
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
+roles:
+  client:
+    acme-ops-grafana:
+      - name: "Viewer"
+        description: "Allowed to read grafana"
+        composite: false
+        clientRole: true
+      - name: "Editor"
+        description: "Allowed to edit grafana"
+        composite: false
+        clientRole: true
+      - name: "Admin"
+        description: "Allowed to administrate grafana"
+        composite: false
+        clientRole: true
+
+clients:
+  - clientId: acme-ops-grafana
+    protocol: openid-connect
+    name: Client for grafana
+    description: "Secure grafana"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: acme-ops-grafana-secret
+    fullScopeAllowed: false
+    defaultClientScopes:
+    redirectUris:
+      - "https://ops.acme.test:3000/grafana/login*"
+    # grafana uses jmespath to access the role resource. it cannot handle '-' as part of the client id
+    protocolMappers:
+      - name: client roles
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-client-role-mapper
+        consentRequired: false
+        config:
+          access.token.claim: 'true'
+          id.token.claim: 'false'
+          userinfo.token.claim: 'true'
+          claim.name: resource_access.grafana.roles
+          jsonType.label: String
+          multivalued: 'true'
+users:
+  - username: devops
+    email: devops@acme.test
+    firstName: Adele
+    lastName: Admina
+    enabled: true
+    credentials:
+      - type: password
+        value: test
+        temporary: false
+    clientRoles:
+      acme-ops-grafana:
+        - "Admin"

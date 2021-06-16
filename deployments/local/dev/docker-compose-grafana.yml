@@ -1,0 +1,32 @@
+services:
+  acme-grafana:
+    image: grafana/grafana:8.0.2
+    ports:
+      - 3000:3000
+    user: "472:1000"
+    environment:
+      GF_SERVER_PROTOCOL: "https"
+      GF_SERVER_HTTP_PORT: 3000
+      GF_SERVER_DOMAIN: "ops.acme.test"
+      GF_SERVER_ROOT_URL: "%(protocol)s://%(domain)s:%(http_port)s/grafana"
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_CERT_FILE: "/etc/grafana/cert.pem"
+      GF_SERVER_CERT_KEY: "/etc/grafana/key.pem"
+      GF_SECURITY_ADMIN_USER: "devops_fallback"
+      GF_SECURITY_ADMIN_PASSWORD: "test"
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: "acme-ops"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: "openid email"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "acme-ops-grafana"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "acme-ops-grafana-secret"
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "https://id.acme.test:8443/auth/realms/acme-ops/protocol/openid-connect/auth"
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http://acme-keycloak:8080/auth/realms/acme-ops/protocol/openid-connect/token"
+      GF_AUTH_GENERIC_OAUTH_API_URL: "http://acme-keycloak:8080/auth/realms/acme-ops/protocol/openid-connect/userinfo"
+      # Generic client role mapping does not work because of '-' in the client name
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "resource_access.grafana.roles[0]"
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT: "true"
+    volumes:
+      - ./run/grafana:/var/lib/grafana
+      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/grafana/cert.pem:z
+      - ../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/grafana/key.pem:z

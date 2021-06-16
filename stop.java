@@ -43,6 +43,10 @@ class start {
         commandLine.add("deployments/local/dev/docker-compose-provisioning.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-graylog.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-prometheus.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-grafana.yml");
         commandLine.add("down");
         commandLine.add("--remove-orphans");
 

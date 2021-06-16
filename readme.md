@@ -143,6 +143,46 @@ rm *.zip
 java start.java --logging=graylog
 ```
 
+### Enable Prometheus
+
+Prometheus can scrape0 metrics from configured targets and persists the collected data in a time series database.
+The metrics data can be used to create monitoring dashboards with tools like grafana (see  [Grafana](#enable-grafana)).
+
+Scrape targets configured:
+
+|System|Target  |Additional Labels
+|------|--------|------
+|keycloak |http://acme-keycloak:9990/metrics | env
+
+#### Run with Prometheus
+```
+java start.java --metrics=prometheus
+```
+
+### Enable Grafana
+
+Grafana supports dashboards and alerting based on data from various datasources.
+
+Note: To enable grafana with tls, a permission change is required as docker does not support a way to map users for shared files.
+You need to add read permissions for the key file `acme.test+1-key.pem` in config/stage/dev/tls for the group of the current user.
+
+Access to Grafana can be configured in multiple ways, even a login with Keycloak is possible. 
+In this example we use configured admin user account to access Grafana, but we also offer a login via Keycloak by leveraging the generic OAuth integration.
+Grafana is configured to not allow login as guest.
+
+#### Run with Grafana
+```
+java start.java --grafana
+```
+
+Open [Grafana](https://apps.acme.test:3000/grafana)
+
+Manual steps when logged in as an Admin (Example User: admina, Password: test)
+* Configure datasource
+    * Add e.g. prometheus as datasource (http://acme-prometheus:9090/) (see  [Grafana](#enable-prometheus))
+    * Add e.g. elastic-search as datasource (http://acme-graylog-lo:9090/) (see  [Graylog](#enable-graylog) services)
+* Import Boards of your choice from [Grafana](https://grafana.com/grafana/dashboards) (for testing an [exported board](../../../config/stage/dev/grafana/microprofile-wildfly-16-metrics_rev1.json) can be used) 
+
 ### Clustering
 
 Clustering examples can be found in the [deployments/local/cluster](deployments/local/cluster) folder.
