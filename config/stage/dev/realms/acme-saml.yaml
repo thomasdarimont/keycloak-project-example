@@ -102,4 +102,4 @@ users:
         value: test
         temporary: false
     realmRoles:
-      - default-roles-acme-internal
+      - default-roles-acme-saml
