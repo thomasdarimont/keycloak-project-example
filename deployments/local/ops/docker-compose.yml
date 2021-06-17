@@ -1,0 +1,13 @@
+services:
+  grafana:
+    image: grafana/grafana:8.0.2
+    ports:
+      - 3000:3000
+    user: "104"
+    volumes:
+      - ../../../config/stage/dev/grafana/defaults.ini:/usr/share/grafana/conf/defaults.ini
+
+networks:
+  default:
+    external: true
+    name: dev_default
