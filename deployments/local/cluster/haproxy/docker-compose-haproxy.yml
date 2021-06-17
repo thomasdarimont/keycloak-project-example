@@ -38,9 +38,6 @@ services:
 # - ../run/haproxy/run:/var/run:z
     sysctls:
       - net.ipv4.ip_unprivileged_port_start=0
-    command:
-      - "-f"
-      - "/usr/local/etc/haproxy/haproxy.cfg"
     ports:
       - "1443:1443"
     depends_on:
