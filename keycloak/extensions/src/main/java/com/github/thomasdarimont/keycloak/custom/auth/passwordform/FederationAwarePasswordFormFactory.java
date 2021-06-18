@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.auth;
+package com.github.thomasdarimont.keycloak.custom.auth.passwordform;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;

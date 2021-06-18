@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.auth;
+package com.github.thomasdarimont.keycloak.custom.auth.passwordform;
 
 import org.keycloak.authentication.authenticators.browser.PasswordForm;
 import org.keycloak.models.KeycloakSession;
