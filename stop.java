@@ -30,7 +30,7 @@ class start {
         var commandLine = new ArrayList<String>();
         commandLine.add("docker-compose");
         commandLine.add("--env-file");
-        commandLine.add("deployments/local/dev/keycloak-common.env");
+        commandLine.add("keycloak.env");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("--file");
