@@ -4,6 +4,7 @@ import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,18 +39,19 @@ public class UsersResource {
     }
 
     @GET
-    // @RolesAllowed("iam") //TODO add once the remote claim mapper is implemented in Keycloak
+    @RolesAllowed("iam") // require 'iam' present in groups claim list
     @Path("/claims")
     public Object claims(
             @QueryParam("issuer") String issuer,
-            @QueryParam("client_id") String clientId,
-            @QueryParam("user_id") String userId
+            @QueryParam("clientId") String clientId,
+            @QueryParam("userId") String userId,
+            @QueryParam("username") String username
     ) {
-        log.infof("### Generating dynamic claims for user. issuer=%s client_id=%s user_id=%s",
-                issuer, clientId, userId
+        log.infof("### Generating dynamic claims for user. issuer=%s client_id=%s user_id=%s username=%s",
+                issuer, clientId, userId, username
         );
         Map<String, Object> data = new HashMap<>();
-        data.put("roles", List.of(clientId + "_user"));
+        data.put("acme", Map.of("roles", List.of(clientId + "_user")));
 
         return data;
     }
