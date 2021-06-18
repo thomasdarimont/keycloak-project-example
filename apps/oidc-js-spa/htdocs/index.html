@@ -52,6 +52,7 @@
         }
 
         .content {
+            font-size: 20px;
             background-color: #eee;
             border: 1px solid #ccc;
             padding: 10px;
@@ -61,11 +62,11 @@
             box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.5);
         }
 
-        .content .message {
+        .message-content {
+            font-size: 20px;
             padding: 10px;
             background-color: #fff;
             border: 1px solid #ccc;
-            font-size: 20px;
         }
 
         .token-content {
@@ -103,106 +104,43 @@
             font-weight: bold;
             width: 250px;
         }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
-<body style="display: none;">
+<body>
 
 <div>
     <h1>ClientId: <span id="clientInfo"></span></h1>
 </div>
 
-<div class="wrapper" id="welcome" style="display: none;">
+<div id="welcome" class="wrapper hidden">
     <div class="menu">
         <button name="loginBtn" onclick="keycloak.login()">Login</button>
     </div>
 
-    <div class="content">
+    <div class="message-content">
         <div class="message">Please login</div>
     </div>
 </div>
 
-<div id="profile" class="wrapper" style="display: none;">
+<div id="content" class="wrapper hidden">
     <div class="menu">
         <button name="profileBtn" onclick="showProfile()">Profile</button>
         <button name="tokenBtn" onclick="showToken()">AccessToken</button>
         <button name="idTokenBtn" onclick="showIdToken()">IDToken</button>
         <button name="userinfoBtn" onclick="showUserInfo()">Userinfo</button>
+        <button name="meBtn" onclick="showMeInfo()">Me Info</button>
         <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
         <button name="changePasswordBtn" onclick="changePassword()">Password</button>
         <button name="reauthBtn" onclick="enforceCurrentAuth()">ReAuth</button>
         <button name="logoutBtn" onclick="keycloak.logout()">Logout</button>
     </div>
 
-    <div class="content">
-        <div id="profile-content" class="message">
-            <table>
-                <tr>
-                    <td class="label">First name</td>
-                    <td><span id="firstName"></span></td>
-                </tr>
-                <tr>
-                    <td class="label">Last name</td>
-                    <td><span id="lastName"></span></td>
-                </tr>
-                <tr>
-                    <td class="label">Email</td>
-                    <td><span id="email"></span></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="wrapper" id="token" style="display: none;">
-    <div class="menu">
-        <button onclick="showProfile()">Profile</button>
-        <button onclick="showToken()">AccessToken</button>
-        <button onclick="showIdToken()">IDToken</button>
-        <button name="userinfoBtn" onclick="showUserInfo()">Userinfo</button>
-        <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
-        <button name="changePasswordBtn" onclick="changePassword()">Password</button>
-        <button name="reauthBtn" onclick="enforceCurrentAuth()">ReAuth</button>
-        <button onclick="keycloak.logout()">Logout</button>
-    </div>
-
-    <div class="content">
-        <div id="access-token-content" class="message token-content"></div>
-    </div>
-</div>
-
-<div class="wrapper" id="idToken" style="display: none;">
-    <div class="menu">
-        <button onclick="showProfile()">Profile</button>
-        <button onclick="showToken()">AccessToken</button>
-        <button onclick="showIdToken()">IDToken</button>
-        <button name="userinfoBtn" onclick="showUserInfo()">Userinfo</button>
-        <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
-        <button name="changePasswordBtn" onclick="changePassword()">Password</button>
-        <button name="reauthBtn" onclick="enforceCurrentAuth()">ReAuth</button>
-        <button onclick="keycloak.logout()">Logout</button>
-    </div>
-
-    <div class="content">
-        <div id="id-token-content" class="message token-content"></div>
-    </div>
-</div>
-
-<div class="wrapper" id="userInfo" style="display: none;">
-    <div class="menu">
-        <button onclick="showProfile()">Profile</button>
-        <button onclick="showToken()">AccessToken</button>
-        <button onclick="showIdToken()">IDToken</button>
-        <button name="userinfoBtn" onclick="showUserInfo()">Userinfo</button>
-        <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
-        <button name="changePasswordBtn" onclick="changePassword()">Password</button>
-        <button name="reauthBtn" onclick="enforceCurrentAuth()">ReAuth</button>
-        <button onclick="keycloak.logout()">Logout</button>
-    </div>
-
-    <div class="content">
-        <div id="userinfo-token-content" class="message token-content"></div>
-    </div>
+    <div id="data" class="content"></div>
 </div>
 
 
@@ -225,7 +163,7 @@
 
     document.getElementById("clientInfo").textContent = clientId;
 
-    window.onload = function () {
+    window.onload = () => {
 
         window.keycloak = new Keycloak({
             url: keycloakUrl,
@@ -235,36 +173,37 @@
 
         // Workaround for KEYCLOAK-14414
         window.keycloak._login = window.keycloak.login;
-        window.keycloak.login = function (options) {
+        window.keycloak.login = (options) => {
             if (options) {
                 options.scope = scope;
             }
             return window.keycloak._login.apply(window.keycloak, [options]);
         };
 
-
-        keycloak.init({
-            onLoad: 'login-required',
+        let initConfig = {
+            onLoad: 'login-required', // redirects to login if not login
+            // onLoad: 'check-sso', // shows login button of not logged in
             checkLoginIframe: true,
             checkLoginIframeInterval: 1,
             pkceMethod: 'S256'
-        })
-            .success(function () {
+        };
 
-                if (keycloak.authenticated) {
-                    showProfile();
-                } else {
-                    welcome();
-                }
+        let onLoginSuccess = () => {
+            if (keycloak.authenticated) {
+                showProfile();
+            } else {
+                showWelcome();
+            }
+        };
 
-                document.body.style.display = 'block';
-            });
+        keycloak.init(initConfig).success(onLoginSuccess);
 
-        keycloak.onAuthLogout = welcome;
+        keycloak.onAuthLogout = showWelcome;
     };
 
-    function welcome() {
-        show('welcome');
+    function showWelcome() {
+        document.getElementById("welcome").classList.remove("hidden");
+        document.getElementById("content").classList.add("hidden");
     }
 
     function getTimeSinceLastAuth() {
@@ -298,43 +237,76 @@
 
     function showProfile() {
 
-        if (keycloak.tokenParsed['given_name']) {
-            document.getElementById('firstName').innerHTML = keycloak.tokenParsed['given_name'];
-        }
-        if (keycloak.tokenParsed['family_name']) {
-            document.getElementById('lastName').innerHTML = keycloak.tokenParsed['family_name'];
-        }
-        if (keycloak.tokenParsed['email']) {
-            document.getElementById('email').innerHTML = keycloak.tokenParsed['email'];
-        }
-
-        show('profile');
+        let profileHtml = `
+            <table>
+                <tr>
+                    <td class="label">First name</td>
+                    <td><span id="firstName">${keycloak.tokenParsed['given_name']}</span></td>
+                </tr>
+                <tr>
+                    <td class="label">Last name</td>
+                    <td><span id="lastName">${keycloak.tokenParsed['family_name']}</span></td>
+                </tr>
+                <tr>
+                    <td class="label">Email</td>
+                    <td><span id="email">${keycloak.tokenParsed['email']}</span></td>
+                </tr>
+            </table>
+        `;
+        show(profileHtml, "message-content");
     }
 
     function showToken() {
-        document.getElementById('access-token-content').innerHTML = JSON.stringify(keycloak.tokenParsed, null, '    ');
-        show('token');
+        let data = JSON.stringify(keycloak.tokenParsed, null, '    ');
+        show(data, "token-content");
     }
 
     function showIdToken() {
-        document.getElementById('id-token-content').innerHTML = JSON.stringify(keycloak.idTokenParsed, null, '    ');
-        show('idToken');
+        let data = JSON.stringify(keycloak.idTokenParsed, null, '    ');
+        show(data, "token-content");
     }
 
     async function showUserInfo() {
         let userInfoData = await keycloak.loadUserInfo();
 
-        document.getElementById('userinfo-token-content').innerHTML = JSON.stringify(userInfoData, null, '    ');
-        show('userInfo');
+        await keycloak.updateToken(5);
+
+        let data = JSON.stringify(userInfoData, null, '    ');
+        show(data, "token-content");
     }
 
-    function show(id) {
-        document.getElementById('welcome').style.display = 'none';
-        document.getElementById('profile').style.display = 'none';
-        document.getElementById('token').style.display = 'none';
-        document.getElementById('idToken').style.display = 'none';
-        document.getElementById('userInfo').style.display = 'none';
-        document.getElementById(id).style.display = 'block';
+    async function showMeInfo() {
+
+        await keycloak.updateToken(5);
+
+        let response = await fetch("https://apps.acme.test:4543/api/users/me", {
+            headers: {
+                "Authorization": "Bearer " + keycloak.token,
+                "Accept": "application/json"
+            }
+        });
+
+        let meData;
+        if (response.ok) {
+            meData = await response.json();
+        } else {
+            meData = { error: "status " + response.status };
+        }
+
+
+
+        let data = JSON.stringify(meData, null, '    ');
+        show(data, "token-content");
+    }
+
+    function show(data, cssClass) {
+        let contentElement = document.getElementById('content');
+        contentElement.classList.remove("hidden")
+
+        let dataElement = document.getElementById('data');
+        dataElement.innerHTML = data;
+        dataElement.classList.remove(["message-content", "token-content"]);
+        dataElement.classList.add(cssClass);
     }
 </script>
 </body>
