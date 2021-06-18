@@ -31,7 +31,7 @@
         <docker.file>keycloak/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>13.0.1</keycloak.version>
+        <keycloak.version>14.0.0</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
         <buildNumber>0-SNAPSHOT</buildNumber>

@@ -45,7 +45,7 @@ public class KeycloakTestSupport {
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
 
         KeycloakContainer keycloakContainer = imageName == null
-                ? new KeycloakContainer("quay.io/keycloak/keycloak:13.0.1")
+                ? new KeycloakContainer("quay.io/keycloak/keycloak:14.0.0")
                 : new KeycloakContainer(imageName);
 
         if (realmImportFileName != null) {

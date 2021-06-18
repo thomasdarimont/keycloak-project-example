@@ -1,4 +1,4 @@
-ARG KEYCLOAK_VERSION=13.0.1
+ARG KEYCLOAK_VERSION=14.0.0
 ARG ALPINE_VERSION=3.13.5
 
 #####################################################

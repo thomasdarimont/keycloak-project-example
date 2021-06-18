@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   acme-keycloak:
-    image: quay.io/keycloak/keycloak:13.0.1
+    image: quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
     user: "1000:1000"
     env_file:
       - ./keycloak-common.env

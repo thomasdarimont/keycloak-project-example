@@ -2,7 +2,7 @@ services:
 
 # Keycloak service definition will be inherited from concrete clustering configurations.
   acme-keycloak:
-    image: quay.io/keycloak/keycloak:13.0.1
+    image: quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
     user: "1000:1000"
     environment:
       KEYCLOAK_USER: "admin"
