@@ -1,0 +1,70 @@
+realm: acme-demo
+enabled: true
+displayName: Acme Demo
+displayNameHtml: Acme Demo
+loginWithEmailAllowed: true
+loginTheme: internal
+resetPasswordAllowed: true
+accountTheme: keycloak.v2
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
+
+clients:
+  - id: acme-standard-client-1
+    clientId: acme-standard-client
+    protocol: openid-connect
+    name: Standard Client
+    description: "Standard Client Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: acme-standard-client-1-secret
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/acme-standard-client/login*"
+
+  - id: acme-direct-access-client-1
+    clientId: acme-direct-access-client
+    protocol: openid-connect
+    name: Standard Client
+    description: "Direct Access Grant Client Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    secret: acme-direct-access-client-1-secret
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/acme-direct-access-client-1/login*"
+
+  - id: acme-service-client-1
+    clientId: acme-service-client
+    protocol: openid-connect
+    name: Standard Client
+    description: "Service Client Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    secret: acme-service-client-1-secret
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/acme-service-client-1/login*"
+
+users:
+  - username: tester
+    email: test@local.test
+    firstName: Theo
+    lastName: Tester
+    enabled: true
+    attributes:
+      locale: [ "de" ]
+    credentials:
+      - type: password
+        value: test
+        temporary: false
