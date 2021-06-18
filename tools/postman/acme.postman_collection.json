@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "865b445c-225a-4180-984a-339a301d8c53",
-		"name": "Keycloak Endpoints",
+		"_postman_id": "e419cb32-6467-40e3-bece-2365395a445a",
+		"name": "Acme Keycloak",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -9,525 +9,539 @@
 			"name": "Standards",
 			"item": [
 				{
-					"name": "OA2/OIDC",
+					"name": "OIDC Authorization Code Flow",
 					"item": [
 						{
-							"name": "Access Token",
-							"item": [
+							"name": "Authentication Request",
+							"event": [
 								{
-									"name": "OAUTH2 Authorization code - Request Authentication",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"if(pm.response.status === 'OK') {",
-													"    const $ = cheerio.load(pm.response.text());",
-													"    const querystring = require('querystring');",
-													"    const url = require('url');",
-													"",
-													"    const mzUrl = url.parse($(\"form#kc-form-login\").attr('action'))",
-													"    const params = querystring.parse(mzUrl.query)",
-													"",
-													"    pm.environment.set(\"keycloak_execution\", params.execution);",
-													"    pm.environment.set(\"keycloak_session_code\", params.session_code);",
-													"    pm.environment.set(\"keycloak_tab_id\", params.tab_id);",
-													"    console.log(\"Done Step 1\");",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/auth?client_id={{KEYCLOAK_TEST_CLIENT}}&redirect_uri={{keycloak_test_client_redirect_uri}}&state=12345678&response_type=code&scope=openid profile email",
-											"host": [
-												"{{KEYCLOAK_SERVER_URL}}"
-											],
-											"path": [
-												"realms",
-												"{{KEYCLOAK_REALM}}",
-												"protocol",
-												"openid-connect",
-												"auth"
-											],
-											"query": [
-												{
-													"key": "client_id",
-													"value": "{{KEYCLOAK_TEST_CLIENT}}"
-												},
-												{
-													"key": "redirect_uri",
-													"value": "{{keycloak_test_client_redirect_uri}}"
-												},
-												{
-													"key": "state",
-													"value": "12345678"
-												},
-												{
-													"key": "response_type",
-													"value": "code"
-												},
-												{
-													"key": "scope",
-													"value": "openid profile email"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "OAUTH2 Authorization code - Authenticate",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 302\", function () {",
-													"    pm.response.to.have.status(302);",
-													"});",
-													"",
-													"if(pm.response.status === 'Found') {",
-													"    const querystring = require('querystring');",
-													"    const urlModule = require('url');",
-													"",
-													"    const headers = pm.response.headers",
-													"",
-													"    const locationHeader = headers.get(\"Location\")",
-													"",
-													"    const mzUrl = urlModule.parse(locationHeader)",
-													"    const params = querystring.parse(mzUrl.query)",
-													"",
-													"    pm.environment.set(\"keycloak_code\", params.code);",
-													"    pm.environment.set(\"keycloak_session_state\",params.session_state);",
-													"    ",
-													"    console.log(\"Done Step 2\");",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"protocolProfileBehavior": {
-										"followRedirects": false
-									},
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "urlencoded",
-											"urlencoded": [
-												{
-													"key": "username",
-													"value": "{{KEYCLOAK_TEST_USER_EMAIL}}",
-													"type": "text"
-												},
-												{
-													"key": "username",
-													"value": "{{KEYCLOAK_TEST_USER}}",
-													"type": "text",
-													"disabled": true
-												},
-												{
-													"key": "password",
-													"value": "{{KEYCLOAK_TEST_PASS}}",
-													"type": "text"
-												},
-												{
-													"key": "credentialId",
-													"value": "",
-													"type": "text"
-												}
-											]
-										},
-										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/login-actions/authenticate?session_code={{keycloak_session_code}}&execution={{keycloak_execution}}&client_id={{KEYCLOAK_TEST_CLIENT}}&tab_id={{keycloak_tab_id}}",
-											"host": [
-												"{{KEYCLOAK_SERVER_URL}}"
-											],
-											"path": [
-												"realms",
-												"{{KEYCLOAK_REALM}}",
-												"login-actions",
-												"authenticate"
-											],
-											"query": [
-												{
-													"key": "session_code",
-													"value": "{{keycloak_session_code}}"
-												},
-												{
-													"key": "execution",
-													"value": "{{keycloak_execution}}"
-												},
-												{
-													"key": "client_id",
-													"value": "{{KEYCLOAK_TEST_CLIENT}}"
-												},
-												{
-													"key": "tab_id",
-													"value": "{{keycloak_tab_id}}"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "OAUTH2 Authorization code - Token exchange",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"if(pm.response.status === 'OK') {",
-													"    var jsonData = JSON.parse(responseBody);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_access_token\", jsonData.access_token);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_refresh_token\", jsonData.refresh_token);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_id_token\", jsonData.id_token);",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"value": "application/x-www-form-urlencoded",
-												"type": "text"
-											}
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"if(pm.response.status === 'OK') {",
+											"    const $ = cheerio.load(pm.response.text());",
+											"    const querystring = require('querystring');",
+											"    const url = require('url');",
+											"",
+											"    const mzUrl = url.parse($(\"form#kc-form-login\").attr('action'))",
+											"    const params = querystring.parse(mzUrl.query)",
+											"",
+											"    pm.globals.set(\"keycloak_execution\", params.execution);",
+											"    pm.globals.set(\"keycloak_session_code\", params.session_code);",
+											"    pm.globals.set(\"keycloak_tab_id\", params.tab_id);",
+											"    console.log(\"Done Step 1\");",
+											"}"
 										],
-										"body": {
-											"mode": "urlencoded",
-											"urlencoded": [
-												{
-													"key": "client_id",
-													"value": "{{KEYCLOAK_TEST_CLIENT}}",
-													"type": "text"
-												},
-												{
-													"key": "client_secret",
-													"value": "{{keycloak_test_client_secret}}",
-													"type": "text"
-												},
-												{
-													"key": "grant_type",
-													"value": "authorization_code",
-													"type": "text"
-												},
-												{
-													"key": "state",
-													"value": "12345678",
-													"type": "text"
-												},
-												{
-													"key": "code",
-													"value": "{{keycloak_code}}",
-													"type": "text"
-												},
-												{
-													"key": "session_code",
-													"value": "{{keycloak_session_code}}",
-													"type": "text"
-												},
-												{
-													"key": "redirect_uri",
-													"value": "{{keycloak_test_client_redirect_uri}}",
-													"type": "text"
-												}
-											]
-										},
-										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
-											"host": [
-												"{{KEYCLOAK_SERVER_URL}}"
-											],
-											"path": [
-												"realms",
-												"{{KEYCLOAK_REALM}}",
-												"protocol",
-												"openid-connect",
-												"token"
-											]
-										},
-										"description": "Obtain SAT (service account token)"
-									},
-									"response": []
-								},
-								{
-									"name": "OAUTH2 Refresh Token",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"if(pm.response.status === 'OK') {",
-													"    var jsonData = JSON.parse(responseBody);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_access_token\", jsonData.access_token);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_refresh_token\", jsonData.refresh_token);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_id_token\", jsonData.id_token);",
-													"",
-													"    console.log(\"Done refresh\")",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"value": "application/x-www-form-urlencoded",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "urlencoded",
-											"urlencoded": [
-												{
-													"key": "client_id",
-													"value": "{{KEYCLOAK_TEST_CLIENT}}",
-													"type": "text"
-												},
-												{
-													"key": "client_secret",
-													"value": "{{keycloak_test_client_secret}}",
-													"type": "text"
-												},
-												{
-													"key": "grant_type",
-													"value": "refresh_token",
-													"type": "text"
-												},
-												{
-													"key": "state",
-													"value": "12345678",
-													"type": "text"
-												},
-												{
-													"key": "refresh_token",
-													"value": "{{keycloak_test_user_refresh_token}}",
-													"type": "text"
-												},
-												{
-													"key": "session_code",
-													"value": "{{keycloak_session_code}}",
-													"type": "text"
-												},
-												{
-													"key": "redirect_uri",
-													"value": "{{keycloak_test_client_redirect_uri}}",
-													"type": "text"
-												}
-											]
-										},
-										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
-											"host": [
-												"{{KEYCLOAK_SERVER_URL}}"
-											],
-											"path": [
-												"realms",
-												"{{KEYCLOAK_REALM}}",
-												"protocol",
-												"openid-connect",
-												"token"
-											]
-										},
-										"description": "Obtain SAT (service account token)"
-									},
-									"response": []
-								},
-								{
-									"name": "OAUTH2 Client credentials",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Status code is 200\", function () {",
-													"    pm.response.to.have.status(200);",
-													"});",
-													"",
-													"if(pm.response.status === 'OK') {",
-													"    var jsonData = JSON.parse(responseBody);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_access_token\", jsonData.access_token);",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"name": "Content-Type",
-												"value": "application/x-www-form-urlencoded",
-												"type": "text"
-											}
-										],
-										"body": {
-											"mode": "urlencoded",
-											"urlencoded": [
-												{
-													"key": "client_id",
-													"value": "service-only-client",
-													"type": "text"
-												},
-												{
-													"key": "client_secret",
-													"value": "fd1742e6-ca06-4574-9703-44607dbc9e85",
-													"type": "text"
-												},
-												{
-													"key": "grant_type",
-													"value": "client_credentials",
-													"type": "text"
-												}
-											]
-										},
-										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
-											"host": [
-												"{{KEYCLOAK_SERVER_URL}}"
-											],
-											"path": [
-												"realms",
-												"{{KEYCLOAK_REALM}}",
-												"protocol",
-												"openid-connect",
-												"token"
-											]
-										},
-										"description": "Obtain SAT (service account token)"
-									},
-									"response": []
+										"type": "text/javascript"
+									}
 								}
-							]
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/auth?client_id={{KEYCLOAK_STANDARD_CLIENT}}&client_secret={{KEYCLOAK_STANDARD_CLIENT_SECRET}}&redirect_uri={{KEYCLOAK_STANDARD_CLIENT_REDIRECT_URI}}&state=12345678&response_type=code&scope=openid profile email",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"protocol",
+										"openid-connect",
+										"auth"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT}}"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_SECRET}}"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_REDIRECT_URI}}"
+										},
+										{
+											"key": "state",
+											"value": "12345678"
+										},
+										{
+											"key": "response_type",
+											"value": "code"
+										},
+										{
+											"key": "scope",
+											"value": "openid profile email"
+										}
+									]
+								}
+							},
+							"response": []
 						},
 						{
-							"name": "Access Token Outdated",
-							"item": [
+							"name": "Authenticate",
+							"event": [
 								{
-									"name": "OAUTH2 Password",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"postman.setNextRequest()"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"if(pm.response.status === 'OK') {",
-													"    var jsonData = JSON.parse(responseBody);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_access_token\", jsonData.access_token);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_refresh_token\", jsonData.refresh_token);",
-													"    postman.setEnvironmentVariable(\"keycloak_test_user_id_token\", jsonData.id_token);",
-													"",
-													"    console.log(\"Done password flow\")",
-													"}"
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "noauth"
-										},
-										"method": "POST",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/x-www-form-urlencoded"
-											}
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 302\", function () {",
+											"    pm.response.to.have.status(302);",
+											"});",
+											"",
+											"if(pm.response.status === 'Found') {",
+											"    const querystring = require('querystring');",
+											"    const urlModule = require('url');",
+											"",
+											"    const headers = pm.response.headers",
+											"",
+											"    const locationHeader = headers.get(\"Location\")",
+											"",
+											"    const mzUrl = urlModule.parse(locationHeader)",
+											"    const params = querystring.parse(mzUrl.query)",
+											"",
+											"    pm.globals.set(\"keycloak_code\", params.code);",
+											"    pm.globals.set(\"keycloak_session_state\",params.session_state);",
+											"    ",
+											"    console.log(\"Done Step 2\");",
+											"}"
 										],
-										"body": {
-											"mode": "urlencoded",
-											"urlencoded": [
-												{
-													"key": "client_id",
-													"value": "{{KEYCLOAK_TEST_CLIENT}}",
-													"type": "text"
-												},
-												{
-													"key": "username",
-													"value": "{{KEYCLOAK_TEST_USER_EMAIL}}",
-													"type": "text"
-												},
-												{
-													"key": "password",
-													"value": "{{KEYCLOAK_TEST_PASS}}",
-													"type": "text"
-												},
-												{
-													"key": "grant_type",
-													"value": "password",
-													"type": "text"
-												},
-												{
-													"key": "client_secret",
-													"value": "{{keycloak_test_client_secret}}",
-													"type": "text"
-												}
-											]
-										},
-										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
-											"host": [
-												"{{KEYCLOAK_SERVER_URL}}"
-											],
-											"path": [
-												"realms",
-												"{{KEYCLOAK_REALM}}",
-												"protocol",
-												"openid-connect",
-												"token"
-											]
-										},
-										"description": "Obtain UAT = user access token from a user in realm"
-									},
-									"response": []
+										"type": "text/javascript"
+									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {
+								"followRedirects": false
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "{{KEYCLOAK_TEST_USER_EMAIL}}",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "{{KEYCLOAK_TEST_USER}}",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "password",
+											"value": "{{KEYCLOAK_TEST_PASS}}",
+											"type": "text"
+										},
+										{
+											"key": "credentialId",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/login-actions/authenticate?session_code={{keycloak_session_code}}&execution={{keycloak_execution}}&client_id={{KEYCLOAK_STANDARD_CLIENT}}&tab_id={{keycloak_tab_id}}",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"login-actions",
+										"authenticate"
+									],
+									"query": [
+										{
+											"key": "session_code",
+											"value": "{{keycloak_session_code}}"
+										},
+										{
+											"key": "execution",
+											"value": "{{keycloak_execution}}"
+										},
+										{
+											"key": "client_id",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT}}"
+										},
+										{
+											"key": "tab_id",
+											"value": "{{keycloak_tab_id}}"
+										}
+									]
+								}
+							},
+							"response": []
 						},
+						{
+							"name": "Token exchange",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"if(pm.response.status === 'OK') {",
+											"    var jsonData = JSON.parse(responseBody);",
+											"    pm.globals.set(\"keycloak_user_access_token\", jsonData.access_token);",
+											"    pm.globals.set(\"keycloak_user_refresh_token\", jsonData.refresh_token);",
+											"    pm.globals.set(\"keycloak_user_id_token\", jsonData.id_token);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_SECRET}}",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "authorization_code",
+											"type": "text"
+										},
+										{
+											"key": "state",
+											"value": "12345678",
+											"type": "text"
+										},
+										{
+											"key": "code",
+											"value": "{{keycloak_code}}",
+											"type": "text"
+										},
+										{
+											"key": "session_code",
+											"value": "{{keycloak_session_code}}",
+											"type": "text"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_REDIRECT_URI}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"protocol",
+										"openid-connect",
+										"token"
+									]
+								},
+								"description": "Obtain SAT (service account token)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "OA2 ROPC Grant",
+					"item": [
+						{
+							"name": "Token exchange",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"postman.setNextRequest()"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if(pm.response.status === 'OK') {",
+											"    var jsonData = JSON.parse(responseBody);",
+											"    pm.globals.set(\"keycloak_user_access_token\", jsonData.access_token);",
+											"    pm.globals.set(\"keycloak_user_refresh_token\", jsonData.refresh_token);",
+											"    pm.globals.set(\"keycloak_user_id_token\", \"\");",
+											"",
+											"    console.log(\"Done password flow\")",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{KEYCLOAK_DA_CLIENT}}",
+											"type": "text"
+										},
+										{
+											"key": "username",
+											"value": "{{KEYCLOAK_TEST_USER_EMAIL}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{KEYCLOAK_TEST_PASS}}",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "password",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{KEYCLOAK_DA_CLIENT_SECRET}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"protocol",
+										"openid-connect",
+										"token"
+									]
+								},
+								"description": "Obtain UAT = user access token from a user in realm"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "OA2 Client Credentials Grant",
+					"item": [
+						{
+							"name": "Token exchange",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"if(pm.response.status === 'OK') {",
+											"    var jsonData = JSON.parse(responseBody);",
+											"    pm.globals.set(\"keycloak_user_access_token\", jsonData.access_token);",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{KEYCLOAK_SERVICE_CLIENT}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{KEYCLOAK_SERVICE_CLIENT_SECRET}}",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"protocol",
+										"openid-connect",
+										"token"
+									]
+								},
+								"description": "Obtain SAT (service account token)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "OA2 Refresh token",
+					"item": [
+						{
+							"name": "Token exchange",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"if(pm.response.status === 'OK') {",
+											"    var jsonData = JSON.parse(responseBody);",
+											"    pm.globals.set(\"keycloak_user_access_token\", jsonData.access_token);",
+											"    pm.globals.set(\"keycloak_user_refresh_token\", jsonData.refresh_token);",
+											"    pm.globals.set(\"keycloak_user_id_token\", jsonData.id_token);",
+											"",
+											"    console.log(\"Done refresh\")",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/x-www-form-urlencoded",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "client_id",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT}}",
+											"type": "text"
+										},
+										{
+											"key": "client_secret",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_SECRET}}",
+											"type": "text"
+										},
+										{
+											"key": "grant_type",
+											"value": "refresh_token",
+											"type": "text"
+										},
+										{
+											"key": "state",
+											"value": "12345678",
+											"type": "text"
+										},
+										{
+											"key": "refresh_token",
+											"value": "{{keycloak_user_refresh_token}}",
+											"type": "text"
+										},
+										{
+											"key": "session_code",
+											"value": "{{keycloak_session_code}}",
+											"type": "text"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_REDIRECT_URI}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"protocol",
+										"openid-connect",
+										"token"
+									]
+								},
+								"description": "Obtain SAT (service account token)"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "OA2/OIDC Util",
+					"item": [
 						{
 							"name": "OIDC User Info",
 							"request": {
@@ -536,7 +550,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "{{keycloak_test_user_access_token}}",
+											"value": "{{keycloak_user_access_token}}",
 											"type": "string"
 										}
 									]
@@ -554,13 +568,6 @@
 										"protocol",
 										"openid-connect",
 										"userinfo"
-									],
-									"query": [
-										{
-											"key": "",
-											"value": "",
-											"disabled": true
-										}
 									]
 								}
 							},
@@ -574,12 +581,12 @@
 									"basic": [
 										{
 											"key": "password",
-											"value": "{{keycloak_test_client_secret}}",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT_SECRET}}",
 											"type": "string"
 										},
 										{
 											"key": "username",
-											"value": "{{KEYCLOAK_TEST_CLIENT}}",
+											"value": "{{KEYCLOAK_STANDARD_CLIENT}}",
 											"type": "string"
 										}
 									]
@@ -591,34 +598,31 @@
 									"urlencoded": [
 										{
 											"key": "token",
-											"value": "{{keycloak_test_user_access_token}}",
+											"value": "{{keycloak_user_access_token}}",
 											"type": "text"
 										},
 										{
 											"key": "token",
-											"value": "{{keycloak_test_user_id_token}}",
+											"value": "{{keycloak_user_id_token}}",
 											"type": "text",
 											"disabled": true
 										},
 										{
 											"key": "token",
-											"value": "{{keycloak_test_user_refresh_token}}",
+											"value": "{{keycloak_user_refresh_token}}",
 											"type": "text",
 											"disabled": true
 										}
 									]
 								},
 								"url": {
-									"raw": "http://localhost:8080/auth/realms/acme-apps/protocol/openid-connect/token/introspect",
-									"protocol": "http",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/token/introspect",
 									"host": [
-										"localhost"
+										"{{KEYCLOAK_SERVER_URL}}"
 									],
-									"port": "8080",
 									"path": [
-										"auth",
 										"realms",
-										"acme-apps",
+										"{{KEYCLOAK_REALM}}",
 										"protocol",
 										"openid-connect",
 										"token",
@@ -637,19 +641,46 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/auth/realms/acme-apps/protocol/openid-connect/logout",
-									"protocol": "http",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/logout",
 									"host": [
-										"localhost"
+										"{{KEYCLOAK_SERVER_URL}}"
 									],
-									"port": "8080",
 									"path": [
-										"auth",
 										"realms",
-										"acme-apps",
+										"{{KEYCLOAK_REALM}}",
 										"protocol",
 										"openid-connect",
 										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "OIDC Logout IDToken",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/logout?id_token_hint={{keycloak_user_id_token}}",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"protocol",
+										"openid-connect",
+										"logout"
+									],
+									"query": [
+										{
+											"key": "id_token_hint",
+											"value": "{{keycloak_user_id_token}}"
+										}
 									]
 								}
 							},
@@ -671,6 +702,9 @@
 								}
 							],
 							"request": {
+								"auth": {
+									"type": "noauth"
+								},
 								"method": "GET",
 								"header": [],
 								"url": {
@@ -683,6 +717,33 @@
 										"{{KEYCLOAK_REALM}}",
 										".well-known",
 										"openid-configuration"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "OIDC Certs",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/realms/{{KEYCLOAK_REALM}}/protocol/openid-connect/certs",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"auth",
+										"realms",
+										"acme-demo",
+										"protocol",
+										"openid-connect",
+										"certs"
 									]
 								}
 							},
@@ -875,12 +936,12 @@
 							"response": []
 						},
 						{
-							"name": "Brute force specific user [SAT]",
+							"name": "Brute force specific user",
 							"request": {
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/attack-detection/brute-force/users/{{keycloak_test_user_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/attack-detection/brute-force/users/{{keycloak_user_id}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -891,7 +952,7 @@
 										"attack-detection",
 										"brute-force",
 										"users",
-										"{{keycloak_test_user_id}}"
+										"{{keycloak_user_id}}"
 									]
 								},
 								"description": "Clear any user login failures for the user This can release temporary disabled user\n* Add userId"
@@ -899,12 +960,12 @@
 							"response": []
 						},
 						{
-							"name": "Brute force specific user [SAT]",
+							"name": "Brute force specific user",
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/attack-detection/brute-force/users/{{keycloak_test_user_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/attack-detection/brute-force/users/{{keycloak_user_id}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -915,7 +976,7 @@
 										"attack-detection",
 										"brute-force",
 										"users",
-										"{{keycloak_test_user_id}}"
+										"{{keycloak_user_id}}"
 									]
 								},
 								"description": "Get status of a username in brute force detection. \n* Add userId"
@@ -932,6 +993,88 @@
 							"item": []
 						},
 						{
+							"name": "UPDATE GLOBAL VARIABLE USER ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json()[0];",
+											"pm.globals.set(\"keycloak_user_id\",jsonData.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users?username={{KEYCLOAK_TEST_USER}}",
+									"host": [
+										"{{KEYCLOAK_SERVER_URL}}"
+									],
+									"path": [
+										"admin",
+										"realms",
+										"{{KEYCLOAK_REALM}}",
+										"users"
+									],
+									"query": [
+										{
+											"key": "briefRepresentation",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "email",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "first",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "firstName",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "lastName",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "max",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "username",
+											"value": "{{KEYCLOAK_TEST_USER}}"
+										}
+									]
+								},
+								"description": "Get users Returns a list of users, filtered according to query parameters"
+							},
+							"response": []
+						},
+						{
 							"name": "Get user by id",
 							"request": {
 								"method": "GET",
@@ -945,7 +1088,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users/{{keycloak_test_user_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users/{{keycloak_user_id}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -954,7 +1097,7 @@
 										"realms",
 										"{{KEYCLOAK_REALM}}",
 										"users",
-										"{{keycloak_test_user_id}}"
+										"{{keycloak_user_id}}"
 									]
 								},
 								"description": "Get representation of the user"
@@ -1050,7 +1193,7 @@
 											"const mzUrl = url.parse(locationHeader);",
 											"",
 											"const userId = mzUrl.path.substring(mzUrl.path.lastIndexOf('/') + 1);",
-											"postman.setEnvironmentVariable(\"keycloak_test_user_id\",userId);"
+											"postman.setEnvironmentVariable(\"keycloak_user_id\",userId);"
 										],
 										"type": "text/javascript"
 									}
@@ -1087,7 +1230,7 @@
 							"response": []
 						},
 						{
-							"name": "Set up a new password for the user",
+							"name": "Set password",
 							"request": {
 								"method": "PUT",
 								"header": [
@@ -1103,7 +1246,7 @@
 									"raw": "{\"type\":\"password\",\"value\":\"{{KEYCLOAK_TEST_PASS}}\",\"temporary\":false}"
 								},
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users/{{keycloak_test_user_id}}/reset-password",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users/{{keycloak_user_id}}/reset-password",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -1112,7 +1255,7 @@
 										"realms",
 										"{{KEYCLOAK_REALM}}",
 										"users",
-										"{{keycloak_test_user_id}}",
+										"{{keycloak_user_id}}",
 										"reset-password"
 									]
 								},
@@ -1147,7 +1290,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users/{{keycloak_test_user_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/users/{{keycloak_user_id}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -1156,7 +1299,7 @@
 										"realms",
 										"{{KEYCLOAK_REALM}}",
 										"users",
-										"{{keycloak_test_user_id}}"
+										"{{keycloak_user_id}}"
 									]
 								},
 								"description": "Delete the user"
@@ -1185,7 +1328,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{keycloak_test_client_id}}/roles",
+											"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{KEYCLOAK_STANDARD_CLIENT_ID}}/roles",
 											"host": [
 												"{{KEYCLOAK_SERVER_URL}}"
 											],
@@ -1194,7 +1337,7 @@
 												"realms",
 												"{{KEYCLOAK_REALM}}",
 												"clients",
-												"{{keycloak_test_client_id}}",
+												"{{KEYCLOAK_STANDARD_CLIENT_ID}}",
 												"roles"
 											]
 										},
@@ -1215,7 +1358,7 @@
 											"script": {
 												"exec": [
 													"var jsonData = pm.response.json();",
-													"pm.environment.set(\"keycloak_test_client_secret\", jsonData.value);"
+													"pm.globals.set(\"KEYCLOAK_STANDARD_CLIENT_SECRET\", jsonData.value);"
 												],
 												"type": "text/javascript"
 											}
@@ -1233,7 +1376,7 @@
 											}
 										],
 										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{keycloak_test_client_id}}/client-secret",
+											"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{KEYCLOAK_STANDARD_CLIENT_ID}}/client-secret",
 											"host": [
 												"{{KEYCLOAK_SERVER_URL}}"
 											],
@@ -1242,7 +1385,7 @@
 												"realms",
 												"{{KEYCLOAK_REALM}}",
 												"clients",
-												"{{keycloak_test_client_id}}",
+												"{{KEYCLOAK_STANDARD_CLIENT_ID}}",
 												"client-secret"
 											]
 										},
@@ -1258,7 +1401,7 @@
 											"script": {
 												"exec": [
 													"var jsonData = pm.response.json();",
-													"pm.environment.set(\"keycloak_test_client_secret\", jsonData.value);"
+													"pm.globals.set(\"keycloak_test_client_secret\", jsonData.value);"
 												],
 												"type": "text/javascript"
 											}
@@ -1285,7 +1428,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{keycloak_test_client_id}}/client-secret",
+											"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{KEYCLOAK_STANDARD_CLIENT_ID}}/client-secret",
 											"host": [
 												"{{KEYCLOAK_SERVER_URL}}"
 											],
@@ -1294,7 +1437,7 @@
 												"realms",
 												"{{KEYCLOAK_REALM}}",
 												"clients",
-												"{{keycloak_test_client_id}}",
+												"{{KEYCLOAK_STANDARD_CLIENT_ID}}",
 												"client-secret"
 											]
 										},
@@ -1339,7 +1482,7 @@
 									"script": {
 										"exec": [
 											"var jsonData = pm.response.json();",
-											"pm.environment.set(\"keycloak_test_client_redirect_uri\", jsonData.rootUrl+jsonData.redirectUris[0]);"
+											"pm.globals.set(\"keycloak_test_client_redirect_uri\", jsonData.rootUrl+jsonData.redirectUris[0]);"
 										],
 										"type": "text/javascript"
 									}
@@ -1357,7 +1500,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{keycloak_test_client_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{KEYCLOAK_STANDARD_CLIENT_ID}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -1366,7 +1509,7 @@
 										"realms",
 										"{{KEYCLOAK_REALM}}",
 										"clients",
-										"{{keycloak_test_client_id}}"
+										"{{KEYCLOAK_STANDARD_CLIENT_ID}}"
 									]
 								},
 								"description": "Get representation of the client"
@@ -1409,7 +1552,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"clientId\": \"{{KEYCLOAK_TEST_CLIENT}}\",\n    \"surrogateAuthRequired\": false,\n    \"enabled\": true,\n    \"alwaysDisplayInConsole\": false,\n    \"clientAuthenticatorType\": \"client-secret\",\n    \"redirectUris\": [\n        \"http://localhost:3000/login*\"\n    ],\n    \"webOrigins\": [],\n    \"notBefore\": 0,\n    \"bearerOnly\": false,\n    \"consentRequired\": false,\n    \"standardFlowEnabled\": true,\n    \"implicitFlowEnabled\": false,\n    \"directAccessGrantsEnabled\": true,\n    \"serviceAccountsEnabled\": false,\n    \"publicClient\": false,\n    \"frontchannelLogout\": false,\n    \"protocol\": \"openid-connect\",\n    \"attributes\": {\n        \"saml.assertion.signature\": \"false\",\n        \"saml.force.post.binding\": \"false\",\n        \"saml.multivalued.roles\": \"false\",\n        \"saml.encrypt\": \"false\",\n        \"oauth2.device.authorization.grant.enabled\": \"false\",\n        \"backchannel.logout.revoke.offline.tokens\": \"false\",\n        \"saml.server.signature\": \"false\",\n        \"saml.server.signature.keyinfo.ext\": \"false\",\n        \"use.refresh.tokens\": \"true\",\n        \"exclude.session.state.from.auth.response\": \"false\",\n        \"oidc.ciba.grant.enabled\": \"false\",\n        \"saml.artifact.binding\": \"false\",\n        \"backchannel.logout.session.required\": \"true\",\n        \"client_credentials.use_refresh_token\": \"false\",\n        \"saml_force_name_id_format\": \"false\",\n        \"saml.client.signature\": \"false\",\n        \"tls.client.certificate.bound.access.tokens\": \"false\",\n        \"saml.authnstatement\": \"false\",\n        \"display.on.consent.screen\": \"false\",\n        \"saml.onetimeuse.condition\": \"false\"\n    },\n    \"authenticationFlowBindingOverrides\": {},\n    \"fullScopeAllowed\": true,\n    \"nodeReRegistrationTimeout\": -1,\n    \"defaultClientScopes\": [\n        \"web-origins\",\n        \"profile\",\n        \"roles\",\n        \"email\"\n    ],\n    \"optionalClientScopes\": [\n        \"address\",\n        \"phone\",\n        \"offline_access\",\n        \"microprofile-jwt\"\n    ],\n    \"access\": {\n        \"view\": true,\n        \"configure\": true,\n        \"manage\": true\n    }\n}"
+									"raw": "{\n    \"clientId\": \"{{KEYCLOAK_STANDARD_CLIENT}}\",\n    \"surrogateAuthRequired\": false,\n    \"enabled\": true,\n    \"alwaysDisplayInConsole\": false,\n    \"clientAuthenticatorType\": \"client-secret\",\n    \"redirectUris\": [\n        \"{{KEYCLOAK_STANDARD_CLIENT_REDIRECT_URI}}\"\n    ],\n    \"webOrigins\": [],\n    \"notBefore\": 0,\n    \"bearerOnly\": false,\n    \"consentRequired\": false,\n    \"standardFlowEnabled\": true,\n    \"implicitFlowEnabled\": false,\n    \"directAccessGrantsEnabled\": true,\n    \"serviceAccountsEnabled\": false,\n    \"publicClient\": false,\n    \"frontchannelLogout\": false,\n    \"protocol\": \"openid-connect\",\n    \"attributes\": {\n        \"saml.assertion.signature\": \"false\",\n        \"saml.force.post.binding\": \"false\",\n        \"saml.multivalued.roles\": \"false\",\n        \"saml.encrypt\": \"false\",\n        \"oauth2.device.authorization.grant.enabled\": \"false\",\n        \"backchannel.logout.revoke.offline.tokens\": \"false\",\n        \"saml.server.signature\": \"false\",\n        \"saml.server.signature.keyinfo.ext\": \"false\",\n        \"use.refresh.tokens\": \"true\",\n        \"exclude.session.state.from.auth.response\": \"false\",\n        \"oidc.ciba.grant.enabled\": \"false\",\n        \"saml.artifact.binding\": \"false\",\n        \"backchannel.logout.session.required\": \"true\",\n        \"client_credentials.use_refresh_token\": \"false\",\n        \"saml_force_name_id_format\": \"false\",\n        \"saml.client.signature\": \"false\",\n        \"tls.client.certificate.bound.access.tokens\": \"false\",\n        \"saml.authnstatement\": \"false\",\n        \"display.on.consent.screen\": \"false\",\n        \"saml.onetimeuse.condition\": \"false\"\n    },\n    \"authenticationFlowBindingOverrides\": {},\n    \"fullScopeAllowed\": true,\n    \"nodeReRegistrationTimeout\": -1,\n    \"defaultClientScopes\": [\n        \"web-origins\",\n        \"profile\",\n        \"roles\",\n        \"email\"\n    ],\n    \"optionalClientScopes\": [\n        \"address\",\n        \"phone\",\n        \"offline_access\",\n        \"microprofile-jwt\"\n    ],\n    \"access\": {\n        \"view\": true,\n        \"configure\": true,\n        \"manage\": true\n    }\n}"
 								},
 								"url": {
 									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients",
@@ -1441,10 +1584,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"enabled\": true,\n    \"secret\": \"mamamama\",\n    \"bearerOnly\": false,\n    \"consentRequired\": false,\n    \"standardFlowEnabled\": true,\n    \"implicitFlowEnabled\": false,\n    \"directAccessGrantsEnabled\": false,\n    \"serviceAccountsEnabled\": false,\n    \"publicClient\": false\n}"
+									"raw": "{\n    \"enabled\": true,\n    \"secret\": \"{{KEYCLOAK_STANDARD_CLIENT_SECRET}}\",\n    \"bearerOnly\": false,\n    \"consentRequired\": false,\n    \"standardFlowEnabled\": true,\n    \"implicitFlowEnabled\": false,\n    \"directAccessGrantsEnabled\": false,\n    \"serviceAccountsEnabled\": false,\n    \"publicClient\": false\n}"
 								},
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{keycloak_test_client_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{KEYCLOAK_STANDARD_CLIENT_ID}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -1453,7 +1596,7 @@
 										"realms",
 										"{{KEYCLOAK_REALM}}",
 										"clients",
-										"{{keycloak_test_client_id}}"
+										"{{KEYCLOAK_STANDARD_CLIENT_ID}}"
 									]
 								},
 								"description": "Create a new client Client’s client_id must be unique!"
@@ -1474,7 +1617,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{keycloak_test_client_id}}",
+									"raw": "{{KEYCLOAK_SERVER_URL}}/admin/realms/{{KEYCLOAK_REALM}}/clients/{{KEYCLOAK_STANDARD_CLIENT_ID}}",
 									"host": [
 										"{{KEYCLOAK_SERVER_URL}}"
 									],
@@ -1483,7 +1626,7 @@
 										"realms",
 										"{{KEYCLOAK_REALM}}",
 										"clients",
-										"{{keycloak_test_client_id}}"
+										"{{KEYCLOAK_STANDARD_CLIENT_ID}}"
 									]
 								},
 								"description": "Get representation of the client"
@@ -1510,7 +1653,7 @@
 						"type": "text/javascript",
 						"exec": [
 							"const keycloak_url = pm.environment.get(\"KEYCLOAK_SERVER_URL\");",
-							"const realm = pm.environment.get(\"KEYCLOAK_ADMIN_CLI_REALM\");",
+							"const realm = pm.globals.get(\"KEYCLOAK_ADMIN_CLI_REALM\");",
 							"console.log(\"Using keycloak url: \" + keycloak_url + \" and realm: \" + realm);",
 							"const postRequest = {",
 							"  url: keycloak_url + '/realms/' + realm + '/protocol/openid-connect/token',",
@@ -1522,8 +1665,8 @@
 							"    mode: 'urlencoded',",
 							"    urlencoded: [",
 							"        {key: \"client_id\", value: \"admin-cli\", disabled: false},",
-							"        {key: \"username\", value: pm.environment.get(\"KEYCLOAK_ADMIN_CLI_USER\"), disabled: false},",
-							"        {key: \"password\", value: pm.environment.get(\"KEYCLOAK_ADMIN_CLI_PASS\"), disabled: false},",
+							"        {key: \"username\", value: pm.globals.get(\"KEYCLOAK_ADMIN_CLI_USER\"), disabled: false},",
+							"        {key: \"password\", value: pm.globals.get(\"KEYCLOAK_ADMIN_CLI_PASS\"), disabled: false},",
 							"        {key: \"grant_type\", value: \"password\", disabled: false},",
 							"    ]",
 							"  }",
@@ -1532,7 +1675,7 @@
 							"",
 							"  console.log(error ? error : response.text());",
 							"  var jsonData = JSON.parse(response.text());",
-							"  pm.environment.set(\"KEYCLOAK_ADMIN_CLI_USER_TOKEN\", jsonData.access_token);",
+							"  pm.globals.set(\"KEYCLOAK_ADMIN_CLI_USER_TOKEN\", jsonData.access_token);",
 							"});",
 							""
 						]
@@ -1654,7 +1797,7 @@
 				"bearer": [
 					{
 						"key": "token",
-						"value": "{{keycloak_test_user_access_token}}",
+						"value": "{{keycloak_user_access_token}}",
 						"type": "string"
 					}
 				]
@@ -1681,7 +1824,7 @@
 			]
 		},
 		{
-			"name": "Custom Extensions",
+			"name": "Extensions",
 			"item": [
 				{
 					"name": "Custom ping",

@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class runKeycloakConfigCli {
+class applyKeycloakConfigCli {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var commandLine = new ArrayList<String>();

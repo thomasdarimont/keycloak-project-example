@@ -1,22 +1,14 @@
 # Work with Postman(tm)
 
 1. Install/Open [Postman](https://www.postman.com/)
-2. Import [environment](keycloak-project-example.postman_environment.json)
-3. Import [collection](keycloak_endpoints.postman_collection.json) 
-
-Depending on the started keycloak environment the variables might need to be adjusted.
-
-1. Keycloak server URL
-2. Keycloak realm to use
-    1. Be aware of the setting loginname as username
-    
-The collection contains calls to create resources like clients and users to work with the collection.
-
-1. Create a user with POST Create user
-    1. Read the user with GET User by id
-2. Create a client with POST Create client
-    1. Read the client-credentials with GET Client credentials
-    
-When using the Standard flows via OAuth2/OIDC make sure you lock out when the multistep flows do not work
-
-To be continued...
+2. Import folder tools/postman or individual files, e.g. from `Scratch Pad` 
+   1. Import [globals](acme.postman_globals.json)
+   2. Import [http-environment for ](acme.postman_environment_http.json)
+   3. Import [https-environment for https](acme.postman_environment_https.json)
+   4. Import [collection](acme.postman_collection.json) 
+3. Apply demo configuration to the keycloak env of choice
+   1. ```
+      java bin/keycloakConfigCli --import=config/stage/demo/acme-demo.yaml --keycloak-url=http://localhost:8080/auth
+      ```
+4. From the imported collection named `Acme Keycloak` run `UPDATE GLOBAL VARIABLE USER ID` to work with the id based endpoints. 
+   

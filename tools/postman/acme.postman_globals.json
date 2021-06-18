@@ -1,0 +1,159 @@
+{
+	"id": "146e52f0-fd32-4814-8e58-8a3c0f4d5eb7",
+	"values": [
+		{
+			"key": "KEYCLOAK_REALM",
+			"value": "acme-demo",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_ADMIN_CLI_REALM",
+			"value": "master",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_ADMIN_CLI_USER_TOKEN",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJVR1NVNjBnalRSdmk2S2RRcGFLZEZvTXRtd1RmSzU2MkhMVEpXVDdua1BVIn0.eyJleHAiOjE2MjM5NDA5NjMsImlhdCI6MTYyMzk0MDkwMywianRpIjoiOTUwYTg4ZTAtMWZiMS00OTYxLWI5MzItMWJjNjI5NTQ4NzU0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2F1dGgvcmVhbG1zL21hc3RlciIsInN1YiI6Ijc0MTVmNTE3LWQzMDUtNDU1ZS05ODRjLTRkOTc5MzQ4N2E4NyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImFkbWluLWNsaSIsInNlc3Npb25fc3RhdGUiOiJmMzI4OTdmYS0yOTJjLTRkNGMtOTg5Yy00OTBjMzAyZmI5MjEiLCJhY3IiOiIxIiwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhZG1pbiJ9.BE7ko7qm2JLX1M8dIRJpAr2fwpXIl7jzJALzi83IjGB6AoFMZ8iPDbFwDAw3t4Q22-GQruQh5GrWVo6yqNdnuOxUicMgiiBih58Irs0eSQTNwBp_S_UXjxJUpD5TAEXOKU4T9_LRUrUAoHaKHdWFvF_CopZUEawrPGzX0Azbc_RMISTYkbZ61mvoMA030yZ1z4orfH_G3ohbZyXzL6NrKtHbu0gd4DdnDBwuXO13DWwmI4fMkiMzdrxc2eHY4_yQTxOzH_j-xIQGno8Z9ZLEzmduiLYelHQfIr1XSZ_tnp1fG9PjeY75jkDbrzZoq0PUTiUzkPp2weqqH7lUeftAiA",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_ADMIN_CLI_USER",
+			"value": "admin",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_ADMIN_CLI_PASS",
+			"value": "admin",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_STANDARD_CLIENT",
+			"value": "acme-standard-client",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_STANDARD_CLIENT_ID",
+			"value": "acme-standard-client-1",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_STANDARD_CLIENT_SECRET",
+			"value": "acme-standard-client-1-secret",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_STANDARD_CLIENT_REDIRECT_URI",
+			"value": "http://localhost/acme-standard-client/login*",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_SERVICE_CLIENT",
+			"value": "acme-service-client",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_SERVICE_CLIENT_ID",
+			"value": "acme-service-client-1-id",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_SERVICE_CLIENT_SECRET",
+			"value": "acme-service-client-1-secret",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_SERVICE_CLIENT_REDIRECT_URI",
+			"value": "http://localhost/acme-service-client/login*",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_DA_CLIENT",
+			"value": "acme-direct-access-client",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_DA_CLIENT_ID",
+			"value": "acme-direct-access-client-1",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_DA_CLIENT_SECRET",
+			"value": "acme-direct-access-client-1-secret",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_DA_CLIENT_REDIRECT_URI",
+			"value": "http://localhost/acme-direct-access-client/login*",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_execution",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_session_code",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_tab_id",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_code",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_session_state",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_TEST_USER",
+			"value": "tester",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_TEST_USER_EMAIL",
+			"value": "test@local.test",
+			"enabled": true
+		},
+		{
+			"key": "KEYCLOAK_TEST_PASS",
+			"value": "test",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_user_id",
+			"value": "a9397148-d947-491a-8647-c9393c4f4851",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_user_id_token",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_user_access_token",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_user_refresh_token",
+			"value": "",
+			"enabled": true
+		},
+		{
+			"key": "keycloak_test_client_redirect_uri",
+			"value": "",
+			"enabled": true
+		}
+	],
+	"name": "My Workspace Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2021-06-18T14:47:51.978Z",
+	"_postman_exported_using": "Postman/8.5.1"
+}
