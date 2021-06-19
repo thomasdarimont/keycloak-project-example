@@ -32,4 +32,4 @@ Nginx Keycloak URL: https://id.acme.test:2443/auth
 docker-compose --env-file ../../../keycloak.env --file apache/docker-compose-apache.yml up --remove-orphans
 ```
 
-Nginx Keycloak URL: https://id.acme.test:3443/auth
+Apache Keycloak URL: https://id.acme.test:3443/auth
