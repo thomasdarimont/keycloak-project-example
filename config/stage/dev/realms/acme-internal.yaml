@@ -8,7 +8,7 @@ resetPasswordAllowed: true
 accountTheme: keycloak.v2
 adminTheme: keycloak
 emailTheme: keycloak
-sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"
 
 eventsListeners:
@@ -62,7 +62,7 @@ clients:
     serviceAccountsEnabled: false
 #    attributes: { }
     fullScopeAllowed: false
-    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
     baseUrl: "/?realm=acme-internal"
     redirectUris:
       - "/*"
@@ -85,9 +85,9 @@ clients:
     standardFlowEnabled: true
     directAccessGrantsEnabled: false
     fullScopeAllowed: false
-    secret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret}"
+    secret: "$(env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret)"
     redirectUris:
-      - "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-apps/broker/idp-acme-internal/endpoint/*"
+      - "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps/broker/idp-acme-internal/endpoint/*"
     webOrigins:
       - "+"
     defaultClientScopes:
@@ -104,7 +104,7 @@ clients:
     publicClient: true
     standardFlowEnabled: true
     directAccessGrantsEnabled: true
-    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
     baseUrl: "/?realm=acme-internal&client_id=test-client"
     redirectUris:
       - "/*"

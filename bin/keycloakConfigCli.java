@@ -70,7 +70,7 @@ class keycloakConfigCli {
         commandLine.add("-v");
         commandLine.add(pathToConfig + ":" + CONFIG_PATH_IN_CONTAINER);
 
-        commandLine.add("adorsys/keycloak-config-cli:" + keycloakConfigCliVersion);
+        commandLine.add("quay.io/adorsys/keycloak-config-cli:" + keycloakConfigCliVersion);
 
         var pb = new ProcessBuilder(commandLine);
         pb.inheritIO();

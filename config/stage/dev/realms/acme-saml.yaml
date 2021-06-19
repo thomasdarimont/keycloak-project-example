@@ -7,19 +7,19 @@ loginTheme: internal
 accountTheme: keycloak
 adminTheme: keycloak
 emailTheme: keycloak
-sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 
 clients:
   - clientId: acme_saml_idp_broker
     name: Acme SAML Broker Client
     rootUrl: ''
-    adminUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-saml/protocol/saml"
+    adminUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-saml/protocol/saml"
     surrogateAuthRequired: false
     enabled: true
     alwaysDisplayInConsole: false
     clientAuthenticatorType: client-secret
     redirectUris:
-      - "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-apps/broker/idp-acme-saml/endpoint/*"
+      - "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps/broker/idp-acme-saml/endpoint/*"
     notBefore: 0
     bearerOnly: false
     consentRequired: false

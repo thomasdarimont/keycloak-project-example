@@ -9,7 +9,7 @@ loginTheme: apps
 accountTheme: keycloak
 adminTheme: keycloak
 emailTheme: keycloak
-sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "browser"
 registrationFlow: "Custom Registration"
 
@@ -41,7 +41,7 @@ clients:
     serviceAccountsEnabled: false
     #    attributes: { }
     fullScopeAllowed: false
-    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
     baseUrl: "/?realm=acme-apps"
     redirectUris:
       - "/*"
@@ -69,14 +69,14 @@ identityProviders:
     firstBrokerLoginFlowAlias: "first broker login"
 #    postBrokerLoginFlowAlias: "Custom Post Broker Login"
     config:
-      issuer: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal"
-      tokenUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/token"
-      jwksUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/certs"
-      userInfoUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/userinfo"
-      authorizationUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/auth"
-      logoutUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-internal/protocol/openid-connect/logout"
+      issuer: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal"
+      tokenUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/token"
+      jwksUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/certs"
+      userInfoUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/userinfo"
+      authorizationUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/auth"
+      logoutUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/logout"
       clientId: "acme_internal_idp_broker"
-      clientSecret: "${env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret}"
+      clientSecret: "$(env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret)"
       clientAuthMethod: "client_secret_post"
       defaultScope: "openid"
       loginHint: "true"
@@ -105,7 +105,7 @@ identityProviders:
       nameIDPolicyFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
       postBindingResponse: 'true'
       principalAttribute: "username"
-      singleLogoutServiceUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-saml/protocol/saml"
+      singleLogoutServiceUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-saml/protocol/saml"
       entityId: acme_saml_idp_broker
       backchannelSupported: 'true'
       signatureAlgorithm: RSA_SHA256
@@ -114,7 +114,7 @@ identityProviders:
       authnContextComparisonType: exact
       postBindingAuthnRequest: 'true'
       syncMode: FORCE
-      singleSignOnServiceUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-saml/protocol/saml"
+      singleSignOnServiceUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-saml/protocol/saml"
       wantAuthnRequestsSigned: 'true'
       addExtensionsElementWithKeyInfo: 'false'
       principalType: SUBJECT
@@ -132,14 +132,14 @@ identityProviders:
     firstBrokerLoginFlowAlias: "first broker login"
     #    postBrokerLoginFlowAlias: "Custom Post Broker Login"
     config:
-      issuer: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap"
-      tokenUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/token"
-      jwksUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/certs"
-      userInfoUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/userinfo"
-      authorizationUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/auth"
-      logoutUrl: "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-ldap/protocol/openid-connect/logout"
+      issuer: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap"
+      tokenUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap/protocol/openid-connect/token"
+      jwksUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap/protocol/openid-connect/certs"
+      userInfoUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap/protocol/openid-connect/userinfo"
+      authorizationUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap/protocol/openid-connect/auth"
+      logoutUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap/protocol/openid-connect/logout"
       clientId: "acme_ldap_idp_broker"
-      clientSecret: "${env:ACME_APPS_LDAP_IDP_BROKER_SECRET:-secret}"
+      clientSecret: "$(env:ACME_APPS_LDAP_IDP_BROKER_SECRET:-secret)"
       clientAuthMethod: "client_secret_post"
       defaultScope: "openid"
       loginHint: "true"

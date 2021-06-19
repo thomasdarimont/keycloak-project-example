@@ -47,7 +47,7 @@ d) **Operator** configuring realm and server for different stages
 | Java | 11
 | mvn  | 3.6
 | docker | 20.10
-| docker-composer | 1.29 
+| docker-compose | 1.29 
 
 # Development Environment
 

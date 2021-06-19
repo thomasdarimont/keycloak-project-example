@@ -8,7 +8,7 @@ resetPasswordAllowed: true
 accountTheme: keycloak.v2
 adminTheme: keycloak
 emailTheme: keycloak
-sslRequired: ${env:SSL_REQUIRED:-EXTERNAL}
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"
 
 smtpServer:
@@ -52,7 +52,7 @@ clients:
     serviceAccountsEnabled: false
 #    attributes: { }
     fullScopeAllowed: false
-    rootUrl: "${env:APPS_FRONTEND_URL_MINISPA}"
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
     baseUrl: "/?realm=acme-ldap"
     redirectUris:
       - "/*"
@@ -74,9 +74,9 @@ clients:
     standardFlowEnabled: true
     directAccessGrantsEnabled: false
     fullScopeAllowed: false
-    secret: "${env:ACME_APPS_LDAP_IDP_BROKER_SECRET:-secret}"
+    secret: "$(env:ACME_APPS_LDAP_IDP_BROKER_SECRET:-secret)"
     redirectUris:
-      - "${env:KEYCLOAK_FRONTEND_URL}/realms/acme-apps/broker/idp-acme-ldap/endpoint/*"
+      - "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps/broker/idp-acme-ldap/endpoint/*"
     webOrigins:
       - "+"
     defaultClientScopes:
@@ -213,7 +213,7 @@ components:
               "group.name.ldap.attribute": ["cn"]
               "preserve.group.inheritance": ["false"]
               "membership.user.ldap.attribute": ["uid"]
-              "groups.dn": ["${env:ACME_LDAP_GROUP_DN:-dc=corp,dc=acme,dc=local}"]
+              "groups.dn": ["$(env:ACME_LDAP_GROUP_DN:-dc=corp,dc=acme,dc=local)"]
               mode: ["READ_ONLY"]
               "user.roles.retrieve.strategy": ["LOAD_GROUPS_BY_MEMBER_ATTRIBUTE"]
               "ignore.missing.groups": ["true"]
@@ -228,7 +228,7 @@ components:
         fullSyncPeriod: ["-1"]
         searchScope: ["2"]
         useTruststoreSpi: ["ldapsOnly"]
-        usersDn: ["${env:ACME_LDAP_USERS_DN:-dc=corp,dc=acme,dc=local}"]
+        usersDn: ["$(env:ACME_LDAP_USERS_DN:-dc=corp,dc=acme,dc=local)"]
         maxLifespan: ["3600000"]
         connectionPooling: ["true"]
         cachePolicy: ["NO_CACHE"]
@@ -238,15 +238,15 @@ components:
         usePasswordModifyExtendedOp: ["true"]
         "trustEmail": ["false"]
         userObjectClasses: ["inetOrgPerson, organizationalPerson"]
-        bindDn: ["${env:LDAP_USER:-ldap_user}"]
+        bindDn: ["$(env:LDAP_USER:-ldap_user)"]
         usernameLDAPAttribute: ["uid"]
         changedSyncPeriod: ["-1"]
-        bindCredential: ["${env:LDAP_PASSWORD:-ldap_password}"]
+        bindCredential: ["$(env:LDAP_PASSWORD:-ldap_password)"]
         rdnLDAPAttribute: ["uid"]
         vendor: ["other"]
         editMode: ["READ_ONLY"]
         uuidLDAPAttribute: ["entryUUID"]
-        connectionUrl: ["${env:LDAP_URL:-ldap://localhost:389}"]
+        connectionUrl: ["$(env:LDAP_URL:-ldap://localhost:389)"]
         syncRegistrations: ["false"]
         authType: ["simple"]
         batchSizeForSync: ["1000"]
