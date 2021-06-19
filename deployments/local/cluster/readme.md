@@ -6,6 +6,10 @@ Keycloak Clustering Examples
 ## Prepare
 
 Copy the `acme.test*.pem` files from the `config/stage/dev/tls` into the [haproxy](haproxy) directory.
+```
+cp ../../../config/stage/dev/tls/*.pem haproxy/
+```
+
 
 ## Run 
 ```
@@ -33,3 +37,12 @@ docker-compose --env-file ../../../keycloak.env --file apache/docker-compose-apa
 ```
 
 Apache Keycloak URL: https://id.acme.test:3443/auth
+
+# Cluster with Envoy Load-Balancer
+
+## Run
+```
+docker-compose --env-file ../../../keycloak.env --file envoy/docker-compose-envoy.yml up --remove-orphans
+```
+
+Envoy Keycloak URL: https://id.acme.test:4443/auth
