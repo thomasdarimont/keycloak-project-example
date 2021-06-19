@@ -14,7 +14,7 @@ public class AcmeAuditListener implements EventListenerProvider {
     @Override
     public void onEvent(Event event) {
         // called for each UserEvent’s
-        log.infof("Forward to audit service: audit userEvent %s", event);
+        log.infof("Forward to audit service: audit userEvent %s", event.getType());
     }
 
     @Override
