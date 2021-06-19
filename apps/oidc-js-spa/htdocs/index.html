@@ -156,12 +156,13 @@
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email acme.profile';
 
-    var script = document.createElement('script');
+    document.getElementById("clientInfo").textContent = clientId;
+
+    // dynamically add keycloak.js script
+    let script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = keycloakUrl + "/js/keycloak.js";
     document.getElementsByTagName('head')[0].appendChild(script);
-
-    document.getElementById("clientInfo").textContent = clientId;
 
     window.onload = () => {
 
@@ -171,21 +172,13 @@
             clientId: clientId
         });
 
-        // Workaround for KEYCLOAK-14414
-        window.keycloak._login = window.keycloak.login;
-        window.keycloak.login = (options) => {
-            if (options) {
-                options.scope = scope;
-            }
-            return window.keycloak._login.apply(window.keycloak, [options]);
-        };
-
         let initConfig = {
             onLoad: 'login-required', // redirects to login if not login
             // onLoad: 'check-sso', // shows login button of not logged in
             checkLoginIframe: true,
             checkLoginIframeInterval: 1,
-            pkceMethod: 'S256'
+            pkceMethod: 'S256',
+            scope: scope
         };
 
         let onLoginSuccess = () => {
@@ -207,8 +200,8 @@
     }
 
     function getTimeSinceLastAuth() {
-        let timeSinceAuthSeconds = Math.floor((Date.now() - (keycloak.tokenParsed.auth_time * 1000)) / 1000);
-        return timeSinceAuthSeconds;
+        let timeSinceAuthInSeconds = Math.floor((Date.now() - (keycloak.tokenParsed.auth_time * 1000)) / 1000);
+        return timeSinceAuthInSeconds;
     }
 
     function enforceCurrentAuth() {
@@ -225,7 +218,7 @@
 
         keycloak.login({
             loginHint: keycloak.tokenParsed.preferred_username,
-            maxAge: 10
+            maxAge: 12
         });
     }
 
@@ -257,11 +250,13 @@
     }
 
     function showToken() {
+
         let data = JSON.stringify(keycloak.tokenParsed, null, '    ');
         show(data, "token-content");
     }
 
     function showIdToken() {
+
         let data = JSON.stringify(keycloak.idTokenParsed, null, '    ');
         show(data, "token-content");
     }
@@ -289,24 +284,23 @@
                     "Accept": "application/json"
                 }
             });
-    
+
             if (response.ok) {
                 meData = await response.json();
             } else {
-                meData = { error: "status " + response.status };
+                meData = {error: "status " + response.status};
             }
         } catch (error) {
             console.log(error);
-            meData = { error: error.message };
-        } 
-
-
+            meData = {error: error.message};
+        }
 
         let data = JSON.stringify(meData, null, '    ');
         show(data, "token-content");
     }
 
     function show(data, cssClass) {
+
         let contentElement = document.getElementById('content');
         contentElement.classList.remove("hidden")
 
