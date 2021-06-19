@@ -267,9 +267,10 @@
     }
 
     async function showUserInfo() {
-        let userInfoData = await keycloak.loadUserInfo();
 
         await keycloak.updateToken(5);
+
+        let userInfoData = await keycloak.loadUserInfo();
 
         let data = JSON.stringify(userInfoData, null, '    ');
         show(data, "token-content");
@@ -279,19 +280,25 @@
 
         await keycloak.updateToken(5);
 
-        let response = await fetch("https://apps.acme.test:4543/api/users/me", {
-            headers: {
-                "Authorization": "Bearer " + keycloak.token,
-                "Accept": "application/json"
-            }
-        });
-
         let meData;
-        if (response.ok) {
-            meData = await response.json();
-        } else {
-            meData = { error: "status " + response.status };
-        }
+        try {
+            let response = await fetch("https://apps.acme.test:4543/api/users/me", {
+                timeout: 2000,
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json"
+                }
+            });
+    
+            if (response.ok) {
+                meData = await response.json();
+            } else {
+                meData = { error: "status " + response.status };
+            }
+        } catch (error) {
+            console.log(error);
+            meData = { error: error.message };
+        } 
 
 
 
