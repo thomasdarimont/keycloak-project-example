@@ -193,7 +193,7 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
             return;
         }
 
-        String accessToken = TokenUtils.generateAccessToken(session, userSession, "admin-cli", token -> {
+        String accessToken = TokenUtils.generateAccessToken(session, userSession, "admin-cli", "iam", token -> {
             // mark this token request as an internal iam request
             token.getOtherClaims().put("groups", List.of("iam"));
         });
