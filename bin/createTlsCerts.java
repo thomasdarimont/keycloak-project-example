@@ -35,6 +35,9 @@ class createTlsCerts {
     static final String TARGET_DIR_ENV = "TARGET_DIR";
     static final String TARGET_DIR_DEFAULT = "./config/stage/dev/tls";
 
+    static final String P12_OPT = "--pkcs12";
+    static final String KEEP_OPT = "--keep";
+
     static final String PEM_FILE_GLOB = "glob:**/*.pem";
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -49,6 +52,9 @@ class createTlsCerts {
             System.out.println("");
             System.out.printf("%s: %s%n", DOMAIN_OPT, "override the domain used for certificats");
             System.out.printf("%s: %s%n", TARGET_DIR_OPT, "override the target folder to place the certificates in");
+            System.out.printf("%s: %s%n", P12_OPT, "Generate a legacy .p12 (PFX) pkcs12 container instead if a domain.pem and domain-key.pem file.");
+            System.out.printf("%s: %s%n", KEEP_OPT, "Keep existing (.pem and .p12) files.");
+            
             System.out.println("");
             System.out.printf("Example: %s=%s %s=%s", DOMAIN_OPT, DOMAIN_DEFAULT, TARGET_DIR_OPT, TARGET_DIR_DEFAULT);
             System.out.println("");
@@ -65,13 +71,22 @@ class createTlsCerts {
             System.out.printf("Creating missing %s folder at %s success:%s%n"
                     , targetDir, folder.getAbsolutePath(), folder.mkdirs());
         }
-        /* Delete existing cert-files */
-        Files.list(Paths.get(targetDir)).filter(p -> FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB).matches(p)).forEach(f -> f.toFile().delete());
+
+        if (!argList.contains(KEEP_OPT)) {
+            /* Delete existing cert-files */
+            Files.list(Paths.get(targetDir))
+                 .filter(p -> FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB).matches(p))
+                 .forEach(f -> f.toFile().delete());
+        }
 
         /* Create mkcert command */
         var commandLine = new ArrayList<String>();
         commandLine.add("mkcert");
         commandLine.add("-install");
+        if (argList.contains(P12_OPT)) {
+            commandLine.add("-pkcs12");
+        }
+
         commandLine.add(domain);
         commandLine.add("*." + domain);
 
