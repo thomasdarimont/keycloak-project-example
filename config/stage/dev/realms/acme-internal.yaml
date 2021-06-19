@@ -167,7 +167,6 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 3020
 
-# Manual default realmRoles assigned due too keycloak-config-cli bug, remove when issue has been fixed https://github.com/adorsys/keycloak-config-cli/issues/451
 users:
   - username: employee
     email: employee@local
@@ -180,8 +179,6 @@ users:
       - type: password
         value: test
         temporary: false
-    realmRoles:
-      - default-roles-acme-internal
 
   - username: tester
     email: tester@local
@@ -194,5 +191,3 @@ users:
       - type: password
         value: test
         temporary: false
-    realmRoles:
-      - default-roles-acme-internal
