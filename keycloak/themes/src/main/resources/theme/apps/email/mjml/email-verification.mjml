@@ -1,0 +1,32 @@
+<mjml lang="en">
+  <mj-head>
+    <mj-include path="../common/styles.mjml" />
+  </mj-head>
+  <mj-body background-color="#fff">
+    <mj-wrapper padding="32px 0px">
+      <mj-section padding="40px 20px" border-radius="8px" background-color="rgb(239, 241, 244)">
+        <mj-column>
+          <mj-text mj-class="logo" padding="0">ACME</mj-text>
+          <mj-text mj-class="headline">Your email verification link</mj-text>
+          <mj-button href="${link}">Verify email</mj-button>
+          <mj-text mj-class="text-m" align="center">
+            This link will expire within
+            ${linkExpirationFormatter(linkExpiration)}.
+          </mj-text>
+          <mj-divider
+            border-width="1px"
+            border-color="white"
+            padding="10px 0"
+          />
+
+          <mj-navbar>
+            <mj-navbar-link href="/">${realmName}</mj-navbar-link>
+            <mj-navbar-link href="/privacy">Privacy</mj-navbar-link>
+            <mj-navbar-link href="/terms">Terms</mj-navbar-link>
+            <mj-navbar-link href="/imprint">Imprint</mj-navbar-link>
+          </mj-navbar>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

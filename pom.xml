@@ -12,6 +12,7 @@
 
     <modules>
         <module>keycloak/extensions</module>
+        <module>keycloak/themes</module>
         <module>keycloak/docker</module>
         <module>apps/backend-api-quarkus</module>
     </modules>
@@ -50,5 +51,6 @@
         <docker-maven-plugin.version>0.35.0</docker-maven-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <frontend-maven-plugin.version>1.12.0</frontend-maven-plugin.version>
     </properties>
 </project>

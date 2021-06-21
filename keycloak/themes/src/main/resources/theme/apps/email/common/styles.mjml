@@ -1,0 +1,32 @@
+<mj-attributes>
+  <!-- GLOBALS -->
+  <mj-all align="center" />
+  <mj-all
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif"
+  />
+  <mj-all color="rgb(40, 42, 48)" />
+
+  <!-- COMPONENTS -->
+  <mj-button
+    background-color="#0366d6"
+    color="white"
+    border-radius="5px"
+  />
+
+  <mj-navbar-link text-transform="none" padding="0 10px" />
+
+  <!-- TEXT -->
+  <mj-class
+    name="logo"
+    font-size="14px"
+  />
+  <mj-class
+    name="headline"
+    font-size="24px"
+    line-height="32px"
+  />
+
+  <mj-class name="text-m" font-size="14px" line-height="20px" color="rgb(107, 111, 118)" />
+  <mj-class name="text-s" font-size="12px" line-height="16px" />
+  <mj-class name="text-xs" font-size="11px" line-height="18px" />
+</mj-attributes>
