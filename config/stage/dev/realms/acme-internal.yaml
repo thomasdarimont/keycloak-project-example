@@ -167,6 +167,32 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 3020
 
+roles:
+  realm:
+  - name: "acme-user"
+    description: "Acme User"
+
+  - name: "acme-user-support"
+    description: "Acme Support User"
+    composite: true
+    composites:
+      client:
+        "realm-management":
+          - query-groups
+          - view-users
+
+  - name: "default-roles-acme-internal"
+    description: "${role_default-roles}"
+    composite: true
+    composites:
+      realm:
+      - "offline_access"
+      - "acme-user"
+      client:
+        "account":
+        - "manage-account"
+        - "view-profile"
+
 users:
   - username: employee
     email: employee@local
@@ -191,3 +217,17 @@ users:
       - type: password
         value: test
         temporary: false
+
+  - username: support
+    email: support@local
+    firstName: Stefan
+    lastName: Support
+    enabled: true
+    attributes:
+      locale: ["de"]
+    credentials:
+      - type: password
+        value: test
+        temporary: false
+    realmRoles:
+    - "acme-user-support"

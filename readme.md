@@ -145,6 +145,10 @@ The `acme-internal` realm contains a test users which are stored in the Keycloak
 
 Users:
 - Username `tester` and password `test` (from database)
+- Username `support` and password `test` (from database)
+
+The support user has access to a [dedicated realm scoped admin-console](https://www.keycloak.org/docs/latest/server_admin/index.html#_per_realm_admin_permissions) and can perform user and group lookups.
+An example for a realm scoped admin-console URL is: `https://id.acme.test:8443/auth/admin/acme-internal/console`.
 
 #### Acme-LDAP Realm
 
