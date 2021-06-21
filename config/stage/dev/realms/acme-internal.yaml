@@ -4,6 +4,9 @@ displayName: Acme Internal
 displayNameHtml: Acme Internal
 loginWithEmailAllowed: true
 loginTheme: internal
+internationalizationEnabled: true
+supportedLocales: ["en","de"]
+defaultLocale: "en"
 resetPasswordAllowed: true
 accountTheme: keycloak.v2
 adminTheme: keycloak
@@ -20,7 +23,6 @@ eventsExpiration: 10368000
 # enabledEventTypes: [ "SEND_RESET_PASSWORD", "UPDATE_CONSENT_ERROR", "GRANT_CONSENT", ... ]
 adminEventsEnabled: false
 adminEventsDetailsEnabled: false
-
 smtpServer:
   replyToDisplayName: "Acme Employee Support"
   port: 1025
@@ -165,7 +167,22 @@ authenticationFlows:
         priority: 3010
       - authenticator: auth-otp-form
         requirement: REQUIRED
+#        requirement: ALTERNATIVE
         priority: 3020
+#      - authenticator: acme-sms-authenticator
+#        requirement: ALTERNATIVE
+#        priority: 3030
+#        authenticatorConfig: "acme-sms-auth-default"
+
+#authenticatorConfig:
+#  - alias: "acme-sms-auth-default"
+#    config:
+#      "phoneNumberPattern": "\\+49.*"
+#      "sender": "$realmDisplayName"
+#      "length": "6"
+#      "client": "mock"
+#      "ttl": "300"
+#      "attempts": "5"
 
 roles:
   realm:
@@ -213,6 +230,8 @@ users:
     enabled: true
     attributes:
       locale: ["de"]
+      phone_number: ["+49178111222333"]
+      phone_number_verified: ["true"]
     credentials:
       - type: password
         value: test
