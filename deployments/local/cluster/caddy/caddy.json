@@ -1,0 +1,70 @@
+{
+  "apps": {
+    "http": {
+      "servers": {
+        "srv0": {
+          "listen": [
+            ":443"
+          ],
+          "routes": [
+            {
+              "match": [
+                {
+                  "host": [
+                    "id.acme.test"
+                  ]
+                }
+              ],
+              "handle": [
+                {
+                  "handler": "reverse_proxy",
+                  "transport": {
+                    "protocol": "http"
+                  },
+                  "upstreams": [
+                    {
+                      "dial": "acme-keycloak-1:8080"
+                    },
+                    {
+                      "dial": "acme-keycloak-2:8080"
+                    }
+                  ],
+                  "load_balancing": {
+                    "selection_policy": {
+                      "policy": "ip_hash"
+                    },
+                    "try_duration": "1s",
+                    "try_interval": "250ms"
+                  },
+                  "health_checks": {
+                    "active": {
+                      "path": "/auth",
+                      "port": 8080,
+                      "interval": "3s",
+                      "timeout": "2s",
+                      "expect_status": 200
+                    }
+                  }
+                }
+              ],
+              "terminal": true
+            }
+          ]
+        }
+      }
+    },
+    "tls": {
+      "certificates": {
+        "load_files": [
+          {
+            "certificate": "/etc/caddy/server.crt",
+            "key": "/etc/caddy/server.key",
+            "tags": [
+              "selfsigned"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+services:
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:5443/auth
+    # IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:5443/auth
+    # IntelliJ currently does not support the depends_on condition syntax
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-caddy-lb:
+    image: caddy:2.4.2-alpine
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./caddy.json:/etc/caddy/caddy.json:z
+      - ../../../../config/stage/dev/tls/acme.test+1.pem:/etc/caddy/server.crt:z
+      - ../../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/caddy/server.key:z
+    command: [ "caddy", "run", "-config" , "/etc/caddy/caddy.json"]
+    ports:
+      - "5443:443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2

@@ -33,3 +33,12 @@ docker-compose --env-file ../../../keycloak.env --file apache/docker-compose-apa
 ```
 
 Apache Keycloak URL: https://id.acme.test:3443/auth
+
+# Cluster with Caddy Load-Balancer
+
+## Run
+```
+docker-compose --env-file ../../../keycloak.env --file caddy/docker-compose-caddy.yml up --remove-orphans
+```
+
+Caddy Keycloak URL: https://id.acme.test:5443/auth
