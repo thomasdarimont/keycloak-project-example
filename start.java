@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Controller script to start the Keycloak environment.
@@ -34,6 +35,9 @@ class start {
     static final String HTTPS_OPT = "--https";
     static final String OPENLDAP_OPT = "--openldap";
     static final String POSTGRES_OPT = "--database=postgres";
+    static final String EXTENSIONS_OPT = "--extensions=";
+    static final String EXTENSIONS_OPT_CLASSES = "classes";
+    static final String EXTENSIONS_OPT_JAR = "jar";
 
     public static void main(String[] args) {
 
@@ -43,6 +47,7 @@ class start {
         var useHttps = argList.contains(HTTPS_OPT) || argList.contains(HTTPS_OPT + "=true");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
+        var extension = argList.stream().filter(s -> s.startsWith(EXTENSIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXTENSIONS_OPT_CLASSES);
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
@@ -53,6 +58,7 @@ class start {
             System.out.printf("  %s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) Implies --http. If not provided, plain HTTP is used");
             System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
             System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If no other database is provided, H2 database is used");
+            System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
 
             System.out.printf("%n%s supports the following commands: %n", "start.java");
             System.out.println("");
@@ -64,6 +70,7 @@ class start {
             System.out.printf("  %s %s%n", "java start.java --https", "# Start Keycloak Environment with https");
             System.out.printf("  %s %s%n", "java start.java --https --database=postgres", "# Start Keycloak Environment with PostgreSQL database");
             System.out.printf("  %s %s%n", "java start.java --https --openldap --database=postgres", "# Start Keycloak Environment with PostgreSQL database and OpenLDAP");
+            System.out.printf("  %s %s%n", "java start.java --extensions=classes", "# Start Keycloak with extensions mounted from classes folder. Use --extensions=jar to mount the jar file into the container");
             System.exit(0);
             return;
         }
@@ -94,6 +101,18 @@ class start {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-openldap.yml");
         }
+
+        if (EXTENSIONS_OPT_CLASSES.equals(extension)) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-extensions-classes.yml");
+        } else if(EXTENSIONS_OPT_JAR.equals(extension)) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-extensions-jar.yml");
+        } else {
+            System.err.printf("Unkown extension include option %s, valid ones are %s and %s%n", extension, EXTENSIONS_OPT_CLASSES, EXTENSIONS_OPT_JAR);
+            System.exit(-1);
+        }
+
 
         if (usePostgres) {
             commandLine.add("--file");
