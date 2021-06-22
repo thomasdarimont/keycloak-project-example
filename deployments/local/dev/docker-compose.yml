@@ -32,7 +32,6 @@ services:
       - "9990:9990"
       - "127.0.0.1:8787:8787"
     volumes:
-      - ../../../keycloak/extensions/target/classes:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
       - ../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
       - ../../../keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
       - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
