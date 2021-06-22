@@ -3,20 +3,22 @@ enabled: true
 displayName: Acme Internal
 displayNameHtml: Acme Internal
 loginWithEmailAllowed: true
-loginTheme: internal
 internationalizationEnabled: true
 supportedLocales: ["en","de"]
 defaultLocale: "en"
 resetPasswordAllowed: true
+loginTheme: internal
 accountTheme: keycloak.v2
 adminTheme: keycloak
-emailTheme: keycloak
+emailTheme: internal
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"
 
 eventsListeners:
   - "jboss-logging"
   - "acme-audit-listener"
+  - "email"
+
 eventsEnabled: true
 # 120 days
 eventsExpiration: 10368000
