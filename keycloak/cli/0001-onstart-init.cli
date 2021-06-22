@@ -46,6 +46,10 @@ echo SETUP: Hostname configuration
 # /subsystem=datasources/data-source=KeycloakDS:write-attribute(name=min-pool-size,value=30)
 # /subsystem=datasources/data-source=KeycloakDS:write-attribute(name=max-pool-size,value=30)
 
+echo SETUP: Configure built-in "email" event listener to only send emails for user initiated UPDATE_PASSWORD events
+/subsystem=keycloak-server/spi=eventsListener/provider=email:add(enabled=true)
+# "UPDATE_TOTP","REMOVE_TOTP"
+/subsystem=keycloak-server/spi=eventsListener/provider=email:write-attribute(name=properties.exclude-events,value=["LOGIN_ERROR"])
 
 echo SETUP: Finished Keycloak custom configuration.
 
