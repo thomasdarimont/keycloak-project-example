@@ -7,7 +7,8 @@ services:
       - ./keycloak-http.env
       - ./keycloak-openldap.env
     environment:
-#      LDAP_LOG_LEVEL: "256"
+# use LDAP_LOG_LEVEL: 256 for verbose logging
+      LDAP_LOG_LEVEL: "0"
       LDAP_ORGANISATION: "Acme Inc."
       LDAP_DOMAIN: "corp.acme.local"
       LDAP_BASE_DN: ""
