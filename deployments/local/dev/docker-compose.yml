@@ -13,6 +13,8 @@ services:
       KEYCLOAK_THEME_CACHING: "false"
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
       PROXY_ADDRESS_FORWARDING: "true"
+# force usage for standalone.xml for local dev
+      KEYCLOAK_CONFIG_FILE: "standalone.xml"
 
 # Exposes Metrics via http://localhost:9990/metrics
       KEYCLOAK_STATISTICS: all
