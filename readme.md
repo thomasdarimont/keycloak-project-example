@@ -228,13 +228,18 @@ To manually trigger an extension redeployment after extension code changes / bui
 java bin/deployExtensions.java
 ```
 
-## Exporting a Realm
+## Import-/Exporting a Realm
 
-To export an existing realm as JSON start the docker-compose infrastructure and run the following script.
+To import/export of an existing realm as JSON start the docker-compose infrastructure and run the following script.
 The export will create a file like `acme-apps-realm.json` in the `./keycloak/imex` folder.
 
 ```
-java bin/exportRealm.java --realm=acme-apps
+java bin/realm.java --realm=acme-apps
+```
+
+The import would search an file `acme-apps-realm.json` in the `./keycloak/imex` folder.
+```
+java bin/realm.java --realm=acme-apps --action=import
 ```
 
 # Tools
