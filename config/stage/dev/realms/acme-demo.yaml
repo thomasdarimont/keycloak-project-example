@@ -15,7 +15,7 @@ clients:
     clientId: acme-standard-client
     protocol: openid-connect
     name: Standard Client
-    description: "Standard Client Description"
+    description: "Standard Client Description v2"
     enabled: true
     publicClient: false
     standardFlowEnabled: true
