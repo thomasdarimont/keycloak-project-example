@@ -32,7 +32,7 @@ echo SETUP: Hostname configuration
 # Configure Keycloak to use the frontend-URL as the base URL for backend endpoints
 /subsystem=keycloak-server/spi=hostname/provider=default:write-attribute(name=properties.forceBackendUrlToFrontendUrl, value=${env.KEYCLOAK_FORCE_FRONTEND_TO_BACKEND_URL:true})
 
-### Hostname SPI Configuration ###
+### Sticky Session SPI Configuration ###
 
 echo SETUP: Stick Session configuration
 # The Keycloak Book recommends to always rely on the session affinity provided by the reverse proxy
