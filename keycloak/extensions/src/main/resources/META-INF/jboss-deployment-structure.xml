@@ -18,6 +18,8 @@
             <module name="org.apache.commons.io"/>
             <module name="javax.api"/>
             <module name="javax.transaction.api"/>
+            <module name="org.freemarker"/>
+            <module name="com.googlecode.owasp-java-html-sanitizer"/>
             <module name="com.fasterxml.jackson.core.jackson-core"/>
             <module name="com.fasterxml.jackson.core.jackson-annotations"/>
             <module name="com.fasterxml.jackson.core.jackson-databind"/>

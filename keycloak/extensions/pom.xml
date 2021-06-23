@@ -37,8 +37,15 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Test Dependencies -->
+        <!-- required for freemaker customizations -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
