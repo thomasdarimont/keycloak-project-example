@@ -11,9 +11,11 @@ import org.keycloak.models.KeycloakSessionFactory;
 @AutoService(RequiredActionFactory.class)
 public class UpdatePhoneNumberRequiredActionFactory implements RequiredActionFactory, DisplayTypeRequiredActionFactory {
 
+    private static final RequiredActionProvider INSTANCE = new UpdatePhoneNumberRequiredAction();
+
     @Override
     public RequiredActionProvider create(KeycloakSession session) {
-        return new UpdatePhoneNumberRequiredAction(session);
+        return INSTANCE;
     }
 
     @Override

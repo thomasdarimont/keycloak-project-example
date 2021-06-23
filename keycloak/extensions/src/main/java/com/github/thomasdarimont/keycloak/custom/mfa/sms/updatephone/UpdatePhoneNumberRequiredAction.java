@@ -28,12 +28,6 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     public static final String PHONE_NUMBER_ATTRIBUTE = "phone_number";
 
-    private final KeycloakSession session;
-
-    public UpdatePhoneNumberRequiredAction(KeycloakSession session) {
-        this.session = session;
-    }
-
     @Override
     public InitiatedActionSupport initiatedActionSupport() {
         // whether we can refer to that action via kc_actions URL parameter
@@ -80,6 +74,8 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
+
+        // TODO trigger phone number verification via SMS
 
         // user submitted the form
 

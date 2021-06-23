@@ -1,16 +1,16 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "title">
-        Update Mobile Phone Number
+        ${msg('acmePhoneNumberTitle')}
     <#elseif section = "header">
-        Update Mobile Phone Number
+        ${msg('acmePhoneNumberTitle')}
     <#elseif section = "form">
 
-        <p>Please update your mobile phone number</p>
+        <p>${msg('acmePhoneNumberCta')}</p>
         <form id="kc-passwd-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="mobile">(Mobile) Phone Number</label>
+                    <label for="mobile">${msg('phoneNumber')}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input id="mobile" type="tel" name="mobile" value="${currentMobile}" required aria-invalid="<#if messagesPerField.existsError('mobile')>true</#if>"/>
@@ -25,8 +25,12 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                           type="submit" value="${msg("doSubmit")}"/>
+                    <#if isAppInitiatedAction??>
+                        <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doSubmit")}" />
+                        <button class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}" type="submit" name="cancel-aia" value="true" />${msg("doCancel")}</button>
+                    <#else>
+                        <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" type="submit" value="${msg("doSubmit")}" />
+                    </#if>
                 </div>
             </div>
         </form>
