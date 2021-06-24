@@ -56,7 +56,7 @@
                                         <fileSet>
                                             <directory>../extensions/target</directory>
                                             <includes>
-                                                <include>extensions-${project.version}.jar</include>
+                                                <include>extensions.jar</include>
                                             </includes>
                                             <outputDirectory>extensions</outputDirectory>
                                         </fileSet>
