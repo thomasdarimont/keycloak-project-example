@@ -231,7 +231,7 @@ users:
     lastName: Tester
     enabled: true
     attributes:
-      locale: ["de"]
+      locale: ["en"]
       phone_number: ["+49178111222333"]
       phone_number_verified: ["true"]
     credentials:
