@@ -1,0 +1,67 @@
+name: Acme e2e Test CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Seup Node.js '14.x'
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - name: Prepare artifacts (e.g. extensions) for docker-compose stack
+        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DskipTests verify --file pom.xml
+
+      - name: Build the docker-compose stack
+        run: |
+          export USER=`id -u`
+          export GROUP=
+          echo "Running as ${USER}:${GROUP}"
+          java bin/envcheck.java
+          java start.java --http --extensions=jar
+
+      - name: Sleep
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '120s'
+
+      - name: Check keycloak is reachable
+        run: docker run --network container:dev_acme-keycloak_1 --rm appropriate/curl -s --retry 10 --max-time 120 --retry-connrefused http://localhost:8080/
+
+      - name: Check docker-compose stack
+        if: ${{ always() }}
+        run: |
+          docker ps -a
+          docker inspect dev_acme-keycloak_1
+          docker logs --details dev_acme-keycloak_1
+
+      - name: Run cypress tests
+        working-directory: ./keycloak/e2e-tests
+        run: |
+          yarn install
+          docker run --network container:dev_acme-keycloak_1 --rm -v ${PWD}:/e2e -w /e2e --entrypoint=cypress cypress/included:7.7.0 run
+
+      - name: Archive testrun video
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: testrun-video
+          path: ./keycloak/e2e-tests/cypress/videos/
+          retention-days: 1
+
+      - name: Shutdown the docker-compose stack
+        if: ${{ always() }}
+        run: java stop.java
