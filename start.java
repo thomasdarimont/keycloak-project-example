@@ -122,6 +122,7 @@ class start {
         }
 
         commandLine.add("up");
+        commandLine.add("-d");
         commandLine.add("--remove-orphans");
 
         System.exit(runCommandAndWait(commandLine));

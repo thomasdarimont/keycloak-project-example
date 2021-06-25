@@ -42,7 +42,7 @@ d) **Operator** configuring realm and server for different stages
 - Examples for running a cluster behind a reverse proxy with examples for [HAProxy](deployments/local/cluster/haproxy), [Apache](deployments/local/cluster/apache), [nginx](deployments/local/cluster/nginx), [caddy](deployments/local/cluster/caddy)
 - Examples for running a Keycloak cluster with an external infinispan cluster with [remote](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml) and [hotrod](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml) cache store.
 
-## Usage prerequisites
+## Usage envcheck
 
 | Tool | Version
 |------|--------
@@ -224,7 +224,7 @@ yarn run cypress:open
 
 To manually check if all prequisits are fulfilled.
 ```
-java bin/prerequisites.bin
+java bin/envcheck.java
 ```
 
 ## Manually Trigger Extension Deployment
