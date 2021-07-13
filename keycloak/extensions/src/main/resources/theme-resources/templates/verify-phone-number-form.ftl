@@ -13,7 +13,7 @@
                     <label for="code">${msg('smsAuthLabel')}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input id="code" type="text" name="code" value="" required
+                    <input id="code" type="text" name="code" value="" required autocomplete="one-time-code"
                            aria-invalid="<#if messagesPerField.existsError('code')>true</#if>"/>
 
                     <#if messagesPerField.existsError('code')>
