@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.mfa.sms;
 
 import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
+import com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials.SmsCredentialModel;
 import com.google.auto.service.AutoService;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
@@ -85,7 +86,7 @@ public class SmsAuthenticatorFactory implements AuthenticatorFactory, ServerInfo
 
     @Override
     public String getReferenceCategory() {
-        return "sms";
+        return SmsCredentialModel.TYPE;
     }
 
     @Override

@@ -1,12 +1,12 @@
 package com.github.thomasdarimont.keycloak.custom.mfa.sms;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClient;
 import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
+import com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials.SmsCredentialModel;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
-import org.keycloak.common.util.RandomString;
+import org.keycloak.credential.CredentialModel;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
@@ -15,13 +15,12 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.representations.IDToken;
 import org.keycloak.sessions.AuthenticationSessionModel;
-import org.keycloak.theme.Theme;
+import org.keycloak.util.JsonSerialization;
 
 import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.security.SecureRandom;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +36,7 @@ public class SmsAuthenticator implements Authenticator {
     static final String CONFIG_CLIENT = "client";
     static final String CONFIG_PHONENUMBER_PATTERN = "phoneNumberPattern";
 
-    static final String AUTH_NOTE_CODE = "smsCode";
+    public static final String AUTH_NOTE_CODE = "smsCode";
     static final String AUTH_NOTE_ATTEMPTS = "smsAttempts";
 
     static final String ERROR_SMS_AUTH_INVALID_NUMBER = "smsAuthInvalidNumber";
@@ -56,7 +55,7 @@ public class SmsAuthenticator implements Authenticator {
         }
 
         UserModel user = context.getUser();
-        String phoneNumber = extractPhoneNumber(user);
+        String phoneNumber = extractPhoneNumber(context.getSession(), context.getRealm(), user);
         boolean validPhoneNumberFormat = validatePhoneNumberFormat(phoneNumber, context);
         if (!validPhoneNumberFormat) {
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
@@ -65,14 +64,29 @@ public class SmsAuthenticator implements Authenticator {
             return;
         }
 
-        String phoneNumberVerified = user.getFirstAttribute(IDToken.PHONE_NUMBER_VERIFIED);
         // TODO check for phoneNumberVerified
 
         sendCodeAndChallenge(context, user, phoneNumber, false);
     }
 
-    protected String extractPhoneNumber(UserModel user) {
-        return user.getFirstAttribute(IDToken.PHONE_NUMBER);
+    protected String extractPhoneNumber(KeycloakSession session, RealmModel realm, UserModel user) {
+
+        Optional<CredentialModel> maybeSmsCredential = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, SmsCredentialModel.TYPE).findFirst();
+        if (maybeSmsCredential.isEmpty()) {
+            return null;
+        }
+
+        CredentialModel credentialModel = maybeSmsCredential.get();
+
+        SmsCredentialModel smsModel = new SmsCredentialModel(credentialModel);
+        smsModel.readCredentialData();
+
+        String phoneNumber = smsModel.getPhoneNumber();
+        if (phoneNumber == null) {
+            phoneNumber = user.getFirstAttribute(IDToken.PHONE_NUMBER_VERIFIED);
+        }
+
+        return phoneNumber;
     }
 
     protected void sendCodeAndChallenge(AuthenticationFlowContext context, UserModel user, String phoneNumber, boolean resend) {
@@ -90,19 +104,8 @@ public class SmsAuthenticator implements Authenticator {
 
         context.challenge(generateLoginForm(context, context.form())
                 .setAttribute("resend", resend)
-                .setInfo("smsSentInfo", abbreviatePhoneNumber(phoneNumber))
+                .setInfo("smsSentInfo", PhoneNumberUtils.abbreviatePhoneNumber(phoneNumber))
                 .createForm(TEMPLATE_LOGIN_SMS));
-    }
-
-    protected String abbreviatePhoneNumber(String phoneNumber) {
-
-        // +49178****123
-        if (phoneNumber.length() > 6) {
-            // if only show the first 6 and last 3 digits of the phone number
-            return phoneNumber.substring(0, 6) + "***" + phoneNumber.replaceAll(".*(\\d{3})$", "$1");
-        }
-
-        return phoneNumber;
     }
 
     protected LoginFormsProvider generateLoginForm(AuthenticationFlowContext context, LoginFormsProvider form) {
@@ -114,40 +117,13 @@ public class SmsAuthenticator implements Authenticator {
         AuthenticatorConfigModel config = context.getAuthenticatorConfig();
         int length = Integer.parseInt(getConfigValue(context, CONFIG_CODE_LENGTH, "6"));
         int ttl = Integer.parseInt(getConfigValue(context, CONFIG_CODE_TTL, "300"));
+        Map<String, String> clientConfig = config != null ? config.getConfig() : Collections.singletonMap("client", SmsClientFactory.MOCK_SMS_CLIENT);
 
-        String code = generateCode(length);
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
-        authSession.setAuthNote(AUTH_NOTE_CODE, code);
-        authSession.setAuthNote("codeExpireAt", computeExpireAt(ttl));
+        KeycloakSession session = context.getSession();
+        RealmModel realm = context.getRealm();
 
-        try {
-            KeycloakSession session = context.getSession();
-            Theme theme = session.theme().getTheme(Theme.Type.LOGIN);
-            Locale locale = session.getContext().resolveLocale(user);
-            String smsAuthText = theme.getMessages(locale).getProperty("smsAuthText");
-            String boundDomain = resolveRealmDomain(context);
-            String smsText = generateSmsText(ttl, code, smsAuthText, boundDomain);
-
-            SmsClient smsClient = createSmsClient(config.getConfig());
-
-            String sender = resolveSender(context);
-            smsClient.send(sender, phoneNumber, smsText);
-
-        } catch (Exception e) {
-            log.errorf(e, "Could not send sms");
-            return false;
-        }
-
-        return true;
-    }
-
-    private String generateSmsText(int ttlSeconds, String code, String smsAuthText, String boundDomain) {
-        int ttlMinutes = Math.floorDiv(ttlSeconds, 60);
-        return String.format(smsAuthText, code, ttlMinutes, boundDomain);
-    }
-
-    private String computeExpireAt(int ttlSeconds) {
-        return Long.toString(System.currentTimeMillis() + (ttlSeconds * 1000));
+        return new SmsCodeSender().sendVerificationCode(session, realm, user, phoneNumber, clientConfig, length, ttl, authSession);
     }
 
     protected String getConfigValue(AuthenticationFlowContext context, String key, String defaultValue) {
@@ -165,24 +141,6 @@ public class SmsAuthenticator implements Authenticator {
         return config.getOrDefault(key, defaultValue);
     }
 
-    protected String resolveRealmDomain(AuthenticationFlowContext context) {
-        return URI.create(System.getenv("KEYCLOAK_FRONTEND_URL")).getHost();
-    }
-
-    protected SmsClient createSmsClient(Map<String, String> config) {
-        String smsClientName = config.get(CONFIG_CLIENT);
-        return SmsClientFactory.createClient(smsClientName, config);
-    }
-
-    protected String resolveSender(AuthenticationFlowContext context) {
-
-        RealmModel realm = context.getRealm();
-        String sender = getConfigValue(context, "sender", "keycloak");
-        if ("$realmDisplayName".equals(sender.trim())) {
-            sender = realm.getDisplayName();
-        }
-        return sender;
-    }
 
     protected boolean validatePhoneNumberFormat(String phoneNumber, AuthenticationFlowContext context) {
 
@@ -194,9 +152,6 @@ public class SmsAuthenticator implements Authenticator {
         return phoneNumber.matches(pattern);
     }
 
-    protected String generateCode(int length) {
-        return new RandomString(length, new SecureRandom(), RandomString.digits).nextString();
-    }
 
     @Override
     public void action(AuthenticationFlowContext context) {
@@ -205,7 +160,7 @@ public class SmsAuthenticator implements Authenticator {
 
         if (formParams.containsKey("resend")) {
             UserModel user = context.getUser();
-            String phoneNumber = extractPhoneNumber(user);
+            String phoneNumber = extractPhoneNumber(context.getSession(), context.getRealm(), user);
             sendCodeAndChallenge(context, user, phoneNumber, true);
             return;
         }
@@ -289,8 +244,11 @@ public class SmsAuthenticator implements Authenticator {
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
+
+        boolean configuredFor = session.userCredentialManager().isConfiguredFor(realm, user, SmsCredentialModel.TYPE);
+
         // we only support 2FA with SMS for users with Phone Numbers
-        return extractPhoneNumber(user) != null;
+        return configuredFor && extractPhoneNumber(session, realm, user) != null;
     }
 
     @Override
