@@ -181,7 +181,7 @@ To build a custom Keycloak Docker image that contains the custom extensions and 
 ```bash
 mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
 ```
-The dockerfile can be customized via `-Ddocker.image=keycloak/Dockerfile.plain` after `mvn clean verify`.
+The dockerfile can be customized via `-Ddocker.file=keycloak/Dockerfile.alpine-slim` after `mvn clean verify`.
 It is also possible to configure the image name via `-Ddocker.image=acme/acme-keycloak2`.
 
 ### Running the custom Docker Image locally
@@ -288,5 +288,5 @@ The extensions can now be redeployed by running `Tools -> External Tools -> kc-d
 We use [aquasec/trivy](https://github.com/aquasecurity/trivy) to scan the generated docker image for vulnerabilities.
 
 ```
-java bin/scanImage.java thomasdarimont/custom-keycloak:1.0.0-SNAPSHOT
+java bin/scanImage.java --image-name=acme/acme-keycloak:latest
 ```
