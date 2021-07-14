@@ -31,7 +31,7 @@ RUN   echo "Create trimmed down JDK" && \
       --vm=server \
       --exclude-files="**/bin/rmiregistry,**/bin/jrunscript,**/bin/rmid" \
       --module-path "$JAVA_HOME/jmods" \
-      --add-modules java.base,java.instrument,java.logging,java.management,java.se,java.naming,java.security.jgss,java.security.sasl,java.sql,java.transaction.xa,java.xml,java.xml.crypto,jdk.security.auth,jdk.xml.dom,jdk.naming.dns,jdk.unsupported,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.jcmd,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.internal.vm.ci,jdk.internal.vm.compiler,jdk.internal.vm.compiler.management,jdk.sctp \
+      --add-modules java.base,java.instrument,java.logging,java.management,java.se,java.naming,java.security.jgss,java.security.sasl,java.sql,java.transaction.xa,java.xml,java.xml.crypto,jdk.security.auth,jdk.xml.dom,jdk.naming.dns,jdk.unsupported,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.jcmd,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.internal.vm.ci,jdk.internal.vm.compiler,jdk.internal.vm.compiler.management,jdk.sctp,jdk.compiler \
       --output $JAVA_TARGET && \
       echo "Add Java Debugging tools from JDK" && \
       cp $JAVA_HOME/lib/libjdwp.so $JAVA_TARGET/lib/ && \
@@ -69,12 +69,15 @@ RUN   addgroup -S jboss -g 1000 && \
 COPY --from=keycloak --chown=jboss:jboss /opt/jboss /opt/jboss
 
 COPY --chown=jboss:jboss ./custom-docker-entrypoint.sh $JBOSS_TOOLS/
+COPY --chown=jboss:jboss ./mitigate-cves.java $JBOSS_TOOLS/
 
 # Make tools executable by jboss user
 RUN   chmod 755 $JBOSS_TOOLS/custom-docker-entrypoint.sh
 
 # Switch to jboss user
 USER jboss
+
+RUN  $JAVA_HOME/bin/java $JBOSS_TOOLS/mitigate-cves.java
 
 CMD ["-b", "0.0.0.0"]
 

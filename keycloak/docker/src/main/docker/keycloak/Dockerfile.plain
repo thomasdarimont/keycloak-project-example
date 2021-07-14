@@ -12,6 +12,8 @@ RUN true \
 
 USER jboss
 
+RUN  $JAVA_HOME/bin/java $JBOSS_TOOLS/mitigate-cves.java
+
 # Add custom Startup-Scripts
 COPY --chown=jboss:root maven/cli/ /opt/jboss/startup-scripts
 
