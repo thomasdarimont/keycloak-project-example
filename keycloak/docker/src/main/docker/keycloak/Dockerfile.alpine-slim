@@ -1,5 +1,5 @@
 ARG KEYCLOAK_VERSION=14.0.0
-ARG ALPINE_VERSION=3.13.5
+ARG ALPINE_VERSION=3.14.0
 
 #####################################################
 # Base keycloak image with binary keycloak release
@@ -7,14 +7,14 @@ FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as keycloak
 
 #####################################################
 # Prepare custom JDK with jlink
-# alpine:3.13.5
-# see https://hub.docker.com/layers/alpine/library/alpine/3.13.5/images/sha256-827525365ff718681b0688621e09912af49a17611701ee4d421ba50d57c13f7e?context=explore
+# alpine:3.14.0
+# see https://hub.docker.com/layers/alpine/library/alpine/3.14.0/images/sha256-8d99168167baa6a6a0d7851b9684625df9c1455116a9601835c2127df2aaa2f5?context=explore
 FROM alpine:$ALPINE_VERSION as java
 
-ENV OPENJDK_VERSION=11.0.9_p11-r1
+ENV OPENJDK_VERSION=11.0.11_p9-r0
 
-RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.13/community/x86_64/openjdk11-jdk-${OPENJDK_VERSION}.apk
-RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.13/community/x86_64/openjdk11-jmods-${OPENJDK_VERSION}.apk
+RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.14/community/x86_64/openjdk11-jdk-${OPENJDK_VERSION}.apk
+RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.14/community/x86_64/openjdk11-jmods-${OPENJDK_VERSION}.apk
 
 RUN apk add binutils --no-cache --allow-untrusted --no-cache openjdk11-jdk-${OPENJDK_VERSION}.apk openjdk11-jmods-${OPENJDK_VERSION}.apk
 
