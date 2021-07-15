@@ -4,6 +4,11 @@
         ${msg("loginAccountTitle")}
     <#elseif section = "form">
 
+        <!-- dump all available attribute keys -->
+        <#--<#list .data_model?keys as key>-->
+        <#--    ${key}<br>-->
+        <#--</#list>-->
+
         <!-- customization -->
 
         <div id="kc-form">
