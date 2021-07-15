@@ -51,6 +51,70 @@ echo SETUP: Configure built-in "email" event listener to only send emails for us
 # "UPDATE_TOTP","REMOVE_TOTP"
 /subsystem=keycloak-server/spi=eventsListener/provider=email:write-attribute(name=properties.exclude-events,value=["LOGIN_ERROR"])
 
+### MISC
+
+echo SETUP: Avoid ... WARN...
+# Avoid ... WARN  [org.jboss.as.ejb3.remote] (ClusterTopologyRegistrar - 1) WFLYEJB0509: Clustered EJBs in Node: keycloak-0 are bound to INADDR_ANY(0.0.0.0).
+#                  Client cannot reach back the cluster when they are not in the same local network.
+# See https://developer.jboss.org/thread/276859
+/socket-binding-group=standard-sockets/socket-binding=http:list-add(name=client-mappings,value={destination-address=${jboss.host.name}})
+/socket-binding-group=standard-sockets/socket-binding=https:list-add(name=client-mappings,value={destination-address=${jboss.host.name}})
+
+echo SETUP: Get rid of WARN WFLYTX0013
+# Gets rid of WARN WFLYTX0013: Node identifier property is set to the default value. Please make sure it is unique.
+/subsystem=transactions:write-attribute(name=node-identifier,value="${env.NODE_IDENTIFIER:${jboss.node.name}}")
+
+echo SETUP: cleanup configuration
+
+if (outcome == success) of /subsystem=ejb3/service=remote:read-resource
+  echo SETUP: Disable http remoting
+  /subsystem=ejb3/service=remote:remove()
+  echo
+end-if
+
+if (outcome == success) of /subsystem=modcluster/:read-resource
+   echo SETUP: Remove modcluster subsystem
+   /subsystem=modcluster:remove()
+   /extension=org.jboss.as.modcluster:remove()
+   /socket-binding-group=standard-sockets/socket-binding=modcluster:remove()
+  echo
+end-if
+
+if (outcome == success) of /subsystem=undertow/server=default-server/ajp-listener=ajp:read-resource
+  echo SETUP: Remove AJP Listener
+  /subsystem=undertow/server=default-server/ajp-listener=ajp:remove()
+  /socket-binding-group=standard-sockets/socket-binding=ajp:remove()
+  echo
+end-if
+
+### Undertow Configuration ###
+
+echo SETUP: Adjust Undertow configuration
+
+## See undertow configuration
+# https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4-beta/html/configuration_guide/configuring_the_web_server_undertow#undertow-configure-filters
+# https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#predicates-attributes-and-handlers
+
+# Reject requests for clients-registrations and the welcome page
+# -> response-code(302)
+# -> redirect('https://example.com')
+# -> redirect('${env.KEYCLOAK_FRONTEND_URL}')
+/subsystem=undertow/configuration=filter/expression-filter=rejectAccessDefault:add( \
+    expression="(regex('/auth/realms/.*/clients-registrations/openid-connect') or path('/auth/'))-> response-code(403)" \
+)
+/subsystem=undertow/server=default-server/host=default-host/filter-ref=rejectAccessDefault:add()
+
+### Logging Configuration ###
+
+# echo SETUP: Adjust Logging configuration
+# See: https://wildscribe.github.io/WildFly/13.0/subsystem/logging/json-formatter/index.html
+# See: https://github.com/wildfly/wildfly/blob/master/docs/src/main/asciidoc/_admin-guide/subsystem-configuration/Logging_Formatters.adoc#json-formatter
+# supported properties: [date-format, exception-output-type, key-overrides, meta-data, pretty-print, print-details, record-delimiter, zone-id]
+
+echo SETUP: Enable JSON Logging
+# /subsystem=logging/json-formatter=JSON-PATTERN:add(exception-output-type=formatted, key-overrides={timestamp=@timestamp,logger-name=logger_name,stack-trace=stack_trace,level=level_name}, meta-data={app=keycloak})
+# /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter,value=JSON-PATTERN)
+
 echo SETUP: Finished Keycloak custom configuration.
 
 stop-embedded-server
