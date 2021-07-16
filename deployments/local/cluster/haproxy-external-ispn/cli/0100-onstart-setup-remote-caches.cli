@@ -1,0 +1,154 @@
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
+
+echo SETUP: Begin Remote Keycloak cache configuration...
+
+# See https://github.com/keycloak/keycloak-documentation/blob/master/server_installation/topics/operating-mode/crossdc/proc-configuring-infinispan.adoc
+
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=ispn-remote:add( \
+  host=${env.KEYCLOAK_REMOTE_ISPN_HOSTNAME:keycloak-ispn}, \
+  port=${env.KEYCLOAK_REMOTE_ISPN_PORT:11222} \
+)
+
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures:remove()
+
+batch
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work:add()
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work/store=remote:add(cache=work,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=remote:add(cache=sessions,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=remote:add(cache=clientSessions,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions/store=remote:add(cache=authenticationSessions,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions/store=remote:add(cache=offlineSessions,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions/store=remote:add(cache=offlineClientSessions,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens/store=remote:add(cache=actionTokens,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures/store=remote:add(cache=loginFailures,remote-servers=[ispn-remote],passivation=false,fetch-state=false,purge=false,preload=false,shared=true)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures/store=remote:write-attribute(name=properties,value={ \
+    rawValues=true, \
+    marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+    infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+    infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+    infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+    infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+    infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+    infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+    infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+    })
+run-batch
+
+echo SETUP: Finished Keycloak cache configuration.
+
+stop-embedded-server

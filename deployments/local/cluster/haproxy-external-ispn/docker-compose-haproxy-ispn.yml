@@ -1,0 +1,71 @@
+services:
+
+  acme-ispn-1:
+    build: ./ispn
+    environment:
+      JAVA_OPTIONS: "-Dinfinispan.bind.address=192.168.64.2"
+    #   -e USER="keycloak"
+    #   -e PASS="password"
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./ispn/conf/infinispan-keycloak.xml:/opt/infinispan/server/conf/infinispan-keycloak.xml:z
+      - ./ispn/conf/users.properties:/opt/infinispan/server/conf/users.properties:z
+      - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k https://192.168.64.2:11222"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    env_file:
+      - ./haproxy-external-ispn.env
+    volumes:
+      - ./cli/0100-onstart-setup-remote-caches.cli:/opt/jboss/startup-scripts/0100-onstart-setup-remote-caches.cli:z
+      - ./ispn/ispn-truststore.jks:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks:z
+    command: [ "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+      acme-ispn-1:
+        condition: service_healthy
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    env_file:
+      - ./haproxy-external-ispn.env
+    volumes:
+      - ./cli/0100-onstart-setup-remote-caches.cli:/opt/jboss/startup-scripts/0100-onstart-setup-remote-caches.cli:z
+      - ./ispn/ispn-truststore.jks:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks:z
+    command: [ "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+      acme-ispn-1:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-haproxy-lb:
+    build: ../haproxy
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ../haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:z
+    #      - ../../../../config/stage/dev/tls/acme.test+1.pem:/etc/haproxy/haproxy.crt.pem:z
+    #      - ../../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/haproxy/haproxy.crt.pem.key:z
+    # - ../run/haproxy/run:/var/run:z
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
+    ports:
+      - "1443:1443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2
