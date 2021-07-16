@@ -87,34 +87,6 @@ if (outcome == success) of /subsystem=undertow/server=default-server/ajp-listene
   echo
 end-if
 
-### Undertow Configuration ###
-
-echo SETUP: Adjust Undertow configuration
-
-## See undertow configuration
-# https://access.redhat.com/documentation/en-us/red_hat_jboss_enterprise_application_platform/7.4-beta/html/configuration_guide/configuring_the_web_server_undertow#undertow-configure-filters
-# https://undertow.io/undertow-docs/undertow-docs-2.1.0/index.html#predicates-attributes-and-handlers
-
-# Reject requests for clients-registrations and the welcome page
-# -> response-code(302)
-# -> redirect('https://example.com')
-# -> redirect('${env.KEYCLOAK_FRONTEND_URL}')
-/subsystem=undertow/configuration=filter/expression-filter=rejectAccessDefault:add( \
-    expression="(regex('/auth/realms/.*/clients-registrations/openid-connect') or path('/auth/'))-> response-code(403)" \
-)
-/subsystem=undertow/server=default-server/host=default-host/filter-ref=rejectAccessDefault:add()
-
-### Logging Configuration ###
-
-# echo SETUP: Adjust Logging configuration
-# See: https://wildscribe.github.io/WildFly/13.0/subsystem/logging/json-formatter/index.html
-# See: https://github.com/wildfly/wildfly/blob/master/docs/src/main/asciidoc/_admin-guide/subsystem-configuration/Logging_Formatters.adoc#json-formatter
-# supported properties: [date-format, exception-output-type, key-overrides, meta-data, pretty-print, print-details, record-delimiter, zone-id]
-
-echo SETUP: Enable JSON Logging
-# /subsystem=logging/json-formatter=JSON-PATTERN:add(exception-output-type=formatted, key-overrides={timestamp=@timestamp,logger-name=logger_name,stack-trace=stack_trace,level=level_name}, meta-data={app=keycloak})
-# /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter,value=JSON-PATTERN)
-
 echo SETUP: Finished Keycloak custom configuration.
 
 stop-embedded-server
