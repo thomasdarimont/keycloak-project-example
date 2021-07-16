@@ -4,6 +4,8 @@ testrun/
 run/
 deployments/local/dev/run/
 
+deployments/local/cluster/haproxy-external-ispn/ispn/data/
+
 !deployments/local/cluster/run/.gitkeep
 deployments/local/cluster/run/
 
