@@ -39,6 +39,7 @@ services:
     ports:
       - "8080"
       - "8443"
+      - "8787"
 
   acme-keycloak-db:
     image: postgres:11.12

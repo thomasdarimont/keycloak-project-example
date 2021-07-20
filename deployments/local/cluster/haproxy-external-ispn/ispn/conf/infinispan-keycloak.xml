@@ -5,9 +5,11 @@
     <!-- see https://docs.jboss.org/infinispan/11.0/configdocs/infinispan-config-11.0.html -->
 
     <cache-container name="default" statistics="true">
+
+        <!-- TODO revise jgroups stack to use -->
         <transport
                 cluster="${infinispan.cluster.name:cluster}"
-                stack="${infinispan.cluster.stack:tcp}"
+                stack="${infinispan.cluster.stack:udp}"
                 node-name="${infinispan.node.name:}"/>
 
         <replicated-cache name="work">
@@ -16,7 +18,7 @@
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
         </replicated-cache>
-        <distributed-cache name="sessions" owners="1">
+        <distributed-cache name="sessions" owners="2">
                 <persistence passivation="true">
                     <file-store preload="true" path="../mydata/sessions">
                     </file-store>
@@ -26,31 +28,31 @@
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
         </distributed-cache>
-        <distributed-cache name="authenticationSessions" owners="1">
+        <distributed-cache name="authenticationSessions" owners="2">
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
         </distributed-cache>
-        <distributed-cache name="offlineSessions" owners="1">
+        <distributed-cache name="offlineSessions" owners="2">
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
         </distributed-cache>
-        <distributed-cache name="clientSessions" owners="1">
+        <distributed-cache name="clientSessions" owners="2">
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
         </distributed-cache>
-        <distributed-cache name="offlineClientSessions" owners="1">
+        <distributed-cache name="offlineClientSessions" owners="2">
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
         </distributed-cache>
-        <distributed-cache name="loginFailures" owners="1">
+        <distributed-cache name="loginFailures" owners="2">
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>

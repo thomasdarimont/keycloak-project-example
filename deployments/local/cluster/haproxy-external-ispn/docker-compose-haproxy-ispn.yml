@@ -2,15 +2,29 @@ services:
 
   acme-ispn-1:
     build: ./ispn
-#    environment:
-    #   -e USER="keycloak"
-    #   -e PASS="password"
     volumes:
       # relative paths needs to be relative to the docker-compose cwd.
       - ./ispn/conf/infinispan-keycloak.xml:/opt/infinispan/server/conf/infinispan-keycloak.xml:z
       - ./ispn/conf/users.properties:/opt/infinispan/server/conf/users.properties:z
       - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
-      - ./ispn/data:/opt/infinispan/server/mydata:z
+      - ./ispn/data/ispn-1:/opt/infinispan/server/mydata:z
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):11222"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-ispn-2:
+    build: ./ispn
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./ispn/conf/infinispan-keycloak.xml:/opt/infinispan/server/conf/infinispan-keycloak.xml:z
+      - ./ispn/conf/users.properties:/opt/infinispan/server/conf/users.properties:z
+      - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
+      - ./ispn/data/ispn-2:/opt/infinispan/server/mydata:z
     healthcheck:
       test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):11222"]
       interval: 10s
@@ -29,10 +43,16 @@ services:
     volumes:
       - ./cli/0100-onstart-setup-remote-caches.cli:/opt/jboss/startup-scripts/0100-onstart-setup-remote-caches.cli:z
       - ./ispn/ispn-truststore.jks:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks:z
-    command: [ "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
+# Patched cacerts without the expired certificates
+      - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
+    command: [ "--debug", "*:8787", "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
     depends_on:
       acme-ispn-1:
         condition: service_healthy
+    ports:
+      - "8080"
+      - "8443"
+      - "8787:8787"
 
   acme-keycloak-2:
     extends:
@@ -43,6 +63,8 @@ services:
     volumes:
       - ./cli/0100-onstart-setup-remote-caches.cli:/opt/jboss/startup-scripts/0100-onstart-setup-remote-caches.cli:z
       - ./ispn/ispn-truststore.jks:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks:z
+# Patched cacerts without the expired certificates
+      - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
     command: [ "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
     depends_on:
       acme-keycloak-db:
