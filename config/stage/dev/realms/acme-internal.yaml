@@ -80,6 +80,27 @@ clients:
     optionalClientScopes:
       - "phone"
 
+  - clientId: app-mobile
+    protocol: openid-connect
+    name: App Mobile
+    description: "App Mobile Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+# using directAccessGrantsEnabled just for demo purposes
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: false
+    redirectUris:
+      - "acme://app/callback/*"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+      - "offline_access"
+
   - clientId: acme_internal_idp_broker
     protocol: openid-connect
     name: Acme Internal Broker
