@@ -168,23 +168,22 @@ authenticationFlows:
         requirement: REQUIRED
         priority: 3010
       - authenticator: auth-otp-form
-        requirement: REQUIRED
-#        requirement: ALTERNATIVE
+        requirement: ALTERNATIVE
         priority: 3020
-#      - authenticator: acme-sms-authenticator
-#        requirement: ALTERNATIVE
-#        priority: 3030
-#        authenticatorConfig: "acme-sms-auth-default"
+      - authenticator: acme-sms-authenticator
+        requirement: ALTERNATIVE
+        priority: 3030
+        authenticatorConfig: "acme-sms-auth-default"
 
-#authenticatorConfig:
-#  - alias: "acme-sms-auth-default"
-#    config:
-#      "phoneNumberPattern": "\\+49.*"
-#      "sender": "$realmDisplayName"
-#      "length": "6"
-#      "client": "mock"
-#      "ttl": "300"
-#      "attempts": "5"
+authenticatorConfig:
+  - alias: "acme-sms-auth-default"
+    config:
+      "phoneNumberPattern": "\\+49.*"
+      "sender": "$realmDisplayName"
+      "length": "6"
+      "client": "mock"
+      "ttl": "300"
+      "attempts": "5"
 
 roles:
   realm:
