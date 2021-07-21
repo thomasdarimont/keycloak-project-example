@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>wildfly-clustering-infinispan-extension-patch</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <!-- see https://search.maven.org/artifact/org.wildfly/wildfly-parent/23.0.2.Final/pom -->
+        <version.wildfly>23.0.2.Final</version.wildfly>
+        <version.org.wildfly.transaction.client>1.1.13.Final</version.org.wildfly.transaction.client>
+        <version.org.infinispan>11.0.9.Final</version.org.infinispan>
+        <version.org.infinispan.protostream>4.3.5.Final</version.org.infinispan.protostream>
+        <version.net.jcip>1.0</version.net.jcip>
+        <version.io.netty>4.1.63.Final</version.io.netty>
+        <version.io.reactivex.rxjava3>3.0.9</version.io.reactivex.rxjava3>
+        <version.org.kohsuke.metainf-services>1.8</version.org.kohsuke.metainf-services>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-infinispan-extension</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-ee-infinispan</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-jgroups-extension</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-infinispan-client</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-infinispan-marshalling</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-infinispan-spi</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-marshalling-jboss</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-clustering-spi</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-transactions</artifactId>
+            <version>${version.wildfly}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.transaction</groupId>
+            <artifactId>wildfly-transaction-client</artifactId>
+            <version>${version.org.wildfly.transaction.client}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-cachestore-jdbc</artifactId>
+            <version>${version.org.infinispan}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-cachestore-remote</artifactId>
+            <version>${version.org.infinispan}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.infinispan.protostream</groupId>
+            <artifactId>protostream</artifactId>
+            <version>${version.org.infinispan.protostream}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>${version.net.jcip}</version>
+        </dependency>
+        <dependency>
+            <!-- This is only required for the InfinispanExtension to initialize Netty's InternalLoggerFactory -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${version.io.netty}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivex.rxjava3</groupId>
+            <artifactId>rxjava</artifactId>
+            <version>${version.io.reactivex.rxjava3}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kohsuke.metainf-services</groupId>
+            <artifactId>metainf-services</artifactId>
+            <scope>provided</scope>
+            <version>${version.org.kohsuke.metainf-services}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>wildfly-clustering-infinispan-extension-patch</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>org.wildfly:wildfly-clustering-infinispan-extension</artifact>
+                                    <includes>
+                                        <include>org/jboss/as/**</include>
+                                        <include>**/*.properties</include>
+                                        <include>schema/*</include>
+                                        <include>subsystem-templates/*</include>
+                                        <include>META-INF/services/*</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                            <artifactSet>
+                                <!--                                <excludes>-->
+                                <!--                                    <exclude>*:*</exclude>-->
+                                <!--                                </excludes>-->
+                                <includes>
+                                    <include>org.wildfly:wildfly-clustering-infinispan-extension</include>
+                                </includes>
+                            </artifactSet>
+
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.properties.PropertiesTransformer">
+                                    <resource>org/jboss/as/clustering/infinispan/subsystem/LocalDescriptions.properties</resource>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

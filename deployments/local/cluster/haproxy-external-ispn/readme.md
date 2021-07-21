@@ -75,4 +75,11 @@ docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/doc
 
 ## Problems
 
-- Cannot configure connect-timeout for remote caches as the configuration attribute is not supported by wildfly.
+### Infinispan connect-timeout for remote caches not supported by Keycloak/Wildfly
+Cannot configure connect-timeout for remote caches as the configuration attribute is not supported by wildfly, 
+but supported by infinispan.
+
+See: https://issues.redhat.com/browse/WFLY-15046
+
+A possible workaround is using [wildfly-clustering-infinispan-extension-patch](/keycloak/patches/wildfly-clustering-infinispan-extension-patch), which 
+contains a patched version of `wildfly-clustering-infinispan-extension.jar` with support for configuring `connect-timeouts`.
