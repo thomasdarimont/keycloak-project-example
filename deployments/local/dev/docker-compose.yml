@@ -34,6 +34,7 @@ services:
     volumes:
       - ../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
       - ../../../keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
+      - ../../../keycloak/themes/internal-modern:/opt/jboss/keycloak/themes/internal-modern:z
       - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
       - ../../../keycloak/imex:/opt/jboss/imex:z
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
