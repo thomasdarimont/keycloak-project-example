@@ -1,6 +1,6 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.client;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.mock.MockSmsClient;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.mock.MockSmsClient;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;

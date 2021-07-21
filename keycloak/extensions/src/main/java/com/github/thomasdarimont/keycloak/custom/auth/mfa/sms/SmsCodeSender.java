@@ -1,7 +1,7 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClient;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClient;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.common.util.RandomString;
 import org.keycloak.models.KeycloakSession;

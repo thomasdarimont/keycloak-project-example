@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 
 public class PhoneNumberUtils {
 

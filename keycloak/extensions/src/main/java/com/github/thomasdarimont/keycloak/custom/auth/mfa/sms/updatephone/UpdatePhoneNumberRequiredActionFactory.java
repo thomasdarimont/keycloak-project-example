@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.updatephone;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone;
 
 import com.google.auto.service.AutoService;
 import org.keycloak.Config;

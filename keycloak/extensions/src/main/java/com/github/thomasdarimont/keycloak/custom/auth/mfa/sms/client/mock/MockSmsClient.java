@@ -1,6 +1,6 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.client.mock;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.mock;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClient;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClient;
 import lombok.extern.jbosslog.JBossLog;
 
 import java.util.Map;

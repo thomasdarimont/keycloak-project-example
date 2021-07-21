@@ -1,9 +1,9 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.updatephone;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.SmsAuthenticator;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.SmsCodeSender;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.InitiatedActionSupport;

@@ -1,7 +1,7 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.google.auto.service.AutoService;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;

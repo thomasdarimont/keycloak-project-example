@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.client;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client;
 
 public interface SmsClient {
 

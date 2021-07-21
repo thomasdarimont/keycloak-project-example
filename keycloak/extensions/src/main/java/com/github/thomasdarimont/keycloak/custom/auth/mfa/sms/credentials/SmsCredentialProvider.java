@@ -1,7 +1,7 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.PhoneNumberUtils;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.updatephone.UpdatePhoneNumberRequiredAction;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.PhoneNumberUtils;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone.UpdatePhoneNumberRequiredAction;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialInput;
@@ -14,12 +14,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
-import org.keycloak.representations.IDToken;
-import org.keycloak.util.JsonSerialization;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @JBossLog
 public class SmsCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {

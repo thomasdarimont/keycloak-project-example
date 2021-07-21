@@ -1,7 +1,7 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.client.SmsClientFactory;
-import com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -15,10 +15,8 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.representations.IDToken;
 import org.keycloak.sessions.AuthenticationSessionModel;
-import org.keycloak.util.JsonSerialization;
 
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.mfa.sms.credentials;
+package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials;
 
 import com.google.auto.service.AutoService;
 import org.keycloak.credential.CredentialModel;
