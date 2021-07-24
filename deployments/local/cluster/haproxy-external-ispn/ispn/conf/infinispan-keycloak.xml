@@ -12,59 +12,48 @@
                 stack="${infinispan.cluster.stack:udp}"
                 node-name="${infinispan.node.name:}"/>
 
-        <replicated-cache name="work">
+        <replicated-cache-configuration name="replicated-cache-cfg">
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
+        </replicated-cache-configuration>
+
+        <distributed-cache-configuration name="distributed-cache-cfg">
+            <encoding>
+                <key media-type="application/x-jboss-marshalling"/>
+                <value media-type="application/x-jboss-marshalling"/>
+            </encoding>
+        </distributed-cache-configuration>
+
+        <replicated-cache name="work" configuration="replicated-cache-cfg">
         </replicated-cache>
-        <distributed-cache name="sessions" owners="2">
+
+        <distributed-cache name="sessions" owners="2" configuration="distributed-cache-cfg">
                 <persistence passivation="true">
                     <file-store preload="true" path="../mydata/sessions">
                     </file-store>
                 </persistence>
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
         </distributed-cache>
-        <distributed-cache name="authenticationSessions" owners="2">
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
+
+        <distributed-cache name="authenticationSessions" owners="2" configuration="distributed-cache-cfg">
         </distributed-cache>
-        <distributed-cache name="offlineSessions" owners="2">
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
+
+        <distributed-cache name="offlineSessions" owners="2"  configuration="distributed-cache-cfg">
         </distributed-cache>
-        <distributed-cache name="clientSessions" owners="2">
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
+
+        <distributed-cache name="clientSessions" owners="2"  configuration="distributed-cache-cfg">
         </distributed-cache>
-        <distributed-cache name="offlineClientSessions" owners="2">
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
+
+        <distributed-cache name="offlineClientSessions" owners="2" configuration="distributed-cache-cfg">
         </distributed-cache>
-        <distributed-cache name="loginFailures" owners="2">
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
+
+        <distributed-cache name="loginFailures" owners="2" configuration="distributed-cache-cfg">
         </distributed-cache>
-        <distributed-cache name="actionTokens" owners="2">
+
+        <distributed-cache name="actionTokens" owners="2" configuration="distributed-cache-cfg">
             <!--  <heap-memory size="-1"/> wildfly specific? -->
             <expiration interval="300000" max-idle="-1"/>
-            <encoding>
-                <key media-type="application/x-jboss-marshalling"/>
-                <value media-type="application/x-jboss-marshalling"/>
-            </encoding>
         </distributed-cache>
     </cache-container>
 
