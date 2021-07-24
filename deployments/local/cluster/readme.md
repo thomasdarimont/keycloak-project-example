@@ -16,14 +16,24 @@ haproxy status URL: https://id.acme.test:1443/haproxy?status
 
 HAProxy Keycloak URL: https://id.acme.test:1443/auth
 
-## Run with dedicated Infinispan Cluster
+## Run with dedicated Infinispan Cluster with Remote store
 
 The haproxy example can also be started with a dedicated infinispan cluster where the 
 distributed and replicated caches in Keycloak will be stored in a remote infinispan. 
 
 To start the environment with a dedicated infinispan cluster, just run:
 ```
-docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn.yml up
+docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml up
+```
+
+## Run with dedicated Infinispan Cluster with Hotrod store
+
+The haproxy example can also be started with a dedicated infinispan cluster where the
+distributed and replicated caches in Keycloak will be stored in a remote infinispan.
+
+To start the environment with a dedicated infinispan cluster, just run:
+```
+docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml up
 ```
 
 # Cluster with nginx Load-Balancer

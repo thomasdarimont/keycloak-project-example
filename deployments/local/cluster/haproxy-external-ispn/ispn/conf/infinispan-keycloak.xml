@@ -72,6 +72,7 @@
 
         <interfaces>
             <interface name="public">
+                <!-- we bind to the eth0 interface instead of a specific ip address to ease access -->
 <!--                <inet-address value="${infinispan.bind.address:127.0.0.1}"/>-->
                 <match-interface value="eth0"/>
             </interface>

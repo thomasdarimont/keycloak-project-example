@@ -1,0 +1,166 @@
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
+
+echo SETUP: Begin hotrod Keycloak cache configuration...
+
+echo SETUP: Create remote remote-destination-outbound-socket-binding for accessing remote keycloak-hotrod-cache
+# see https://docs.wildfly.org/23/wildscribe/socket-binding-group/remote-destination-outbound-socket-binding/index.html
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=ispn-remote-1:add( \
+  host=${env.KEYCLOAK_REMOTE_ISPN_HOSTNAME1:keycloak-ispn1}, \
+  port=${env.KEYCLOAK_REMOTE_ISPN_PORT:11222} \
+)
+
+/socket-binding-group=standard-sockets/remote-destination-outbound-socket-binding=ispn-remote-2:add( \
+  host=${env.KEYCLOAK_REMOTE_ISPN_HOSTNAME2:keycloak-ispn2}, \
+  port=${env.KEYCLOAK_REMOTE_ISPN_PORT:11222} \
+)
+
+echo SETUP: Create remote cache container keycloak-hotrod-cache
+# see https://docs.wildfly.org/23/wildscribe/subsystem/infinispan/index.html
+# see https://docs.wildfly.org/23/wildscribe/subsystem/infinispan/remote-cache-container/index.html
+# TODO configure sslContext explicitly
+batch
+/subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:add( \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT}, \
+  modules=[org.keycloak.keycloak-model-infinispan], \
+  default-remote-cluster=ispn-remote \
+)
+/subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:write-attribute(name=statistics-enabled,value="${wildfly.infinispan.statistics-enabled:${wildfly.statistics-enabled:false}}")
+/subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:write-attribute(name=properties,value={ \
+  marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
+  infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
+  infinispan.client.hotrod.auth_password=${env.KEYCLOAK_REMOTE_ISPN_PASSWORD:password}, \
+  infinispan.client.hotrod.auth_realm=${env.KEYCLOAK_REMOTE_ISPN_REALM:default}, \
+  infinispan.client.hotrod.auth_server_name=${env.KEYCLOAK_REMOTE_ISPN_SERVER:infinispan}, \
+  infinispan.client.hotrod.trust_store_file_name=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PATH:/opt/jboss/keycloak/standalone/configuration/ispn-truststore.jks}, \
+  infinispan.client.hotrod.trust_store_type=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_TYPE:JKS}, \
+  infinispan.client.hotrod.trust_store_password=${env.KEYCLOAK_REMOTE_ISPN_TRUSTSTORE_PASSWORD:password} \
+  })
+
+/subsystem=infinispan/remote-cache-container=keycloak-hotrod-container/remote-cluster=ispn-remote:add( \
+  socket-bindings=[ispn-remote-1,ispn-remote-2] \
+)
+run-batch
+
+echo SETUP: Remove Keycloak caches
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens:remove()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures:remove()
+
+echo SETUP: Create remote cache work
+batch
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work:add()
+/subsystem=infinispan/cache-container=keycloak/replicated-cache=work/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache sessions
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:add()
+# see https://docs.wildfly.org/23/wildscribe/subsystem/infinispan/cache-container/distributed-cache/store/hotrod/index.html
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache clientSessions
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache authenticationSessions
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache offlineSessions
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache offlineClientSessions
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache actionTokens
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+echo SETUP: Create remote cache loginFailures
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures:add()
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures/store=hotrod:add( \
+  shared=true, \
+  passivation=false, \
+  fetch-state=false, \
+  purge=false, \
+  preload=false, \
+  remote-cache-container=keycloak-hotrod-container \
+)
+run-batch
+
+
+echo SETUP: Finished Keycloak cache configuration.
+
+stop-embedded-server
