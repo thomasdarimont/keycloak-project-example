@@ -1,7 +1,18 @@
 Clustered Keycloak with Remote Infinispan Cache configuration behind haproxy
 ---
 
-# Prepare Infinispan Keystore and Truststore
+This example provides the configuration to connect Keycloak to an external infinispan cluster.
+The external infinispan cluster contains the [cache configurations required by Keycloak](ispn/conf/infinispan-keycloak.xml). 
+
+Keycloak / Wildfly offers multiple options for accessing an external infinispan cluster, e.g. via the 
+(deprecated) remote and the recommended hotrod cache store configuration.
+
+This example project contains configurations for both variants:
+- [Remote cache store configuration](docker-compose-haproxy-ispn-remote.yml) with the [remote cache cli](cli/0100-onstart-setup-remote-caches.cli) adjustments.
+- [HotRod cache store configuration](docker-compose-haproxy-ispn-hotrod.yml) with the [hotrod cache cli](cli/0100-onstart-setup-hotrod-caches.cli) adjustments.
+
+# Setup
+## Prepare Infinispan Keystore and Truststore
 
 ```
 keytool -genkey \
@@ -28,7 +39,12 @@ keytool -importcert \
 rm ispn-server.crt
 ```
 
-# Patch CA Certs
+# Run
+
+To run this example see the [readme.md](../readme.md) in the cluster folder.
+
+## Misc
+### Patch CA Certs
 
 As of Keycloak image 14.0.0 the used JDK Truststore contains expired certificates which lead to an 
 exception during server start. To fix this, we need to remove the expired certificates.
@@ -65,13 +81,6 @@ chmod u-w ./ispn/cacerts
 ```
 
 Now mount the fixed `cacerts` into the container via `./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z`
-
-# Start Environment
-
-```
-cd ..
-docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn.yml  up --remove-orphans
-```
 
 ## Problems
 
