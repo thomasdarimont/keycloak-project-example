@@ -19,7 +19,10 @@ HAProxy Keycloak URL: https://id.acme.test:1443/auth
 ## Run with dedicated Infinispan Cluster with Remote store
 
 The haproxy example can also be started with a dedicated infinispan cluster where the 
-distributed and replicated caches in Keycloak will be stored in a remote infinispan. 
+distributed and replicated caches in Keycloak will be stored in an external infinispan cluster with cache store type `remote`. 
+
+Note that this example uses a patched version of the `wildfly-clustering-infinispan-extension.jar` in order to
+allow to configure a `connect-timeout`.
 
 To start the environment with a dedicated infinispan cluster, just run:
 ```
@@ -29,7 +32,7 @@ docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/doc
 ## Run with dedicated Infinispan Cluster with Hotrod store
 
 The haproxy example can also be started with a dedicated infinispan cluster where the
-distributed and replicated caches in Keycloak will be stored in a remote infinispan.
+distributed and replicated caches in Keycloak will be stored in an external infinispan cluster with cache store type `hotrod`
 
 To start the environment with a dedicated infinispan cluster, just run:
 ```

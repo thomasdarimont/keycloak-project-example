@@ -28,17 +28,19 @@ c) **Tester/Developer** acceptance/e2e-testing with cypress
 d) **Operator** configuring realm and server for different stages
 
 ## Some Highlights
-- Extension: Custom REST Endpoint the can expose additional custom APIs: `CustomResource`
-- Support for deploying extensions to running Keycloak container
+- Extensions: SMS Authenticator, Backup-Codes, Remote Claim Mapper, Audit Event Listener, and Custom REST Endpoint the can expose custom endpoints: `CustomResource`
+- Support for deploying extensions to a running Keycloak container
 - Support for instant reloading of theme and extension code changes
 - Support Keycloak configuration customization via CLI scripts
 - Examples for Integration Tests with [Keycloak-Testcontainers](https://github.com/dasniko/testcontainers-keycloak)
-- Example for End to End Tests with [Cypress](https://www.cypress.io/)
+- Example for End-to-End Tests with [Cypress](https://www.cypress.io/)
 - Realm configuration as Configuration as Code via [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) 
 - Multi-realm setup example with OpenID Connect and SAML based Identity Brokering
 - LDAP based User Federation backed by [Docker-OpenLDAP](https://github.com/osixia/docker-openldap)
 - Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
 - TLS Support
+- Examples for running a cluster behind a reverse proxy with examples for [HAProxy](deployments/local/cluster/haproxy), [Apache](deployments/local/cluster/apache), [nginx](deployments/local/cluster/nginx), [caddy](deployments/local/cluster/caddy)
+- Examples for running a Keycloak cluster with an external infinispan cluster with [remote](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml) and [hotrod](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml) cache store.
 
 ## Usage prerequisites
 
@@ -120,6 +122,10 @@ The example environment can be configured to use PostgreSQL as a database via th
 ```
 java start.java --database=postgres
 ```
+
+### Clustering
+
+Clustering examples can be found in the [deployments/local/cluster](deployments/local/cluster) folder.
 
 ## Acme Example Realm Configuration
 
