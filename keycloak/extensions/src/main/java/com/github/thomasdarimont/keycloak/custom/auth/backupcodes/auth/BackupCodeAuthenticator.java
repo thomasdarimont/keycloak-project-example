@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.backupcodes.auth;
 
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.action.GenerateBackupCodeAction;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import org.keycloak.authentication.AbstractFormAuthenticator;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -11,6 +12,7 @@ import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
@@ -76,7 +78,8 @@ public class BackupCodeAuthenticator extends AbstractFormAuthenticator {
     }
 
     protected boolean isSecondFactorConfigured(KeycloakSession session, RealmModel realm, UserModel user) {
-        return session.userCredentialManager().isConfiguredFor(realm, user, OTPCredentialModel.TYPE);
+        UserCredentialManager ucm = session.userCredentialManager();
+        return ucm.isConfiguredFor(realm, user, OTPCredentialModel.TYPE) || ucm.isConfiguredFor(realm, user, SmsCredentialModel.TYPE);
     }
 
     @Override
