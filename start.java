@@ -38,6 +38,7 @@ class start {
     static final String EXTENSIONS_OPT = "--extensions=";
     static final String EXTENSIONS_OPT_CLASSES = "classes";
     static final String EXTENSIONS_OPT_JAR = "jar";
+    static final String DETACH_OPT = "--detach";
 
     public static void main(String[] args) {
 
@@ -48,6 +49,7 @@ class start {
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
         var extension = argList.stream().filter(s -> s.startsWith(EXTENSIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXTENSIONS_OPT_CLASSES);
+        var useDetach = argList.contains(DETACH_OPT);
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
@@ -59,6 +61,7 @@ class start {
             System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
             System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If no other database is provided, H2 database is used");
             System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
+            System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background, print ew container name.. (Optional)");
 
             System.out.printf("%n%s supports the following commands: %n", "start.java");
             System.out.println("");
@@ -122,7 +125,9 @@ class start {
         }
 
         commandLine.add("up");
-        commandLine.add("-d");
+        if (useDetach) {
+            commandLine.add("--detach");
+        }
         commandLine.add("--remove-orphans");
 
         System.exit(runCommandAndWait(commandLine));
