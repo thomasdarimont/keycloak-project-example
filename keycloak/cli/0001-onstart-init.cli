@@ -63,6 +63,7 @@ echo SETUP: Add missing userSessions SPI
 echo
 end-if
 
+echo SETUP: Infinispan: Configure built-in "infinispan"
 echo SETUP: Offline-Sessions: Configure built-in "infinispan"  UserSessions loader
 if (outcome == failed) of /subsystem=keycloak-server/spi=userSessions/provider=infinispan/:read-resource
 echo SETUP: Add missing "infinispan" provider with disabled offlineSession preloading
@@ -72,6 +73,15 @@ echo SETUP: Add missing "infinispan" provider with disabled offlineSession prelo
 echo
 end-if
 
+echo SETUP: Infinispan: Configure "authenticationSessions" SPI
+if (outcome == failed) of /subsystem=keycloak-server/spi=authenticationSessions/:read-resource
+/subsystem=keycloak-server/spi=authenticationSessions:add()
+echo SETUP: Infinispan: Configure "authenticationSessions" provider to mitigate CVE-2021-3637
+# authSessionsLimit since Keycloak 14.0.0
+# see https://bugzilla.redhat.com/show_bug.cgi?id=1979638
+# see https://issues.redhat.com/browse/KEYCLOAK-16616
+/subsystem=keycloak-server/spi=authenticationSessions/provider=infinispan:add(properties={authSessionsLimit => ${env.KEYCLOAK_AUTH_SESSIONS_LIMIT:10}},enabled=true)
+end-if
 
 ### MISC
 
