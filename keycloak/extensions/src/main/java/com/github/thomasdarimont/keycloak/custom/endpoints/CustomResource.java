@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.representations.AccessToken;
 
@@ -37,5 +38,13 @@ public class CustomResource {
         payload.put("timestamp", System.currentTimeMillis());
 
         return Response.ok(payload).build();
+    }
+
+    @Path("settings/me")
+    public UserSettingsResource settings() {
+
+        var userSettingsResource = new UserSettingsResource(session, token);
+        ResteasyProviderFactory.getInstance().injectProperties(userSettingsResource);
+        return userSettingsResource;
     }
 }

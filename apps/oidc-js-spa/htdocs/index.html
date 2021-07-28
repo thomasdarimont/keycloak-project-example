@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
 
@@ -134,9 +133,10 @@
         <button name="idTokenBtn" onclick="showIdToken()">IDToken</button>
         <button name="userinfoBtn" onclick="showUserInfo()">Userinfo</button>
         <button name="meBtn" onclick="showMeInfo()">Me Info</button>
-        <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
+        <button name="settingsBtn" onclick="showSettings()">Settings</button>
         <button name="changePasswordBtn" onclick="changePassword()">Password</button>
         <button name="reauthBtn" onclick="enforceCurrentAuth()">ReAuth</button>
+        <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
         <button name="logoutBtn" onclick="keycloak.logout()">Logout</button>
     </div>
 
@@ -155,6 +155,23 @@
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email acme.profile';
+    // &show=profileBtn,accountBtn,meBtn,tokenBtn,idTokenBtn,userinfoBtn,reauthBtn,logoutBtn
+    // &show=acme-apps&show=profileBtn,logoutBtn
+
+    const allButtons = ["profileBtn", "accountBtn", "settingsBtn", "meBtn", "tokenBtn", "idTokenBtn", "userinfoBtn", "reauthBtn", "logoutBtn"];
+    const uiElementsToShowDefault = [...allButtons].filter((value, index, arr) => {
+        return value != 'meBtn';
+    });
+
+    let uiElementsToShow = searchParams.get("show")?.split(",") || uiElementsToShowDefault;
+    for (let btnName of allButtons) {
+        if (!uiElementsToShow.includes(btnName)) {
+            let btn = document.querySelector(`button[name=${btnName}]`);
+            if (btn) {
+                btn.parentElement.removeChild(btn);
+            }
+        }
+    }
 
     document.getElementById("clientInfo").textContent = clientId;
 
@@ -247,6 +264,94 @@
             </table>
         `;
         show(profileHtml, "message-content");
+    }
+
+    async function showSettings() {
+
+        await keycloak.updateToken(5);
+
+        let settingsData;
+        try {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/settings/me`, {
+                timeout: 2000,
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                settingsData = await response.json();
+            } else {
+                settingsData = {error: "status " + response.status};
+            }
+        } catch (error) {
+            console.log(error);
+            settingsData = {error: error.message};
+        }
+
+        let settingsHtml = `
+        <form id="frmSettings" name="frmSettings" action="" onsubmit="return false" onkeydown="return event.key != 'Enter';">
+            <table>
+                <tr>
+                    <td class="label"><label for="setting1">Setting 1</label></td>
+                    <td><input type="text" id="setting1" name="setting1" value="${settingsData.setting1}" pattern="[\d\w]{0,20}"></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="setting2">Setting 2</label></td>
+                    <td><input type="checkbox" id="setting2" name="setting2" ${settingsData.setting2 ? "checked" : ""}></td>
+                </tr>
+            </table>
+            <button id="btnSaveSettings" onClick="saveSettings(); return false">Save</button>
+            <span id="settingsStatus"></span>
+            </form>
+        `;
+        show(settingsHtml, "message-content");
+    }
+
+    async function saveSettings() {
+
+        await keycloak.updateToken(5);
+
+        let settings = {
+            "setting1": document.getElementById("setting1").value,
+            "setting2": document.getElementById("setting2").checked
+        };
+
+        try {
+
+            let settingsStatus = document.getElementById("settingsStatus");
+            settingsStatus.innerText = "Saving settings ...";
+
+            let btnSave = document.getElementById("btnSaveSettings");
+            btnSave.disabled = true;
+
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/settings/me`, {
+                timeout: 2000,
+                method: "PUT",
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json",
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            });
+
+            if (response.ok) {
+                newSettingsData = await response.json();
+                settingsStatus.innerText = "Settings saved";
+            } else {
+                newSettingsData = {error: "status " + response.status};
+                settingsStatus.innerText = "Could not save settings";
+            }
+            setTimeout(() => {
+                settingsStatus.innerText = "";
+                btnSave.disabled = false;
+            }, 1000)
+        } catch (error) {
+            console.log(error);
+            newSettingsData = {error: error.message};
+        }
     }
 
     function showToken() {
