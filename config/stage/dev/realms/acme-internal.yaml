@@ -201,6 +201,9 @@ authenticationFlows:
         requirement: ALTERNATIVE
         priority: 3030
         authenticatorConfig: "acme-sms-auth-default"
+      - authenticator: acme-auth-backup-code
+        requirement: ALTERNATIVE
+        priority: 3040
 
 authenticatorConfig:
   - alias: "acme-sms-auth-default"
