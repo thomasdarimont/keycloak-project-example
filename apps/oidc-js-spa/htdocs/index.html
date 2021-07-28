@@ -91,6 +91,10 @@
             width: 100%;
         }
 
+        table.credentials, table.profile{
+            width: unset;
+        }
+
         tr.even {
             background-color: #eee;
         }
@@ -128,16 +132,16 @@
 
 <div id="content" class="wrapper hidden">
     <div class="menu">
-        <button name="profileBtn" onclick="showProfile()">Profile</button>
-        <button name="tokenBtn" onclick="showToken()">AccessToken</button>
-        <button name="idTokenBtn" onclick="showIdToken()">IDToken</button>
-        <button name="userinfoBtn" onclick="showUserInfo()">Userinfo</button>
-        <button name="meBtn" onclick="showMeInfo()">Me Info</button>
-        <button name="settingsBtn" onclick="showSettings()">Settings</button>
-        <button name="changePasswordBtn" onclick="changePassword()">Password</button>
-        <button name="reauthBtn" onclick="enforceCurrentAuth()">ReAuth</button>
-        <button name="accountBtn" onclick="keycloak.accountManagement()">Account</button>
-        <button name="logoutBtn" onclick="keycloak.logout()">Logout</button>
+        <button name="profileBtn" onclick="showProfile()" class="profile">Profile</button>
+        <button name="tokenBtn" onclick="showToken()" class="token">AccessToken</button>
+        <button name="idTokenBtn" onclick="showIdToken()" class="idToken">IDToken</button>
+        <button name="userinfoBtn" onclick="showUserInfo()" class="userinfo">Userinfo</button>
+        <button name="meBtn" onclick="showMeInfo()" class="meinfo">Me Info</button>
+        <button name="settingsBtn" onclick="showSettings()" class="settings">Settings</button>
+        <button name="security" onclick="showSecurity()" class="security">Security</button>
+        <button name="reauthBtn" onclick="enforceCurrentAuth()" class="reauth">ReAuth</button>
+        <button name="accountBtn" onclick="keycloak.accountManagement()" class="account">Account</button>
+        <button name="logoutBtn" onclick="keycloak.logout()" class="logout">Logout</button>
     </div>
 
     <div id="data" class="content"></div>
@@ -150,23 +154,22 @@
     let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://localhost:8080" : "https://id.acme.test:8443");
     let keycloakUrl = keycloakBaseUrl + (searchParams.get("path") || "/auth");
 
-    let realm = searchParams.get("realm") || 'custom';
+    let realm = searchParams.get("realm") || 'acme-internal';
     let clientId = searchParams.get("client_id") || 'app-minispa';
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email acme.profile';
-    // &show=profileBtn,accountBtn,meBtn,tokenBtn,idTokenBtn,userinfoBtn,reauthBtn,logoutBtn
-    // &show=acme-apps&show=profileBtn,logoutBtn
+    // &show=profile,settings,security,logout
 
-    const allButtons = ["profileBtn", "accountBtn", "settingsBtn", "meBtn", "tokenBtn", "idTokenBtn", "userinfoBtn", "reauthBtn", "logoutBtn"];
-    const uiElementsToShowDefault = [...allButtons].filter((value, index, arr) => {
-        return value != 'meBtn';
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "reauth", "logout"];
+    const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
+        return value != 'meinfo';
     });
 
-    let uiElementsToShow = searchParams.get("show")?.split(",") || uiElementsToShowDefault;
-    for (let btnName of allButtons) {
-        if (!uiElementsToShow.includes(btnName)) {
-            let btn = document.querySelector(`button[name=${btnName}]`);
+    let contextClassesToShow = searchParams.get("show")?.split(",") || contextClassesToShowDefault;
+    for (let className of allContextClasses) {
+        if (!contextClassesToShow.includes(className)) {
+            let btn = document.querySelector(`button.${className}`);
             if (btn) {
                 btn.parentElement.removeChild(btn);
             }
@@ -239,27 +242,189 @@
         });
     }
 
+    async function showSecurity() {
+
+        await keycloak.updateToken(5);
+
+        let credentialsData;
+        try {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/credentials/me`, {
+                timeout: 2000,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json",
+                }
+            });
+
+            if (response.ok) {
+                credentialsData = await response.json();
+            } else {
+                credentialsData = {error: "status " + response.status};
+            }
+        } catch (error) {
+            console.log(error);
+            credentialsData = {error: error.message};
+        }
+
+        let passwordInfo = credentialsData.credentialInfos['password'];
+        let otpInfo = credentialsData.credentialInfos['otp'];
+        let smsInfo = credentialsData.credentialInfos['mfa-sms'];
+        let backupCodeInfo = credentialsData.credentialInfos['backup-code'];
+
+        let otpAuthHtml = "";
+        if (otpInfo) {
+            for (let optInfoItem of otpInfo) {
+                otpAuthHtml += `
+                <tr>
+                    <td>${!!optInfoItem ? "&check;" : ""}</td>
+                    <td>MFA OTP</td>
+                    <td>${!!optInfoItem ? optInfoItem.credentialLabel : ''}</td>
+                    <td>${!!optInfoItem ? formatDate(optInfoItem.createdAt) : '-'}</td>
+                    <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
+                    <td>${!!optInfoItem ? '<a href="#" onclick="removeMfa(\'otp\',\'' +  optInfoItem.credentialId  +'\');return false">Remove</a>' : ''}</td>
+                </tr>`;
+            }
+        } else {
+            otpAuthHtml += `
+                <tr>
+                    <td></td>
+                    <td>MFA OTP</td>
+                    <td></td>
+                    <td>-</td>
+                    <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
+                    <td></td>
+                </tr>`;
+        }
+
+        let securityHtml = `
+            <table class="credentials">
+            <thead>
+                <th>Set-up</th>
+                <th>Credential</th>
+                <th>Label</th>
+                <th>Created At</th>
+                <th colspan="2">Actions</th>
+            </thead>
+            <tbody>
+            <tr>
+                <td>&check;</td>
+                <td>Password</td>
+                <td></td>
+                <td>${formatDate(passwordInfo[0].createdAt)}</td>
+                <td><a href="#" onclick="changePassword();return false">Update</a></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>${!!smsInfo ? "&check;" : ""}</td>
+                <td>MFA SMS</td>
+                <td>${!!smsInfo ? smsInfo[0].credentialLabel : ''}</td>
+                <td>${!!smsInfo ? formatDate(smsInfo[0].createdAt) : '-'}</td>
+                <td><a href="#" onclick="changeMfa('mfa-sms');return false">Update</a></td>
+                <td>${!!smsInfo ? '<a href="#" onclick="removeMfa(\'mfa-sms\');return false">Remove</a>' : ''}</td>
+            </tr>
+            <tr>
+                 <td>${!!backupCodeInfo ? "&check;" : ""}</td>
+                 <td>Backup Code</td>
+                 <td>${!!backupCodeInfo ? backupCodeInfo[0].credentialLabel : ''}</td>
+                 <td>${!!backupCodeInfo ? formatDate(backupCodeInfo[0].createdAt) : '-'}</td>
+                 <td><a href="#" onclick="changeMfa('backup-code');return false">Update</a></td>
+                 <td>${!!backupCodeInfo ? '<a href="#" onclick="removeMfa(\'backup-code\');return false">Remove</a>' : ''}</td>
+            </tr>
+            ${otpAuthHtml}
+            </tbody>
+            </table>
+        `;
+        show(securityHtml, "message-content");
+    }
+
+    function formatDate(timestamp) {
+        return new Intl.DateTimeFormat('de-DE', {dateStyle: 'medium', timeStyle: 'short'}).format(new Date(timestamp))
+    }
+
     function changePassword() {
+
         keycloak.login({
             action: "UPDATE_PASSWORD"
         });
     }
 
+    function changeEmail() {
+
+        keycloak.login({
+            action: "acme-update-email"
+        });
+    }
+
+    function changeMfa(method) {
+
+        let actions = {
+            "otp": "CONFIGURE_TOTP",
+            "mfa-sms": "acme-update-phonenumber",
+            "backup-code": "acme-generate-backup-codes",
+        }
+
+        let action = actions[method];
+        if (!action) {
+            console.error("No action found for method: " + method);
+            return;
+        }
+
+        keycloak.login({
+            action: action
+        });
+    }
+
+    async function removeMfa(credentialType, credentialId) {
+
+        if (!(["otp", "mfa-sms", "backup-code"].includes(credentialType))) {
+            return;
+        }
+
+        let credentialsData;
+        try {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/credentials/me`, {
+                timeout: 2000,
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({credentialType, credentialId})
+            });
+
+            if (response.ok) {
+                credentialsData = await response.json();
+            } else {
+                credentialsData = {error: "status " + response.status};
+            }
+        } catch (error) {
+            console.log(error);
+            credentialsData = {error: error.message};
+        }
+
+        showSecurity();
+    }
+
     function showProfile() {
 
         let profileHtml = `
-            <table>
+            <table class="profile">
                 <tr>
                     <td class="label">First name</td>
                     <td><span id="firstName">${keycloak.tokenParsed['given_name']}</span></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">Last name</td>
                     <td><span id="lastName">${keycloak.tokenParsed['family_name']}</span></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">Email</td>
                     <td><span id="email">${keycloak.tokenParsed['email']}</span></td>
+                    <td><a href="#" onclick="changeEmail();return false">Update</a></td>
                 </tr>
             </table>
         `;

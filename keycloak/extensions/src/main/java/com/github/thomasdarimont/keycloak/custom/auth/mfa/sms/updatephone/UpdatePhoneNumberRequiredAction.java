@@ -76,6 +76,11 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         LoginFormsProvider form = context.form();
         form.setAttribute("username", context.getUser().getUsername());
 
+        if (context.getAuthenticationSession().getAuthNote(PHONENUMBER_AUTH_NOTE) != null) {
+            // we are already sent a code
+            return form.createForm("update-phone-number-form.ftl");
+        }
+
         String phoneNumber = context.getUser().getFirstAttribute(PHONE_NUMBER_ATTRIBUTE);
         form.setAttribute("currentMobile", phoneNumber == null ? "" : phoneNumber);
 

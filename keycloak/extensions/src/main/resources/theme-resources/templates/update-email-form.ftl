@@ -1,24 +1,24 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "title">
-        ${msg('acmePhoneNumberTitle')}
+        ${msg('acmeEmailUpdateTitle')}
     <#elseif section = "header">
-        ${msg('acmePhoneNumberTitle')}
+        ${msg('acmeEmailUpdateTitle')}
     <#elseif section = "form">
 
-        <p>${msg('acmePhoneNumberVerifyCta')}</p>
-        <form id="kc-passwd-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
+        <p>${msg('acmeEmailUpdateCta')}</p>
+        <form id="kc-email-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="code">${msg('smsAuthLabel')}</label>
+                    <label for="email">${msg('email')}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input id="code" type="text" name="code" value="" required autocomplete="one-time-code"
-                           aria-invalid="<#if messagesPerField.existsError('code')>true</#if>"/>
+                    <input id="email" type="email" name="email" value="${currentEmail}" required
+                           aria-invalid="<#if messagesPerField.existsError('email')>true</#if>" autocomplete="off"/>
 
-                    <#if messagesPerField.existsError('code')>
-                        <span id="input-error-code" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
-                            ${kcSanitize(messagesPerField.get('code'))?no_esc}
+                    <#if messagesPerField.existsError('email')>
+                        <span id="input-error-email" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
+                            ${kcSanitize(messagesPerField.get('email'))?no_esc}
                         </span>
                     </#if>
                 </div>
@@ -28,13 +28,13 @@
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <#if isAppInitiatedAction??>
                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                               name="verify" type="submit" value="${msg("doSubmit")}"/>
+                               type="submit" name="update" value="${msg("doSubmit")}"/>
                         <button
                         class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" name="cancel-aia" value="true" formnovalidate>${msg("doCancel")}</button>
+                        type="submit" name="cancel-aia" value="true" formnovalidate/>${msg("doCancel")}</button>
                     <#else>
                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                               name="verify" type="submit" value="${msg("doSubmit")}"/>
+                               name="update" type="submit" value="${msg("doSubmit")}"/>
                     </#if>
                 </div>
             </div>

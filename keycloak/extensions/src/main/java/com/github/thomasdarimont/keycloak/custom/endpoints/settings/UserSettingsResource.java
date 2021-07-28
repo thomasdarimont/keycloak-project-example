@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.endpoints;
+package com.github.thomasdarimont.keycloak.custom.endpoints.settings;
 
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.models.KeycloakContext;

@@ -63,6 +63,8 @@ clients:
     publicClient: true
     standardFlowEnabled: true
     directAccessGrantsEnabled: false
+# Show client in account-console
+    alwaysDisplayInConsole: true
     serviceAccountsEnabled: false
 #    attributes: { }
     fullScopeAllowed: false

@@ -1,16 +1,16 @@
 <#import "template.ftl" as layout>
 <@layout.registrationLayout displayInfo=true; section>
     <#if section = "title">
-        ${msg('acmePhoneNumberTitle')}
+        ${msg('acmeEmailUpdateVerifyTitle')}
     <#elseif section = "header">
-        ${msg('acmePhoneNumberTitle')}
+        ${msg('acmeEmailUpdateVerifyTitle')}
     <#elseif section = "form">
 
-        <p>${msg('acmePhoneNumberVerifyCta')}</p>
-        <form id="kc-passwd-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
+        <p>${msg('acmeEmailVerifyCta')}</p>
+        <form id="kc-email-update-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
-                    <label for="code">${msg('smsAuthLabel')}</label>
+                    <label for="code">${msg('emailAuthLabel')}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input id="code" type="text" name="code" value="" required autocomplete="one-time-code"
