@@ -41,6 +41,10 @@ clientScopes:
     description: Acme Profile AgeInfo
     protocol: openid-connect
     protocolMappers:
+      - name: "Acme: Audience Resolve"
+        protocol: openid-connect
+        protocolMapper: oidc-audience-resolve-mapper
+        consentRequired: false
       - name: "Acme: AgeInfo"
         protocol: openid-connect
         protocolMapper: oidc-acme-ageinfo-mapper
