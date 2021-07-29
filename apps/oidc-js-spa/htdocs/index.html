@@ -91,7 +91,7 @@
             width: 100%;
         }
 
-        table.credentials, table.profile{
+        table.credentials, table.profile, table.apps{
             width: unset;
         }
 
@@ -138,7 +138,8 @@
         <button name="userinfoBtn" onclick="showUserInfo()" class="userinfo">Userinfo</button>
         <button name="meBtn" onclick="showMeInfo()" class="meinfo">Me Info</button>
         <button name="settingsBtn" onclick="showSettings()" class="settings">Settings</button>
-        <button name="security" onclick="showSecurity()" class="security">Security</button>
+        <button name="securityBtn" onclick="showSecurity()" class="security">Security</button>
+        <button name="appsBtn" onclick="showApps()" class="apps">Apps</button>
         <button name="reauthBtn" onclick="enforceCurrentAuth()" class="reauth">ReAuth</button>
         <button name="accountBtn" onclick="keycloak.accountManagement()" class="account">Account</button>
         <button name="logoutBtn" onclick="keycloak.logout()" class="logout">Logout</button>
@@ -159,11 +160,12 @@
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email acme.profile';
-    // &show=profile,settings,security,logout
+    // &show=profile,settings,apps,security,logout
 
-    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "reauth", "logout"];
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout"];
+    const contextClassesToHideDefault = ["meinfo", "apps"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
-        return value != 'meinfo';
+        return !contextClassesToHideDefault.includes(value);
     });
 
     let contextClassesToShow = searchParams.get("show")?.split(",") || contextClassesToShowDefault;
@@ -336,6 +338,70 @@
             </table>
         `;
         show(securityHtml, "message-content");
+    }
+
+    async function showApps() {
+
+        await keycloak.updateToken(5);
+
+        let appsData;
+        try {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/applications/me`, {
+                timeout: 2000,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json",
+                }
+            });
+
+            if (response.ok) {
+                appsData = await response.json();
+            } else {
+                appsData = {error: "status " + response.status};
+            }
+        } catch (error) {
+            console.log(error);
+            appsData = {error: error.message};
+        }
+
+        let clients = [...appsData.clients].filter((value, index, arr) => {
+            // filter current client
+            return clientId != value.clientId;
+        });
+
+        let appEntriesHtml = "";
+        if (clients && clients.length > 0) {
+
+
+            for (let client of clients) {
+                appEntriesHtml += `
+                <tr>
+                    <td>${client.clientName}</td>
+                    <td>${client.description}</td>
+                    <td><a href="${client.effectiveUrl}" target="_blank">Browse</a></td>
+                </tr>`;
+            }
+        } else {
+            appEntriesHtml += `
+                <tr>
+                    <td colspan="3">No Clients</td>
+                </tr>`;
+        }
+
+        let appsHtml = `
+            <table class="apps">
+                <thead>
+                    <th>Client</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </thead>
+                <tbody>
+                    ${appEntriesHtml}
+                </tbody>
+            </table>
+        `;
+        show(appsHtml, "message-content");
     }
 
     function formatDate(timestamp) {

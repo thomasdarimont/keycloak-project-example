@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
+import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -54,6 +55,14 @@ public class CustomResource {
     public UserCredentialsInfoResource credentials() {
 
         var resource = new UserCredentialsInfoResource(session, token);
+        ResteasyProviderFactory.getInstance().injectProperties(resource);
+        return resource;
+    }
+
+    @Path("applications/me")
+    public ApplicationsInfoResource applications() {
+
+        var resource = new ApplicationsInfoResource(session, token);
         ResteasyProviderFactory.getInstance().injectProperties(resource);
         return resource;
     }
