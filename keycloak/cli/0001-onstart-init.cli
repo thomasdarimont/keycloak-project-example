@@ -5,6 +5,17 @@ echo Using server configuration file:
 
 echo SETUP: Begin Keycloak custom configuration...
 
+### Logging ###
+
+echo SETUP: Disable file logging
+/subsystem=logging/root-logger=ROOT:remove-handler(name=FILE)
+
+echo SETUP: Configure log levels
+/subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=ALL)
+/subsystem=logging/root-logger=ROOT/:write-attribute(name=level,value=${env.KEYCLOAK_LOGLEVEL_ROOT:INFO})
+/subsystem=logging/logger=org.keycloak:write-attribute(name=level,value=${env.KEYCLOAK_LOGLEVEL_KEYCLOAK:INFO})
+/subsystem=logging/logger=com.github.thomasdarimont.keycloak:add(level=${env.KEYCLOAK_LOGLEVEL_ACME:INFO})
+
 ### Event Listeners SPI Configuration ###
 echo SETUP: Event Listeners configuration
 # Add dedicated eventsListener config element to allow configuring elements.

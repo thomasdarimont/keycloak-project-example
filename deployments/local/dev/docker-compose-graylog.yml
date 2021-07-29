@@ -1,0 +1,107 @@
+services:
+  # MongoDB: https://hub.docker.com/_/mongo/
+  acme-graylog-mongo:
+    labels:
+      - "co.elastic.logs/enabled=false"
+    image: mongo:4.2
+    volumes:
+      - ./run/graylog/data/mongodb:/data/db:z
+    command: --quiet
+
+  # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/docker.html
+  acme-graylog-elasticsearch:
+    labels:
+      - "co.elastic.logs/enabled=false"
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=localhost
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+
+  # Graylog: https://hub.docker.com/r/graylog/graylog/
+  acme-graylog:
+    labels:
+      - "co.elastic.logs/enabled=false"
+#    image: graylog/graylog:4.1
+    build:
+      context: "../../../config/stage/dev/tls"
+      dockerfile: "../../../../deployments/local/dev/graylog/Dockerfile"
+    environment:
+      # CHANGE ME (must be at least 16 characters)!
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      # Password: admin
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_PUBLISH_URI=https://apps.acme.test:9000/
+      - GRAYLOG_HTTP_EXTERNAL_URI=https://apps.acme.test:9000/
+      - GRAYLOG_HTTP_ENABLE_TLS=true
+# certs added in custom docker build
+      - GRAYLOG_HTTP_TLS_CERT_FILE=/usr/share/graylog/data/config/ssl/cert.crt
+      - GRAYLOG_HTTP_TLS_KEY_FILE=/usr/share/graylog/data/config/ssl/key.key
+# Install keycloak message extractors
+      - GRAYLOG_CONTENT_PACKS_AUTO_INSTALL=iam-keycloak-content-pack-v1.json
+    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+    volumes:
+      - ./run/graylog/data/journal:/usr/share/graylog/data/journal:z
+      - ./graylog/contentpacks:/usr/share/graylog/data/contentpacks:z
+    restart: always
+    depends_on:
+      - acme-graylog-mongo
+      - acme-graylog-elasticsearch
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):9000"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+    links:
+      - acme-graylog-elasticsearch:elasticsearch
+      - acme-graylog-mongo:mongo
+    ports:
+      # Graylog web interface and REST API
+      - 9000:9000
+      # Syslog TCP
+      - 1514:1514
+      # Syslog UDP
+      - 1514:1514/udp
+      # Filebeat
+      - 5044:5044
+      # GELF TCP
+      - 12201:12201
+      # GELF UDP
+      - 12201:12201/udp
+
+#  acme-filebeat:
+#    labels:
+#      - "co.elastic.logs/enabled=false"
+#    image: docker.elastic.co/beats/filebeat:7.13.4
+#    user: root
+#    # Need to override user so we can access the log files, and docker.sock
+#    command: >
+#      ./filebeat -e -c /etc/motd
+#      -E "filebeat.inputs=[{type:docker,containers:{ids:'*'}}]"
+#      -E "output.logstash.hosts=['acme-graylog:5044']"
+#    volumes:
+#      - /var/lib/docker/containers:/var/lib/docker/containers:z
+#      - /var/run/docker.sock:/var/run/docker.sock:z
+#  acme-keycloak:
+#    labels:
+#      - "co.elastic.logs/enabled=true"
+#      - "co.elastic.logs/multiline.type=pattern"
+#      - "co.elastic.logs/multiline.pattern='^\\['"
+#      - "co.elastic.logs/multiline.negate=true"
+#      - "co.elastic.logs/multiline.match=after"
+
+  acme-keycloak:
+    volumes:
+# Add logstash-gelf-module
+      - ./graylog/modules/logstash-gelf-1.14.1/biz:/opt/jboss/keycloak/modules/system/layers/base/biz:z
+# Enable logging to logstash gelf
+      - ./graylog/cli/0020-onstart-setup-graylog-logging.cli:/opt/jboss/startup-scripts/0020-onstart-setup-graylog-logging.cli:z

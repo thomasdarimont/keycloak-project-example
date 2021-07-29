@@ -35,6 +35,7 @@ class start {
     static final String HTTPS_OPT = "--https";
     static final String OPENLDAP_OPT = "--openldap";
     static final String POSTGRES_OPT = "--database=postgres";
+    static final String GRAYLOG_OPT = "--logging=graylog";
     static final String EXTENSIONS_OPT = "--extensions=";
     static final String EXTENSIONS_OPT_CLASSES = "classes";
     static final String EXTENSIONS_OPT_JAR = "jar";
@@ -48,6 +49,7 @@ class start {
         var useHttps = argList.contains(HTTPS_OPT) || argList.contains(HTTPS_OPT + "=true");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
+        var useGraylog = argList.contains(GRAYLOG_OPT);
         var extension = argList.stream().filter(s -> s.startsWith(EXTENSIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXTENSIONS_OPT_CLASSES);
         var useDetach = argList.contains(DETACH_OPT);
 
@@ -59,7 +61,8 @@ class start {
             System.out.printf("  %s: %s%n", HTTP_OPT, "enables HTTP support.");
             System.out.printf("  %s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) Implies --http. If not provided, plain HTTP is used");
             System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
-            System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables postgrase database support. (Optional) If no other database is provided, H2 database is used");
+            System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables PostgreSQL database support. (Optional) If no other database is provided, H2 database is used");
+            System.out.printf("  %s: %s%n", GRAYLOG_OPT, "enables Graylog database support. (Optional)");
             System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
             System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background, print ew container name.. (Optional)");
 
@@ -78,6 +81,7 @@ class start {
             return;
         }
 
+        createFolderIfMissing("deployments/local/dev/run/keycloak/logs");
         createFolderIfMissing("deployments/local/dev/run/keycloak/data");
 
         System.out.println("### Starting Keycloak Environment with HTTP" + (useHttps ? "S" : ""));
@@ -116,18 +120,30 @@ class start {
             System.exit(-1);
         }
 
-
         if (usePostgres) {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-postgres.yml");
-
             createFolderIfMissing("deployments/local/dev/run/postgres/data/");
+        }
+
+        var requiresBuild = false;
+
+        if (useGraylog) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-graylog.yml");
+            createFolderIfMissing("deployments/local/dev/run/graylog/data/mongodb");
+            requiresBuild = true;
         }
 
         commandLine.add("up");
         if (useDetach) {
             commandLine.add("--detach");
         }
+
+        if (requiresBuild) {
+            commandLine.add("--build");
+        }
+
         commandLine.add("--remove-orphans");
 
         System.exit(runCommandAndWait(commandLine));

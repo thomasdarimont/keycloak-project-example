@@ -40,6 +40,7 @@ services:
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
       - ../../../keycloak/cli:/opt/jboss/startup-scripts:z
       - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
+      - ./run/keycloak/logs:/opt/jboss/keycloak/standalone/logs:z
 
   acme-keycloak-provisioning:
     image: quay.io/adorsys/keycloak-config-cli:v4.0.1-14.0.0
