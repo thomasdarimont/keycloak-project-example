@@ -40,6 +40,7 @@ class start {
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-postgres.yml");
         commandLine.add("down");
+        commandLine.add("--remove-orphans");
 
         var pb = new ProcessBuilder(commandLine);
         pb.directory(new File("."));
