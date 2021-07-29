@@ -157,6 +157,7 @@
 
     let realm = searchParams.get("realm") || 'acme-internal';
     let clientId = searchParams.get("client_id") || 'app-minispa';
+    let customResourcesUrl = `${keycloakUrl}/realms/${realm}/custom-resources`;
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email acme.profile';
@@ -250,7 +251,7 @@
 
         let credentialsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/credentials/me`, {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
                 timeout: 2000,
                 method: "GET",
                 headers: {
@@ -346,7 +347,7 @@
 
         let appsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/applications/me`, {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/applications`, {
                 timeout: 2000,
                 method: "GET",
                 headers: {
@@ -378,7 +379,7 @@
                 appEntriesHtml += `
                 <tr>
                     <td>${client.clientName}</td>
-                    <td>${client.description}</td>
+                    <td>${client.description ? client.description : '-'}</td>
                     <td><a href="${client.effectiveUrl}" target="_blank">Browse</a></td>
                 </tr>`;
             }
@@ -449,7 +450,7 @@
 
         let credentialsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/credentials/me`, {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
                 timeout: 2000,
                 method: "DELETE",
                 headers: {
@@ -503,7 +504,7 @@
 
         let settingsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/settings/me`, {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
                 timeout: 2000,
                 headers: {
                     "Authorization": "Bearer " + keycloak.token,
@@ -557,7 +558,7 @@
             let btnSave = document.getElementById("btnSaveSettings");
             btnSave.disabled = true;
 
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/settings/me`, {
+            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
                 timeout: 2000,
                 method: "PUT",
                 headers: {

@@ -43,7 +43,7 @@ public class CustomResource {
         return Response.ok(payload).build();
     }
 
-    @Path("settings/me")
+    @Path("me/settings")
     public UserSettingsResource settings() {
 
         var resource = new UserSettingsResource(session, token);
@@ -51,7 +51,7 @@ public class CustomResource {
         return resource;
     }
 
-    @Path("credentials/me")
+    @Path("me/credentials")
     public UserCredentialsInfoResource credentials() {
 
         var resource = new UserCredentialsInfoResource(session, token);
@@ -59,7 +59,7 @@ public class CustomResource {
         return resource;
     }
 
-    @Path("applications/me")
+    @Path("me/applications")
     public ApplicationsInfoResource applications() {
 
         var resource = new ApplicationsInfoResource(session, token);
