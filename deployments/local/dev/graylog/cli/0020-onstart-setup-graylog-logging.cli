@@ -6,6 +6,7 @@ echo Using server configuration file:
 echo SETUP: Begin Graylog custom configuration...
 
 echo SETUP: Configure GELF logging to graylog
+if (outcome == failed) of /subsystem=logging/custom-handler=GELF/:read-resource
 /subsystem=logging/custom-handler=GELF/:add(module=biz.paluch.logging, class=biz.paluch.logging.gelf.wildfly.WildFlyGelfLogHandler, properties={ \
        host=${env.LOG_SERVER_HOST:udp:acme-graylog}, \
        port=${env.LOG_SERVER_PORT:12201}, \
@@ -18,6 +19,8 @@ echo SETUP: Configure GELF logging to graylog
        additionalFields="appGrp=iam,appSvc=iam-keycloak,appStage=${env.KEYCLOAK_DEPLOYMENT_STAGE:dev}", \
        additionalFieldTypes="appGrp=String,appSvc=String,MessageParam0=String,MessageParam1=String,MessageParam2=String,MessageParam3=String,MessageParam4=String,MessageParam5=String,MessageParam6=String" \
 })
+echo
+end-if
 
 /subsystem=logging/custom-handler=GELF/:change-log-level(level=ALL)
 /subsystem=logging/root-logger=ROOT/:write-attribute(name=level,value=INFO)
