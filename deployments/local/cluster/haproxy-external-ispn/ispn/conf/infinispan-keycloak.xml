@@ -12,7 +12,7 @@
                 stack="${infinispan.cluster.stack:udp}"
                 node-name="${infinispan.node.name:}"/>
 
-        <replicated-cache-configuration name="replicated-cache-cfg">
+        <replicated-cache-configuration name="replicated-cache-cfg" >
             <encoding>
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
@@ -31,7 +31,8 @@
 
         <distributed-cache name="sessions" owners="2" configuration="distributed-cache-cfg">
                 <persistence passivation="true">
-                    <file-store preload="true" path="../mydata/sessions">
+                    <!-- purge="false" fetch-state="false" see:  https://infinispan.org/docs/stable/titles/configuring/configuring.html#configuring_cache_stores-persistence-->
+                    <file-store preload="true" purge="false" fetch-state="false" path="../mydata/sessions">
                     </file-store>
                 </persistence>
         </distributed-cache>
@@ -90,7 +91,7 @@
         </security>
 
         <endpoints socket-binding="default" security-realm="default">
-            <hotrod-connector name="hotrod">
+            <hotrod-connector name="hotrod" >
                 <!-- TODO configure additional authentication -->
             </hotrod-connector>
             <rest-connector name="rest"/>

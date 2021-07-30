@@ -29,6 +29,7 @@ batch
   default-remote-cluster=ispn-remote \
 )
 /subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:write-attribute(name=statistics-enabled,value="${wildfly.infinispan.statistics-enabled:${wildfly.statistics-enabled:false}}")
+/subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:write-attribute(name=protocol-version,value="${env.KEYCLOAK_INFINISPAN_HOTROD_PROTOCOL_VERSION:3.0}")
 /subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:write-attribute(name=properties,value={ \
   marshaller=org.keycloak.cluster.infinispan.KeycloakHotRodMarshallerFactory, \
   infinispan.client.hotrod.auth_username=${env.KEYCLOAK_REMOTE_ISPN_USERNAME:keycloak}, \
