@@ -17,6 +17,8 @@
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
+
+            <expiration lifespan="900000000000000000"/>
         </replicated-cache-configuration>
 
         <distributed-cache-configuration name="distributed-cache-cfg">
@@ -24,6 +26,8 @@
                 <key media-type="application/x-jboss-marshalling"/>
                 <value media-type="application/x-jboss-marshalling"/>
             </encoding>
+
+            <expiration lifespan="900000000000000000"/>
         </distributed-cache-configuration>
 
         <replicated-cache name="work" configuration="replicated-cache-cfg">
@@ -53,7 +57,10 @@
         </distributed-cache>
 
         <distributed-cache name="actionTokens" owners="2" configuration="distributed-cache-cfg">
-            <!--  <heap-memory size="-1"/> wildfly specific? -->
+            <memory>
+                <!--  <heap-memory size="-1"/> wildfly specific? -->
+                <object/>
+            </memory>
             <expiration interval="300000" max-idle="-1"/>
         </distributed-cache>
     </cache-container>
