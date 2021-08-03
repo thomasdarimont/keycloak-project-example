@@ -12,7 +12,7 @@ class envcheck {
         var returnCode = 0;
 
         /* Check required tools: maven */
-        final var pbMaven = new ProcessBuilder(List.of("mvn", "-version"));
+        var pbMaven = new ProcessBuilder(List.of("mvn", "-version"));
         pbMaven.inheritIO();
         var processMaven = pbMaven.start();
         returnCode += processMaven.waitFor();
@@ -21,7 +21,7 @@ class envcheck {
         }
 
         /* Check required tools: docker-compose */
-        final var pbDockerComposer = new ProcessBuilder(List.of("docker-compose", "-v"));
+        var pbDockerComposer = new ProcessBuilder(List.of("docker-compose", "-v"));
         pbDockerComposer.inheritIO();
         var processDockerComposer = pbDockerComposer.start();
         returnCode += processDockerComposer.waitFor();
@@ -30,7 +30,7 @@ class envcheck {
         }
 
         /*Check directories exist */
-        List<String> requiredDirectories = List.of("./keycloak/extensions/target/classes",
+        var requiredDirectories = List.of("./keycloak/extensions/target/classes",
                 "./keycloak/imex","./keycloak/themes/apps",
                 "./deployments/local/dev/run/keycloak/data",
                 "./keycloak/extensions/target/classes",

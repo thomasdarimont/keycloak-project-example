@@ -50,7 +50,7 @@ class realm {
 
         var realmName = Optional.ofNullable(System.getenv(MIGRATION_REALM_ENV)).orElse(argList.stream().filter(s -> s.startsWith(MIGRATION_REALM_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(MIGRATION_REALM_DEFAULT));
         var additionalOptions = Optional.ofNullable(System.getenv(ADDITIONAL_OPTIONS_ENV)).orElse(argList.stream().filter(s -> s.startsWith(ADDITIONAL_OPTIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(ADDITIONAL_OPTIONS_DEFAULT));
-        ;
+
         var verbose = argList.contains(VERBOSE_CMD);
         var migrationAction = Optional.ofNullable(System.getenv(MIGRATION_ACTION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(MIGRATION_ACTION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(MIGRATION_ACTION_DEFAULT));
 
@@ -79,7 +79,7 @@ class realm {
         var pb = new ProcessBuilder(commandLine);
         pb.redirectErrorStream(true);
         var process = pb.start();
-        try (Scanner scanner = new Scanner(process.getInputStream())) {
+        try (var scanner = new Scanner(process.getInputStream())) {
             while (scanner.hasNextLine()) {
                 var line = scanner.nextLine();
                 if (line.contains("KC-SERVICES0034") || line.contains("KC-SERVICES0031")) {

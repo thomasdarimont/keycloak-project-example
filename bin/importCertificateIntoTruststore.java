@@ -41,23 +41,21 @@ public class importCertificateIntoTruststore {
             System.exit(0);
         }
 
-        String file = argList.stream().filter(arg -> arg.matches(FILE_OPT + "=[^ ]+"))
+        var file = argList.stream().filter(arg -> arg.matches(FILE_OPT + "=[^ ]+"))
                 .findFirst().map(arg -> arg.split("=")[1])
                 .orElseThrow(() -> new IllegalArgumentException("Missing --file parameter"));
 
-        String alias = argList.stream().filter(arg -> arg.matches(ALIAS_OPT + "=[^ ]+"))
+        var alias = argList.stream().filter(arg -> arg.matches(ALIAS_OPT + "=[^ ]+"))
                 .findFirst().map(arg -> arg.split("=")[1])
                 .orElseThrow(() -> new IllegalArgumentException("Missing --alias parameter"));
 
-        String truststorePath = argList.stream().filter(arg -> arg.matches(TRUST_STORE_OPT + "=[^ ]+"))
+        var truststorePath = argList.stream().filter(arg -> arg.matches(TRUST_STORE_OPT + "=[^ ]+"))
                 .findFirst().map(arg -> arg.split("=")[1])
                 .orElseThrow(() -> new IllegalArgumentException("Missing --truststore parameter"));
 
-        String password = argList.stream().filter(arg -> arg.matches(TRUST_STORE_PASSWORD_OPT + "=[^ ]+"))
+        var password = argList.stream().filter(arg -> arg.matches(TRUST_STORE_PASSWORD_OPT + "=[^ ]+"))
                 .findFirst().map(arg -> arg.split("=")[1])
                 .orElseThrow(() -> new IllegalArgumentException("Missing --password parameter"));
-
-
 
         var commandLine = new ArrayList<String>();
         commandLine.add("keytool");

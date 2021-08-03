@@ -50,8 +50,8 @@ class keycloakConfigCli {
         var keycloakConfigCliVersion = Optional.ofNullable(System.getenv(KEYCLOAOK_CONFIG_CLI_VERSION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(KEYCLOAOK_CONFIG_CLI_VERSION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(KEYCLOAOK_CONFIG_CLI_VERSION_DEFAULT));
 
         var configFileOrFolderAsFile = Path.of(configFileOrFolder).toRealPath(LinkOption.NOFOLLOW_LINKS).toFile();
-        final String pathToConfig;
-        final String fileOrDirectoryNameOfConfig;
+        var pathToConfig;
+        var fileOrDirectoryNameOfConfig;
         if (configFileOrFolderAsFile.isFile()) {
             pathToConfig = configFileOrFolderAsFile.getParent();
             fileOrDirectoryNameOfConfig = CONFIG_PATH_IN_CONTAINER + "/" + configFileOrFolderAsFile.getName();

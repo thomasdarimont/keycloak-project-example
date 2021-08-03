@@ -91,7 +91,7 @@ class createTlsCerts {
         commandLine.add("*." + domain);
 
         /* Execute mkcert command */
-        final var pb = new ProcessBuilder(commandLine);
+        var pb = new ProcessBuilder(commandLine);
         pb.directory(new File(targetDir));
         pb.inheritIO();
         var process = pb.start();
