@@ -16,6 +16,18 @@ haproxy status URL: https://id.acme.test:1443/haproxy?status
 
 HAProxy Keycloak URL: https://id.acme.test:1443/auth
 
+## Run with encrypted and authenticated JGroups traffic
+
+The encryption uses JGroup's `SYM_ENCRYPT` protocol with AES encryption by default.
+Note that you might generate a new PKCS12 keystore with a secretkey via the script in `haproxy-encrypted-ispn/jgroups-keystore.sh`.
+Make sure that every Keycloak instance in the cluster must use the exactly same file.
+
+The JGroups authentication uses the `AUTH` module with a pre-shared key. 
+
+```
+docker-compose --env-file ../../../keycloak.env --file haproxy-encrypted-ispn/docker-compose-enc-haproxy.yml up --remove-orphans
+```
+
 ## Run with dedicated Infinispan Cluster with Remote store
 
 The haproxy example can also be started with a dedicated infinispan cluster where the 

@@ -1,0 +1,47 @@
+services:
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    volumes:
+      - ./cli/0200-onstart-setup-jgroups-encryption.cli:/opt/jboss/startup-scripts/0200-onstart-setup-jgroups-encryption.cli:z
+      - ./ispn/jgroups.p12:/opt/jboss/keycloak/standalone/configuration/jgroups.p12:z
+    command: [ "--debug", "*:8787", "-Dwildfly.statistics-enabled=true" ]
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+    ports:
+      - "8080"
+      - "8443"
+      - "9990:9990"
+      - "8787:8787"
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    volumes:
+      - ./cli/0200-onstart-setup-jgroups-encryption.cli:/opt/jboss/startup-scripts/0200-onstart-setup-jgroups-encryption.cli:z
+      - ./ispn/jgroups.p12:/opt/jboss/keycloak/standalone/configuration/jgroups.p12:z
+    command: [ "-Dwildfly.statistics-enabled=true" ]
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-haproxy-lb:
+    build: ../haproxy
+    volumes:
+      - ../haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:z
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
+    ports:
+      - "1443:1443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2

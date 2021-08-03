@@ -1,0 +1,22 @@
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
+
+echo SETUP: Begin JGroups encryption configuration...
+
+echo SETUP: Configure JGroups symmetric encryption
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:add(add-index=5)
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:write-attribute(name="properties.provider",value="SunJCE")
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:write-attribute(name="properties.sym_algorithm",value="AES")
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:write-attribute(name="properties.keystore_type",value="PKCS12")
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:write-attribute(name="properties.keystore_name",value="${jboss.server.config.dir}/jgroups.p12")
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:write-attribute(name="properties.alias",value="${env.KEYCLOAK_JGROUPS_KEYSTORE_ALIAS:jgroups}")
+/subsystem=jgroups/stack=tcp/protocol=SYM_ENCRYPT:write-attribute(name="properties.store_password",value="${env.KEYCLOAK_JGROUPS_KEYSTORE_PASSWORD:changeme3}")
+
+echo SETUP: Configure JGroups authentication
+/subsystem=jgroups/stack=tcp/protocol=AUTH:add(add-index=9,properties={auth_class=org.jgroups.auth.MD5Token,token_hash=SHA,auth_value="${env.KEYCLOAK_JGROUPS_AUTH_PASSWORD:changeme2}"})
+
+echo SETUP: Finished JGroups encryption configuration.
+
+stop-embedded-server
