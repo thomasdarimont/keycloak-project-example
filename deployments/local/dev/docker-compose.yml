@@ -21,7 +21,16 @@ services:
 
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
-    command: [ "--debug", "*:8787", "--server-config", "$KEYCLOAK_CONFIG_FILE", "-b" , "0.0.0.0", "-bmanagement" , "0.0.0.0", "-Dwildfly.statistics-enabled=true"]
+    command:
+      - "--debug"
+      - "*:8787"
+      - "--server-config"
+      - "$KEYCLOAK_CONFIG_FILE"
+      - "-b"
+      - "0.0.0.0"
+      - "-bmanagement"
+      - "0.0.0.0"
+      - "-Dwildfly.statistics-enabled=true"
     extra_hosts:
       # 172.17.0.1 is host.docker.internal
       - "id.acme.test:172.17.0.1"
@@ -41,6 +50,7 @@ services:
       - ../../../keycloak/cli:/opt/jboss/startup-scripts:z
       - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
       - ./run/keycloak/logs:/opt/jboss/keycloak/standalone/logs:z
+      - ./run/keycloak/perf:/opt/jboss/keycloak/standalone/perf:z
 
   acme-keycloak-provisioning:
     image: quay.io/adorsys/keycloak-config-cli:v4.0.1-14.0.0

@@ -83,6 +83,7 @@ class start {
 
         createFolderIfMissing("deployments/local/dev/run/keycloak/logs");
         createFolderIfMissing("deployments/local/dev/run/keycloak/data");
+        createFolderIfMissing("deployments/local/dev/run/keycloak/perf");
 
         System.out.println("### Starting Keycloak Environment with HTTP" + (useHttps ? "S" : ""));
 
