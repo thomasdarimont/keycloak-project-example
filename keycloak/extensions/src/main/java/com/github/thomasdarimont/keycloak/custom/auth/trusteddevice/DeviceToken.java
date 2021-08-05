@@ -6,13 +6,13 @@ import org.keycloak.representations.JsonWebToken;
 
 public class DeviceToken extends JsonWebToken {
 
+    @JsonProperty("device_id")
+    private String deviceId;
+
     @Override
     public TokenCategory getCategory() {
         return TokenCategory.INTERNAL;
     }
-
-    @JsonProperty("device_id")
-    private String deviceId;
 
     public String getDeviceId() {
         return deviceId;

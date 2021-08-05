@@ -122,16 +122,18 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
         if (formParams.containsKey("trust-device")) {
             log.info("Register trusted device");
-            DeviceToken deviceToken = createDeviceToken(httpRequest);
+
+            int numberOfDaysToTrustDevice = 120; //FIXME make name of days to remember deviceToken configurable
+
+            DeviceToken deviceToken = createDeviceToken(httpRequest, numberOfDaysToTrustDevice);
 
             String deviceName = sanitizeDeviceName(formParams.getFirst("device"));
 
             TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(deviceName, deviceToken.getDeviceId());
             session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
 
-            int numberOfDaysToTrustDevice = 120; //FIXME make name of days to remember deviceToken configurable
-            int maxAge = numberOfDaysToTrustDevice * 24 * 60 * 60;
             String deviceTokenString = session.tokens().encode(deviceToken);
+            int maxAge = numberOfDaysToTrustDevice * 24 * 60 * 60;
             DeviceCookie.addDeviceCookie(deviceTokenString, maxAge, session, realm);
             log.info("Registered trusted device");
         }
@@ -174,7 +176,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         return deviceName;
     }
 
-    protected DeviceToken createDeviceToken(HttpRequest httpRequest) {
+    protected DeviceToken createDeviceToken(HttpRequest httpRequest, int numberOfDaysToTrustDevice) {
 
         // TODO enhance generated device id with information from httpRequest, e.g. browser fingerprint
 
@@ -182,7 +184,10 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         String deviceId = BigInteger.valueOf(new SecureRandom().nextLong()).toString(36);
         DeviceToken deviceToken = new DeviceToken();
 
-        deviceToken.iat((long) Time.currentTime());
+        long iat = Time.currentTime();
+        long exp = iat + (long)numberOfDaysToTrustDevice * 24 * 60 * 60;
+        deviceToken.iat(iat);
+        deviceToken.exp(exp);
         deviceToken.setDeviceId(deviceId);
         return deviceToken;
     }

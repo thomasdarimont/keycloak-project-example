@@ -12,7 +12,7 @@ import javax.ws.rs.core.UriBuilder;
 
 public class DeviceCookie {
 
-    public static final String COOKIE_NAME = "KEYCLOAK_DEVICE";
+    public static final String COOKIE_NAME = "ACME_KEYCLOAK_DEVICE";
 
     public static void removeDeviceCookie(KeycloakSession session, RealmModel realm) {
         // maxAge = 1 triggers legacy cookie removal

@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials;
 
-import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialProvider;
 import com.google.auto.service.AutoService;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;

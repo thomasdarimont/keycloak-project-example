@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.auth;
 
-import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
@@ -11,7 +10,6 @@ import org.keycloak.authentication.Authenticator;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 
 @JBossLog

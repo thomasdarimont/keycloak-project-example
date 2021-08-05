@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials;
 
-import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.BackupCode;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialInput;
@@ -11,9 +10,7 @@ import org.keycloak.credential.CredentialTypeMetadata;
 import org.keycloak.credential.CredentialTypeMetadataContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
-import org.keycloak.models.credential.PasswordCredentialModel;
 
 public class TrustedDeviceCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
 
