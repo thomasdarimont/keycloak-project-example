@@ -131,13 +131,14 @@ public class GenerateBackupCodeAction implements RequiredActionProvider {
         // TODO introduce dedicated UPDATE_BACKUP_CODE or UPDATE_SECOND_FACTOR event
         List<BackupCode> backupCodes = createNewBackupCodes(realm, user, session);
 
-        event.event(EventType.UPDATE_PASSWORD);
-        event.detail("backup_code", "true");
-        event.success();
-
         // remove required action
         context.getUser().removeRequiredAction(ID);
         context.success();
+
+        event.event(EventType.CUSTOM_REQUIRED_ACTION);
+        event.detail("action_id", ID);
+        event.detail("backup_code", "true");
+        event.success();
 
         // Show backup code download form
         context.challenge(createDownloadForm(context, backupCodes).createForm("backup-codes-download.ftl"));

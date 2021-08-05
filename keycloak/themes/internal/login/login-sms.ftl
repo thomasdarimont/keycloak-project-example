@@ -21,6 +21,15 @@
                     </#if>
                 </div>
             </div>
+
+            <div class="checkbox">
+                <label for="registerTrustedDevice" class="${properties.kcLabelClass!}">
+                    <input type="checkbox" id="registerTrustedDevice" name="register-trusted-device" class="${properties.kcCheckboxInputClass!}"
+                           value=""/>
+                    ${msg("trustThisDevice")}
+                </label>
+            </div>
+
             <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">

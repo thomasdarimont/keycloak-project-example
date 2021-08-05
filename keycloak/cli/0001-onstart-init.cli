@@ -39,7 +39,7 @@ end-if
 
 echo SETUP: Configure built-in "email" event listener to only send emails for user initiated UPDATE_PASSWORD events
 /subsystem=keycloak-server/spi=eventsListener/provider=email:add(enabled=true)
-/subsystem=keycloak-server/spi=eventsListener/provider=email:write-attribute(name=properties.exclude-events,value=["LOGIN_ERROR"])
+/subsystem=keycloak-server/spi=eventsListener/provider=email:write-attribute(name=properties.exclude-events,value=["LOGIN_ERROR","LOGIN"])
 /subsystem=keycloak-server/spi=eventsListener/provider=email:write-attribute(name=properties.include-events,value=["UPDATE_PASSWORD","UPDATE_TOTP","REMOVE_TOTP"])
 
 ### Theme Configuration ###

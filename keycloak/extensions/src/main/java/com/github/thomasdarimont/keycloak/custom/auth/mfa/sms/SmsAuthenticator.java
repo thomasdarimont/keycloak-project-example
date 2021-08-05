@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -203,6 +204,10 @@ public class SmsAuthenticator implements Authenticator {
                     .createErrorPage(Response.Status.BAD_REQUEST);
             handleFailure(context, AuthenticationFlowError.EXPIRED_CODE, errorPage);
             return;
+        }
+
+        if (formParams.containsKey("register-trusted-device")) {
+            context.getUser().addRequiredAction(ManageTrustedDeviceAction.ID);
         }
 
         context.success();
