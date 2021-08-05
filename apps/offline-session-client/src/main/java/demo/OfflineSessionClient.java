@@ -54,17 +54,16 @@ public class OfflineSessionClient {
     CommandLineRunner clr(TlsRestTemplateCustomizer tlsRestTemplateCustomizer) {
         return args -> {
 
-            var rt = new RestTemplateBuilder(tlsRestTemplateCustomizer)
-                    .rootUri("https://id.acme.test:8443/auth")
-                    .build();
-
             var oauthInfo = OAuthInfo.builder()
+                    .issuer("https://id.acme.test:8443/auth/realms/acme-internal")
                     .clientId("app-mobile")
                     .scope("profile offline_access")
                     .grantType("password")
                     .username("tester")
                     .password("test")
                     .build();
+
+            var rt = new RestTemplateBuilder(tlsRestTemplateCustomizer).build();
 
             var oauthClient = new OAuthClient(rt, oauthInfo, 3);
 
@@ -88,6 +87,8 @@ public class OfflineSessionClient {
     @Data
     static class OAuthInfo {
 
+        final String issuer;
+
         final String clientId;
         final String clientSecret;
 
@@ -97,6 +98,19 @@ public class OfflineSessionClient {
 
         final String username;
         final String password;
+
+
+        public String getUserInfoUrl() {
+            return getIssuer() + "/protocol/openid-connect/userinfo";
+        }
+
+        public String getTokenUrl() {
+            return getIssuer() + "/protocol/openid-connect/token";
+        }
+
+        public String getLogoutUrl() {
+            return getIssuer() + "/protocol/openid-connect/logout";
+        }
     }
 
     @Slf4j
@@ -120,9 +134,9 @@ public class OfflineSessionClient {
 
             if (offlineTokenFile.exists()) {
 
-                String offlineToken = null;
+                String offlineToken;
                 try {
-                    offlineToken = new String(Files.readAllBytes(offlineTokenPath), StandardCharsets.UTF_8);
+                    offlineToken = Files.readString(offlineTokenPath);
                 } catch (IOException e) {
                     log.error("Could not read offline_token", e);
                     return false;
@@ -148,7 +162,6 @@ public class OfflineSessionClient {
             return false;
         }
 
-
         public UserInfoResponse fetchUserInfo() {
 
             ensureTokenValidSeconds(tokenMinSecondsValid);
@@ -157,7 +170,7 @@ public class OfflineSessionClient {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.setBearerAuth(accessTokenResponse.getAccess_token());
 
-            var userInfoResponseEntity = rt.exchange("/realms/acme-internal/protocol/openid-connect/userinfo", HttpMethod.GET, new HttpEntity<>(headers), UserInfoResponse.class);
+            var userInfoResponseEntity = rt.exchange(oauthInfo.getUserInfoUrl(), HttpMethod.GET, new HttpEntity<>(headers), UserInfoResponse.class);
             return userInfoResponseEntity.getBody();
         }
 
@@ -172,7 +185,7 @@ public class OfflineSessionClient {
             requestBody.add("refresh_token", refreshToken);
             requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity = rt.postForEntity("/realms/acme-internal/protocol/openid-connect/token", new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
+            var responseEntity = rt.postForEntity(oauthInfo.getTokenUrl(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 return false;
             }
@@ -199,7 +212,7 @@ public class OfflineSessionClient {
             requestBody.add("password", oauthInfo.password);
             requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity = rt.postForEntity("/realms/acme-internal/protocol/openid-connect/token", new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
+            var responseEntity = rt.postForEntity(oauthInfo.getTokenUrl(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 return false;
             }
@@ -231,22 +244,21 @@ public class OfflineSessionClient {
 
         public boolean logout() {
 
-//            ensureTokenValidSeconds(10);
+            if (accessTokenResponse == null || accessTokenResponse.getRefresh_token() == null) {
+                log.error("Could not logout offline-client: missing offline token");
+                return false;
+            }
 
             var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//            headers.setBearerAuth(accessTokenResponse.getAccess_token());
 
             var requestBody = new LinkedMultiValueMap<String, String>();
             requestBody.add("client_id", oauthInfo.clientId);
             requestBody.add("refresh_token", accessTokenResponse.getRefresh_token());
-//            requestBody.add("grant_type", oauthInfo.grantType);
-//            requestBody.add("username", oauthInfo.username);
-//            requestBody.add("password", oauthInfo.password);
-//            requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity = rt.postForEntity("/realms/acme-internal/protocol/openid-connect/logout", new HttpEntity<>(requestBody, headers), Map.class);
+            var responseEntity = rt.postForEntity(oauthInfo.getLogoutUrl(), new HttpEntity<>(requestBody, headers), Map.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                log.error("Could not logout offline-client: logout failed");
                 return false;
             }
 
@@ -257,8 +269,6 @@ public class OfflineSessionClient {
                     log.error("Could not delete offline_token", e);
                 }
             }
-
-            Map body = responseEntity.getBody();
 
             accessTokenResponse = null;
             return true;
