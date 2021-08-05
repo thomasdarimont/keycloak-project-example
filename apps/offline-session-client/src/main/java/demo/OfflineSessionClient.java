@@ -30,10 +30,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -67,6 +69,12 @@ public class OfflineSessionClient {
             var oauthClient = new OAuthClient(rt, oauthInfo, 3);
 
             oauthClient.loadOfflineToken(true, "apps/offline-session-client/data/offline_token");
+
+            if (Arrays.asList(args).contains("--logout")) {
+                boolean loggedOut = oauthClient.logout();
+                System.out.println("Logout success: " + loggedOut);
+                System.exit(0);
+            }
 
             var userInfo = oauthClient.fetchUserInfo();
             System.out.println(userInfo);
@@ -103,14 +111,18 @@ public class OfflineSessionClient {
 
         private AccessTokenResponse accessTokenResponse;
 
-        public boolean loadOfflineToken(boolean obtainIfMissing, String offlineTokenPath) {
+        private Path offlineTokenPath;
 
-            File offlineTokenFile = new File(offlineTokenPath);
+        public boolean loadOfflineToken(boolean obtainIfMissing, String offlineTokenLocation) {
+
+            File offlineTokenFile = new File(offlineTokenLocation);
+            this.offlineTokenPath = offlineTokenFile.toPath();
+
             if (offlineTokenFile.exists()) {
 
                 String offlineToken = null;
                 try {
-                    offlineToken = new String(Files.readAllBytes(offlineTokenFile.toPath()), StandardCharsets.UTF_8);
+                    offlineToken = new String(Files.readAllBytes(offlineTokenPath), StandardCharsets.UTF_8);
                 } catch (IOException e) {
                     log.error("Could not read offline_token", e);
                     return false;
@@ -127,7 +139,7 @@ public class OfflineSessionClient {
             if (success) {
                 log.info("Obtain new offline token...");
                 try {
-                    Files.write(offlineTokenFile.toPath(), accessTokenResponse.getRefresh_token().getBytes(StandardCharsets.UTF_8));
+                    Files.write(offlineTokenPath, accessTokenResponse.getRefresh_token().getBytes(StandardCharsets.UTF_8));
                     return true;
                 } catch (IOException e) {
                     log.error("Could not write offline_token", e);
@@ -215,6 +227,41 @@ public class OfflineSessionClient {
         public String getAccessToken() {
             ensureTokenValidSeconds(tokenMinSecondsValid);
             return this.accessTokenResponse.access_token;
+        }
+
+        public boolean logout() {
+
+//            ensureTokenValidSeconds(10);
+
+            var headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+//            headers.setBearerAuth(accessTokenResponse.getAccess_token());
+
+            var requestBody = new LinkedMultiValueMap<String, String>();
+            requestBody.add("client_id", oauthInfo.clientId);
+            requestBody.add("refresh_token", accessTokenResponse.getRefresh_token());
+//            requestBody.add("grant_type", oauthInfo.grantType);
+//            requestBody.add("username", oauthInfo.username);
+//            requestBody.add("password", oauthInfo.password);
+//            requestBody.add("scope", oauthInfo.scope);
+
+            var responseEntity = rt.postForEntity("/realms/acme-internal/protocol/openid-connect/logout", new HttpEntity<>(requestBody, headers), Map.class);
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                return false;
+            }
+
+            if (offlineTokenPath != null) {
+                try {
+                    Files.delete(offlineTokenPath);
+                } catch (IOException e) {
+                    log.error("Could not delete offline_token", e);
+                }
+            }
+
+            Map body = responseEntity.getBody();
+
+            accessTokenResponse = null;
+            return true;
         }
     }
 
