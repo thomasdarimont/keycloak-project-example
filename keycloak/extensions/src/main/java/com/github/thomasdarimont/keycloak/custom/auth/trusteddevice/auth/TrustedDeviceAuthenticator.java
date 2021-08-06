@@ -10,6 +10,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.CredentialValidator;
+import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 import org.keycloak.models.KeycloakSession;
@@ -32,6 +33,10 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
             return null;
         }
 
+        if (Time.currentTime() >= trustedDeviceToken.getExp()) {
+            // token expired
+            return null;
+        }
 
         CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
                 .filter(cm -> cm.getSecretData().equals(trustedDeviceToken.getDeviceId()))
