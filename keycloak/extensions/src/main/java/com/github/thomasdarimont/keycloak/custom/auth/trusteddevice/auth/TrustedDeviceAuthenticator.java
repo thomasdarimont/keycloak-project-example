@@ -17,10 +17,8 @@ public class TrustedDeviceAuthenticator implements Authenticator {
 
     static final String ID = "acme-auth-trusted-device";
 
-    public static TrustedDeviceCredentialModel lookupTrustedDevice(AuthenticationFlowContext context) {
-        HttpRequest httpRequest = context.getHttpRequest();
-        KeycloakSession session = context.getSession();
-        UserModel user = context.getAuthenticationSession().getAuthenticatedUser();
+    public static TrustedDeviceCredentialModel lookupTrustedDevice(KeycloakSession session, RealmModel realm, UserModel user, HttpRequest httpRequest) {
+
         if (user == null) {
             return null;
         }
@@ -30,8 +28,8 @@ public class TrustedDeviceAuthenticator implements Authenticator {
             return null;
         }
 
-        RealmModel realm = context.getRealm();
-        CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, context.getUser(), TrustedDeviceCredentialModel.TYPE)
+
+        CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
                 .filter(cm -> cm.getSecretData().equals(deviceToken.getDeviceId()))
                 .findAny().orElse(null);
 
@@ -39,13 +37,18 @@ public class TrustedDeviceAuthenticator implements Authenticator {
             return null;
         }
 
-        return new TrustedDeviceCredentialModel(credentialModel.getUserLabel(), credentialModel.getSecretData());
+        return new TrustedDeviceCredentialModel(credentialModel.getId(), credentialModel.getUserLabel(), credentialModel.getSecretData());
     }
 
     @Override
     public void authenticate(AuthenticationFlowContext context) {
 
-        TrustedDeviceCredentialModel candidate = lookupTrustedDevice(context);
+        TrustedDeviceCredentialModel candidate = lookupTrustedDevice( //
+                context.getSession(), //
+                context.getRealm(),  //
+                context.getAuthenticationSession().getAuthenticatedUser(), //
+                context.getHttpRequest() //
+        );
 
         if (candidate == null) {
             log.info("Unknown device detected!");

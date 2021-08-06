@@ -2,7 +2,9 @@ package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action;
 
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceToken;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.auth.TrustedDeviceAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProviderFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.support.UserAgentParser;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -10,6 +12,7 @@ import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.common.util.Time;
+import org.keycloak.credential.CredentialProvider;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
@@ -73,21 +76,22 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         HttpRequest request = context.getHttpRequest();
 
         String userAgentString = request.getHttpHeaders().getHeaderString(HttpHeaders.USER_AGENT);
-        String name = "Browser";
+        String deviceName = "Browser";
 
         // TODO generate a better device name based on the user agent
         UserAgent userAgent = UserAgentParser.parseUserAgent(userAgentString);
         if (userAgent == null) {
-            return name;
+            return deviceName;
         }
+        String userAgentPart = userAgent.family;
 
+        String osNamePart = "";
         OS os = UserAgentParser.parseOperationSystem(userAgentString);
-        String osName = "";
         if (os != null) {
-            osName = "(" + os.family + ")";
+            osNamePart = "(" + os.family + ")";
         }
 
-        return name + " " + userAgent.family + " " + osName;
+        return deviceName + " " + userAgentPart + " " + osNamePart;
     }
 
 
@@ -116,8 +120,14 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         }
 
         if (formParams.containsKey("dont-trust-device")) {
-            log.info("Skip trusted device registration");
-            DeviceCookie.removeDeviceCookie(session, realm);
+            log.info("Remove trusted device registration");
+
+            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceAuthenticator.lookupTrustedDevice(session, realm, user, httpRequest);
+            if (trustedDeviceModel != null) {
+//                session.userCredentialManager().removeStoredCredential(realm, user, trustedDeviceModel.getId());
+                CredentialProvider<?> trustedDevicesCredentialProvider = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID);
+                trustedDevicesCredentialProvider.deleteCredential(realm, user, trustedDeviceModel.getId());
+            }
         }
 
         if (formParams.containsKey("trust-device")) {
@@ -129,7 +139,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
             String deviceName = sanitizeDeviceName(formParams.getFirst("device"));
 
-            TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(deviceName, deviceToken.getDeviceId());
+            TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(null, deviceName, deviceToken.getDeviceId());
             session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
 
             String deviceTokenString = session.tokens().encode(deviceToken);
@@ -185,7 +195,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         DeviceToken deviceToken = new DeviceToken();
 
         long iat = Time.currentTime();
-        long exp = iat + (long)numberOfDaysToTrustDevice * 24 * 60 * 60;
+        long exp = iat + (long) numberOfDaysToTrustDevice * 24 * 60 * 60;
         deviceToken.iat(iat);
         deviceToken.exp(exp);
         deviceToken.setDeviceId(deviceId);

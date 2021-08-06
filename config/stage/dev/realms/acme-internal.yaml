@@ -7,8 +7,8 @@ internationalizationEnabled: true
 supportedLocales: ["en","de"]
 defaultLocale: "en"
 resetPasswordAllowed: true
-loginTheme: internal
-accountTheme: keycloak.v2
+loginTheme: "internal-modern"
+accountTheme: "internal-modern"
 adminTheme: keycloak
 emailTheme: internal
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
@@ -194,7 +194,10 @@ authenticationFlows:
       - authenticator: conditional-user-configured
         requirement: REQUIRED
         priority: 3010
-      - authenticator: auth-otp-form
+      - authenticator: acme-auth-trusted-device
+        requirement: ALTERNATIVE
+        priority: 3015
+      - authenticator: acme-auth-otp-form
         requirement: ALTERNATIVE
         priority: 3020
       - authenticator: acme-sms-authenticator

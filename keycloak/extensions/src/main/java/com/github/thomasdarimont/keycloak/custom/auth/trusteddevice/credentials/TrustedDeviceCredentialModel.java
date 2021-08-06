@@ -16,7 +16,8 @@ public class TrustedDeviceCredentialModel extends CredentialModel {
         this.deviceToken = deviceToken;
     }
 
-    public TrustedDeviceCredentialModel(String deviceName, String deviceId) {
+    public TrustedDeviceCredentialModel(String id, String deviceName, String deviceId) {
+        this.setId(id);
         this.setUserLabel(deviceName);
         this.deviceId = deviceId;
     }

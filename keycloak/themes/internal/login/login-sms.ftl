@@ -40,7 +40,7 @@
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <div class="${properties.kcFormButtonsWrapperClass!}">
                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                               type="submit" value="${msg("doSubmit")}"/>
+                               type="submit" value="${msg("proceed")}"/>
 
                         <input name="resend"
                                class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!} <#if showResend??><#else>hidden</#if>"
