@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.keycloak.TokenCategory;
 import org.keycloak.representations.JsonWebToken;
 
-public class DeviceToken extends JsonWebToken {
+public class TrustedDeviceToken extends JsonWebToken {
 
     @JsonProperty("device_id")
     private String deviceId;

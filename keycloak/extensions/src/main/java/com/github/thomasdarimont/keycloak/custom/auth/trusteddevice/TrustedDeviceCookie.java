@@ -10,7 +10,7 @@ import org.keycloak.services.util.CookieHelper;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.UriBuilder;
 
-public class DeviceCookie {
+public class TrustedDeviceCookie {
 
     public static final String COOKIE_NAME = "ACME_KEYCLOAK_DEVICE";
 
@@ -46,7 +46,7 @@ public class DeviceCookie {
         );
     }
 
-    public static DeviceToken parseDeviceTokenFromCookie(HttpRequest httpRequest, KeycloakSession session) {
+    public static TrustedDeviceToken parseDeviceTokenFromCookie(HttpRequest httpRequest, KeycloakSession session) {
 
         Cookie deviceCookie = httpRequest.getHttpHeaders().getCookies().get(COOKIE_NAME);
         if (deviceCookie == null) {
@@ -54,6 +54,6 @@ public class DeviceCookie {
         }
 
         // decodes and validates device cookie
-        return session.tokens().decode(deviceCookie.getValue(), DeviceToken.class);
+        return session.tokens().decode(deviceCookie.getValue(), TrustedDeviceToken.class);
     }
 }

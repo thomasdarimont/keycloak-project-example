@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials;
 
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceCookie;
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceToken;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -51,6 +51,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
         model.setUserLabel(trustedDeviceCredentialModel.getUserLabel());
         model.setSecretData(trustedDeviceCredentialModel.getDeviceId());
         model.setCredentialData(null);
+
         return model;
     }
 
@@ -82,13 +83,13 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
             return false;
         }
 
-        DeviceToken deviceToken = DeviceCookie.parseDeviceTokenFromCookie(httpRequest, session);
-        if (deviceToken == null || !deviceToken.getDeviceId().equals(credentialModel.getSecretData())) {
+        TrustedDeviceToken trustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(httpRequest, session);
+        if (trustedDeviceToken == null || !trustedDeviceToken.getDeviceId().equals(credentialModel.getSecretData())) {
             return false;
         }
 
         // request comes from browser with device cookie that needs to be deleted
-        DeviceCookie.removeDeviceCookie(session, realm);
+        TrustedDeviceCookie.removeDeviceCookie(session, realm);
         return true;
     }
 

@@ -1,19 +1,19 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials;
 
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceToken;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import org.keycloak.credential.CredentialModel;
 
 public class TrustedDeviceCredentialModel extends CredentialModel {
 
     public static final String TYPE = "acme-trusted-device";
 
-    private DeviceToken deviceToken;
+    private TrustedDeviceToken trustedDeviceToken;
 
     private String deviceId;
 
-    public TrustedDeviceCredentialModel(String deviceName, DeviceToken deviceToken) {
+    public TrustedDeviceCredentialModel(String deviceName, TrustedDeviceToken trustedDeviceToken) {
         this.setUserLabel(deviceName);
-        this.deviceToken = deviceToken;
+        this.trustedDeviceToken = trustedDeviceToken;
     }
 
     public TrustedDeviceCredentialModel(String id, String deviceName, String deviceId) {
@@ -27,8 +27,8 @@ public class TrustedDeviceCredentialModel extends CredentialModel {
         return TYPE;
     }
 
-    public DeviceToken getDeviceToken() {
-        return deviceToken;
+    public TrustedDeviceToken getDeviceToken() {
+        return trustedDeviceToken;
     }
 
     public String getDeviceId() {

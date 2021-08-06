@@ -1,11 +1,12 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action;
 
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceCookie;
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceToken;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceName;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.auth.TrustedDeviceAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProviderFactory;
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.support.UserAgentParser;
+import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.InitiatedActionSupport;
@@ -21,14 +22,8 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AuthenticationManager;
-import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.sessions.AuthenticationSessionModel;
-import org.owasp.html.HtmlPolicyBuilder;
-import org.owasp.html.PolicyFactory;
-import ua_parser.OS;
-import ua_parser.UserAgent;
 
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.math.BigInteger;
@@ -39,7 +34,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
     public static final String ID = "acme-manage-trusted-device";
 
-    private static final PolicyFactory TEXT_ONLY_SANITIZATION_POLICY = new HtmlPolicyBuilder().toFactory();
+    private static final int NUMBER_OF_DAYS_TO_TRUST_DEVICE = Integer.getInteger("keycloak.acme.auth.trusteddevice.trustdays", 120);
 
     @Override
     public InitiatedActionSupport initiatedActionSupport() {
@@ -64,7 +59,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
         UserModel user = context.getAuthenticationSession().getAuthenticatedUser();
         String username = user.getUsername();
-        String deviceName = generateDeviceName(context);
+        String deviceName = TrustedDeviceName.generateDeviceName(context.getHttpRequest());
 
         LoginFormsProvider form = context.form();
         form.setAttribute("username", username);
@@ -72,33 +67,10 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         return form;
     }
 
-    private String generateDeviceName(RequiredActionContext context) {
-        HttpRequest request = context.getHttpRequest();
-
-        String userAgentString = request.getHttpHeaders().getHeaderString(HttpHeaders.USER_AGENT);
-        String deviceName = "Browser";
-
-        // TODO generate a better device name based on the user agent
-        UserAgent userAgent = UserAgentParser.parseUserAgent(userAgentString);
-        if (userAgent == null) {
-            return deviceName;
-        }
-        String userAgentPart = userAgent.family;
-
-        String osNamePart = "";
-        OS os = UserAgentParser.parseOperationSystem(userAgentString);
-        if (os != null) {
-            osNamePart = "(" + os.family + ")";
-        }
-
-        return deviceName + " " + userAgentPart + " " + osNamePart;
-    }
-
-
     @Override
     public void processAction(RequiredActionContext context) {
 
-        if (isCancelApplicationInitiatedAction(context)) {
+        if (RequiredActionUtils.isCancelApplicationInitiatedAction(context)) {
             AuthenticationSessionModel authSession = context.getAuthenticationSession();
             AuthenticationManager.setKcActionStatus(ManageTrustedDeviceAction.ID, RequiredActionContext.KcActionStatus.CANCELLED, authSession);
             context.success();
@@ -122,29 +94,39 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         if (formParams.containsKey("dont-trust-device")) {
             log.info("Remove trusted device registration");
 
-            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceAuthenticator.lookupTrustedDevice(session, realm, user, httpRequest);
+            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceAuthenticator.lookupTrustedDeviceFromCookie(session, realm, user, httpRequest);
             if (trustedDeviceModel != null) {
-//                session.userCredentialManager().removeStoredCredential(realm, user, trustedDeviceModel.getId());
-                CredentialProvider<?> trustedDevicesCredentialProvider = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID);
-                trustedDevicesCredentialProvider.deleteCredential(realm, user, trustedDeviceModel.getId());
+                session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
+                        .deleteCredential(realm, user, trustedDeviceModel.getId());
             }
         }
 
         if (formParams.containsKey("trust-device")) {
-            log.info("Register trusted device");
+            TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceAuthenticator.lookupTrustedDeviceFromCookie(session, realm, user, httpRequest);
 
-            int numberOfDaysToTrustDevice = 120; //FIXME make name of days to remember deviceToken configurable
+            if (currentTrustedDevice == null) {
+                log.info("Register new trusted device");
+            } else {
+                log.info("Update existing trusted device");
+            }
 
-            DeviceToken deviceToken = createDeviceToken(httpRequest, numberOfDaysToTrustDevice);
+            int numberOfDaysToTrustDevice = NUMBER_OF_DAYS_TO_TRUST_DEVICE; //FIXME make name of days to remember deviceToken configurable
 
-            String deviceName = sanitizeDeviceName(formParams.getFirst("device"));
+            String deviceId = currentTrustedDevice == null ? null : currentTrustedDevice.getDeviceId();
+            TrustedDeviceToken trustedDeviceToken = createDeviceToken(deviceId, numberOfDaysToTrustDevice);
+            String deviceName = TrustedDeviceName.sanitizeDeviceName(formParams.getFirst("device"));
 
-            TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(null, deviceName, deviceToken.getDeviceId());
-            session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
+            if (currentTrustedDevice == null) {
+                TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(null, deviceName, trustedDeviceToken.getDeviceId());
+                session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
+            } else {
+                // update label name for existing device
+                session.userCredentialManager().updateCredentialLabel(realm, user, currentTrustedDevice.getId(), deviceName);
+            }
 
-            String deviceTokenString = session.tokens().encode(deviceToken);
+            String deviceTokenString = session.tokens().encode(trustedDeviceToken);
             int maxAge = numberOfDaysToTrustDevice * 24 * 60 * 60;
-            DeviceCookie.addDeviceCookie(deviceTokenString, maxAge, session, realm);
+            TrustedDeviceCookie.addDeviceCookie(deviceTokenString, maxAge, session, realm);
             log.info("Registered trusted device");
         }
 
@@ -170,43 +152,23 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
                 .forEach(cm -> ucm.removeStoredCredential(realm, user, cm.getId()));
     }
 
-    private String sanitizeDeviceName(String deviceNameInput) {
-
-        String deviceName = deviceNameInput;
-
-        if (deviceName == null || deviceName.isEmpty()) {
-            deviceName = "Browser";
-        } else if (deviceName.length() > 32) {
-            deviceName = deviceName.substring(0, 32);
-        }
-
-        deviceName = TEXT_ONLY_SANITIZATION_POLICY.sanitize(deviceName);
-        deviceName = deviceName.trim();
-
-        return deviceName;
-    }
-
-    protected DeviceToken createDeviceToken(HttpRequest httpRequest, int numberOfDaysToTrustDevice) {
+    protected TrustedDeviceToken createDeviceToken(String deviceId, int numberOfDaysToTrustDevice) {
 
         // TODO enhance generated device id with information from httpRequest, e.g. browser fingerprint
 
+        String currentDeviceId = deviceId;
         // generate a unique but short device id
-        String deviceId = BigInteger.valueOf(new SecureRandom().nextLong()).toString(36);
-        DeviceToken deviceToken = new DeviceToken();
+        if (currentDeviceId == null) {
+            currentDeviceId = BigInteger.valueOf(new SecureRandom().nextLong()).toString(36);
+        }
+        TrustedDeviceToken trustedDeviceToken = new TrustedDeviceToken();
 
         long iat = Time.currentTime();
         long exp = iat + (long) numberOfDaysToTrustDevice * 24 * 60 * 60;
-        deviceToken.iat(iat);
-        deviceToken.exp(exp);
-        deviceToken.setDeviceId(deviceId);
-        return deviceToken;
-    }
-
-    protected boolean isCancelApplicationInitiatedAction(RequiredActionContext context) {
-
-        HttpRequest httpRequest = context.getHttpRequest();
-        MultivaluedMap<String, String> formParams = httpRequest.getDecodedFormParameters();
-        return formParams.containsKey(LoginActionsService.CANCEL_AIA);
+        trustedDeviceToken.iat(iat);
+        trustedDeviceToken.exp(exp);
+        trustedDeviceToken.setDeviceId(currentDeviceId);
+        return trustedDeviceToken;
     }
 
     @Override
