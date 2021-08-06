@@ -53,7 +53,7 @@ services:
     volumes:
       - ./run/graylog/data/journal:/usr/share/graylog/data/journal:z
       - ./graylog/contentpacks:/usr/share/graylog/data/contentpacks:z
-    restart: always
+#    restart: always
     depends_on:
       - acme-graylog-mongo
       - acme-graylog-elasticsearch

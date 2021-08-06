@@ -94,7 +94,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         if (formParams.containsKey("dont-trust-device")) {
             log.info("Remove trusted device registration");
 
-            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceAuthenticator.lookupTrustedDeviceFromCookie(session, realm, user, httpRequest);
+            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceAuthenticator.lookupTrustedDeviceCredentialModelFromCookie(session, realm, user, httpRequest);
             if (trustedDeviceModel != null) {
                 session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
                         .deleteCredential(realm, user, trustedDeviceModel.getId());
@@ -102,7 +102,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         }
 
         if (formParams.containsKey("trust-device")) {
-            TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceAuthenticator.lookupTrustedDeviceFromCookie(session, realm, user, httpRequest);
+            TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceAuthenticator.lookupTrustedDeviceCredentialModelFromCookie(session, realm, user, httpRequest);
 
             if (currentTrustedDevice == null) {
                 log.info("Register new trusted device");

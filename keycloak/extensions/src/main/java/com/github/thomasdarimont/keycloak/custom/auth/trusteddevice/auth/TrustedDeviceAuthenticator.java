@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.auth;
 
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProvider;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProviderFactory;
@@ -11,7 +10,6 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.CredentialValidator;
 import org.keycloak.common.util.Time;
-import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -22,13 +20,13 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
 
     static final String ID = "acme-auth-trusted-device";
 
-    public static TrustedDeviceCredentialModel lookupTrustedDeviceFromCookie(KeycloakSession session, RealmModel realm, UserModel user, HttpRequest httpRequest) {
+    public static TrustedDeviceCredentialModel lookupTrustedDeviceCredentialModelFromCookie(KeycloakSession session, RealmModel realm, UserModel user, HttpRequest httpRequest) {
 
         if (user == null) {
             return null;
         }
 
-        TrustedDeviceToken trustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(httpRequest, session);
+        var trustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(httpRequest, session);
         if (trustedDeviceToken == null) {
             return null;
         }
@@ -38,7 +36,7 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
             return null;
         }
 
-        CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
+        var credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
                 .filter(cm -> cm.getSecretData().equals(trustedDeviceToken.getDeviceId()))
                 .findAny().orElse(null);
 
@@ -52,14 +50,14 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
     @Override
     public void authenticate(AuthenticationFlowContext context) {
 
-        TrustedDeviceCredentialModel candidate = lookupTrustedDeviceFromCookie( //
+        var trustedDeviceCredentialModel = lookupTrustedDeviceCredentialModelFromCookie( //
                 context.getSession(), //
                 context.getRealm(),  //
                 context.getAuthenticationSession().getAuthenticatedUser(), //
                 context.getHttpRequest() //
         );
 
-        if (candidate == null) {
+        if (trustedDeviceCredentialModel == null) {
             log.info("Unknown device detected!");
             context.attempted();
             return;
@@ -67,7 +65,7 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
 
         log.info("Found trusted device.");
         context.getEvent().detail("trusted_device", "true");
-        context.getEvent().detail("trusted_device_id", candidate.getDeviceId());
+        context.getEvent().detail("trusted_device_id", trustedDeviceCredentialModel.getDeviceId());
         context.success();
     }
 
