@@ -7,6 +7,8 @@ import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.common.util.Time;
+import org.keycloak.credential.CredentialInput;
+import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
 import org.keycloak.credential.CredentialTypeMetadata;
@@ -17,9 +19,7 @@ import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 
 @JBossLog
-public class TrustedDeviceCredentialProvider implements CredentialProvider<CredentialModel>
-//        , CredentialInputValidator
-{
+public class TrustedDeviceCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
 
     private final KeycloakSession session;
 
@@ -108,30 +108,45 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
         CredentialTypeMetadata.CredentialTypeMetadataBuilder builder = CredentialTypeMetadata.builder();
         builder.type(getType());
         builder.category(CredentialTypeMetadata.Category.TWO_FACTOR);
-//        builder.createAction(ManageTrustedDeviceAction.ID);
         // TODO make backup code removal configurable
         builder.removeable(true);
         builder.displayName("trusted-device-display-name");
         builder.helpText("trusted-device-help-text");
-        builder.updateAction(ManageTrustedDeviceAction.ID); // we can only have either a create or update action
+
+        // Note, that we can only have either a create or update action
+        builder.updateAction(ManageTrustedDeviceAction.ID); // we use the update action to remove or "untrust" a device.
+        //        builder.createAction(ManageTrustedDeviceAction.ID);
+
         // TODO configure proper FA icon for backup codes
         builder.iconCssClass("kcAuthenticatorTrustedDeviceClass");
 
         return builder.build(session);
     }
 
-//    @Override
-//    public boolean supportsCredentialType(String credentialType) {
-//        return TrustedDeviceCredentialModel.TYPE.equals(credentialType);
-//    }
-//
-//    @Override
-//    public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-//        return session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().orElse(null) != null;
-//    }
-//
-//    @Override
-//    public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
-//        return false;
-//    }
+    @Override
+    public boolean supportsCredentialType(String credentialType) {
+        return TrustedDeviceCredentialModel.TYPE.equals(credentialType);
+    }
+
+    @Override
+    public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
+        return session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().orElse(null) != null;
+    }
+
+    @Override
+    public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
+
+        if (!(credentialInput instanceof TrustedDeviceCredentialInput)) {
+            return false;
+        }
+
+        TrustedDeviceCredentialInput tdci = (TrustedDeviceCredentialInput) credentialInput;
+
+        CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
+                .filter(cm -> cm.getSecretData().equals(tdci.getChallengeResponse()))
+                .findAny().orElse(null);
+
+        return credentialModel != null;
+
+    }
 }

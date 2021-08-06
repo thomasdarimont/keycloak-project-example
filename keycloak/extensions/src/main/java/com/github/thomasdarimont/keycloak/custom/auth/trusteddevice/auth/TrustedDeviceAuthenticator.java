@@ -3,17 +3,22 @@ package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.auth;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.DeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProvider;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProviderFactory;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
+import org.keycloak.authentication.CredentialValidator;
 import org.keycloak.credential.CredentialModel;
+import org.keycloak.credential.CredentialProvider;
+import org.keycloak.credential.OTPCredentialProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 @JBossLog
-public class TrustedDeviceAuthenticator implements Authenticator {
+public class TrustedDeviceAuthenticator implements Authenticator, CredentialValidator<TrustedDeviceCredentialProvider> {
 
     static final String ID = "acme-auth-trusted-device";
 
@@ -85,5 +90,10 @@ public class TrustedDeviceAuthenticator implements Authenticator {
     @Override
     public void close() {
         // NOOP
+    }
+
+    @Override
+    public TrustedDeviceCredentialProvider getCredentialProvider(KeycloakSession session) {
+        return (TrustedDeviceCredentialProvider)session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID);
     }
 }
