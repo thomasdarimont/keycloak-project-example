@@ -755,7 +755,7 @@
             "configuration": {
               "regex_value": {
                 "@type": "string",
-                "@value": "clientId=(\\w+)"
+                "@value": "clientId=([a-zA-Z0-9./:-_]+)"
               }
             },
             "source_field": {
