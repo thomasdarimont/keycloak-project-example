@@ -23,9 +23,10 @@
 
     function enableInactivityMonitoring() {
 
-        went_inactive = new Date().getTime();
+        let idleSinceTimestamp = Date.now();
 
-        auto_reload_diff = 29*60*1000
+        const maxIdleMinutesBeforeAutoReload = 29;
+        const autoReloadInactivityThresholdMillis = maxIdleMinutesBeforeAutoReload * 60 * 1000
 
         var hidden, visibilityChange;
         if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
@@ -40,11 +41,11 @@
         }
 
         function handleVisibilityChange() {
+            const now = Date.now();
             if (document[hidden]) {
-                went_inactive = new Date().getTime();
+                idleSinceTimestamp = now;
             } else {
-                if(new Date().getTime() >  auto_reload_diff + went_inactive)
-                {
+                if (now > idleSinceTimestamp + autoReloadInactivityThresholdMillis) {
                     location.reload();
                 }
             }
@@ -56,7 +57,7 @@
             // Handle page visibility change
             document.addEventListener(visibilityChange, handleVisibilityChange, false);
         }
-    };
+    }
 
     function onDomContentLoaded() {
         updateMobileIconOnSmsAuthenticatorInAuthenticationSelector();
