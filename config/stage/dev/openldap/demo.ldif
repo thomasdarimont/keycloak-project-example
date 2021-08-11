@@ -1,5 +1,21 @@
 version: 1
 
+# Add Keycloak bind user
+dn: cn=keycloak,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: person
+objectClass: top
+cn: keycloak
+sn: keycloak
+userPassword:: e1NTSEF9MW1pSWwrTUROUGlvMExTRUZPOGloejk1eldpTTN3ZGRIZDV6Z2c9P
+ Q==
+
+# Add custom ACL for keycloak bind user
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: {2}to * by self read by dn="cn=admin,dc=corp,dc=acme,dc=local" by dn="cn=keycloak,dc=corp,dc=acme,dc=local" write by * none
+
 dn: ou=Accounting,dc=corp,dc=acme,dc=local
 changetype: add
 ou: Accounting
