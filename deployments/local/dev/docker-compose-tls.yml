@@ -19,10 +19,10 @@ services:
       - ./keycloak-tls.env
       - ./keycloak-openldap.env
 
-  acme-app-oidc-js-spa:
+  acme-account-console:
     image: httpd:2.4
     volumes:
-      - ../../../apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
+      - ../../../apps/acme-account-console:/usr/local/apache2/htdocs/:z
       - ../../../config/stage/dev/tls/acme.test+1.pem:/usr/local/apache2/conf/server.crt:z
       - ../../../config/stage/dev/tls/acme.test+1-key.pem:/usr/local/apache2/conf/server.key:z
     ports:

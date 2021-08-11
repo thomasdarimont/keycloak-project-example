@@ -77,10 +77,10 @@ services:
       - "1080:8025"
       - "1025:1025"
 
-  acme-app-oidc-js-spa:
+  acme-account-console:
     image: httpd:2.4
     volumes:
-      - ../../../apps/oidc-js-spa/htdocs:/usr/local/apache2/htdocs/:z
+      - ../../../apps/acme-account-console:/usr/local/apache2/htdocs/:z
     ports:
       - "4000:80"
       - "4443:443"

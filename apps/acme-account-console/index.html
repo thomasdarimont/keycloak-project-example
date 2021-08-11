@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
 
-    <title>Mini SPA Demo</title>
+    <title>Acme Account Console</title>
 
     <style>
         body {
@@ -162,9 +162,10 @@
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email acme.profile';
     // &show=profile,settings,apps,security,logout
+    // &show=profile,logout,token,idToken,userinfo,reauth,account
 
     const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout"];
-    const contextClassesToHideDefault = ["meinfo", "apps"];
+    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
         return !contextClassesToHideDefault.includes(value);
     });
@@ -378,7 +379,7 @@
             for (let client of clients) {
                 appEntriesHtml += `
                 <tr>
-                    <td>${client.clientName}</td>
+                    <td>${client.clientName ? client.clientName : client.clientId}</td>
                     <td>${client.description ? client.description : '-'}</td>
                     <td><a href="${client.effectiveUrl}" target="_blank">Browse</a></td>
                 </tr>`;
