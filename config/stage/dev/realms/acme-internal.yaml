@@ -244,6 +244,16 @@ roles:
         - "manage-account"
         - "view-profile"
 
+groups:
+  - "name": "Users"
+    #    "path": "/Users"
+    "attributes":
+      groupAttribute1: ["groupAttributeValue1"]
+    "realmRoles":
+      - "acme-user"
+    #    "clientRoles": {}
+    "subGroups": []
+
 users:
   - username: employee
     email: employee@local
@@ -256,6 +266,8 @@ users:
       - type: password
         value: test
         temporary: false
+    groups:
+      - "Users"
 
   - username: tester
     email: tester@local
@@ -270,6 +282,8 @@ users:
       - type: password
         value: test
         temporary: false
+    groups:
+      - "Users"
 
   - username: support
     email: support@local
@@ -284,3 +298,5 @@ users:
         temporary: false
     realmRoles:
     - "acme-user-support"
+    groups:
+      - "Users"
