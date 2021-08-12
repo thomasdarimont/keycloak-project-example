@@ -47,6 +47,15 @@ services:
 # certs added in custom docker build
       - GRAYLOG_HTTP_TLS_CERT_FILE=/usr/share/graylog/data/config/ssl/cert.crt
       - GRAYLOG_HTTP_TLS_KEY_FILE=/usr/share/graylog/data/config/ssl/key.key
+# Enable E-mail configuration for alerts
+      - GRAYLOG_TRANSPORT_EMAIL_ENABLED=true
+      - GRAYLOG_TRANSPORT_EMAIL_USE_AUTH=false
+      - GRAYLOG_TRANSPORT_EMAIL_HOSTNAME=mailhog
+      - GRAYLOG_TRANSPORT_EMAIL_PORT=1025
+      - GRAYLOG_TRANSPORT_EMAIL_USE_TLS=false
+      - GRAYLOG_TRANSPORT_EMAIL_USE_SSL=false
+      - GRAYLOG_TRANSPORT_EMAIL_SUBJECT_PREFIX=GrayLog
+      - GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL=graylog@id.acme.test
 # Install keycloak message extractors
       - GRAYLOG_CONTENT_PACKS_AUTO_INSTALL=iam-keycloak-content-pack-v1.json
     entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
