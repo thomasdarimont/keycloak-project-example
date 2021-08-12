@@ -53,7 +53,7 @@ services:
       - ./run/keycloak/perf:/opt/jboss/keycloak/standalone/perf:z
 
   acme-keycloak-provisioning:
-    image: quay.io/adorsys/keycloak-config-cli:v4.0.1-14.0.0
+    image: quay.io/adorsys/keycloak-config-cli:v4.2.1-rc0-15.0.1
     env_file:
       - ./keycloak-common.env
       - ./keycloak-http.env
