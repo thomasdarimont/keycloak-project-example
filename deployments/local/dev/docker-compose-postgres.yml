@@ -1,6 +1,4 @@
-version: '3.8'
 services:
-
   acme-keycloak-db:
     image: postgres:11.12
     environment:
@@ -27,6 +25,8 @@ services:
       DB_USER: keycloak
       DB_PASSWORD: keycloak
       DB_SCHEMA: public
+# See postgres JDBC URL parameters: https://jdbc.postgresql.org/documentation/head/connect.html
+      JDBC_PARAMS: ApplicationName=keycloak
 # IntelliJ currently does not support the depends_on condition syntax
     depends_on:
       acme-keycloak-db:
