@@ -60,7 +60,7 @@ services:
       - GRAYLOG_CONTENT_PACKS_AUTO_INSTALL=iam-keycloak-content-pack-v1.json
     entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
     volumes:
-      - ./run/graylog/data/journal:/usr/share/graylog/data/journal:z
+      - graylog_journal:/usr/share/graylog/data/journal
       - ./graylog/contentpacks:/usr/share/graylog/data/contentpacks:z
 #    restart: always
     depends_on:
@@ -115,3 +115,8 @@ services:
       - ./graylog/modules/logstash-gelf-1.14.1/biz:/opt/jboss/keycloak/modules/system/layers/base/biz:z
 # Enable logging to logstash gelf
       - ./graylog/cli/0020-onstart-setup-graylog-logging.cli:/opt/jboss/startup-scripts/0020-onstart-setup-graylog-logging.cli:z
+
+
+volumes:
+  graylog_journal:
+    driver: local

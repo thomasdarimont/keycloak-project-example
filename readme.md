@@ -128,8 +128,15 @@ java start.java --database=postgres
 
 The example environment can be configured to send Keycloak's logout output to Graylog via the `--logging=graylog` option.
 
-Note that you need to download the [`logstash-gelf` wildfly module](https://search.maven.org/remotecontent?filepath=biz/paluch/logging/logstash-gelf/1.14.1/logstash-gelf-1.14.1-logging-module.zip) 
-and unzip the libraries into the [deployments/local/dev/graylog/modules](deployments/local/dev/graylog/modules) folder. 
+Note that you need to download the [`logstash-gelf` wildfly module](https://search.maven.org/remotecontent?filepath=biz/paluch/logging/logstash-gelf/1.14.1/logstash-gelf-1.14.1-logging-module.zip)
+and unzip the libraries into the [deployments/local/dev/graylog/modules](deployments/local/dev/graylog/modules) folder.
+
+```
+cd deployments/local/dev/graylog/modules
+wget -O logstash-gelf-1.14.1-logging-module.zip https://search.maven.org/remotecontent?filepath=biz/paluch/logging/logstash-gelf/1.14.1/logstash-gelf-1.14.1-logging-module.zip
+unzip -o logstash-gelf-1.14.1-logging-module.zip
+rm *.zip
+```
 
 #### Run with Graylog
 ```
