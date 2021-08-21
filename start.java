@@ -33,7 +33,7 @@ class start {
 
     static final String HELP_CMD = "--help";
 
-    static final String CI_OPT = "--ci"
+    static final String CI_OPT = "--ci";
     static final String HTTP_OPT = "--http";
     static final String HTTPS_OPT = "--https";
     static final String PROVISION_OPT = "--provision";
