@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   acme-keycloak:
     image: quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
@@ -51,21 +50,6 @@ services:
       - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
       - ./run/keycloak/logs:/opt/jboss/keycloak/standalone/logs:z
       - ./run/keycloak/perf:/opt/jboss/keycloak/standalone/perf:z
-
-  acme-keycloak-provisioning:
-    image: quay.io/adorsys/keycloak-config-cli:v4.2.1-rc0-15.0.1
-    env_file:
-      - ./keycloak-common.env
-      - ./keycloak-http.env
-      - ./keycloak-provisioning.env
-    environment:
-      KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
-      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
-      IMPORT_PATH: "/config"
-      IMPORT_FORCE: "false"
-      IMPORT_VARSUBSTITUTION: "true"
-    volumes:
-      - ../../../config/stage/dev/realms:/config:z
 
   mailhog:
     # Web Interface: http://localhost:1080/#

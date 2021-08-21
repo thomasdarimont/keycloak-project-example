@@ -39,6 +39,10 @@ class start {
         commandLine.add("deployments/local/dev/docker-compose-openldap.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-postgres.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-provisioning.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-graylog.yml");
         commandLine.add("down");
         commandLine.add("--remove-orphans");
 

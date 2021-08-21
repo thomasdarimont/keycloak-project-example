@@ -12,7 +12,7 @@ class applyKeycloakConfigCli {
         var commandLine = new ArrayList<String>();
         commandLine.add("docker-compose");
         commandLine.add("--file");
-        commandLine.add("deployments/local/dev/docker-compose.yml");
+        commandLine.add("deployments/local/dev/docker-compose-provisioning.yml");
         commandLine.add("restart");
         commandLine.add("acme-keycloak-provisioning");
 

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   acme-keycloak:
     env_file:
@@ -11,13 +10,6 @@ services:
       - ../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/x509/https/tls.key:z
 # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
-
-  acme-keycloak-provisioning:
-    env_file:
-      - ./keycloak-common.env
-      - ./keycloak-http.env
-      - ./keycloak-tls.env
-      - ./keycloak-openldap.env
 
   acme-account-console:
     image: httpd:2.4
