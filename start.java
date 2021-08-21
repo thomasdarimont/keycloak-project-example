@@ -33,6 +33,7 @@ class start {
 
     static final String HELP_CMD = "--help";
 
+    static final String CI_OPT = "--ci"
     static final String HTTP_OPT = "--http";
     static final String HTTPS_OPT = "--https";
     static final String PROVISION_OPT = "--provision";
@@ -55,6 +56,7 @@ class start {
         var usePostgres = argList.contains(POSTGRES_OPT);
         var useGraylog = argList.contains(GRAYLOG_OPT);
         var extension = argList.stream().filter(s -> s.startsWith(EXTENSIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXTENSIONS_OPT_CLASSES);
+        var ci = argList.stream().filter(s -> s.startsWith(CI_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(null);
         var useDetach = argList.contains(DETACH_OPT);
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
@@ -108,6 +110,10 @@ class start {
 
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
+
+        if ("github".equals(ci)) {
+            commandLine.add("deployments/local/dev/docker-compose-ci-github.yml");
+        }
 
         if (useHttp) {
             envFiles.add("deployments/local/dev/keycloak-http.env");

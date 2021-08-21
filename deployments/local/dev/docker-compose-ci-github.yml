@@ -1,0 +1,3 @@
+services:
+  acme-keycloak:
+    user: "${USER}:${GROUP}"

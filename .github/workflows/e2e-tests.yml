@@ -31,7 +31,7 @@ jobs:
           export GROUP=
           echo "Running as ${USER}:${GROUP}"
           java bin/envcheck.java
-          java start.java --http --extensions=jar --detach
+          java start.java --http --extensions=jar --ci=github --detach
 
       - name: Sleep
         uses: jakejarvis/wait-action@master
