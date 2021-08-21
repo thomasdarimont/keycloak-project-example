@@ -369,7 +369,7 @@
 
         let clients = [...appsData.clients].filter((value, index, arr) => {
             // filter current client
-            return clientId != value.clientId;
+            return clientId !== value.clientId;
         });
 
         let appEntriesHtml = "";
@@ -524,7 +524,7 @@
         }
 
         let settingsHtml = `
-        <form id="frmSettings" name="frmSettings" action="" onsubmit="return false" onkeydown="return event.key != 'Enter';">
+        <form id="frmSettings" name="frmSettings" action="" onsubmit="return false" onkeydown="return event.key !== 'Enter';">
             <table>
                 <tr>
                     <td class="label"><label for="setting1">Setting 1</label></td>
