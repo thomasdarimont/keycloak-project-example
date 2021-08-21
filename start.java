@@ -112,6 +112,7 @@ class start {
         commandLine.add("deployments/local/dev/docker-compose.yml");
 
         if ("github".equals(ci)) {
+            commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-ci-github.yml");
         }
 
