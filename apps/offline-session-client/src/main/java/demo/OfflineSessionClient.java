@@ -43,6 +43,7 @@ import java.util.Objects;
 /**
  * keytool -importcert -noprompt -cacerts -alias "id.acme.test" -storepass changeit -file './config/stage/dev/tls/acme.test+1.pem'
  */
+@Slf4j
 @SpringBootApplication
 public class OfflineSessionClient {
 
@@ -70,16 +71,17 @@ public class OfflineSessionClient {
             oauthClient.loadOfflineToken(true, "apps/offline-session-client/data/offline_token");
 
             if (Arrays.asList(args).contains("--logout")) {
+                log.info("Logout started...");
                 boolean loggedOut = oauthClient.logout();
-                System.out.println("Logout success: " + loggedOut);
+                log.info("Logout success: {}", loggedOut);
                 System.exit(0);
             }
 
             var userInfo = oauthClient.fetchUserInfo();
-            System.out.println(userInfo);
+            log.info("UserInfo: {}", userInfo);
 
             var token = oauthClient.getAccessToken();
-            System.out.println("Token: " + token);
+            log.info("Token: {}", token);
         };
     }
 
@@ -134,6 +136,8 @@ public class OfflineSessionClient {
 
             if (offlineTokenFile.exists()) {
 
+                log.info("Found existing offline token...");
+
                 String offlineToken;
                 try {
                     offlineToken = Files.readString(offlineTokenPath);
@@ -142,7 +146,11 @@ public class OfflineSessionClient {
                     return false;
                 }
 
-                return doRefreshToken(offlineToken);
+                boolean result = doRefreshToken(offlineToken);
+                if (result) {
+                    log.info("Refreshed with existing offline token.");
+                }
+                return result;
             }
 
             if (!obtainIfMissing) {
