@@ -152,7 +152,7 @@
 <script defer>
 
     let searchParams = new URLSearchParams(window.location.search);
-    let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://localhost:8080" : "https://id.acme.test:8443");
+    let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://id.acme.test:8080" : "https://id.acme.test:8443");
     let keycloakUrl = keycloakBaseUrl + (searchParams.get("path") || "/auth");
 
     let realm = searchParams.get("realm") || 'acme-internal';
