@@ -54,6 +54,7 @@ clients:
     fullScopeAllowed: false
     rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
     baseUrl: "/?realm=acme-ldap"
+    adminUrl: ""
     redirectUris:
       - "/*"
       - "http://localhost:4000/*"
