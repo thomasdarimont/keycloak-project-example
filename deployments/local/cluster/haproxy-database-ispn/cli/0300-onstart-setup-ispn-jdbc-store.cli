@@ -10,7 +10,9 @@ echo SETUP: Begin Infinispan jdbc-store configuration.
 batch
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:add(owners=1)
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=expiration:add(lifespan=900000000000000000)
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=eviction:add(max-entries=1)
+
+# You can use this to limit the number of cache items in memory
+# /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=eviction:add(max-entries=1)
 
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc:add( \
   datasource="java:jboss/datasources/KeycloakDS", \
