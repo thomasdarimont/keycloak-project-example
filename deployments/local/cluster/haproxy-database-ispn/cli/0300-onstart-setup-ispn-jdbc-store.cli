@@ -1,0 +1,43 @@
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
+
+echo SETUP: Begin Infinispan jdbc-store configuration.
+
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:remove()
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:add(owners=1)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=expiration:add(lifespan=900000000000000000)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=eviction:add(max-entries=1)
+
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc:add( \
+  datasource="java:jboss/datasources/KeycloakDS", \
+  passivation=false, \
+  fetch-state=true, \
+  preload=false, \
+  purge=false, \
+  shared=true, \
+  max-batch-size=1000 \
+)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc:write-attribute( \
+  name=properties.databaseType, \
+  value=POSTGRES \
+)
+
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc/table=string:add( \
+  data-column={type=bytea}, \
+  drop-on-stop=false, \
+  fetch-size=5000, \
+  prefix=ispn \
+)
+
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc/write=behind:add( \
+  modification-queue-size=1024 \
+)
+run-batch
+
+echo SETUP: Finished Infinispan jdbc-store configuration.
+
+stop-embedded-server

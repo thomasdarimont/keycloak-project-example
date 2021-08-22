@@ -1,0 +1,49 @@
+services:
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
+    volumes:
+      - ./cli/0300-onstart-setup-ispn-jdbc-store.cli:/opt/jboss/startup-scripts/0300-onstart-setup-ispn-jdbc-store.cli:z
+      - ./patch/keycloak-model-infinispan-15.0.2-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.0.2.jar:z
+    command: [ "-Dwildfly.statistics-enabled=true", "-Dkeycloak.infinispan.ignoreSkipCacheStore=true" ]
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak
+    environment:
+      KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
+    volumes:
+      - ./cli/0300-onstart-setup-ispn-jdbc-store.cli:/opt/jboss/startup-scripts/0300-onstart-setup-ispn-jdbc-store.cli:z
+      - ./patch/keycloak-model-infinispan-15.0.2-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.0.2.jar:z
+    command: [ "-Dwildfly.statistics-enabled=true", "-Dkeycloak.infinispan.ignoreSkipCacheStore=true" ]
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+    ports:
+      - "15432:5432"
+
+  acme-haproxy-lb:
+    build: ../haproxy
+    volumes:
+      - ../haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:z
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
+    ports:
+      - "1443:1443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2
+

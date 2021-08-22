@@ -28,6 +28,14 @@ The JGroups authentication uses the `AUTH` module with a pre-shared key.
 docker-compose --env-file ../../../keycloak.env --file haproxy-encrypted-ispn/docker-compose-enc-haproxy.yml up --remove-orphans
 ```
 
+## Run with Infinispan cache content stored in jdbc-store
+
+This example shows how to store data from the user session cache in a database that survives restarts.
+
+```
+docker-compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose-haproxy-jdbc-store.yml up --remove-orphans
+```
+
 ## Run with dedicated Infinispan Cluster with Remote store
 
 The haproxy example can also be started with a dedicated infinispan cluster where the 
