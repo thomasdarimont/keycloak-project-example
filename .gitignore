@@ -12,6 +12,7 @@ deployments/local/cluster/run/
 *.pem
 *-key.pem
 
+module-thorntail.xml
 !scratch/.gitkeep
 scratch/
 *.jfr
