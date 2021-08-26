@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>Acme Greet Me</title>
+
+    <style>
+        ul.menu > li {
+            display: inline;
+            padding: 1px;
+        }
+
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <ul class="menu">
+        <li>
+            <button id="loginBtn" onclick="keycloak.login()">Login</button>
+            <button id="logoutBtn" onclick="keycloak.logout()" class="hidden">Logout</button>
+        </li>
+    </ul>
+</nav>
+
+<div>
+    <h1>ClientId: <span id="clientInfo"></span></h1>
+    <div id="greeting" class="hidden">
+        <h2>Username: <span id="username"></span></h2>
+        <h2>Name: <span id="displayName"></span></h2>
+        <h2>Email: <span id="email"></span></h2>
+        <h2>Issuer: <span id="issuer"></span></h2>
+    </div>
+</div>
+
+<script defer>
+
+    function $(selector) {
+        return document.querySelector(selector);
+    }
+
+    let searchParams = new URLSearchParams(window.location.search);
+    let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://id.acme.test:8080" : "https://id.acme.test:8443");
+    let keycloakUrl = keycloakBaseUrl + (searchParams.get("path") || "/auth");
+
+    let realm = searchParams.get("realm") || 'acme-internal';
+    let clientId = searchParams.get("client_id") || 'app-greetme';
+
+    // ?scope=openid+email+custom.profile+custom.ageinfo
+    let scope = searchParams.get("scope") || 'openid email profile';
+
+    document.getElementById("clientInfo").textContent = clientId;
+
+    // dynamically add keycloak.js script
+    let script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = keycloakUrl + "/js/keycloak.js";
+    document.getElementsByTagName('head')[0].appendChild(script);
+
+    window.onload = () => {
+
+        window.keycloak = new Keycloak({
+            url: keycloakUrl,
+            realm: realm,
+            clientId: clientId
+        });
+
+        let initConfig = {
+            onLoad: 'login-required', // redirects to login if not login
+            // onLoad: 'check-sso', // shows login button of not logged in
+            checkLoginIframe: true,
+            checkLoginIframeInterval: 1,
+            pkceMethod: 'S256',
+            scope: scope
+        };
+
+        let onLoginSuccess = () => {
+            if (keycloak.authenticated) {
+                showGreeting();
+            } else {
+                showWelcome();
+            }
+        };
+
+        keycloak.init(initConfig).success(onLoginSuccess);
+
+        keycloak.onAuthLogout = showWelcome;
+    };
+
+    function showWelcome() {
+        $("#loginBtn").classList.toggle("hidden");
+        $("#logoutBtn").classList.toggle("hidden");
+    }
+
+    function showGreeting() {
+
+        $("#loginBtn").classList.toggle("hidden");
+        $("#logoutBtn").classList.toggle("hidden");
+
+        $("#greeting").classList.toggle("hidden");
+
+        $("#username").innerText = keycloak.tokenParsed.preferred_username;
+        $("#displayName").innerText = keycloak.tokenParsed.name;
+        $("#email").innerText = keycloak.tokenParsed.email;
+        $("#issuer").innerText = keycloak.tokenParsed.iss
+    }
+
+</script>
+</body>
+
+</html>

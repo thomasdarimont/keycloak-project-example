@@ -32,8 +32,8 @@ clientScopes:
 clients:
   - clientId: app-minispa
     protocol: openid-connect
-    name: App Mini SPA
-    description: "App Mini SPA Description"
+    name: Acme Account Console
+    description: "Acme Account Console Description"
     enabled: true
     publicClient: true
     standardFlowEnabled: true
@@ -46,7 +46,7 @@ clients:
     adminUrl: ""
     redirectUris:
       - "/*"
-      - "http://localhost:4000/*"
+      - "http://localhost:4000/acme-account/*"
     webOrigins:
       - "+"
     defaultClientScopes:
@@ -54,6 +54,33 @@ clients:
       - "profile"
     optionalClientScopes:
       - "acme.profile"
+      - "phone"
+
+  - clientId: app-greetme
+    protocol: openid-connect
+    name: Acme Greet Me
+    description: "App Greet Me Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: false
+    rootUrl: "$(env:APPS_FRONTEND_URL_GREETME)"
+    baseUrl: "/?realm=acme-apps"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+      - "http://localhost:4000/acme-greetme/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
       - "phone"
 
 identityProviders:

@@ -148,8 +148,11 @@
     <div id="data" class="content"></div>
 </div>
 
-
 <script defer>
+
+    function $(selector) {
+        return document.querySelector(selector);
+    }
 
     let searchParams = new URLSearchParams(window.location.search);
     let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://id.acme.test:8080" : "https://id.acme.test:8443");
@@ -173,14 +176,14 @@
     let contextClassesToShow = searchParams.get("show")?.split(",") || contextClassesToShowDefault;
     for (let className of allContextClasses) {
         if (!contextClassesToShow.includes(className)) {
-            let btn = document.querySelector(`button.${className}`);
+            let btn = $(`button.${className}`);
             if (btn) {
                 btn.parentElement.removeChild(btn);
             }
         }
     }
 
-    document.getElementById("clientInfo").textContent = clientId;
+    $("#clientInfo").textContent = clientId;
 
     // dynamically add keycloak.js script
     let script = document.createElement('script');
@@ -547,8 +550,8 @@
         await keycloak.updateToken(5);
 
         let settings = {
-            "setting1": document.getElementById("setting1").value,
-            "setting2": document.getElementById("setting2").checked
+            "setting1": $("#setting1").value,
+            "setting2": $("#setting2").checked
         };
 
         try {
@@ -639,10 +642,10 @@
 
     function show(data, cssClass) {
 
-        let contentElement = document.getElementById('content');
+        let contentElement = $('#content');
         contentElement.classList.remove("hidden")
 
-        let dataElement = document.getElementById('data');
+        let dataElement = $('#data');
         dataElement.innerHTML = data;
         dataElement.classList.remove(["message-content", "token-content"]);
         dataElement.classList.add(cssClass);
