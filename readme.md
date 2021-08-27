@@ -96,7 +96,7 @@ This will generate a TLS certificate and key file in `.pem` format in `config/st
 
 Register map the following host names in your hosts configuration:
 ```
-127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test
+127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test ops.acme.test
 ```
 #### Run with HTTPS
 ```
@@ -177,10 +177,10 @@ java start.java --grafana
 
 Open [Grafana](https://apps.acme.test:3000/grafana)
 
-Manual steps when logged in as an Admin (Example User: admina, Password: test)
+Manual steps when logged in as an Admin (Example User: devops_fallback, Password: test)
 * Configure datasource
-    * Add e.g. prometheus as datasource (http://acme-prometheus:9090/) (see  [Grafana](#enable-prometheus))
-    * Add e.g. elastic-search as datasource (http://acme-graylog-lo:9090/) (see  [Graylog](#enable-graylog) services)
+    * Add e.g. prometheus as datasource (http://acme-prometheus:9090/ installed by default) (see [Grafana](#enable-prometheus))
+    * Add e.g. elastic-search as datasource (http://acme-graylog-lo:9090/) (see [Graylog](#enable-graylog) services)
 * Import Boards of your choice from [Grafana](https://grafana.com/grafana/dashboards) (for testing an [exported board](../../../config/stage/dev/grafana/microprofile-wildfly-16-metrics_rev1.json) can be used) 
 
 ### Clustering

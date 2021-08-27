@@ -41,8 +41,11 @@ clients:
     secret: acme-ops-grafana-secret
     fullScopeAllowed: false
     defaultClientScopes:
+    rootUrl: "https://ops.acme.test:3000/grafana"
+    baseUrl: "/"
+    adminUrl: ""
     redirectUris:
-      - "https://ops.acme.test:3000/grafana/login*"
+      - "/login*"
     # grafana uses jmespath to access the role resource. it cannot handle '-' as part of the client id
     protocolMappers:
       - name: client roles

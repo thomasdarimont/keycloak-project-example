@@ -82,7 +82,7 @@
     {
       "collapse": false,
       "collapsed": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "$PROMETHEUS_DS",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1079,7 +1079,7 @@
           "refId": "B"
         },
         {
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "$PROMETHEUS_DS",
           "expr": "base_memory_committedHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "interval": "",
           "intervalFactor": 2,
@@ -1934,7 +1934,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "$PROMETHEUS_DS",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3029,7 +3029,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "$PROMETHEUS_DS",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -9951,7 +9951,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "$PROMETHEUS_DS",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -15792,7 +15792,7 @@
     {
       "collapse": false,
       "collapsed": true,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "$PROMETHEUS_DS",
       "gridPos": {
         "h": 1,
         "w": 24,

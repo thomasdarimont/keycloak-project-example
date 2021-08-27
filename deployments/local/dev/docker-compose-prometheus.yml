@@ -3,8 +3,8 @@ services:
     image: prom/prometheus:v2.28.0
     user: "65534:1000"
     volumes:
-      - ../../../config/stage/dev/prometheus/:/etc/prometheus/
-      - ./run/prometheus:/prometheus
+      - ../../../config/stage/dev/prometheus:/etc/prometheus:z
+#      - ./run/prometheus:/prometheus:z
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
