@@ -42,6 +42,7 @@ d) **Operator** configuring realm and server for different stages
 - Examples for running a cluster behind a reverse proxy with examples for [HAProxy](deployments/local/cluster/haproxy), [Apache](deployments/local/cluster/apache), [nginx](deployments/local/cluster/nginx), [caddy](deployments/local/cluster/caddy)
 - Examples for running a Keycloak cluster with an external infinispan cluster with [remote cache store](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml) and [hotrod cache store](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml).
 - Example for Keycloak with [Graylog](https://www.graylog.org/) for log analysis, dashboards and alerting.
+- Example for metrics collection and dashboards with [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com/oss). 
 
 ## Usage envcheck
 
