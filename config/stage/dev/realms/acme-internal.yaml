@@ -58,6 +58,32 @@ clientScopes:
     description: Acme API Access
     protocol: openid-connect
 
+requiredActions:
+  - alias: acme-update-phonenumber
+    name: 'Acme: Update Mobile Phonenumber'
+    providerId: acme-update-phonenumber
+    enabled: true
+    defaultAction: false
+    priority: 1100
+  - alias: acme-manage-trusted-device
+    name: 'Acme: Manage Trusted Device'
+    providerId: acme-manage-trusted-device
+    enabled: true
+    defaultAction: false
+    priority: 1200
+  - alias: acme-generate-backup-codes
+    name: 'Acme: Generate Backup Codes'
+    providerId: acme-generate-backup-codes
+    enabled: true
+    defaultAction: false
+    priority: 1300
+  - alias: acme-update-email
+    name: 'Acme: Update Email'
+    providerId: acme-update-email
+    enabled: true
+    defaultAction: false
+    priority: 1400
+
 clients:
   - clientId: app-minispa
     protocol: openid-connect
