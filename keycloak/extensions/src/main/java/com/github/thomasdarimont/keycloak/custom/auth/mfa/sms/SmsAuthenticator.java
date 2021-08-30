@@ -81,8 +81,9 @@ public class SmsAuthenticator implements Authenticator {
         smsModel.readCredentialData();
 
         String phoneNumber = smsModel.getPhoneNumber();
-        if (phoneNumber == null) {
-            phoneNumber = user.getFirstAttribute(IDToken.PHONE_NUMBER_VERIFIED);
+        if (phoneNumber == null && Boolean.parseBoolean(user.getFirstAttribute(IDToken.PHONE_NUMBER_VERIFIED))) {
+            // we use the verified phone-number from the user attributes as a fallback
+            phoneNumber = user.getFirstAttribute(IDToken.PHONE_NUMBER);
         }
 
         return phoneNumber;

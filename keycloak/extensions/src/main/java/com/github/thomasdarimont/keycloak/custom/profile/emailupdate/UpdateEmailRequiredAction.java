@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.profile.emailupdate;
 
-import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
-import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone.UpdatePhoneNumberRequiredAction;
+import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.InitiatedActionSupport;
@@ -16,11 +15,11 @@ import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
-import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.sessions.AuthenticationSessionModel;
@@ -39,6 +38,8 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
     public static final String ID = "acme-update-email";
 
+    public static final String AUTH_NOTE_CODE = "emailCode";
+
     public static final String EMAIL_FIELD = "email";
 
     public static final int VERIFY_CODE_LENGTH = 6;
@@ -56,7 +57,8 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
         // check whether we need to show the update custom info form.
 
-        if (!ID.equals(context.getAuthenticationSession().getClientNotes().get("kc_action"))) {
+        AuthenticationSessionModel authSession = context.getAuthenticationSession();
+        if (!ID.equals(authSession.getClientNotes().get(Constants.KC_ACTION))) {
             // only show update form if we explicitly asked for the required action execution
             return;
         }
@@ -98,11 +100,10 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
     public void processAction(RequiredActionContext context) {
 
         if (isCancelApplicationInitiatedAction(context)) {
-            AuthenticationSessionModel authSession = context.getAuthenticationSession();
-            AuthenticationManager.setKcActionStatus(UpdatePhoneNumberRequiredAction.ID, RequiredActionContext.KcActionStatus.CANCELLED, authSession);
-            authSession.removeAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
-            authSession.removeAuthNote(UPDATE_EMAIL_AUTH_NOTE);
-            context.success();
+            RequiredActionUtils.cancelApplicationInitiatedAction(context, ID, authSession -> {
+                authSession.removeAuthNote(AUTH_NOTE_CODE);
+                authSession.removeAuthNote(UPDATE_EMAIL_AUTH_NOTE);
+            });
             return;
         }
 
@@ -129,13 +130,13 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
             final String emailError;
             if (Validation.isBlank(newEmail) || !Validation.isEmailValid(newEmail)) {
                 emailError = "invalidEmailMessage";
-                errorEvent.detail("error","invalid-email-format");
+                errorEvent.detail("error", "invalid-email-format");
             } else if (Objects.equals(newEmail, user.getEmail())) {
                 emailError = "invalidEmailSameAddressMessage";
-                errorEvent.detail("error","invalid-email-same-email");
+                errorEvent.detail("error", "invalid-email-same-email");
             } else if (session.users().getUserByEmail(realm, newEmail) != null) {
                 emailError = "invalidEmailMessage";
-                errorEvent.detail("error","invalid-email-already-in-use");
+                errorEvent.detail("error", "invalid-email-already-in-use");
             } else {
                 emailError = null;
             }
@@ -152,7 +153,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
             }
 
             String code = RandomString.randomCode(VERIFY_CODE_LENGTH).toLowerCase();
-            context.getAuthenticationSession().setAuthNote(SmsAuthenticator.AUTH_NOTE_CODE, code);
+            authSession.setAuthNote(AUTH_NOTE_CODE, code);
 
             LoginFormsProvider form = context.form();
             form.setAttribute("currentEmail", newEmail);
@@ -199,7 +200,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
         if (formData.getFirst("verify") != null) {
             String emailFromAuthNote = authSession.getAuthNote(UPDATE_EMAIL_AUTH_NOTE);
-            String expectedCode = context.getAuthenticationSession().getAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
+            String expectedCode = authSession.getAuthNote(AUTH_NOTE_CODE);
             String actualCode = String.valueOf(formData.getFirst("code")).trim();
             if (!expectedCode.equals(actualCode)) {
                 LoginFormsProvider form = context.form();

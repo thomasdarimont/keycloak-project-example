@@ -14,6 +14,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
+import org.keycloak.representations.IDToken;
 
 @JBossLog
 public class SmsCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
@@ -53,14 +54,25 @@ public class SmsCredentialProvider implements CredentialProvider<CredentialModel
         }
 
         SmsCredentialModel model = (SmsCredentialModel) credentialModel;
+
+        String phoneNumber = extractPhoneNumber(model, user);
+
         model.setType(SmsCredentialModel.TYPE);
         model.setCreatedDate(Time.currentTimeMillis());
-        model.setUserLabel("SMS @ " + PhoneNumberUtils.abbreviatePhoneNumber(model.getPhoneNumber()));
+        model.setUserLabel("SMS @ " + PhoneNumberUtils.abbreviatePhoneNumber(phoneNumber));
         model.writeCredentialData();
 
         session.userCredentialManager().createCredential(realm, user, model);
 
         return model;
+    }
+
+    private String extractPhoneNumber(SmsCredentialModel model, UserModel user) {
+        if (model.getPhoneNumber() != null) {
+            return model.getPhoneNumber();
+        }
+
+        return user.getFirstAttribute(IDToken.PHONE_NUMBER);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.InitiatedActionSupport;
@@ -18,7 +19,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
-import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.sessions.AuthenticationSessionModel;
@@ -41,7 +41,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     public static final int VERIFY_CODE_LENGTH = 6;
 
-    private static final String PHONENUMBER_AUTH_NOTE = ID + "-number";
+    private static final String PHONE_NUMBER_AUTH_NOTE = ID + "-number";
 
     @Override
     public InitiatedActionSupport initiatedActionSupport() {
@@ -76,7 +76,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         LoginFormsProvider form = context.form();
         form.setAttribute("username", context.getUser().getUsername());
 
-        if (context.getAuthenticationSession().getAuthNote(PHONENUMBER_AUTH_NOTE) != null) {
+        if (context.getAuthenticationSession().getAuthNote(PHONE_NUMBER_AUTH_NOTE) != null) {
             // we are already sent a code
             return form.createForm("update-phone-number-form.ftl");
         }
@@ -96,11 +96,10 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
     public void processAction(RequiredActionContext context) {
 
         if (isCancelApplicationInitiatedAction(context)) {
-            AuthenticationSessionModel authSession = context.getAuthenticationSession();
-            AuthenticationManager.setKcActionStatus(UpdatePhoneNumberRequiredAction.ID, RequiredActionContext.KcActionStatus.CANCELLED, authSession);
-            authSession.removeAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
-            authSession.removeAuthNote(PHONENUMBER_AUTH_NOTE);
-            context.success();
+            RequiredActionUtils.cancelApplicationInitiatedAction(context, ID, authSession -> {
+                authSession.removeAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
+                authSession.removeAuthNote(PHONE_NUMBER_AUTH_NOTE);
+            });
             return;
         }
 
@@ -143,14 +142,14 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
             boolean result = new SmsCodeSender().sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), VERIFY_CODE_LENGTH, 300,
                     authSession);
 
-            authSession.setAuthNote(PHONENUMBER_AUTH_NOTE, phoneNumber);
+            authSession.setAuthNote(PHONE_NUMBER_AUTH_NOTE, phoneNumber);
             form.setInfo("smsSentInfo", phoneNumber);
             context.challenge(form.createForm("verify-phone-number-form.ftl"));
             return;
         }
 
         if (formData.getFirst("verify") != null) {
-            String phoneNumberFromAuthNote = authSession.getAuthNote(PHONENUMBER_AUTH_NOTE);
+            String phoneNumberFromAuthNote = authSession.getAuthNote(PHONE_NUMBER_AUTH_NOTE);
             String expectedCode = context.getAuthenticationSession().getAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
             String actualCode = formData.getFirst("code");
             if (!expectedCode.equals(actualCode)) {
@@ -182,6 +181,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         );
 
         SmsCredentialModel model = new SmsCredentialModel();
+        // TODO add support for referencing the phoneNumber from the user profile.
         model.setPhoneNumber(phoneNumber);
 
         ucm.createCredentialThroughProvider(realm, user, model);
@@ -193,7 +193,6 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         MultivaluedMap<String, String> formParams = httpRequest.getDecodedFormParameters();
         return formParams.containsKey(LoginActionsService.CANCEL_AIA);
     }
-
 
     @Override
     public void close() {
