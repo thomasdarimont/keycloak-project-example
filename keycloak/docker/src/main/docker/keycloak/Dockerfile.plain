@@ -10,6 +10,8 @@ RUN true \
     && microdnf clean all \
     && true
 
+COPY --chown=jboss:jboss ./mitigate-cves.java $JBOSS_TOOLS/
+
 USER jboss
 
 RUN  $JAVA_HOME/bin/java $JBOSS_TOOLS/mitigate-cves.java
