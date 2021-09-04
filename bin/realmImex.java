@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-class realm {
+class realmImex {
 
     static final String HELP_CMD = "--help";
 
@@ -34,7 +34,7 @@ class realm {
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
             System.out.println("Realm import/export for keycloak environment");
-            System.out.printf("%s will support the following options as command line parameters: %n", "realm.java");
+            System.out.printf("%s will support the following options as command line parameters: %n", "realmImex.java");
             System.out.println("");
             System.out.printf("Options can be set by environment-variables %s,%s and %s", MIGRATION_REALM_ENV, MIGRATION_ACTION_ENV, ADDITIONAL_OPTIONS_ENV);
             System.out.println("");
