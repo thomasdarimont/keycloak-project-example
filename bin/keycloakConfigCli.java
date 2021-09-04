@@ -1,8 +1,3 @@
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -44,14 +39,14 @@ class keycloakConfigCli {
             System.exit(0);
         }
 
-        var configFileOrFolder = Optional.ofNullable(System.getenv(IMPORT_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMPORT_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide a keycloak-config-cli file or folder to import with "+IMPORT_OPT)));
-        var keycloakUrl = Optional.ofNullable(System.getenv(KEYCLOAK_URL_ENV)).orElse(argList.stream().filter(s -> s.startsWith(KEYCLOAK_URL_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide a keycloak-url to apply import to "+KEYCLOAK_URL_OPT)));
+        var configFileOrFolder = Optional.ofNullable(System.getenv(IMPORT_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMPORT_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide a keycloak-config-cli file or folder to import with " + IMPORT_OPT)));
+        var keycloakUrl = Optional.ofNullable(System.getenv(KEYCLOAK_URL_ENV)).orElse(argList.stream().filter(s -> s.startsWith(KEYCLOAK_URL_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide a keycloak-url to apply import to " + KEYCLOAK_URL_OPT)));
         var envFile = Optional.ofNullable(System.getenv(ENV_FILE_ENV)).orElse(argList.stream().filter(s -> s.startsWith(ENV_FILE_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(ENV_FILE_DEFAULT));
         var keycloakConfigCliVersion = Optional.ofNullable(System.getenv(KEYCLOAOK_CONFIG_CLI_VERSION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(KEYCLOAOK_CONFIG_CLI_VERSION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(KEYCLOAOK_CONFIG_CLI_VERSION_DEFAULT));
 
         var configFileOrFolderAsFile = Path.of(configFileOrFolder).toRealPath(LinkOption.NOFOLLOW_LINKS).toFile();
-        var pathToConfig;
-        var fileOrDirectoryNameOfConfig;
+        var pathToConfig = "";
+        var fileOrDirectoryNameOfConfig = "";
         if (configFileOrFolderAsFile.isFile()) {
             pathToConfig = configFileOrFolderAsFile.getParent();
             fileOrDirectoryNameOfConfig = CONFIG_PATH_IN_CONTAINER + "/" + configFileOrFolderAsFile.getName();
