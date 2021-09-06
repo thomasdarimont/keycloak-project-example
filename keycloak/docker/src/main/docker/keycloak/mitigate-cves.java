@@ -1,14 +1,21 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class MitigateCves {
+class MitigateCves {
+
+    static final boolean VERIFY_CHECKSUM = Boolean.getBoolean("verifyChecksum");
+
+    static final boolean FAIL_ON_FAILED_MITIGATION = Boolean.getBoolean("failOnFailedMitigation");
 
     public static void main(String[] args) {
 
@@ -19,8 +26,10 @@ public class MitigateCves {
 
         List<CveFix> cveFixes = Arrays.asList(
 
+                // Remove unused hornetq modules with CVEs
                 new CveFixDeleteLibrary(baseModulesFolder + "/org/hornetq"),
 
+                // Remove unused activemq modules with CVEs
                 new CveFixDeleteLibrary(baseModulesFolder + "/org/apache/activemq"),
                 new CveFixDeleteLibrary(baseModulesFolder + "/org/wildfly/extension/messaging-activemq"),
                 new CveFixReplaceInFile(baseModulesFolder + "/org/jboss/jts/main/module.xml"
@@ -28,154 +37,166 @@ public class MitigateCves {
                         , ""
                 ),
 
+                // Remove unused jboss-client.jar library with CVEs
                 new CveFixDeleteLibrary(keycloakHomeFolder + "/bin/client/jboss-client.jar"),
 
-                new CveFixReplaceLibrary(baseModulesFolder + "/org/apache/sshd/main"
-                        , "sshd-common-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "sshd-common-${fixedVersion}.jar"
+                // Replace module jars with CVEs with the latest compatible fixed version.
+                new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/apache/sshd/main"
+                        , "sshd-common-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=org/apache/sshd/sshd-common/${fixedVersion}/sshd-common-${fixedVersion}.jar"
+                        , "bbd38821c00f4b0d20271d8a4cd89336d7e7ac57458486c1c9c3798a6e4b873d"
                         , "2.4.0"
                         , "2.7.0"
 
                 ),
-                new CveFixReplaceLibrary(baseModulesFolder + "/org/apache/sshd/main"
-                        , "sshd-core-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "sshd-core-${fixedVersion}.jar"
+                new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/apache/sshd/main"
+                        , "sshd-core-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=org/apache/sshd/sshd-core/${fixedVersion}/sshd-core-${fixedVersion}.jar"
+                        , "2f23d666dd1fd3317891d784f324542e236d89658c02adc7c02d137aa556e636"
                         , "2.4.0"
                         , "2.7.0"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/apache/commons/io/main"
-                        , "commons-io-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "commons-io-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/apache/commons/io/main"
+                        , "commons-io-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=commons-io/commons-io/${fixedVersion}/commons-io-${fixedVersion}.jar"
+                        , "4547858fff38bbf15262d520685b184a3dce96897bc1844871f055b96e8f6e95"
                         , "2.5"
                         , "2.7"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/codehaus/jackson/jackson-core-asl/main"
-                        , "jackson-core-asl-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "jackson-core-asl-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/codehaus/jackson/jackson-core-asl/main"
+                        , "jackson-core-asl-${version}.jar"
                         , "https://maven.repository.redhat.com/ga/org/codehaus/jackson/jackson-core-asl/${fixedVersion}/jackson-core-asl-${fixedVersion}.jar"
+                        , "689ab8fc802693d1780881aac982a820df2585e07ddce0d12a9854a15ba296d5"
                         , "1.9.13.redhat-00007"
                         , "1.9.14.jdk17-redhat-00001"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/codehaus/jackson/jackson-jaxrs/main"
-                        , "jackson-jaxrs-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "jackson-jaxrs-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/codehaus/jackson/jackson-jaxrs/main"
+                        , "jackson-jaxrs-${version}.jar"
                         , "https://maven.repository.redhat.com/ga/org/codehaus/jackson/jackson-jaxrs/${fixedVersion}/jackson-jaxrs-${fixedVersion}.jar"
+                        , "59d11daff360654c8ce258dea35b1a2babeb7e71ebe39fa1487be22dba63627d"
                         , "1.9.13.redhat-00007"
                         , "1.9.14.jdk17-redhat-00001"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/codehaus/jackson/jackson-mapper-asl/main"
-                        , "jackson-mapper-asl-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "jackson-mapper-asl-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/codehaus/jackson/jackson-mapper-asl/main"
+                        , "jackson-mapper-asl-${version}.jar"
                         , "https://maven.repository.redhat.com/ga/org/codehaus/jackson/jackson-mapper-asl/${fixedVersion}/jackson-mapper-asl-${fixedVersion}.jar"
+                        , "d83e364a0dda7345bef76c3f17b7cf6eff6ac6bbbe31fc6ef24c05a940a0de79"
                         , "1.9.13.redhat-00007"
                         , "1.9.14.jdk17-redhat-00001"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/codehaus/jackson/jackson-xc/main"
-                        , "jackson-xc-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "jackson-xc-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/codehaus/jackson/jackson-xc/main"
+                        , "jackson-xc-${version}.jar"
                         , "https://maven.repository.redhat.com/ga/org/codehaus/jackson/jackson-xc/${fixedVersion}/jackson-xc-${fixedVersion}.jar"
+                        , "8911a987be9a38dc1c7e11bae738189d30951d6b5839b04ea70b0c2d0059ee1e"
                         , "1.9.13.redhat-00007"
                         , "1.9.14.jdk17-redhat-00001"
                 )
 
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/picketlink/common/main"
-                        , "picketlink-common-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "picketlink-common-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/picketlink/common/main"
+                        , "picketlink-common-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=org/picketlink/picketlink-common/${fixedVersion}/picketlink-common-${fixedVersion}.jar"
+                        , "f9c4cd25ef29ac571329a36957f4dafc5181a6a6522cf9923149df71934159eb"
                         , "2.5.5.SP12-redhat-00009"
                         , "2.7.1.Final"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/picketlink/federation/main"
-                        , "picketlink-federation-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "picketlink-federation-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/picketlink/federation/main"
+                        , "picketlink-federation-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=org/picketlink/picketlink-federation/${fixedVersion}/picketlink-federation-${fixedVersion}.jar"
+                        , "3a2813ea923b5913cee7a34cfa3cf59e8e25993234381025cbff6342ae0705dc"
                         , "2.5.5.SP12-redhat-00009"
                         , "2.7.1.Final"
                 )
 
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/io/undertow/core/main"
-                        , "undertow-core-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "undertow-core-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/io/undertow/core/main"
+                        , "undertow-core-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=io/undertow/undertow-core/${fixedVersion}/undertow-core-${fixedVersion}.jar"
+                        , "6f1dd211ce9b8d32b6b1ca2c05a43c38912b674c3bab415dd8ec9ad863f958fc"
                         , "2.2.5.Final"
                         , "2.2.10.Final"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/io/undertow/websocket/main"
-                        , "undertow-websockets-jsr-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "undertow-websockets-jsr-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/io/undertow/websocket/main"
+                        , "undertow-websockets-jsr-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=io/undertow/undertow-websockets-jsr/${fixedVersion}/undertow-websockets-jsr-${fixedVersion}.jar"
+                        , "e676456d3f30a3778e0e0975d48aceb5a559db87043fe4f5a022db0d189af39d"
                         , "2.2.5.Final"
                         , "2.2.10.Final"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/io/undertow/servlet/main"
-                        , "undertow-servlet-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "undertow-servlet-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/io/undertow/servlet/main"
+                        , "undertow-servlet-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=io/undertow/undertow-servlet/${fixedVersion}/undertow-servlet-${fixedVersion}.jar"
+                        , "99f41ef1cf39b4cb12e26ed598c7c0eb33558bbc2cb39faab1961d7857149ea4"
                         , "2.2.5.Final"
                         , "2.2.10.Final"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/jsoup/main"
-                        , "jsoup-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "jsoup-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/jsoup/main"
+                        , "jsoup-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=org/jsoup/jsoup/${fixedVersion}/jsoup-${fixedVersion}.jar"
+                        , "a601ba7ce2e2c6e744d4eac793a76707c0121576170ef717ef7a81f2343ada1a"
                         , "1.8.3"
                         , "1.14.2"
                 )
 
-                , new CveFixReplaceLibrary(baseModulesFolder + "/org/apache/thrift/main"
-                        , "libthrift-${vulnerableVersion}.jar"
-                        , "module.xml"
-                        , "libthrift-${fixedVersion}.jar"
+                , new CveFixReplaceModuleLibrary(
+                        baseModulesFolder + "/org/apache/thrift/main"
+                        , "libthrift-${version}.jar"
                         , "https://search.maven.org/remotecontent?filepath=org/apache/thrift/libthrift/${fixedVersion}/libthrift-${fixedVersion}.jar"
+                        , "a10526fe196f6bb3614c85e6c0b5e04a99dfd1bb748b1997586b0d0e8426f159"
                         , "0.13.0"
                         , "0.14.2"
                 )
         );
 
+        int fixed = 0;
+        int failed = 0;
+        int ignored = 0;
         for (var cveFix : cveFixes) {
             System.out.println("### Applying: " + cveFix);
             Result result = cveFix.apply();
             switch (result) {
                 case FIXED:
+                    fixed++;
                     System.out.println("## Successfully applied: " + cveFix);
                     break;
                 case FAILED:
+                    failed++;
                     System.out.println("## Failed to apply: " + cveFix);
                     break;
                 case IGNORED:
+                    ignored++;
                     System.out.println("## Ignored: " + cveFix);
                     break;
             }
         }
 
-        System.out.println("### Mitigation completed.");
+        System.out.printf("### Mitigation completed. (fixed=%s failed=%s ignored=%s)%n", fixed, failed, ignored);
+
+        if (failed > 0 && FAIL_ON_FAILED_MITIGATION) {
+            System.exit(1);
+        }
     }
 
     interface CveFix {
@@ -255,34 +276,47 @@ public class MitigateCves {
         }
     }
 
+    static class CveFixReplaceModuleLibrary extends CveFixReplaceLibrary {
+
+        public CveFixReplaceModuleLibrary(String moduleFolder, String fileNamePattern,
+                                          String newUrl, String newFileChecksum, String vulnerableVersion, String fixedVersion) {
+            super(moduleFolder
+                    , "module.xml"
+                    , fileNamePattern.replace("${version}", "${vulnerableVersion}")
+                    , fileNamePattern.replace("${version}", "${fixedVersion}")
+                    , newUrl
+                    , newFileChecksum
+                    , vulnerableVersion
+                    , fixedVersion);
+
+        }
+    }
+
     static class CveFixReplaceLibrary implements CveFix {
 
         final String moduleFolder;
         final String vulnerableFileName;
         final String fileToPatch;
         final String newUrl;
+        final String newFileChecksum;
         final String fixedFileName;
         final String fileToDelete;
         final String vulnerableVersion;
         final String fixedVersion;
 
-        public CveFixReplaceLibrary(String moduleFolder, String vulnerableFileName, String fileToPatch, String fixedFileName, String newUrl,
+        public CveFixReplaceLibrary(String moduleFolder, String fileToPatch,
+                                    String vulnerableFileName, String fixedFileName, String newUrl,
+                                    String newFileChecksum,
                                     String vulnerableVersion, String fixedVersion) {
-            this(moduleFolder, vulnerableFileName, moduleFolder + "/" + fileToPatch, newUrl, fixedFileName, moduleFolder + "/" + vulnerableFileName,
-                    vulnerableVersion, fixedVersion);
-        }
-
-        public CveFixReplaceLibrary(
-                String moduleFolder, String vulnerableFileName, String fileToPatch, String newUrl, String fixedFileName, String fileToDelete,
-                String vulnerableVersion, String fixedVersion) {
             this.moduleFolder = moduleFolder;
+            this.fileToPatch = moduleFolder + "/" + fileToPatch;
             this.vulnerableVersion = vulnerableVersion;
             this.fixedVersion = fixedVersion;
-            this.fileToPatch = fileToPatch;
             this.newUrl = replaceVersions(newUrl);
+            this.newFileChecksum = newFileChecksum;
             this.vulnerableFileName = replaceVersions(vulnerableFileName);
             this.fixedFileName = replaceVersions(fixedFileName);
-            this.fileToDelete = replaceVersions(fileToDelete);
+            this.fileToDelete = replaceVersions(moduleFolder + "/" + vulnerableFileName);
         }
 
         private String replaceVersions(String input) {
@@ -291,7 +325,7 @@ public class MitigateCves {
                 return null;
             }
 
-            String result = input;
+            var result = input;
             if (input.contains("${vulnerableVersion}") && vulnerableVersion != null) {
                 result = result.replace("${vulnerableVersion}", vulnerableVersion);
             }
@@ -311,9 +345,24 @@ public class MitigateCves {
             }
 
             if (newUrl != null) {
-                boolean downloaded = Utils.downloadFile(newUrl, moduleFolder + "/" + fixedFileName);
+                var targetFileLocation = moduleFolder + "/" + fixedFileName;
+                var downloaded = Utils.downloadFile(newUrl, targetFileLocation);
                 if (downloaded) {
                     System.out.println("Downloaded fixed file: " + fixedFileName);
+
+                    try {
+                        var fileChecksum = Utils.getFileChecksum(MessageDigest.getInstance("SHA-256"), new File(targetFileLocation));
+                        System.out.println("Checksum: " + fileChecksum);
+
+                        if (VERIFY_CHECKSUM) {
+                            if (!newFileChecksum.equals(fileChecksum)) {
+                                System.out.println("Checksum does not match!");
+                                return Result.FAILED;
+                            }
+                        }
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 } else {
                     System.out.println("Failed to download fixed file: " + fixedFileName);
                 }
@@ -331,7 +380,7 @@ public class MitigateCves {
         }
 
         public String toString() {
-            return "CveFixReplaceLibrary: " + fileToDelete + "\nVulnerable file: " + vulnerableFileName + "\nFixed file: " + fixedFileName;
+            return getClass().getSimpleName() + "> Replaced: " + vulnerableFileName + " with: " + fixedFileName;
         }
     }
 
@@ -339,7 +388,7 @@ public class MitigateCves {
 
         private static boolean deleteFile(File file) {
             System.out.printf("Delete file=%s%n", file);
-            boolean deleted = file.delete();
+            var deleted = file.delete();
             if (deleted) {
                 System.out.printf("Successfully deleted file=%s%n", file);
             }
@@ -365,9 +414,9 @@ public class MitigateCves {
 
             try {
                 System.out.printf("Replace text in file=%s search=%s replace=%s%n", location, search, replace);
-                Path path = new File(location).toPath();
-                String content = Files.readString(path, StandardCharsets.UTF_8);
-                String replaced = content.replace(search, replace);
+                var path = new File(location).toPath();
+                var content = Files.readString(path, StandardCharsets.UTF_8);
+                var replaced = content.replace(search, replace);
                 Files.writeString(path, replaced, StandardCharsets.UTF_8);
                 return true;
             } catch (Exception ex) {
@@ -380,9 +429,9 @@ public class MitigateCves {
 
             try {
                 System.out.printf("Replace text in file=%s search=%s replace=%s%n", location, searchPattern, replace);
-                Path path = new File(location).toPath();
-                String content = Files.readString(path, StandardCharsets.UTF_8);
-                String replaced = content.replaceAll(searchPattern, replace);
+                var path = new File(location).toPath();
+                var content = Files.readString(path, StandardCharsets.UTF_8);
+                var replaced = content.replaceAll(searchPattern, replace);
                 Files.writeString(path, replaced, StandardCharsets.UTF_8);
                 return true;
             } catch (Exception ex) {
@@ -394,13 +443,36 @@ public class MitigateCves {
         static boolean downloadFile(String url, String targetFile) {
             try {
                 System.out.println("Downloading file: " + url);
-                URL fileUrl = new URL(url);
+                var fileUrl = new URL(url);
                 Files.copy(fileUrl.openStream(), new File(targetFile).toPath());
                 return true;
             } catch (Exception ex) {
                 System.err.println("Could not download file from url: " + url);
             }
             return false;
+        }
+
+        static String getFileChecksum(MessageDigest digest, File file) throws IOException {
+
+            try (var fis = new FileInputStream(file)) {
+
+                var byteArray = new byte[8192];
+                var bytesCount = 0;
+
+                while ((bytesCount = fis.read(byteArray)) != -1) {
+                    digest.update(byteArray, 0, bytesCount);
+                }
+            }
+
+            var bytes = digest.digest();
+
+            //Convert it to hexadecimal format
+            var sb = new StringBuilder();
+            for (byte aByte : bytes) {
+                sb.append(Integer.toString((aByte & 0xff) + 0x100, 16).substring(1));
+            }
+
+            return sb.toString();
         }
     }
 }
