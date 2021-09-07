@@ -562,22 +562,27 @@
             let btnSave = document.getElementById("btnSaveSettings");
             btnSave.disabled = true;
 
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
-                timeout: 2000,
-                method: "PUT",
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json",
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(settings)
-            });
+            try {
+                let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
+                    timeout: 2000,
+                    method: "PUT",
+                    headers: {
+                        "Authorization": "Bearer " + keycloak.token,
+                        "Accept": "application/json",
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
 
-            if (response.ok) {
-                newSettingsData = await response.json();
-                settingsStatus.innerText = "Settings saved";
-            } else {
-                newSettingsData = {error: "status " + response.status};
+                if (response.ok) {
+                    newSettingsData = await response.json();
+                    settingsStatus.innerText = "Settings saved";
+                } else {
+                    newSettingsData = {error: "status " + response.status};
+                    settingsStatus.innerText = "Could not save settings";
+                }
+            } catch (exception) {
+                newSettingsData = {error: "status " + exception};
                 settingsStatus.innerText = "Could not save settings";
             }
             setTimeout(() => {
