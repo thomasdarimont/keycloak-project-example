@@ -74,7 +74,8 @@ class JwtSecurityConfig {
 
     @Bean
     Converter<Jwt, Collection<GrantedAuthority>> keycloakGrantedAuthoritiesConverter(GrantedAuthoritiesMapper authoritiesMapper, AcmeServiceProperties acmeServiceProperties) {
-        return new KeycloakGrantedAuthoritiesConverter(acmeServiceProperties.getJwt().getClientId(), authoritiesMapper);
+        String clientId = acmeServiceProperties.getJwt().getClientId();
+        return new KeycloakGrantedAuthoritiesConverter(clientId, authoritiesMapper);
     }
 
 }

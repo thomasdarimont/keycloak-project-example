@@ -1,7 +1,5 @@
 package com.acme.backend.springboot.users.support.permissions;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.PermissionEvaluator;
@@ -9,9 +7,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
+/**
+ * Custom {@link PermissionEvaluator} for method level permission checks.
+ *
+ * @see com.acme.backend.springboot.users.config.MethodSecurityConfig
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

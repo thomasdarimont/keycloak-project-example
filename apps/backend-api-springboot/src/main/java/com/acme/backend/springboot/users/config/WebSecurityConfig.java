@@ -1,7 +1,9 @@
 package com.acme.backend.springboot.users.config;
 
+import com.acme.backend.springboot.users.support.access.AccessController;
 import com.acme.backend.springboot.users.support.keycloak.KeycloakJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,7 +21,7 @@ import java.util.List;
  */
 @EnableWebSecurity
 @RequiredArgsConstructor
-class KeycloakWebSecurityConfig extends WebSecurityConfigurerAdapter {
+class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter;
 
@@ -46,12 +48,17 @@ class KeycloakWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // declarative route configuration
 //                .mvcMatchers("/api").hasAuthority("ROLE_ACCESS")
-                .mvcMatchers("/api").access("@accessController.checkAccess()")
+                .mvcMatchers("/api/**").access("@accessController.checkAccess()")
                 //...
                 .anyRequest().fullyAuthenticated()
                 .and()
                 .oauth2ResourceServer()
                 .jwt().jwtAuthenticationConverter(keycloakJwtAuthenticationConverter);
+    }
+
+    @Bean
+    AccessController accessController() {
+        return new AccessController();
     }
 
     /**
