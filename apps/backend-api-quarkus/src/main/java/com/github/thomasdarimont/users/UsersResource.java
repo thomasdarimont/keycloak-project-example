@@ -10,7 +10,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +30,9 @@ public class UsersResource {
 
     @GET
     @Path("/me")
-    public Object me() {
+    public Object me(@Context UriInfo uriInfo) {
 
-        log.infof("### Access me");
+        log.infof("### Accessing " + uriInfo.getPath());
 
         Object username = jwt.getClaim("preferred_username");
         Map<String, Object> data = new HashMap<>();
