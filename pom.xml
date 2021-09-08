@@ -14,6 +14,7 @@
         <module>keycloak/extensions</module>
         <module>keycloak/docker</module>
         <module>apps/backend-api-quarkus</module>
+        <module>apps/backend-api-springboot</module>
         <module>apps/offline-session-client</module>
     </modules>
 

@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.users;
+package com.acme.backend.quarkus.users;
 
 import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
@@ -32,7 +32,7 @@ public class UsersResource {
     @Path("/me")
     public Object me(@Context UriInfo uriInfo) {
 
-        log.infof("### Accessing " + uriInfo.getPath());
+        log.infof("### Accessing %s", uriInfo.getPath());
 
         Object username = jwt.getClaim("preferred_username");
         Map<String, Object> data = new HashMap<>();

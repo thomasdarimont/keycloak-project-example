@@ -623,6 +623,8 @@
 
         let meData;
         try {
+            // https://apps.acme.test:4543 backend-api-quarkus
+            // https://apps.acme.test:4643 backend-api-springboot
             let response = await fetch("https://apps.acme.test:4543/api/users/me", {
                 timeout: 2000,
                 headers: {
