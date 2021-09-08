@@ -134,6 +134,7 @@ public class KeycloakTestSupport {
         keycloakConfigCli.addEnv("KEYCLOAK_URL", keycloakContainer.getAuthServerUrl());
         keycloakConfigCli.addEnv("KEYCLOAK_FRONTEND_URL", keycloakContainer.getAuthServerUrl());
         keycloakConfigCli.addEnv("APPS_FRONTEND_URL_MINISPA", "http://localhost:4000");
+        keycloakConfigCli.addEnv("APPS_FRONTEND_URL_GREETME", "http://localhost:4000");
         keycloakConfigCli.addEnv("ACME_AZURE_AAD_TENANT_URL", "https://login.microsoftonline.com/dummy-azuread-tenant-id");
 
         // TODO make the realm config folder parameterizable
