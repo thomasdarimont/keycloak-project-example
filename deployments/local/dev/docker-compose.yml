@@ -30,6 +30,7 @@ services:
       - "-bmanagement"
       - "0.0.0.0"
       - "-Dwildfly.statistics-enabled=true"
+#      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
       # 172.17.0.1 is host.docker.internal
       - "id.acme.test:172.17.0.1"

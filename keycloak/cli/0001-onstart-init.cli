@@ -16,6 +16,12 @@ echo SETUP: Configure log levels
 /subsystem=logging/logger=org.keycloak:write-attribute(name=level,value=${env.KEYCLOAK_LOGLEVEL_KEYCLOAK:INFO})
 /subsystem=logging/logger=com.github.thomasdarimont.keycloak:add(level=${env.KEYCLOAK_LOGLEVEL_ACME:INFO})
 
+echo SETUP: Configure HTTP log levels
+# You need to set the JVM System property to enable the request logging
+# -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog
+/subsystem=logging/logger=org.apache.http:add(level=${env.KEYCLOAK_LOGLEVEL_HTTP_CLIENT:DEBUG})
+/subsystem=logging/logger=org.apache.http.wire:add(level=${env.KEYCLOAK_LOGLEVEL_HTTP_CLIENT_WIRE:DEBUG})
+
 ### Event Listeners SPI Configuration ###
 echo SETUP: Event Listeners configuration
 # Add dedicated eventsListener config element to allow configuring elements.
