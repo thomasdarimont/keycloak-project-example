@@ -3,7 +3,7 @@
  * @param app
  * @param LOG
  */
-function initApi(app, LOG, config) {
+function initApi(app, config, LOG) {
 
     // API routes can then access JWT claims in the request object via request.user
     app.get('/api/users/me', (req, res) => {

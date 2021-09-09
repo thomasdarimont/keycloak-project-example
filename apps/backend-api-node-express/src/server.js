@@ -3,7 +3,7 @@ import fs from "fs";
 import stoppable from "stoppable";
 import {promisify} from "es6-promisify";
 
-function createServerForApp(app, LOG, config) {
+function createServerForApp(app, config, LOG) {
 
     const httpsServer = https.createServer({
         key: fs.readFileSync(config.TLS_KEY),

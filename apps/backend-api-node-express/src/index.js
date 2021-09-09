@@ -5,10 +5,10 @@ import initLogging from './logging.js';
 
 import createExpressApp from './express.js';
 import createApiEndpoints from './api.js';
-import createServerForApp from "./server.js";
+import createServer from "./server.js";
 
 const LOG = initLogging(config);
 
 const app = createExpressApp(config, LOG);
-createApiEndpoints(app, LOG, config);
-createServerForApp(app, LOG, config);
+createApiEndpoints(app, config, LOG);
+createServer(app, config, LOG);
