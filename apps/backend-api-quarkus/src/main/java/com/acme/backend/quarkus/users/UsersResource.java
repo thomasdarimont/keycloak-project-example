@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
@@ -28,15 +29,28 @@ public class UsersResource {
     @Inject
     JsonWebToken jwt;
 
+    @Context
+    SecurityContext securityContext;
+
+    @Context
+    UriInfo uriInfo;
+
     @GET
     @Path("/me")
-    public Object me(@Context UriInfo uriInfo) {
+    public Object me() {
 
         log.infof("### Accessing %s", uriInfo.getPath());
 
-        Object username = jwt.getClaim("preferred_username");
+        // Note in order to have role information in the token, you need to add the microprofile-jwt scope
+        // to the token to populate the groups claim with the realm roles.
+        // securityContext.isUserInRole("admin");
+
+        //Object username = jwt.getClaim("preferred_username");
+        String username = securityContext.getUserPrincipal().getName();
+
         Map<String, Object> data = new HashMap<>();
         data.put("message", "Hello " + username);
+        data.put("backend", "Quarkus");
         return data;
     }
 
