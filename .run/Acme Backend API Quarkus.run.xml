@@ -11,7 +11,9 @@
               <set />
             </option>
             <option name="goals">
-              <list />
+              <list>
+                <option value="quarkus:dev" />
+              </list>
             </option>
             <option name="pomFileName" value="pom.xml" />
             <option name="profilesMap">
