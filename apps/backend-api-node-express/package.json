@@ -11,6 +11,7 @@
     "express-jwt": "^6.1.0",
     "https": "^1.0.0",
     "jwks-rsa": "^2.0.4",
+    "spdy": "^4.0.2",
     "stoppable": "^1.1.0",
     "winston": "^3.3.3"
   },

@@ -3,9 +3,11 @@ import fs from "fs";
 import stoppable from "stoppable";
 import {promisify} from "es6-promisify";
 
+import spdy from "spdy";
+
 function createServerForApp(app, config, LOG) {
 
-    const httpsServer = https.createServer({
+    const httpsServer = spdy.createServer({
         key: fs.readFileSync(config.TLS_KEY),
         cert: fs.readFileSync(config.TLS_CERT),
     }, app);
@@ -14,8 +16,12 @@ function createServerForApp(app, config, LOG) {
         LOG.info(`API is listening on HTTPS port ${config.PORT}`);
     });
 
-// for Graceful shutdown see https://github.com/RisingStack/kubernetes-graceful-shutdown-example
+    // for Graceful shutdown see https://github.com/RisingStack/kubernetes-graceful-shutdown-example
+    configureGracefulShutdown(httpsServer, config, LOG);
+}
 
+
+function configureGracefulShutdown(httpsServer, config, LOG) {
 // Keep-alive connections doesn't let the server to close in time
 // Destroy extension helps to force close connections
 // Because we wait READINESS_PROBE_DELAY, we expect that all requests are fulfilled
