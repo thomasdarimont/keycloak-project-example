@@ -21,7 +21,7 @@ function configureCors(app, config, LOG) {
     LOG.info("Configure CORS");
 
     const corsOptions = {
-        origin: [config.CORS_ALLOWED_ORIGIN],
+        origin: config.CORS_ALLOWED_ORIGINS.split(","),
         methods: config.CORS_ALLOWED_METHODS.split(","),
         optionsSuccessStatus: 200 // For legacy browser support
     };

@@ -1,7 +1,7 @@
 const ISSUER = process.env.ISSUER || "https://id.acme.test:8443/auth/realms/acme-internal";
 const PORT = process.env.PORT || 4743;
-const CORS_ALLOWED_ORIGIN = process.env.CORS_ALLOWED_ORIGIN || 'https://apps.acme.test:4443';
-const CORS_ALLOWED_METHODS = process.env.CORS_ALLOWED_METHODS || 'GET';
+const CORS_ALLOWED_ORIGINS = process.env.CORS_ALLOWED_ORIGINS || 'https://apps.acme.test:4443'; // * or https://domain1:4443,https://domain2:4443
+const CORS_ALLOWED_METHODS = process.env.CORS_ALLOWED_METHODS || 'GET'; // or GET,POST,PUT
 const TLS_CERT = process.env.TLS_CERT || '../../config/stage/dev/tls/acme.test+1.pem';
 const TLS_KEY = process.env.TLS_KEY || '../../config/stage/dev/tls/acme.test+1-key.pem';
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
@@ -14,7 +14,7 @@ export default {
     ISSUER,
     PORT,
     CORS_ALLOWED_METHODS,
-    CORS_ALLOWED_ORIGIN,
+    CORS_ALLOWED_ORIGINS,
     TLS_CERT,
     TLS_KEY,
     LOG_LEVEL,
