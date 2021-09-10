@@ -91,7 +91,7 @@
             width: 100%;
         }
 
-        table.credentials, table.profile, table.apps{
+        table.credentials, table.profile, table.apps {
             width: unset;
         }
 
@@ -166,6 +166,35 @@
     let scope = searchParams.get("scope") || 'openid email acme.profile';
     // &show=profile,settings,apps,security,logout
     // &show=profile,logout,token,idToken,userinfo,reauth,account
+
+    let meInfo = {
+        backends: {
+            quarkus: {
+                label: "Quarkus",
+                url: "https://apps.acme.test:4543",
+            },
+            springboot: {
+                label: "Spring Boot",
+                url: "https://apps.acme.test:4643",
+            },
+            nodejsexpress: {
+                label: "NodeJS Express",
+                url: "https://apps.acme.test:4743",
+            }
+        },
+        currentBackend: "springboot",
+
+        updateCurrentBackend(backend) {
+            if (!backend in meInfo.backends) {
+                throw "Unsupported backend " + backend;
+            }
+            meInfo.currentBackend = backend;
+        },
+        getCurrentBackendUrl() {
+            return meInfo.backends[meInfo.currentBackend].url;
+        }
+
+    };
 
     const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout"];
     const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account"];
@@ -289,7 +318,7 @@
                     <td>${!!optInfoItem ? optInfoItem.credentialLabel : ''}</td>
                     <td>${!!optInfoItem ? formatDate(optInfoItem.createdAt) : '-'}</td>
                     <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
-                    <td>${!!optInfoItem ? '<a href="#" onclick="removeMfa(\'otp\',\'' +  optInfoItem.credentialId  +'\');return false">Remove</a>' : ''}</td>
+                    <td>${!!optInfoItem ? '<a href="#" onclick="removeMfa(\'otp\',\'' + optInfoItem.credentialId + '\');return false">Remove</a>' : ''}</td>
                 </tr>`;
             }
         } else {
@@ -623,11 +652,7 @@
 
         let meData;
         try {
-            // https://apps.acme.test:4543 backend-api-quarkus
-            // https://apps.acme.test:4643 backend-api-springboot
-            // https://apps.acme.test:4743 backend-api-node-express
-
-            let response = await fetch("https://apps.acme.test:4743/api/users/me", {
+            let response = await fetch(`${meInfo.getCurrentBackendUrl()}/api/users/me`, {
                 timeout: 2000,
                 headers: {
                     "Authorization": "Bearer " + keycloak.token,
@@ -645,8 +670,40 @@
             meData = {error: error.message};
         }
 
-        let data = JSON.stringify(meData, null, '    ');
-        show(data, "token-content");
+        let meDataJson = JSON.stringify(meData, null, '    ');
+
+        let meInfoHtml = `
+        <label for="meBackend">Backend:</label>
+        <select name="meBackend" id="meBackend" onchange="updateMeBackend()">
+        </select>
+
+        <div id="data">${meDataJson}</div>
+        `;
+        show(meInfoHtml, "token-content");
+
+        let meBackendElement = $('#meBackend');
+        meBackendElement.innerHTML = '';
+
+        for (let backend in meInfo.backends) {
+            let option = document.createElement("option");
+            let backendInfo = meInfo.backends[backend];
+            option.value = backend;
+            option.innerText = backendInfo.label;
+            if (meInfo.currentBackend === backend) {
+                option.selected = true;
+            }
+            meBackendElement.appendChild(option);
+        }
+    }
+
+    function updateMeBackend() {
+
+        console.log("updated me backend");
+        let meBackendElement = $('#meBackend');
+        let value = meBackendElement.options[meBackendElement.selectedIndex].value;
+        meInfo.updateCurrentBackend(value);
+
+        showMeInfo();
     }
 
     function show(data, cssClass) {
