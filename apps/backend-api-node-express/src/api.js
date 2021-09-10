@@ -3,7 +3,9 @@
  * @param app
  * @param LOG
  */
-function initApi(app, config, LOG) {
+function createApiEndpoints(app, config, LOG) {
+
+    LOG.info("Create API endpoints");
 
     // API routes can then access JWT claims in the request object via request.user
     app.get('/api/users/me', (req, res) => {
@@ -21,4 +23,4 @@ function initApi(app, config, LOG) {
 
 }
 
-export default initApi;
+export default createApiEndpoints;

@@ -5,7 +5,20 @@ import jwt from "express-jwt";
 
 function createExpressApp(config, LOG) {
 
+    LOG.info("Create express app");
+
     const app = express();
+
+    configureCors(app, config, LOG);
+    configureJwtAuthorization(app, config, LOG);
+
+    return app;
+}
+
+
+function configureCors(app, config, LOG) {
+
+    LOG.info("Configure CORS");
 
     const corsOptions = {
         origin: [config.CORS_ALLOWED_ORIGIN],
@@ -13,12 +26,14 @@ function createExpressApp(config, LOG) {
         optionsSuccessStatus: 200 // For legacy browser support
     }
 
-    app.use(
-        // CORS handling
-        cors(corsOptions)
-    );
+    app.use(cors(corsOptions));
+}
 
-// JWT Bearer Authorization
+function configureJwtAuthorization(app, config, LOG) {
+
+    LOG.info("Configure JWT Authorization");
+
+    // JWT Bearer Authorization
     let jwtOptions = {
         // Dynamically provide a signing key based on the kid in the header and the signing keys provided by the JWKS endpoint.
         secret: jwksRsa.expressJwtSecret({
@@ -42,12 +57,7 @@ function createExpressApp(config, LOG) {
         algorithms: ['RS256']
     };
 
-    app.use('/api/*',
-        // API Authorization
-        jwt(jwtOptions)
-    );
-
-    return app;
+    app.use('/api/*', jwt(jwtOptions));
 }
 
 export default createExpressApp;

@@ -7,13 +7,15 @@ import spdy from "spdy";
 
 function createServerForApp(app, config, LOG) {
 
+    LOG.info("Create server");
+
     const httpsServer = spdy.createServer({
         key: fs.readFileSync(config.TLS_KEY),
         cert: fs.readFileSync(config.TLS_CERT),
     }, app);
 
     httpsServer.listen(config.PORT, () => {
-        LOG.info(`API is listening on HTTPS port ${config.PORT}`);
+        LOG.info(`Listening on HTTPS port ${config.PORT}`);
     });
 
     // for Graceful shutdown see https://github.com/RisingStack/kubernetes-graceful-shutdown-example
