@@ -1,11 +1,10 @@
-import https from "https";
 import fs from "fs";
 import stoppable from "stoppable";
 import {promisify} from "es6-promisify";
 
 import spdy from "spdy";
 
-function createServerForApp(app, config, LOG) {
+function createServer(app, config, LOG) {
 
     LOG.info("Create server");
 
@@ -14,12 +13,13 @@ function createServerForApp(app, config, LOG) {
         cert: fs.readFileSync(config.TLS_CERT),
     }, app);
 
+    // for Graceful shutdown see https://github.com/RisingStack/kubernetes-graceful-shutdown-example
+    configureGracefulShutdown(httpsServer, config, LOG);
+
+    // Start server
     httpsServer.listen(config.PORT, () => {
         LOG.info(`Listening on HTTPS port ${config.PORT}`);
     });
-
-    // for Graceful shutdown see https://github.com/RisingStack/kubernetes-graceful-shutdown-example
-    configureGracefulShutdown(httpsServer, config, LOG);
 }
 
 
@@ -58,4 +58,4 @@ function configureGracefulShutdown(httpsServer, config, LOG) {
     });
 }
 
-export default createServerForApp;
+export default createServer;
