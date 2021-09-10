@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Acme Backend API Quarkus" type="QuarkusRunConfigurationType" factoryName="Quarkus">
+  <configuration default="false" name="backend-api-quarkus" type="QuarkusRunConfigurationType" factoryName="Quarkus">
     <module name="backend-api-quarkus" />
     <QsMavenRunConfiguration>
       <MavenSettings>
@@ -11,9 +11,7 @@
               <set />
             </option>
             <option name="goals">
-              <list>
-                <option value="quarkus:dev" />
-              </list>
+              <list />
             </option>
             <option name="pomFileName" value="pom.xml" />
             <option name="profilesMap">
