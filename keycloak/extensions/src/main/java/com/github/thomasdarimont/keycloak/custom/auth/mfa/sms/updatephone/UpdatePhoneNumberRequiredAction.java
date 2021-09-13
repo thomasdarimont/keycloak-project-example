@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone;
 
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticatorFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
@@ -14,6 +15,7 @@ import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialManager;
@@ -34,14 +36,14 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     public static final String ID = "acme-update-phonenumber";
 
-    public static final String PHONE_NUMBER_FIELD = "mobile";
+    private static final String PHONE_NUMBER_FIELD = "mobile";
 
-    public static final String PHONE_NUMBER_ATTRIBUTE = "phone_number";
-    public static final String PHONE_NUMBER_VERIFIED_ATTRIBUTE = "phone_number_verified";
-
-    public static final int VERIFY_CODE_LENGTH = 6;
+    private static final String PHONE_NUMBER_ATTRIBUTE = "phone_number";
+    private static final String PHONE_NUMBER_VERIFIED_ATTRIBUTE = "phone_number_verified";
 
     private static final String PHONE_NUMBER_AUTH_NOTE = ID + "-number";
+    private static final String FORM_ACTION_UPDATE = "update";
+    private static final String FORM_ACTION_VERIFY = "verify";
 
     @Override
     public InitiatedActionSupport initiatedActionSupport() {
@@ -54,13 +56,15 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
         // check whether we need to show the update custom info form.
 
-        if (!ID.equals(context.getAuthenticationSession().getClientNotes().get("kc_action"))) {
+        AuthenticationSessionModel authSession = context.getAuthenticationSession();
+        if (!ID.equals(authSession.getClientNotes().get(Constants.KC_ACTION))) {
             // only show update form if we explicitly asked for the required action execution
             return;
         }
 
-        if (context.getUser().getFirstAttribute(PHONE_NUMBER_ATTRIBUTE) == null) {
-            context.getUser().addRequiredAction(ID);
+        UserModel user = context.getUser();
+        if (user.getFirstAttribute(PHONE_NUMBER_ATTRIBUTE) == null) {
+            user.addRequiredAction(ID);
         }
     }
 
@@ -74,14 +78,16 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
     protected Response createForm(RequiredActionContext context, Consumer<LoginFormsProvider> formCustomizer) {
 
         LoginFormsProvider form = context.form();
-        form.setAttribute("username", context.getUser().getUsername());
+        UserModel user = context.getUser();
+        form.setAttribute("username", user.getUsername());
 
-        if (context.getAuthenticationSession().getAuthNote(PHONE_NUMBER_AUTH_NOTE) != null) {
+        AuthenticationSessionModel authSession = context.getAuthenticationSession();
+        if (authSession.getAuthNote(PHONE_NUMBER_AUTH_NOTE) != null) {
             // we are already sent a code
             return form.createForm("update-phone-number-form.ftl");
         }
 
-        String phoneNumber = context.getUser().getFirstAttribute(PHONE_NUMBER_ATTRIBUTE);
+        String phoneNumber = user.getFirstAttribute(PHONE_NUMBER_ATTRIBUTE);
         form.setAttribute("currentMobile", phoneNumber == null ? "" : phoneNumber);
 
         if (formCustomizer != null) {
@@ -121,26 +127,27 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
                 .user(authSession.getAuthenticatedUser());
 
 
-        if (formData.getFirst("update") != null) {
+        if (formData.getFirst(FORM_ACTION_UPDATE) != null) {
 
             if (Validation.isBlank(phoneNumber) || phoneNumber.length() < 3) {
 
                 Response challenge = createForm(context, form -> {
                     form.addError(new FormMessage(PHONE_NUMBER_FIELD, "Invalid Input"));
                 });
-
                 context.challenge(challenge);
-
                 errorEvent.error(Errors.INVALID_INPUT);
                 return;
             }
 
-
             LoginFormsProvider form = context.form();
             form.setAttribute("currentMobile", phoneNumber);
 
-            boolean result = new SmsCodeSender().sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), VERIFY_CODE_LENGTH, 300,
-                    authSession);
+            boolean useWebOtp = true;
+            boolean result = createSmsSender(context)
+                    .sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), SmsAuthenticatorFactory.VERIFY_CODE_LENGTH, SmsAuthenticatorFactory.CODE_TTL, useWebOtp, authSession);
+            if (!result) {
+                log.warnf("Failed to send sms message. realm=%s user=%s", realm.getName(), user.getId());
+            }
 
             authSession.setAuthNote(PHONE_NUMBER_AUTH_NOTE, phoneNumber);
             form.setInfo("smsSentInfo", phoneNumber);
@@ -148,9 +155,12 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
             return;
         }
 
-        if (formData.getFirst("verify") != null) {
+        if (formData.getFirst(FORM_ACTION_VERIFY) != null) {
             String phoneNumberFromAuthNote = authSession.getAuthNote(PHONE_NUMBER_AUTH_NOTE);
             String expectedCode = context.getAuthenticationSession().getAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
+
+            // TODO check max failed attempts
+
             String actualCode = formData.getFirst("code");
             if (!expectedCode.equals(actualCode)) {
                 LoginFormsProvider form = context.form();
@@ -173,7 +183,11 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         context.failure();
     }
 
-    private void updateSmsMfaCredential(RealmModel realm, UserModel user, KeycloakSession session, String phoneNumber) {
+    protected SmsCodeSender createSmsSender(RequiredActionContext context) {
+        return new SmsCodeSender();
+    }
+
+    protected void updateSmsMfaCredential(RealmModel realm, UserModel user, KeycloakSession session, String phoneNumber) {
 
         UserCredentialManager ucm = session.userCredentialManager();
         ucm.getStoredCredentialsByTypeStream(realm, user, SmsCredentialModel.TYPE).forEach(

@@ -3,6 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
+import com.github.thomasdarimont.keycloak.custom.support.ConfigUtils;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
@@ -34,6 +35,7 @@ public class SmsAuthenticator implements Authenticator {
     static final String CONFIG_SENDER = "sender";
     static final String CONFIG_CLIENT = "client";
     static final String CONFIG_PHONENUMBER_PATTERN = "phoneNumberPattern";
+    static final String CONFIG_USE_WEBOTP = "useWebOtp";
 
     public static final String AUTH_NOTE_CODE = "smsCode";
     static final String AUTH_NOTE_ATTEMPTS = "smsAttempts";
@@ -55,7 +57,8 @@ public class SmsAuthenticator implements Authenticator {
 
         UserModel user = context.getUser();
         String phoneNumber = extractPhoneNumber(context.getSession(), context.getRealm(), user);
-        boolean validPhoneNumberFormat = validatePhoneNumberFormat(phoneNumber, context);
+        AuthenticatorConfigModel authenticatorConfig = context.getAuthenticatorConfig();
+        boolean validPhoneNumberFormat = validatePhoneNumberFormat(phoneNumber, authenticatorConfig);
         if (!validPhoneNumberFormat) {
             context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
                     generateErrorForm(context, ERROR_SMS_AUTH_INVALID_NUMBER)
@@ -114,41 +117,30 @@ public class SmsAuthenticator implements Authenticator {
 
     protected boolean sendSmsWithCode(AuthenticationFlowContext context, UserModel user, String phoneNumber) {
 
-        AuthenticatorConfigModel config = context.getAuthenticatorConfig();
-        int length = Integer.parseInt(getConfigValue(context, CONFIG_CODE_LENGTH, "6"));
-        int ttl = Integer.parseInt(getConfigValue(context, CONFIG_CODE_TTL, "300"));
-        Map<String, String> clientConfig = config != null ? config.getConfig() : Collections.singletonMap("client", SmsClientFactory.MOCK_SMS_CLIENT);
+        AuthenticatorConfigModel configModel = context.getAuthenticatorConfig();
+        int length = Integer.parseInt(ConfigUtils.getConfigValue(configModel, CONFIG_CODE_LENGTH, "6"));
+        int ttl = Integer.parseInt(ConfigUtils.getConfigValue(configModel, CONFIG_CODE_TTL, "300"));
+        Map<String, String> clientConfig = ConfigUtils.getConfig(configModel, Collections.singletonMap("client", SmsClientFactory.MOCK_SMS_CLIENT));
+        boolean useWebOtp = Boolean.parseBoolean(ConfigUtils.getConfigValue(configModel, CONFIG_USE_WEBOTP, "true"));
 
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
         KeycloakSession session = context.getSession();
         RealmModel realm = context.getRealm();
 
-        return new SmsCodeSender().sendVerificationCode(session, realm, user, phoneNumber, clientConfig, length, ttl, authSession);
+        return createSmsCodeSender(context).sendVerificationCode(session, realm, user, phoneNumber, clientConfig, length, ttl, useWebOtp, authSession);
     }
 
-    protected String getConfigValue(AuthenticationFlowContext context, String key, String defaultValue) {
-
-        AuthenticatorConfigModel configModel = context.getAuthenticatorConfig();
-        if (configModel == null) {
-            return defaultValue;
-        }
-
-        Map<String, String> config = configModel.getConfig();
-        if (config == null) {
-            return defaultValue;
-        }
-
-        return config.getOrDefault(key, defaultValue);
+    protected SmsCodeSender createSmsCodeSender(AuthenticationFlowContext context) {
+        return new SmsCodeSender();
     }
 
-
-    protected boolean validatePhoneNumberFormat(String phoneNumber, AuthenticationFlowContext context) {
+    protected boolean validatePhoneNumberFormat(String phoneNumber, AuthenticatorConfigModel configModel) {
 
         if (phoneNumber == null) {
             return false;
         }
 
-        String pattern = getConfigValue(context, CONFIG_PHONENUMBER_PATTERN, ".*");
+        String pattern = ConfigUtils.getConfigValue(configModel, CONFIG_PHONENUMBER_PATTERN, ".*");
         return phoneNumber.matches(pattern);
     }
 
@@ -169,8 +161,9 @@ public class SmsAuthenticator implements Authenticator {
 
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
 
+        AuthenticatorConfigModel configModel = context.getAuthenticatorConfig();
         int attempts = Integer.parseInt(Optional.ofNullable(authSession.getAuthNote(AUTH_NOTE_ATTEMPTS)).orElse("0"));
-        int maxAttempts = Integer.parseInt(getConfigValue(context, CONFIG_MAX_ATTEMPTS, "5"));
+        int maxAttempts = Integer.parseInt(ConfigUtils.getConfigValue(configModel, CONFIG_MAX_ATTEMPTS, "5"));
         if (attempts >= maxAttempts) {
             log.info("To many invalid attempts.");
             Response errorPage = generateErrorForm(context, ERROR_SMS_AUTH_ATTEMPTS_EXCEEDED)
