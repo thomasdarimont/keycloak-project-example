@@ -1,10 +1,20 @@
 services:
   acme-keycloak-db:
-    image: postgres:11.12
+    build:
+      context: "../../../config/stage/dev/tls"
+      dockerfile: "../../../../deployments/local/dev/postgresql/Dockerfile"
     environment:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
       POSTGRES_DB: keycloak
+    command:
+# Certificates are added in the Dockerfile with the proper permissions for postgresql
+      - "-c"
+      - "ssl=on"
+      - "-c"
+      - "ssl_cert_file=/var/lib/postgresql/server.crt"
+      - "-c"
+      - "ssl_key_file=/var/lib/postgresql/server.key"
     ports:
       - "55432:5432"
     healthcheck:
@@ -26,7 +36,10 @@ services:
       DB_PASSWORD: keycloak
       DB_SCHEMA: public
 # See postgres JDBC URL parameters: https://jdbc.postgresql.org/documentation/head/connect.html
-      JDBC_PARAMS: ApplicationName=keycloak
+      JDBC_PARAMS: ApplicationName=keycloak&ssl=true&sslmode=verify-ca&sslrootcert=/etc/x509/ca/tls.crt
+    volumes:
+      # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
+      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
 # IntelliJ currently does not support the depends_on condition syntax
     depends_on:
       acme-keycloak-db:

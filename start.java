@@ -106,6 +106,7 @@ class start {
         }
 
         var envFiles = new ArrayList<String>();
+        var requiresBuild = false;
 
         var commandLine = new ArrayList<String>();
         commandLine.add("docker-compose");
@@ -153,9 +154,8 @@ class start {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-postgres.yml");
             createFolderIfMissing("deployments/local/dev/run/postgres/data/");
+            requiresBuild = true;
         }
-
-        var requiresBuild = false;
 
         if (useGraylog) {
             commandLine.add("--file");
