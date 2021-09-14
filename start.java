@@ -39,6 +39,7 @@ class start {
     static final String PROVISION_OPT = "--provision";
     static final String OPENLDAP_OPT = "--openldap";
     static final String POSTGRES_OPT = "--database=postgres";
+    static final String MYSQL_OPT = "--database=mysql";
     static final String GRAYLOG_OPT = "--logging=graylog";
     static final String GRAFANA_OPT = "--grafana";
     static final String PROMETHEUS_OPT = "--metrics=prometheus";
@@ -56,6 +57,7 @@ class start {
         var useProvision = !argList.contains(PROVISION_OPT + "=false");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
+        var useMysql = argList.contains(MYSQL_OPT);
         var useGraylog = argList.contains(GRAYLOG_OPT);
         var useGrafana = argList.contains(GRAFANA_OPT);
         var usePrometheus = argList.contains(PROMETHEUS_OPT);
@@ -65,32 +67,15 @@ class start {
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
-            System.out.println("Keycloak Environment starter");
-            System.out.printf("%n%s supports the following options: %n", "start.java");
-            System.out.println("");
-            System.out.printf("  %s: %s%n", HTTP_OPT, "enables HTTP support.");
-            System.out.printf("  %s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) Implies --http. If not provided, plain HTTP is used");
-            System.out.printf("  %s: %s%n", PROVISION_OPT, "enables provisioning via keycloak-config-cli.");
-            System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
-            System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables PostgreSQL database support. (Optional) If no other database is provided, H2 database is used");
-            System.out.printf("  %s: %s%n", GRAYLOG_OPT, "enables Graylog database support. (Optional)");
-            System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
-            System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background, print ew container name.. (Optional)");
-
-            System.out.printf("%n%s supports the following commands: %n", "start.java");
-            System.out.println("");
-            System.out.printf("  %s: %s%n", HELP_CMD, "Shows this help message");
-
-            System.out.printf("%n Usage examples: %n");
-            System.out.println("");
-            System.out.printf("  %s %s%n", "java start.java", "# Start Keycloak Environment with http");
-            System.out.printf("  %s %s%n", "java start.java --https", "# Start Keycloak Environment with https");
-            System.out.printf("  %s %s%n", "java start.java --provision=false", "# Start Keycloak Environment without provisioning");
-            System.out.printf("  %s %s%n", "java start.java --https --database=postgres", "# Start Keycloak Environment with PostgreSQL database");
-            System.out.printf("  %s %s%n", "java start.java --https --openldap --database=postgres", "# Start Keycloak Environment with PostgreSQL database and OpenLDAP");
-            System.out.printf("  %s %s%n", "java start.java --extensions=classes", "# Start Keycloak with extensions mounted from classes folder. Use --extensions=jar to mount the jar file into the container");
+            showHelp();
             System.exit(0);
             return;
+        }
+
+        if (useMysql && useGraylog) {
+            System.out.println("Invalid database configuration detected. Only one --database parameter is allowed!");
+            showHelp();
+            System.exit(-1);
         }
 
         createFolderIfMissing("deployments/local/dev/run/keycloak/logs");
@@ -155,6 +140,11 @@ class start {
             commandLine.add("deployments/local/dev/docker-compose-postgres.yml");
             createFolderIfMissing("deployments/local/dev/run/postgres/data/");
             requiresBuild = true;
+        } else if (useMysql) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-mysql.yml");
+            createFolderIfMissing("deployments/local/dev/run/mysql/data/");
+            requiresBuild = true;
         }
 
         if (useGraylog) {
@@ -205,6 +195,34 @@ class start {
         commandLine.add("--remove-orphans");
 
         System.exit(runCommandAndWait(commandLine));
+    }
+
+    private static void showHelp() {
+        System.out.println("Keycloak Environment starter");
+        System.out.printf("%n%s supports the following options: %n", "start.java");
+        System.out.println("");
+        System.out.printf("  %s: %s%n", HTTP_OPT, "enables HTTP support.");
+        System.out.printf("  %s: %s%n", HTTPS_OPT, "enables HTTPS support. (Optional) Implies --http. If not provided, plain HTTP is used");
+        System.out.printf("  %s: %s%n", PROVISION_OPT, "enables provisioning via keycloak-config-cli.");
+        System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
+        System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables PostgreSQL database support. (Optional) If no other database is provided, H2 database is used");
+        System.out.printf("  %s: %s%n", MYSQL_OPT, "enables MySQL database support. (Optional) If no other database is provided, H2 database is used");
+        System.out.printf("  %s: %s%n", GRAYLOG_OPT, "enables Graylog database support. (Optional)");
+        System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
+        System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background, print ew container name.. (Optional)");
+
+        System.out.printf("%n%s supports the following commands: %n", "start.java");
+        System.out.println("");
+        System.out.printf("  %s: %s%n", HELP_CMD, "Shows this help message");
+
+        System.out.printf("%n Usage examples: %n");
+        System.out.println("");
+        System.out.printf("  %s %s%n", "java start.java", "# Start Keycloak Environment with http");
+        System.out.printf("  %s %s%n", "java start.java --https", "# Start Keycloak Environment with https");
+        System.out.printf("  %s %s%n", "java start.java --provision=false", "# Start Keycloak Environment without provisioning");
+        System.out.printf("  %s %s%n", "java start.java --https --database=postgres", "# Start Keycloak Environment with PostgreSQL database");
+        System.out.printf("  %s %s%n", "java start.java --https --openldap --database=postgres", "# Start Keycloak Environment with PostgreSQL database and OpenLDAP");
+        System.out.printf("  %s %s%n", "java start.java --extensions=classes", "# Start Keycloak with extensions mounted from classes folder. Use --extensions=jar to mount the jar file into the container");
     }
 
     private static int runCommandAndWait(ArrayList<String> commandLine) {

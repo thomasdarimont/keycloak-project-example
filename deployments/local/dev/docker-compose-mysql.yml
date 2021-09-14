@@ -1,0 +1,47 @@
+services:
+  acme-keycloak-db:
+    build:
+      context: "../../../config/stage/dev/tls"
+      dockerfile: "../../../../deployments/local/dev/mysql/Dockerfile"
+    environment:
+      MYSQL_ROOT_PASSWORD: "mysql"
+      MYSQL_USER: "keycloak"
+      MYSQL_PASSWORD: "keycloak"
+      MYSQL_DATABASE: "keycloak"
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_HOST: localhost
+    command:
+# Certificates are added in the Dockerfile with the proper permissions for mysql
+      - "mysqld"
+      - "--bind-address=0.0.0.0"
+      - "--require_secure_transport=ON"
+      - "--ssl-ca=/etc/certs/ca.crt"
+      - "--ssl-cert=/etc/certs/server.crt"
+      - "--ssl-key=/etc/certs/server.key"
+    ports:
+      - "53306:3306"
+    healthcheck:
+      test: "mysqladmin --user root --password=mysql status"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./run/mysql/data:/var/lib/mysql:z
+
+  acme-keycloak:
+    env_file:
+      - ./keycloak-db.env
+    environment:
+      DB_VENDOR: MYSQL
+#      DB_ADDR: acme-keycloak-db
+#      DB_DATABASE: keycloak
+#      DB_USER: keycloak
+#      DB_PASSWORD: keycloak
+# See MySQL JDBC URL parameters: https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
+      JDBC_PARAMS: requireSSL=true&enabledTLSProtocols=TLSv1.2
+    volumes:
+      # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
+      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy

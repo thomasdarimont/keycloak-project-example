@@ -27,14 +27,14 @@ services:
 
   acme-keycloak:
     env_file:
-      - ./keycloak-postgres.env
+      - ./keycloak-db.env
     environment:
       DB_VENDOR: POSTGRES
-      DB_ADDR: acme-keycloak-db
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_PASSWORD: keycloak
-      DB_SCHEMA: public
+#      DB_ADDR: acme-keycloak-db
+#      DB_DATABASE: keycloak
+#      DB_USER: keycloak
+#      DB_PASSWORD: keycloak
+#      DB_SCHEMA: public
 # See postgres JDBC URL parameters: https://jdbc.postgresql.org/documentation/head/connect.html
       JDBC_PARAMS: ApplicationName=keycloak&ssl=true&sslmode=verify-ca&sslrootcert=/etc/x509/ca/tls.crt
     volumes:
