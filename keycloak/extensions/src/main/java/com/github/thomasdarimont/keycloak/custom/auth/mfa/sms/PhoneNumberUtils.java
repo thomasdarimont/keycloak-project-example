@@ -1,8 +1,12 @@
 package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 
+import java.util.Objects;
+
 public class PhoneNumberUtils {
 
     public static String abbreviatePhoneNumber(String phoneNumber) {
+
+        Objects.requireNonNull(phoneNumber, "phoneNumber must not be null");
 
         // +49178****123
         if (phoneNumber.length() > 6) {
