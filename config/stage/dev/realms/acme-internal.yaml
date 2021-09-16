@@ -213,6 +213,24 @@ clients:
       - "acme.profile"
       - "acme.ageinfo"
 
+  - clientId: test-client-ropc
+    protocol: openid-connect
+    name: Test Client ROPC
+    description: "Test Client ROPC Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: true
+    secret: "$(env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret)"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+      - "acme.profile"
+      - "acme.ageinfo"
+
 authenticationFlows:
 ## Identity First Browser Login Flow
   - alias: "Browser Identity First"
