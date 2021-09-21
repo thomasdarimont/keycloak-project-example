@@ -39,6 +39,7 @@ d) **Operator** configuring realm and server for different stages
 - LDAP based User Federation backed by [Docker-OpenLDAP](https://github.com/osixia/docker-openldap)
 - Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
 - TLS Support
+- Support for exposing metrics via smallrye-metrics
 - Examples for running a cluster behind a reverse proxy with examples for [HAProxy](deployments/local/cluster/haproxy), [Apache](deployments/local/cluster/apache), [nginx](deployments/local/cluster/nginx), [caddy](deployments/local/cluster/caddy)
 - Examples for running a Keycloak cluster with an external infinispan cluster with [remote cache store](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml) and [hotrod cache store](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml).
 - Example for Keycloak with [Graylog](https://www.graylog.org/) for log analysis, dashboards and alerting.
@@ -124,6 +125,14 @@ The example environment can be configured to use PostgreSQL as a database via th
 ```
 java start.java --database=postgres
 ```
+
+### Access metrics
+
+The example environment includes an smallrye-metrics and eclipse-metrics integration for wildfly.
+
+Metrics are exposed via the wildfly management interface on http://localhost:9990/metrics
+
+Realm level metrics are collected by a custom `EventListenerProvider` called `metrics`. 
 
 ### Enable Graylog
 

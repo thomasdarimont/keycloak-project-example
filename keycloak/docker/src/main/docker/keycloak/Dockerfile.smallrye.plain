@@ -3,6 +3,8 @@ FROM quay.io/bitnami/wildfly:23.0.2-debian-10-r25 as wildfly
 ARG KEYCLOAK_VERSION=15.0.2
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 
+# Adds smallrye components that we're removed in Keycloak 13.0.1
+
 # Add smallrye common
 COPY --from=wildfly --chown=1000:1000 /opt/bitnami/wildfly/modules/system/layers/base/io/smallrye/common /opt/jboss/keycloak/modules/system/layers/base/io/smallrye/common
 
