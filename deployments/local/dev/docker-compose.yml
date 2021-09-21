@@ -1,7 +1,12 @@
 services:
   acme-keycloak:
-    image: quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
-#    user: "${USER}:${GROUP}"
+    #image: quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+
+    build:
+      context: "./keycloak"
+      dockerfile: "./Dockerfile"
+
+    #    user: "${USER}:${GROUP}"
     env_file:
       - ./keycloak-common.env
       - ./keycloak-http.env

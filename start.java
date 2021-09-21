@@ -91,7 +91,7 @@ class start {
         }
 
         var envFiles = new ArrayList<String>();
-        var requiresBuild = false;
+        var requiresBuild = true;
 
         var commandLine = new ArrayList<String>();
         commandLine.add("docker-compose");

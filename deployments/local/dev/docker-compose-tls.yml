@@ -22,7 +22,8 @@ services:
       - "4000:80"
       - "4443:443"
     command: >
-      sh -c "sed -i -e 's/^#\(Include .*httpd-ssl.conf\)/\1/' conf/httpd.conf &&
+      sh -c "echo 'ServerName apps.acme.test' >> conf/httpd.conf &&
+             sed -i -e 's/^#\(Include .*httpd-ssl.conf\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_ssl.so\)/\1/' conf/httpd.conf &&
              sed -i -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' conf/httpd.conf &&
              exec httpd-foreground"
