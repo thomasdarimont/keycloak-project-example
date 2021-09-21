@@ -1,0 +1,24 @@
+embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
+
+echo Using server configuration file:
+:resolve-expression(expression=${env.JBOSS_HOME}/standalone/configuration/${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml})
+
+echo SETUP: Add Smallrye Components
+
+/extension=org.wildfly.extension.microprofile.config-smallrye:add()
+/extension=org.wildfly.extension.microprofile.health-smallrye:add()
+/extension=org.wildfly.extension.microprofile.metrics-smallrye:add()
+
+# <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
+/subsystem=microprofile-config-smallrye:add()
+
+# <subsystem xmlns="urn:wildfly:microprofile-health-smallrye:2.0" security-enabled="false" empty-liveness-checks-status="${env.MP_HEALTH_EMPTY_LIVENESS_CHECKS_STATUS:UP}" empty-readiness-checks-status="${env.MP_HEALTH_EMPTY_READINESS_CHECKS_STATUS:UP}"/>
+/subsystem=microprofile-health-smallrye:add(security-enabled=false,empty-liveness-checks-status="${env.MP_HEALTH_EMPTY_LIVENESS_CHECKS_STATUS:UP}", empty-readiness-checks-status="${env.MP_HEALTH_EMPTY_READINESS_CHECKS_STATUS:UP}")
+
+# <subsystem xmlns="urn:wildfly:microprofile-metrics-smallrye:2.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
+/subsystem=microprofile-metrics-smallrye:add(security-enabled=false,prefix="${wildfly.metrics.prefix:wildfly}")
+/subsystem=microprofile-metrics-smallrye/:write-attribute(name=exposed-subsystems,value=["*"])
+
+echo SETUP: Finished Adding Smallrye Components
+
+stop-embedded-server
