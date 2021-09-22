@@ -16,7 +16,7 @@ public class KeycloakMetric {
         return metadata;
     }
 
-    public String getName() {
+    public String getKey() {
         return metadata.getName();
     }
 

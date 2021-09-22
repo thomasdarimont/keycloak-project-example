@@ -135,33 +135,27 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
         metricRegistry.register(SERVER_VERSION.getMetadata(), (Gauge<Double>) () -> 0.0, tag("version", Version.VERSION));
 
         // this dynamic metric gauge triggers a metrics collection for realm and global metrics.
-        metricRegistry.register(METRICS_REFRESH.getMetadata(), (Gauge<Double>) () -> metricAccessor.getMetricValue(METRICS_REFRESH.getName()));
+        metricRegistry.register(METRICS_REFRESH.getMetadata(), (Gauge<Double>) () -> metricAccessor.getMetricValue(METRICS_REFRESH.getKey()));
     }
 
     public void updateRealmMetrics(KeycloakSession session, MetricUpdater metricUpdater, RealmModel realm, long lastUpdateTimestamp) {
 
         // Performs the dynamic metrics collection on realm level: this is called when metrics need to be refreshed
 
-        metricUpdater.updateMetricValue(USERS_TOTAL.getMetadata(), session.users().getUsersCount(realm), realm);
-        metricUpdater.updateMetricValue(CLIENTS_TOTAL.getMetadata(), session.clients().getClientsCount(realm), realm);
-        metricUpdater.updateMetricValue(GROUPS_TOTAL.getMetadata(), session.groups().getGroupsCount(realm, false), realm);
+        metricUpdater.updateMetricValue(USERS_TOTAL, session.users().getUsersCount(realm), realm);
+        metricUpdater.updateMetricValue(CLIENTS_TOTAL, session.clients().getClientsCount(realm), realm);
+        metricUpdater.updateMetricValue(GROUPS_TOTAL, session.groups().getGroupsCount(realm, false), realm);
     }
 
     @Override
     public void updateGlobalMetrics(KeycloakSession session, MetricUpdater metricUpdater, long lastUpdateTimestamp) {
 
         // Performs the dynamic metrics collection on global level: this is called when metrics need to be refreshed
-
-        if ((System.currentTimeMillis() - lastUpdateTimestamp) < 10000) {
-            // only update realm count every 10 seconds
-
-            log.debugf("Updating realm count");
-            EntityManager em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
-            Number realmCount = (Number) em.createQuery("select count(r) from RealmEntity r").getSingleResult();
-            metricUpdater.updateMetricValue(REALMS_TOTAL.getMetadata(), realmCount, null);
-            log.debugf("Updated realm count");
-
-        }
+        log.debugf("Updating realm count");
+        EntityManager em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
+        Number realmCount = (Number) em.createQuery("select count(r) from RealmEntity r").getSingleResult();
+        metricUpdater.updateMetricValue(REALMS_TOTAL, realmCount, null);
+        log.debugf("Updated realm count");
     }
 
     private static final Tag[] EMPTY_TAGS = {};
@@ -177,4 +171,5 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
     public static MetricRegistry lookupMetricRegistry() {
         return MetricRegistries.get(MetricRegistry.Type.APPLICATION);
     }
+
 }

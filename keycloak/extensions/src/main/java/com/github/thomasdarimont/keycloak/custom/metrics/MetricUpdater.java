@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.custom.metrics;
 
-import org.eclipse.microprofile.metrics.Metadata;
 import org.keycloak.models.RealmModel;
 
 public interface MetricUpdater {
@@ -10,9 +9,9 @@ public interface MetricUpdater {
      * <p>
      * If the realm is null the metric is consider to be global.
      *
-     * @param metric
+     * @param keycloakMetric
      * @param value
      * @param realm
      */
-    void updateMetricValue(Metadata metric, Number value, RealmModel realm);
+    void updateMetricValue(KeycloakMetric keycloakMetric, Number value, RealmModel realm);
 }
