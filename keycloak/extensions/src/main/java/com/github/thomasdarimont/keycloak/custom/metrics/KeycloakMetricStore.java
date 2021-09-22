@@ -12,7 +12,9 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.utils.KeycloakModelUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Predicate;
@@ -50,7 +52,7 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
         return getMetricValue(metric.getName());
     }
 
-    public Double getMetricValue(String metricName) {
+    public Double getMetricValue(String metricKey) {
 
         refreshMetricsIfNecessary();
 
@@ -59,10 +61,14 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
             return -1.0;
         }
 
-        Double count = metricData.get(metricName);
+        Double count = metricData.get(metricKey);
         if (count != null) {
             return count;
         }
+
+        // metric no longer present
+        MetricID metricID = toMetricId(metricKey);
+        boolean removed = metricRegistry.remove(metricID);
 
         return -1.0;
     }
@@ -110,7 +116,7 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
 
         long lastUpdateDurationMillis = stopwatch.elapsed().toMillis();
         LOG.debugf("metrics refresh took %sms", lastUpdateDurationMillis);
-        metricBuffer.put(KeycloakMetrics.METRICS_REFRESH.getName(), (double) lastUpdateDurationMillis);
+        metricBuffer.put(KeycloakMetrics.METRICS_REFRESH.getKey(), (double) lastUpdateDurationMillis);
 
         LOG.trace("Finished collecting custom metrics.");
 
@@ -131,7 +137,7 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
             }
 
             Tag[] tags = realm == null ? KeycloakMetrics.emptyTag() : new Tag[]{tag("realm", realm.getName())};
-            String metricKey = registerCustomMetricIfMissing(metric, isMetricPresent, tags);
+            String metricKey = registerCustomMetricIfMissing(metric.getMetadata(), isMetricPresent, tags);
             Double metricValue = value.doubleValue();
             metricsBuffer.put(metricKey, metricValue);
         };
@@ -175,5 +181,22 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
             tagMap.put(tag.getTagName(), tag.getTagValue());
         }
         return metricName + tagMap;
+    }
+
+    private static MetricID toMetricId(String metricKey) {
+
+        int labelStart = metricKey.indexOf("{");
+        String metricName = metricKey.substring(0, labelStart);
+        String tagList = metricKey.substring(labelStart + 1, metricKey.length() - 1);
+
+        List<Tag> tags = new ArrayList<>();
+        for (String tagEntry : tagList.split(",")) {
+            int equalsPos = tagEntry.indexOf('=');
+            String key = tagEntry.substring(0, equalsPos);
+            String value = tagEntry.substring(equalsPos + 1, tagEntry.length());
+            tags.add(new Tag(key, value));
+        }
+
+        return new MetricID(metricName, tags.toArray(Tag[]::new));
     }
 }
