@@ -16,6 +16,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.SelinuxContext;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.testcontainers.utility.MountableFile;
 
 import javax.ws.rs.core.Response;
@@ -24,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -44,9 +46,17 @@ public class KeycloakTestSupport {
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
 
-        KeycloakContainer keycloakContainer = imageName == null
-                ? new KeycloakContainer("quay.io/keycloak/keycloak:15.0.2")
-                : new KeycloakContainer(imageName);
+        KeycloakContainer keycloakContainer;
+        if (imageName != null) {
+            keycloakContainer = new KeycloakContainer(imageName);
+        } else {
+            // building custom Keycloak docker image with additional libraries
+            String customDockerFileName = "../docker/src/main/docker/keycloak/Dockerfile.smallrye-ci.plain";
+            ImageFromDockerfile imageFromDockerfile = new ImageFromDockerfile();
+            imageFromDockerfile.withDockerfile(Paths.get(customDockerFileName));
+            keycloakContainer = new KeycloakContainer();
+            keycloakContainer.setImage(imageFromDockerfile);
+        }
 
         if (realmImportFileName != null) {
             addRealmImportFile(realmImportFileName, keycloakContainer);
