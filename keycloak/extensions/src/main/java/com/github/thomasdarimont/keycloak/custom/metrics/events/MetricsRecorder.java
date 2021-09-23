@@ -53,6 +53,10 @@ public class MetricsRecorder {
 
     protected final ConcurrentMap<String, String> realmNameCache = new ConcurrentHashMap<>();
 
+    public MetricsRecorder() {
+        this(KeycloakMetrics.lookupMetricRegistry());
+    }
+
     public MetricsRecorder(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
         this.customUserEventHandlers = registerCustomUserEventHandlers();
@@ -142,7 +146,7 @@ public class MetricsRecorder {
 
     private void recordUserLogout(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("provider", provider),
 //                tag("client_id", event.getClientId()),
@@ -152,7 +156,7 @@ public class MetricsRecorder {
 
     private void recordUserLogoutError(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("provider", provider),
                 tag("client_id", event.getClientId()),
@@ -163,7 +167,7 @@ public class MetricsRecorder {
 
     protected void recordOauthCodeToTokenError(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
@@ -174,7 +178,7 @@ public class MetricsRecorder {
 
     protected void recordOauthCodeToToken(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
                 tag("provider", provider),
@@ -183,7 +187,7 @@ public class MetricsRecorder {
     }
 
     protected void recordClientLogin(Event event) {
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
         };
@@ -191,7 +195,7 @@ public class MetricsRecorder {
     }
 
     protected void recordClientLoginError(Event event) {
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
@@ -201,7 +205,7 @@ public class MetricsRecorder {
 
     protected void recordOauthTokenRefreshError(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
@@ -211,7 +215,7 @@ public class MetricsRecorder {
     }
 
     protected void recordOauthTokenRefresh(Event event) {
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
         };
@@ -220,7 +224,7 @@ public class MetricsRecorder {
 
     protected void recordUserRegistrationError(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
@@ -230,7 +234,7 @@ public class MetricsRecorder {
     }
 
     protected void recordUserRegistration(Event event) {
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
         };
@@ -239,7 +243,7 @@ public class MetricsRecorder {
 
     protected void recordUserLoginError(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
@@ -250,7 +254,7 @@ public class MetricsRecorder {
 
     protected void recordUserLogin(Event event) {
         String provider = getIdentityProvider(event);
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", resolveRealmName(event.getRealmId())),
                 tag("provider", provider),
                 tag("client_id", event.getClientId()),
@@ -275,7 +279,7 @@ public class MetricsRecorder {
             return;
         }
 
-        Tag[] tags = new Tag[]{
+        Tag[] tags = {
                 tag("realm", realmName),
         };
 
