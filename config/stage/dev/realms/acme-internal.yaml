@@ -110,7 +110,7 @@ clients:
 #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
-    baseUrl: "/?realm=acme-internal"
+    baseUrl: "/?realm=acme-internal&show=profile,settings,apps,security,logout"
     adminUrl: ""
     redirectUris:
       - "/*"
