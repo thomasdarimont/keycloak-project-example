@@ -1,0 +1,62 @@
+# HELP application_keycloak_admin_event_UPDATE_total Generic KeyCloak Admin event
+# TYPE application_keycloak_admin_event_UPDATE_total counter
+application_keycloak_admin_event_UPDATE_total{realm="acme-internal",resource="USER"} 2.0
+# HELP application_keycloak_clients_total Total clients
+# TYPE application_keycloak_clients_total gauge
+application_keycloak_clients_total{realm="acme-apps"} 8.0
+application_keycloak_clients_total{realm="acme-demo"} 9.0
+application_keycloak_clients_total{realm="acme-internal"} 12.0
+application_keycloak_clients_total{realm="acme-ldap"} 9.0
+application_keycloak_clients_total{realm="acme-ops"} 7.0
+application_keycloak_clients_total{realm="acme-saml"} 7.0
+application_keycloak_clients_total{realm="master"} 13.0
+application_keycloak_clients_total{realm="workshop"} 6.0
+# HELP application_keycloak_groups_total Total groups
+# TYPE application_keycloak_groups_total gauge
+application_keycloak_groups_total{realm="acme-apps"} 0.0
+application_keycloak_groups_total{realm="acme-demo"} 0.0
+application_keycloak_groups_total{realm="acme-internal"} 1.0
+application_keycloak_groups_total{realm="acme-ldap"} 0.0
+application_keycloak_groups_total{realm="acme-ops"} 0.0
+application_keycloak_groups_total{realm="acme-saml"} 0.0
+application_keycloak_groups_total{realm="master"} 0.0
+application_keycloak_groups_total{realm="workshop"} 2.0
+# HELP application_keycloak_metrics_refresh_total_milliseconds Duration of Keycloak Metrics refresh in milliseconds.
+# TYPE application_keycloak_metrics_refresh_total_milliseconds gauge
+application_keycloak_metrics_refresh_total_milliseconds 7.0
+# HELP application_keycloak_oauth_code_to_token_success_total Total code to token exchanges
+# TYPE application_keycloak_oauth_code_to_token_success_total counter
+application_keycloak_oauth_code_to_token_success_total{client_id="app-minispa",provider="keycloak",realm="acme-internal"} 3.0
+# HELP application_keycloak_oauth_token_refresh_error_total Total errors during token refreshes
+# TYPE application_keycloak_oauth_token_refresh_error_total counter
+application_keycloak_oauth_token_refresh_error_total{client_id="app-minispa",error="invalid_token",provider="keycloak",realm="acme-internal"} 1.0
+# HELP application_keycloak_oauth_token_refresh_success_total Total token refreshes
+# TYPE application_keycloak_oauth_token_refresh_success_total counter
+application_keycloak_oauth_token_refresh_success_total{client_id="app-minispa",realm="acme-internal"} 1.0
+# HELP application_keycloak_realms_total Total realms
+# TYPE application_keycloak_realms_total gauge
+application_keycloak_realms_total 8.0
+# HELP application_keycloak_server_version Keycloak Server Version
+# TYPE application_keycloak_server_version gauge
+application_keycloak_server_version{version="15.0.2"} 0.0
+# HELP application_keycloak_user_login_error_total Total errors during user logins
+# TYPE application_keycloak_user_login_error_total counter
+application_keycloak_user_login_error_total{client_id="app-minispa",error="invalid_user_credentials",provider="keycloak",realm="acme-internal"} 3.0
+application_keycloak_user_login_error_total{client_id="app-minispa",error="user_disabled",provider="keycloak",realm="acme-internal"} 1.0
+application_keycloak_user_login_error_total{client_id="app-minispa",error="user_not_found",provider="keycloak",realm="acme-internal"} 1.0
+# HELP application_keycloak_user_login_success_total Total successful user logins
+# TYPE application_keycloak_user_login_success_total counter
+application_keycloak_user_login_success_total{client_id="app-minispa",provider="keycloak",realm="acme-internal"} 3.0
+# HELP application_keycloak_user_logout_success_total Total successful user logouts
+# TYPE application_keycloak_user_logout_success_total counter
+application_keycloak_user_logout_success_total{provider="keycloak",realm="acme-internal"} 2.0
+# HELP application_keycloak_users_total Total users
+# TYPE application_keycloak_users_total gauge
+application_keycloak_users_total{realm="acme-apps"} 2.0
+application_keycloak_users_total{realm="acme-demo"} 1.0
+application_keycloak_users_total{realm="acme-internal"} 3.0
+application_keycloak_users_total{realm="acme-ldap"} 0.0
+application_keycloak_users_total{realm="acme-ops"} 1.0
+application_keycloak_users_total{realm="acme-saml"} 1.0
+application_keycloak_users_total{realm="master"} 1.0
+application_keycloak_users_total{realm="workshop"} 3.0
