@@ -15,6 +15,7 @@ function createApiEndpoints(app, config, LOG) {
         LOG.info(`### Accessing ${req.path}`);
 
         const data = {
+            datetime: new Date().toISOString(),
             message: `Hello ${username}`,
             backend: 'NodeJS Express',
         };

@@ -14,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class UsersResource {
         Map<String, Object> data = new HashMap<>();
         data.put("message", "Hello " + username);
         data.put("backend", "Quarkus");
+        data.put("datetime", Instant.now());
         return data;
     }
 

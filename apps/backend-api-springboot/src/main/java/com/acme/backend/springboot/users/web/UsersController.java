@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ class UsersController {
         Map<String, Object> data = new HashMap<>();
         data.put("message", "Hello " + username);
         data.put("backend", "Spring Boot");
+        data.put("datetime", Instant.now());
         return data;
     }
 }

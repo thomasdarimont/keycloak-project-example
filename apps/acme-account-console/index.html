@@ -647,7 +647,9 @@
         show(data, "token-content");
     }
 
-    async function showMeInfo() {
+    async function fetchMeInfoData() {
+
+        console.log("Fetching me info");
 
         await keycloak.updateToken(5);
 
@@ -671,12 +673,19 @@
             meData = {error: error.message};
         }
 
+        return meData;
+    }
+
+    async function showMeInfo() {
+
+        let meData = await fetchMeInfoData();
+
         let meDataJson = JSON.stringify(meData, null, '    ');
 
         let meInfoHtml = `
         <label for="meBackend">Backend:</label>
         <select name="meBackend" id="meBackend" onchange="updateMeBackend()">
-        </select>
+        </select><button id="btnMeBackendFetch" onclick="showMeInfo(); return false;">Fetch</button>
 
         <div id="data">${meDataJson}</div>
         `;
