@@ -116,7 +116,7 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
 
         long lastUpdateDurationMillis = stopwatch.elapsed().toMillis();
         LOG.debugf("metrics refresh took %sms", lastUpdateDurationMillis);
-        metricBuffer.put(KeycloakMetrics.METRICS_REFRESH.getKey(), (double) lastUpdateDurationMillis);
+        metricBuffer.put(KeycloakMetrics.SERVER_METRICS_REFRESH.getKey(), (double) lastUpdateDurationMillis);
 
         LOG.trace("Finished collecting custom metrics.");
 

@@ -6,10 +6,10 @@ import org.keycloak.events.admin.AdminEvent;
 
 public class MetricEventListenerProvider implements EventListenerProvider {
 
-    private final MetricsRecorder recorder;
+    private final MetricEventRecorder recorder;
 
     public MetricEventListenerProvider() {
-        this.recorder = new MetricsRecorder();
+        this.recorder = new MetricEventRecorder();
     }
 
     @Override

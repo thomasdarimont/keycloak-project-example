@@ -35,15 +35,17 @@ import static org.keycloak.events.EventType.REFRESH_TOKEN;
 import static org.keycloak.events.EventType.REFRESH_TOKEN_ERROR;
 import static org.keycloak.events.EventType.REGISTER;
 import static org.keycloak.events.EventType.REGISTER_ERROR;
+import static org.keycloak.events.EventType.USER_INFO_REQUEST;
+import static org.keycloak.events.EventType.USER_INFO_REQUEST_ERROR;
 
 @RequiredArgsConstructor
-public class MetricsRecorder {
+public class MetricEventRecorder {
 
-    private static final Logger log = Logger.getLogger(MetricsRecorder.class);
+    private static final Logger log = Logger.getLogger(MetricEventRecorder.class);
 
-    private static final String USER_EVENT_PREFIX = "keycloak_user_event_";
+    private static final String USER_EVENT_METRIC_NAME = "keycloak_user_event";
 
-    private static final String ADMIN_EVENT_PREFIX = "keycloak_admin_event_";
+    private static final String ADMIN_EVENT_METRIC_NAME = "keycloak_admin_event";
 
     private final Map<String, Metadata> genericCounters;
 
@@ -53,11 +55,11 @@ public class MetricsRecorder {
 
     protected final ConcurrentMap<String, String> realmNameCache = new ConcurrentHashMap<>();
 
-    public MetricsRecorder() {
+    public MetricEventRecorder() {
         this(KeycloakMetrics.lookupMetricRegistry());
     }
 
-    public MetricsRecorder(MetricRegistry metricRegistry) {
+    public MetricEventRecorder(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
         this.customUserEventHandlers = registerCustomUserEventHandlers();
         this.genericCounters = registerGenericEventCounters();
@@ -77,6 +79,8 @@ public class MetricsRecorder {
         map.put(REFRESH_TOKEN_ERROR, this::recordOauthTokenRefreshError);
         map.put(CODE_TO_TOKEN, this::recordOauthCodeToToken);
         map.put(CODE_TO_TOKEN_ERROR, this::recordOauthCodeToTokenError);
+        map.put(USER_INFO_REQUEST, this::recordOauthUserInfoRequest);
+        map.put(USER_INFO_REQUEST_ERROR, this::recordOauthUserInfoRequestError);
         return map;
     }
 
@@ -96,7 +100,7 @@ public class MetricsRecorder {
         // TODO add capability to ignore certain admin events
 
         OperationType operationType = event.getOperationType();
-        String counterName = buildCounterName(operationType);
+        String counterName = ADMIN_EVENT_METRIC_NAME;
         Metadata counterMetadata = genericCounters.get(counterName);
         ResourceType resourceType = event.getResourceType();
         String realmName = resolveRealmName(event.getRealmId());
@@ -108,7 +112,8 @@ public class MetricsRecorder {
 
         Tag[] tags = {
                 tag("realm", realmName),
-                tag("resource", resourceType.name())
+                tag("resource", resourceType.name()),
+                tag("operation_type", operationType.name()),
         };
 
         metricRegistry.counter(counterMetadata, tags).inc();
@@ -119,58 +124,77 @@ public class MetricsRecorder {
      */
     private void registerUserEventCounters(Map<String, Metadata> counters) {
 
-        for (EventType type : EventType.values()) {
-            if (customUserEventHandlers.containsKey(type)) {
-                continue;
-            }
-
-            // TODO add capability to ignore certain user events
-
-            String counterName = buildCounterName(type);
-            Metadata counter = createCounter(counterName, false);
-            counters.put(counterName, counter);
-        }
+        String counterName = USER_EVENT_METRIC_NAME;
+        Metadata counter = createCounter(counterName, false);
+        counters.put(counterName, counter);
     }
 
     /**
      * Counters for all admin events
      */
-    private void registerAdminEventCounters(Map<String, Metadata> counters) {
+    protected void registerAdminEventCounters(Map<String, Metadata> counters) {
 
-        for (OperationType type : OperationType.values()) {
-            String counterName = buildCounterName(type);
-            Metadata counter = createCounter(counterName, true);
-            counters.put(counterName, counter);
-        }
+        String counterName = ADMIN_EVENT_METRIC_NAME;
+        Metadata counter = createCounter(counterName, true);
+        counters.put(counterName, counter);
     }
 
-    private void recordUserLogout(Event event) {
-        String provider = getIdentityProvider(event);
+    protected void recordOauthUserInfoRequestError(Event event) {
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        String error = event.getError();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
+                tag("realm", realmName),
+                tag("client_id", clientId),
+                tag("error", error),
+        };
+        metricRegistry.counter(KeycloakMetrics.OAUTH_USERINFO_REQUEST_ERROR_TOTAL.getMetadata(), tags).inc();
+    }
+
+    protected void recordOauthUserInfoRequest(Event event) {
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        Tag[] tags = {
+                tag("realm", realmName),
+                tag("client_id", clientId),
+        };
+        metricRegistry.counter(KeycloakMetrics.OAUTH_USERINFO_REQUEST_SUCCESS_TOTAL.getMetadata(), tags).inc();
+    }
+
+    protected void recordUserLogout(Event event) {
+        String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
+        Tag[] tags = {
+                tag("realm", realmName),
                 tag("provider", provider),
 //                tag("client_id", event.getClientId()),
         };
-        metricRegistry.counter(KeycloakMetrics.USER_LOGOUT_SUCCESS_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGOUT_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
 
-    private void recordUserLogoutError(Event event) {
+    protected void recordUserLogoutError(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        String error = event.getError();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
+                tag("realm", realmName),
                 tag("provider", provider),
-                tag("client_id", event.getClientId()),
-                tag("error", event.getError()),
+                tag("client_id", clientId),
+                tag("error", error),
         };
-        metricRegistry.counter(KeycloakMetrics.USER_LOGOUT_ERROR_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGOUT_ERROR_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordOauthCodeToTokenError(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        String error = event.getError();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
-                tag("error", event.getError()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
+                tag("error", error),
                 tag("provider", provider),
         };
         metricRegistry.counter(KeycloakMetrics.OAUTH_CODE_TO_TOKEN_ERROR_TOTAL.getMetadata(), tags).inc();
@@ -178,88 +202,107 @@ public class MetricsRecorder {
 
     protected void recordOauthCodeToToken(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
                 tag("provider", provider),
         };
         metricRegistry.counter(KeycloakMetrics.OAUTH_CODE_TO_TOKEN_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordClientLogin(Event event) {
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
         };
-        metricRegistry.counter(KeycloakMetrics.CLIENT_LOGIN_SUCCESS_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_CLIENT_LOGIN_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordClientLoginError(Event event) {
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        String error = event.getError();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
-                tag("error", event.getError()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
+                tag("error", error),
         };
-        metricRegistry.counter(KeycloakMetrics.CLIENT_LOGIN_ERROR_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_CLIENT_LOGIN_ERROR_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordOauthTokenRefreshError(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        String error = event.getError();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
-                tag("error", event.getError()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
+                tag("error", error),
                 tag("provider", provider),
         };
         metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_REFRESH_ERROR_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordOauthTokenRefresh(Event event) {
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
         };
         metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_REFRESH_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordUserRegistrationError(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
+        String error = event.getError();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
-                tag("error", event.getError()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
+                tag("error", error),
                 tag("provider", provider),
         };
-        metricRegistry.counter(KeycloakMetrics.USER_REGISTER_ERROR_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_REGISTER_ERROR_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordUserRegistration(Event event) {
+        String realmName = resolveRealmName(event.getRealmId());
+        String clientId = event.getClientId();
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
+                tag("realm", realmName),
+                tag("client_id", clientId),
         };
-        metricRegistry.counter(KeycloakMetrics.USER_REGISTER_SUCCESS_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_REGISTER_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordUserLoginError(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
-                tag("client_id", event.getClientId()),
+                tag("realm", realmName),
+//                tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
                 tag("provider", provider),
         };
-        metricRegistry.counter(KeycloakMetrics.USER_LOGIN_ERROR_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_ERROR_TOTAL.getMetadata(), tags).inc();
     }
 
     protected void recordUserLogin(Event event) {
         String provider = getIdentityProvider(event);
+        String realmName = resolveRealmName(event.getRealmId());
         Tag[] tags = {
-                tag("realm", resolveRealmName(event.getRealmId())),
+                tag("realm", realmName),
                 tag("provider", provider),
-                tag("client_id", event.getClientId()),
+//                tag("client_id", event.getClientId()),
         };
-        metricRegistry.counter(KeycloakMetrics.USER_LOGIN_SUCCESS_TOTAL.getMetadata(), tags).inc();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
 
     /**
@@ -270,7 +313,7 @@ public class MetricsRecorder {
     protected void recordGenericUserEvent(Event event) {
 
         EventType eventType = event.getType();
-        String counterName = buildCounterName(eventType);
+        String counterName = USER_EVENT_METRIC_NAME;
         Metadata counterMetadata = genericCounters.get(counterName);
         String realmName = resolveRealmName(event.getRealmId());
 
@@ -281,8 +324,8 @@ public class MetricsRecorder {
 
         Tag[] tags = {
                 tag("realm", realmName),
+                tag("event_type", eventType.name()),
         };
-
 
         metricRegistry.counter(counterMetadata, tags).inc();
     }
@@ -303,18 +346,10 @@ public class MetricsRecorder {
         }
 
         if (identityProvider == null) {
-            identityProvider = "keycloak";
+            identityProvider = "@realm";
         }
 
         return identityProvider;
-    }
-
-    private String buildCounterName(OperationType type) {
-        return ADMIN_EVENT_PREFIX + type.name();
-    }
-
-    private String buildCounterName(EventType type) {
-        return USER_EVENT_PREFIX + type.name();
     }
 
     /**

@@ -25,80 +25,80 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
             .withType(MetricType.GAUGE)
             .build());
 
-    public static final KeycloakMetric METRICS_REFRESH = newMetric(Metadata.builder()
-            .withName("keycloak_metrics_refresh_total_milliseconds")
+    public static final KeycloakMetric SERVER_METRICS_REFRESH = newMetric(Metadata.builder()
+            .withName("keycloak_server_metrics_refresh_total_milliseconds")
             .withDescription("Duration of Keycloak Metrics refresh in milliseconds.")
             .withType(MetricType.GAUGE)
             .build());
 
-    public static final KeycloakMetric REALMS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_realms_total")
+    public static final KeycloakMetric MODEL_REALMS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_model_realms_total")
             .withDescription("Total realms")
             .withType(MetricType.GAUGE)
             .build());
 
-    public static final KeycloakMetric USERS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_users_total")
+    public static final KeycloakMetric MODEL_USERS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_model_users_total")
             .withDescription("Total users")
             .withType(MetricType.GAUGE)
             .build());
 
-    public static final KeycloakMetric CLIENTS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_clients_total")
+    public static final KeycloakMetric MODEL_CLIENTS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_model_clients_total")
             .withDescription("Total clients")
             .withType(MetricType.GAUGE)
             .build());
 
-    public static final KeycloakMetric GROUPS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_groups_total")
+    public static final KeycloakMetric MODEL_GROUPS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_model_groups_total")
             .withDescription("Total groups")
             .withType(MetricType.GAUGE)
             .build());
 
-    public static final KeycloakMetric CLIENT_LOGIN_SUCCESS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_client_login_success_total")
+    public static final KeycloakMetric AUTH_CLIENT_LOGIN_SUCCESS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_client_login_success_total")
             .withDescription("Total successful client logins")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric CLIENT_LOGIN_ERROR_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_client_login_error_total")
+    public static final KeycloakMetric AUTH_CLIENT_LOGIN_ERROR_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_client_login_error_total")
             .withDescription("Total errors during client logins")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric USER_LOGIN_SUCCESS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_user_login_success_total")
+    public static final KeycloakMetric AUTH_USER_LOGIN_SUCCESS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_user_login_success_total")
             .withDescription("Total successful user logins")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric USER_LOGIN_ERROR_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_user_login_error_total")
+    public static final KeycloakMetric AUTH_USER_LOGIN_ERROR_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_user_login_error_total")
             .withDescription("Total errors during user logins")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric USER_LOGOUT_SUCCESS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_user_logout_success_total")
+    public static final KeycloakMetric AUTH_USER_LOGOUT_SUCCESS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_user_logout_success_total")
             .withDescription("Total successful user logouts")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric USER_LOGOUT_ERROR_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_user_logout_error_total")
+    public static final KeycloakMetric AUTH_USER_LOGOUT_ERROR_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_user_logout_error_total")
             .withDescription("Total errors during user logouts")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric USER_REGISTER_SUCCESS_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_user_register_success_total")
+    public static final KeycloakMetric AUTH_USER_REGISTER_SUCCESS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_user_register_success_total")
             .withDescription("Total user registrations")
             .withType(MetricType.COUNTER)
             .build());
 
-    public static final KeycloakMetric USER_REGISTER_ERROR_TOTAL = newMetric(Metadata.builder()
-            .withName("keycloak_user_register_error_total")
+    public static final KeycloakMetric AUTH_USER_REGISTER_ERROR_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_auth_user_register_error_total")
             .withDescription("Total errors during user registrations")
             .withType(MetricType.COUNTER)
             .build());
@@ -127,6 +127,19 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
             .withType(MetricType.COUNTER)
             .build());
 
+    public static final KeycloakMetric OAUTH_USERINFO_REQUEST_SUCCESS_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_oauth_userinfo_request_success_total")
+            .withDescription("Total user info requests")
+            .withType(MetricType.COUNTER)
+            .build());
+
+    public static final KeycloakMetric OAUTH_USERINFO_REQUEST_ERROR_TOTAL = newMetric(Metadata.builder()
+            .withName("keycloak_oauth_userinfo_request_error_total")
+            .withDescription("Total errors during user info requests")
+            .withType(MetricType.COUNTER)
+            .build());
+
+
     public void registerMetrics(MetricRegistry metricRegistry, KeycloakMetricAccessor metricAccessor) {
 
         // we should only register metrics here and avoid expensive initializations!
@@ -135,16 +148,16 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
         metricRegistry.register(SERVER_VERSION.getMetadata(), (Gauge<Double>) () -> 0.0, tag("version", Version.VERSION));
 
         // this dynamic metric gauge triggers a metrics collection for realm and global metrics.
-        metricRegistry.register(METRICS_REFRESH.getMetadata(), (Gauge<Double>) () -> metricAccessor.getMetricValue(METRICS_REFRESH.getKey()));
+        metricRegistry.register(SERVER_METRICS_REFRESH.getMetadata(), (Gauge<Double>) () -> metricAccessor.getMetricValue(SERVER_METRICS_REFRESH.getKey()));
     }
 
     public void updateRealmMetrics(KeycloakSession session, MetricUpdater metricUpdater, RealmModel realm, long lastUpdateTimestamp) {
 
         // Performs the dynamic metrics collection on realm level: this is called when metrics need to be refreshed
 
-        metricUpdater.updateMetricValue(USERS_TOTAL, session.users().getUsersCount(realm), realm);
-        metricUpdater.updateMetricValue(CLIENTS_TOTAL, session.clients().getClientsCount(realm), realm);
-        metricUpdater.updateMetricValue(GROUPS_TOTAL, session.groups().getGroupsCount(realm, false), realm);
+        metricUpdater.updateMetricValue(MODEL_USERS_TOTAL, session.users().getUsersCount(realm), realm);
+        metricUpdater.updateMetricValue(MODEL_CLIENTS_TOTAL, session.clients().getClientsCount(realm), realm);
+        metricUpdater.updateMetricValue(MODEL_GROUPS_TOTAL, session.groups().getGroupsCount(realm, false), realm);
     }
 
     @Override
@@ -154,7 +167,7 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
         log.debugf("Updating realm count");
         EntityManager em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
         Number realmCount = (Number) em.createQuery("select count(r) from RealmEntity r").getSingleResult();
-        metricUpdater.updateMetricValue(REALMS_TOTAL, realmCount, null);
+        metricUpdater.updateMetricValue(MODEL_REALMS_TOTAL, realmCount, null);
         log.debugf("Updated realm count");
     }
 
@@ -171,5 +184,4 @@ public final class KeycloakMetrics implements RealmMetricsUpdater {
     public static MetricRegistry lookupMetricRegistry() {
         return MetricRegistries.get(MetricRegistry.Type.APPLICATION);
     }
-
 }
