@@ -60,3 +60,1316 @@ application_keycloak_users_total{realm="acme-ops"} 1.0
 application_keycloak_users_total{realm="acme-saml"} 1.0
 application_keycloak_users_total{realm="master"} 1.0
 application_keycloak_users_total{realm="workshop"} 3.0
+# HELP base_classloader_loadedClasses_total Displays the total number of classes that have been loaded since the Java virtual machine has started execution.
+# TYPE base_classloader_loadedClasses_total counter
+base_classloader_loadedClasses_total 34122.0
+# HELP base_classloader_loadedClasses_count Displays the number of classes that are currently loaded in the Java virtual machine.
+# TYPE base_classloader_loadedClasses_count gauge
+base_classloader_loadedClasses_count 33296.0
+# HELP base_classloader_unloadedClasses_total Displays the total number of classes unloaded since the Java virtual machine has started execution.
+# TYPE base_classloader_unloadedClasses_total counter
+base_classloader_unloadedClasses_total 827.0
+# HELP base_cpu_availableProcessors Displays the number of processors available to the Java virtual machine. This value may change during a particular invocation of the virtual machine.
+# TYPE base_cpu_availableProcessors gauge
+base_cpu_availableProcessors 12.0
+# HELP base_cpu_processCpuLoad Displays the "recent cpu usage" for the Java Virtual Machine process.
+# TYPE base_cpu_processCpuLoad gauge
+base_cpu_processCpuLoad 0.0
+# HELP base_cpu_processCpuTime_seconds Displays the CPU time used by the process on which the Java virtual machine is running in nanoseconds
+# TYPE base_cpu_processCpuTime_seconds gauge
+base_cpu_processCpuTime_seconds 74.44
+# HELP base_cpu_systemLoadAverage Displays the system load average for the last minute. The system load average is the sum of the number of runnable entities queued to the available processors and the number of runnable entities running on the available processors averaged over a period of time. The way in which the load average is calculated is operating system specific but is typically a damped time-dependent average. If the load average is not available, a negative value is displayed. This attribute is designed to provide a hint about the system load and may be queried frequently. The load average may be unavailable on some platform where it is expensive to implement this method.
+# TYPE base_cpu_systemLoadAverage gauge
+base_cpu_systemLoadAverage 2.55
+# HELP base_gc_total Displays the total number of collections that have occurred. This attribute lists -1 if the collection count is undefined for this collector.
+# TYPE base_gc_total counter
+base_gc_total{name="G1 Old Generation"} 0.0
+base_gc_total{name="G1 Young Generation"} 49.0
+# HELP base_gc_time_total Displays the approximate accumulated collection elapsed time in milliseconds. This attribute displays -1 if the collection elapsed time is undefined for this collector. The Java virtual machine implementation may use a high resolution timer to measure the elapsed time. This attribute may display the same value even if the collection count has been incremented if the collection elapsed time is very short.
+# TYPE base_gc_time_total counter
+base_gc_time_total_seconds{name="G1 Old Generation"} 0.0
+base_gc_time_total_seconds{name="G1 Young Generation"} 0.47600000000000003
+# HELP base_jvm_uptime_seconds Displays the uptime of the Java virtual machine
+# TYPE base_jvm_uptime_seconds gauge
+base_jvm_uptime_seconds 95.424
+# HELP base_memory_committedHeap_bytes Displays the amount of memory that is committed for the Java virtual machine to use.
+# TYPE base_memory_committedHeap_bytes gauge
+base_memory_committedHeap_bytes 1.68820736E8
+# HELP base_memory_committedNonHeap_bytes Displays the amount of memory that is committed for the Java virtual machine to use.
+# TYPE base_memory_committedNonHeap_bytes gauge
+base_memory_committedNonHeap_bytes 2.7222016E8
+# HELP base_memory_maxHeap_bytes Displays the maximum amount of memory in bytes that can be used for memory management.
+# TYPE base_memory_maxHeap_bytes gauge
+base_memory_maxHeap_bytes 5.36870912E8
+# HELP base_memory_maxNonHeap_bytes Displays the maximum amount of memory in bytes that can be used for memory management.
+# TYPE base_memory_maxNonHeap_bytes gauge
+base_memory_maxNonHeap_bytes 7.80140544E8
+# HELP base_memory_usedHeap_bytes Displays the amount of used memory.
+# TYPE base_memory_usedHeap_bytes gauge
+base_memory_usedHeap_bytes 1.02858256E8
+# HELP base_memory_usedNonHeap_bytes Displays the amount of used memory.
+# TYPE base_memory_usedNonHeap_bytes gauge
+base_memory_usedNonHeap_bytes 2.515282E8
+# HELP base_thread_count Number of currently deployed threads
+# TYPE base_thread_count gauge
+base_thread_count 157.0
+# HELP base_thread_daemon_count Displays the current number of live daemon threads.
+# TYPE base_thread_daemon_count gauge
+base_thread_daemon_count 90.0
+# HELP base_thread_max_count Displays the peak live thread count since the Java virtual machine started or peak was reset. This includes daemon and non-daemon threads.
+# TYPE base_thread_max_count gauge
+base_thread_max_count 224.0
+# HELP vendor_BufferPool_used_memory_bytes The memory used by the NIO pool
+# TYPE vendor_BufferPool_used_memory_bytes gauge
+vendor_BufferPool_used_memory_bytes{name="direct"} 2151424.0
+vendor_BufferPool_used_memory_bytes{name="mapped"} 0.0
+# HELP vendor_memoryPool_usage_bytes Current usage of the memory pool
+# TYPE vendor_memoryPool_usage_bytes gauge
+vendor_memoryPool_usage_bytes{name="CodeHeap 'non-nmethods'"} 1652096.0
+vendor_memoryPool_usage_bytes{name="CodeHeap 'non-profiled nmethods'"} 1.2118656E7
+vendor_memoryPool_usage_bytes{name="CodeHeap 'profiled nmethods'"} 4.4642688E7
+vendor_memoryPool_usage_bytes{name="Compressed Class Space"} 2.2511248E7
+vendor_memoryPool_usage_bytes{name="G1 Eden Space"} 1048576.0
+vendor_memoryPool_usage_bytes{name="G1 Old Gen"} 9.8663952E7
+vendor_memoryPool_usage_bytes{name="G1 Survivor Space"} 3145728.0
+vendor_memoryPool_usage_bytes{name="Metaspace"} 1.70610664E8
+# HELP vendor_memoryPool_usage_max_bytes Peak usage of the memory pool
+# TYPE vendor_memoryPool_usage_max_bytes gauge
+vendor_memoryPool_usage_max_bytes{name="CodeHeap 'non-nmethods'"} 1747328.0
+vendor_memoryPool_usage_max_bytes{name="CodeHeap 'non-profiled nmethods'"} 1.2118656E7
+vendor_memoryPool_usage_max_bytes{name="CodeHeap 'profiled nmethods'"} 4.4642688E7
+vendor_memoryPool_usage_max_bytes{name="Compressed Class Space"} 2.2513456E7
+vendor_memoryPool_usage_max_bytes{name="G1 Eden Space"} 5.5574528E7
+vendor_memoryPool_usage_max_bytes{name="G1 Old Gen"} 9.8663952E7
+vendor_memoryPool_usage_max_bytes{name="G1 Survivor Space"} 8388608.0
+vendor_memoryPool_usage_max_bytes{name="Metaspace"} 1.7062692E8
+# HELP wildfly_datasources_jdbc_prepared_statement_cache_access_count The number of times that the statement cache was accessed
+# TYPE wildfly_datasources_jdbc_prepared_statement_cache_access_count gauge
+wildfly_datasources_jdbc_prepared_statement_cache_access_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_jdbc_prepared_statement_cache_access_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_jdbc_prepared_statement_cache_add_count The number of statements added to the statement cache
+# TYPE wildfly_datasources_jdbc_prepared_statement_cache_add_count gauge
+wildfly_datasources_jdbc_prepared_statement_cache_add_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_jdbc_prepared_statement_cache_add_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_jdbc_prepared_statement_cache_current_size The number of prepared and callable statements currently cached in the statement cache
+# TYPE wildfly_datasources_jdbc_prepared_statement_cache_current_size gauge
+wildfly_datasources_jdbc_prepared_statement_cache_current_size{data_source="ExampleDS"} 0.0
+wildfly_datasources_jdbc_prepared_statement_cache_current_size{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_jdbc_prepared_statement_cache_delete_count The number of statements discarded from the cache
+# TYPE wildfly_datasources_jdbc_prepared_statement_cache_delete_count gauge
+wildfly_datasources_jdbc_prepared_statement_cache_delete_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_jdbc_prepared_statement_cache_delete_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_jdbc_prepared_statement_cache_hit_count The number of times that statements from the cache were used
+# TYPE wildfly_datasources_jdbc_prepared_statement_cache_hit_count gauge
+wildfly_datasources_jdbc_prepared_statement_cache_hit_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_jdbc_prepared_statement_cache_hit_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_jdbc_prepared_statement_cache_miss_count The number of times that a statement request could not be satisfied with a statement from the cache
+# TYPE wildfly_datasources_jdbc_prepared_statement_cache_miss_count gauge
+wildfly_datasources_jdbc_prepared_statement_cache_miss_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_jdbc_prepared_statement_cache_miss_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_active_count The active count
+# TYPE wildfly_datasources_pool_active_count gauge
+wildfly_datasources_pool_active_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_active_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_available_count The available count
+# TYPE wildfly_datasources_pool_available_count gauge
+wildfly_datasources_pool_available_count{data_source="ExampleDS"} 20.0
+wildfly_datasources_pool_available_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_average_blocking_time Average Blocking Time for pool
+# TYPE wildfly_datasources_pool_average_blocking_time gauge
+wildfly_datasources_pool_average_blocking_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_average_blocking_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_average_creation_time The average time spent creating a physical connection
+# TYPE wildfly_datasources_pool_average_creation_time gauge
+wildfly_datasources_pool_average_creation_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_average_creation_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_average_get_time The average time spent obtaining a physical connection
+# TYPE wildfly_datasources_pool_average_get_time gauge
+wildfly_datasources_pool_average_get_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_average_get_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_average_pool_time The average time for a physical connection spent in the pool
+# TYPE wildfly_datasources_pool_average_pool_time gauge
+wildfly_datasources_pool_average_pool_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_average_pool_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_average_usage_time The average time spent using a physical connection
+# TYPE wildfly_datasources_pool_average_usage_time gauge
+wildfly_datasources_pool_average_usage_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_average_usage_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_blocking_failure_count The number of failures trying to obtain a physical connection
+# TYPE wildfly_datasources_pool_blocking_failure_count gauge
+wildfly_datasources_pool_blocking_failure_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_blocking_failure_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_created_count The created count
+# TYPE wildfly_datasources_pool_created_count gauge
+wildfly_datasources_pool_created_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_created_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_destroyed_count The destroyed count
+# TYPE wildfly_datasources_pool_destroyed_count gauge
+wildfly_datasources_pool_destroyed_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_destroyed_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_idle_count The number of physical connections currently idle
+# TYPE wildfly_datasources_pool_idle_count gauge
+wildfly_datasources_pool_idle_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_idle_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_in_use_count The number of physical connections currently in use
+# TYPE wildfly_datasources_pool_in_use_count gauge
+wildfly_datasources_pool_in_use_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_in_use_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_creation_time The maximum time for creating a physical connection
+# TYPE wildfly_datasources_pool_max_creation_time gauge
+wildfly_datasources_pool_max_creation_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_creation_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_get_time The maximum time for obtaining a physical connection
+# TYPE wildfly_datasources_pool_max_get_time gauge
+wildfly_datasources_pool_max_get_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_get_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_pool_time The maximum time for a physical connection in the pool
+# TYPE wildfly_datasources_pool_max_pool_time gauge
+wildfly_datasources_pool_max_pool_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_pool_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_usage_time The maximum time using a physical connection
+# TYPE wildfly_datasources_pool_max_usage_time gauge
+wildfly_datasources_pool_max_usage_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_usage_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_used_count The maximum number of connections used
+# TYPE wildfly_datasources_pool_max_used_count gauge
+wildfly_datasources_pool_max_used_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_used_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_wait_count The maximum number of threads waiting for a connection
+# TYPE wildfly_datasources_pool_max_wait_count gauge
+wildfly_datasources_pool_max_wait_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_wait_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_max_wait_time The maximum wait time for a connection
+# TYPE wildfly_datasources_pool_max_wait_time gauge
+wildfly_datasources_pool_max_wait_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_max_wait_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_timed_out The timed out count
+# TYPE wildfly_datasources_pool_timed_out gauge
+wildfly_datasources_pool_timed_out{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_timed_out{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_total_blocking_time The total blocking time
+# TYPE wildfly_datasources_pool_total_blocking_time gauge
+wildfly_datasources_pool_total_blocking_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_total_blocking_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_total_creation_time The total time spent creating physical connections
+# TYPE wildfly_datasources_pool_total_creation_time gauge
+wildfly_datasources_pool_total_creation_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_total_creation_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_total_get_time The total time spent obtaining physical connections
+# TYPE wildfly_datasources_pool_total_get_time gauge
+wildfly_datasources_pool_total_get_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_total_get_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_total_pool_time The total time spent by physical connections in the pool
+# TYPE wildfly_datasources_pool_total_pool_time gauge
+wildfly_datasources_pool_total_pool_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_total_pool_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_total_usage_time The total time spent using physical connections
+# TYPE wildfly_datasources_pool_total_usage_time gauge
+wildfly_datasources_pool_total_usage_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_total_usage_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_wait_count The number of requests that had to wait to obtain a physical connection
+# TYPE wildfly_datasources_pool_wait_count gauge
+wildfly_datasources_pool_wait_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_wait_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xacommit_average_time The average time for a XAResource commit invocation
+# TYPE wildfly_datasources_pool_xacommit_average_time gauge
+wildfly_datasources_pool_xacommit_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xacommit_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xacommit_count The number of XAResource commit invocations
+# TYPE wildfly_datasources_pool_xacommit_count gauge
+wildfly_datasources_pool_xacommit_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xacommit_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xacommit_max_time The maximum time for a XAResource commit invocation
+# TYPE wildfly_datasources_pool_xacommit_max_time gauge
+wildfly_datasources_pool_xacommit_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xacommit_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xacommit_total_time The total time for all XAResource commit invocations
+# TYPE wildfly_datasources_pool_xacommit_total_time gauge
+wildfly_datasources_pool_xacommit_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xacommit_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaend_average_time The average time for a XAResource end invocation
+# TYPE wildfly_datasources_pool_xaend_average_time gauge
+wildfly_datasources_pool_xaend_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaend_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaend_count The number of XAResource end invocations
+# TYPE wildfly_datasources_pool_xaend_count gauge
+wildfly_datasources_pool_xaend_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaend_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaend_max_time The maximum time for a XAResource end invocation
+# TYPE wildfly_datasources_pool_xaend_max_time gauge
+wildfly_datasources_pool_xaend_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaend_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaend_total_time The total time for all XAResource end invocations
+# TYPE wildfly_datasources_pool_xaend_total_time gauge
+wildfly_datasources_pool_xaend_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaend_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaforget_average_time The average time for a XAResource forget invocation
+# TYPE wildfly_datasources_pool_xaforget_average_time gauge
+wildfly_datasources_pool_xaforget_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaforget_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaforget_count The number of XAResource forget invocations
+# TYPE wildfly_datasources_pool_xaforget_count gauge
+wildfly_datasources_pool_xaforget_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaforget_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaforget_max_time The maximum time for a XAResource forget invocation
+# TYPE wildfly_datasources_pool_xaforget_max_time gauge
+wildfly_datasources_pool_xaforget_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaforget_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaforget_total_time The total time for all XAResource forget invocations
+# TYPE wildfly_datasources_pool_xaforget_total_time gauge
+wildfly_datasources_pool_xaforget_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaforget_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaprepare_average_time The average time for a XAResource prepare invocation
+# TYPE wildfly_datasources_pool_xaprepare_average_time gauge
+wildfly_datasources_pool_xaprepare_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaprepare_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaprepare_count The number of XAResource prepare invocations
+# TYPE wildfly_datasources_pool_xaprepare_count gauge
+wildfly_datasources_pool_xaprepare_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaprepare_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaprepare_max_time The maximum time for a XAResource prepare invocation
+# TYPE wildfly_datasources_pool_xaprepare_max_time gauge
+wildfly_datasources_pool_xaprepare_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaprepare_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xaprepare_total_time The total time for all XAResource prepare invocations
+# TYPE wildfly_datasources_pool_xaprepare_total_time gauge
+wildfly_datasources_pool_xaprepare_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xaprepare_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarecover_average_time The average time for a XAResource recover invocation
+# TYPE wildfly_datasources_pool_xarecover_average_time gauge
+wildfly_datasources_pool_xarecover_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarecover_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarecover_count The number of XAResource recover invocations
+# TYPE wildfly_datasources_pool_xarecover_count gauge
+wildfly_datasources_pool_xarecover_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarecover_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarecover_max_time The maximum time for a XAResource recover invocation
+# TYPE wildfly_datasources_pool_xarecover_max_time gauge
+wildfly_datasources_pool_xarecover_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarecover_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarecover_total_time The total time for all XAResource recover invocations
+# TYPE wildfly_datasources_pool_xarecover_total_time gauge
+wildfly_datasources_pool_xarecover_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarecover_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarollback_average_time The average time for a XAResource rollback invocation
+# TYPE wildfly_datasources_pool_xarollback_average_time gauge
+wildfly_datasources_pool_xarollback_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarollback_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarollback_count The number of XAResource rollback invocations
+# TYPE wildfly_datasources_pool_xarollback_count gauge
+wildfly_datasources_pool_xarollback_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarollback_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarollback_max_time The maximum time for a XAResource rollback invocation
+# TYPE wildfly_datasources_pool_xarollback_max_time gauge
+wildfly_datasources_pool_xarollback_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarollback_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xarollback_total_time The total time for all XAResource rollback invocations
+# TYPE wildfly_datasources_pool_xarollback_total_time gauge
+wildfly_datasources_pool_xarollback_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xarollback_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xastart_average_time The average time for a XAResource start invocation
+# TYPE wildfly_datasources_pool_xastart_average_time gauge
+wildfly_datasources_pool_xastart_average_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xastart_average_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xastart_count The number of XAResource start invocations
+# TYPE wildfly_datasources_pool_xastart_count gauge
+wildfly_datasources_pool_xastart_count{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xastart_count{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xastart_max_time The maximum time for a XAResource start invocation
+# TYPE wildfly_datasources_pool_xastart_max_time gauge
+wildfly_datasources_pool_xastart_max_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xastart_max_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_datasources_pool_xastart_total_time The total time for all XAResource start invocations
+# TYPE wildfly_datasources_pool_xastart_total_time gauge
+wildfly_datasources_pool_xastart_total_time{data_source="ExampleDS"} 0.0
+wildfly_datasources_pool_xastart_total_time{data_source="KeycloakDS"} 0.0
+# HELP wildfly_ee_active_thread_count The approximate number of threads that are actively executing tasks.
+# TYPE wildfly_ee_active_thread_count gauge
+wildfly_ee_active_thread_count{managed_executor_service="default"} 0.0
+wildfly_ee_active_thread_count{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ee_completed_task_count The approximate total number of tasks that have completed execution.
+# TYPE wildfly_ee_completed_task_count gauge
+wildfly_ee_completed_task_count{managed_executor_service="default"} 0.0
+wildfly_ee_completed_task_count{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ee_current_queue_size The current size of the executor's task queue.
+# TYPE wildfly_ee_current_queue_size gauge
+wildfly_ee_current_queue_size{managed_executor_service="default"} 0.0
+wildfly_ee_current_queue_size{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ee_hung_thread_count The number of executor threads that are hung.
+# TYPE wildfly_ee_hung_thread_count gauge
+wildfly_ee_hung_thread_count{managed_executor_service="default"} 0.0
+wildfly_ee_hung_thread_count{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ee_max_thread_count The largest number of executor threads.
+# TYPE wildfly_ee_max_thread_count gauge
+wildfly_ee_max_thread_count{managed_executor_service="default"} 0.0
+wildfly_ee_max_thread_count{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ee_task_count The approximate total number of tasks that have ever been submitted for execution.
+# TYPE wildfly_ee_task_count gauge
+wildfly_ee_task_count{managed_executor_service="default"} 0.0
+wildfly_ee_task_count{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ee_thread_count The current number of executor threads.
+# TYPE wildfly_ee_thread_count gauge
+wildfly_ee_thread_count{managed_executor_service="default"} 0.0
+wildfly_ee_thread_count{managed_scheduled_executor_service="default"} 0.0
+# HELP wildfly_ejb3_active_count The approximate number of threads that are actively executing tasks.
+# TYPE wildfly_ejb3_active_count gauge
+wildfly_ejb3_active_count{thread_pool="default"} 0.0
+# HELP wildfly_ejb3_completed_task_count The approximate total number of tasks that have completed execution.
+# TYPE wildfly_ejb3_completed_task_count gauge
+wildfly_ejb3_completed_task_count{thread_pool="default"} 0.0
+# HELP wildfly_ejb3_current_thread_count The current number of threads in the pool.
+# TYPE wildfly_ejb3_current_thread_count gauge
+wildfly_ejb3_current_thread_count{thread_pool="default"} 0.0
+# HELP wildfly_ejb3_largest_thread_count The largest number of threads that have ever simultaneously been in the pool.
+# TYPE wildfly_ejb3_largest_thread_count gauge
+wildfly_ejb3_largest_thread_count{thread_pool="default"} 0.0
+# HELP wildfly_ejb3_queue_size The queue size.
+# TYPE wildfly_ejb3_queue_size gauge
+wildfly_ejb3_queue_size{thread_pool="default"} 0.0
+# HELP wildfly_ejb3_rejected_count The number of tasks that have been rejected.
+# TYPE wildfly_ejb3_rejected_count gauge
+wildfly_ejb3_rejected_count{thread_pool="default"} 0.0
+# HELP wildfly_ejb3_task_count The approximate total number of tasks that have ever been scheduled for execution.
+# TYPE wildfly_ejb3_task_count gauge
+wildfly_ejb3_task_count{thread_pool="default"} 0.0
+# HELP wildfly_infinispan_activations_total The number of cache node activations (bringing a node into memory from a cache store).
+# TYPE wildfly_infinispan_activations_total counter
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="authorization"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_activations_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="keys"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="realms"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="users"} 0.0
+wildfly_infinispan_activations_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_average_read_time_seconds Average time (in ms) for cache reads. Includes hits and misses.
+# TYPE wildfly_infinispan_average_read_time_seconds gauge
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_average_read_time_seconds{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_average_remove_time_seconds Average time (in ms) for cache removes.
+# TYPE wildfly_infinispan_average_remove_time_seconds gauge
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_average_remove_time_seconds{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_average_replication_time_total The average time taken to replicate data around the cluster.
+# TYPE wildfly_infinispan_average_replication_time_total counter
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_average_replication_time_total_seconds{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_average_write_time_seconds Average time (in ms) for cache writes.
+# TYPE wildfly_infinispan_average_write_time_seconds gauge
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_average_write_time_seconds{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_commits_total The number of transaction commits.
+# TYPE wildfly_infinispan_commits_total counter
+wildfly_infinispan_commits_total{cache_container="ejb",cache="http-remoting-connector",component="transaction"} 0.0
+# HELP wildfly_infinispan_current_concurrency_level The estimated number of concurrently updating threads which this cache can support.
+# TYPE wildfly_infinispan_current_concurrency_level gauge
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="actionTokens",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="authenticationSessions",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="clientSessions",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="ejb",cache="http-remoting-connector",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="loginFailures",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="offlineClientSessions",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="offlineSessions",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="sessions",component="locking"} 1000.0
+wildfly_infinispan_current_concurrency_level{cache_container="keycloak",cache="work",component="locking"} 1000.0
+# HELP wildfly_infinispan_evictions_total The number of cache eviction operations.
+# TYPE wildfly_infinispan_evictions_total counter
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_evictions_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_evictions_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_hit_ratio The hit/miss ratio for the cache (hits/hits+misses).
+# TYPE wildfly_infinispan_hit_ratio gauge
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_hit_ratio{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_hits_total The number of cache attribute hits.
+# TYPE wildfly_infinispan_hits_total counter
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_hits_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_hits_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_misses_total The number of cache attribute misses.
+# TYPE wildfly_infinispan_misses_total counter
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_misses_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_misses_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_number_of_entries The number of entries in the cache including passivated entries.
+# TYPE wildfly_infinispan_number_of_entries gauge
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="clientSessions"} 1.0
+wildfly_infinispan_number_of_entries{cache_container="ejb",cache="http-remoting-connector"} 2.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="sessions"} 1.0
+wildfly_infinispan_number_of_entries{cache_container="keycloak",cache="work"} 79.0
+# HELP wildfly_infinispan_number_of_entries_in_memory The number of entries in the cache excluding passivated entries.
+# TYPE wildfly_infinispan_number_of_entries_in_memory gauge
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="clientSessions"} 1.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="ejb",cache="http-remoting-connector"} 2.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="sessions"} 1.0
+wildfly_infinispan_number_of_entries_in_memory{cache_container="keycloak",cache="work"} 79.0
+# HELP wildfly_infinispan_number_of_locks_available The number of locks available to this cache.
+# TYPE wildfly_infinispan_number_of_locks_available gauge
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="actionTokens",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="authenticationSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="clientSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="ejb",cache="http-remoting-connector",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="loginFailures",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="offlineClientSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="offlineSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="sessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_available{cache_container="keycloak",cache="work",component="locking"} 0.0
+# HELP wildfly_infinispan_number_of_locks_held The number of locks currently in use by this cache.
+# TYPE wildfly_infinispan_number_of_locks_held gauge
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="actionTokens",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="authenticationSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="clientSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="ejb",cache="http-remoting-connector",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="loginFailures",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="offlineClientSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="offlineSessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="sessions",component="locking"} 0.0
+wildfly_infinispan_number_of_locks_held{cache_container="keycloak",cache="work",component="locking"} 0.0
+# HELP wildfly_infinispan_passivations_total The number of cache node passivations (passivating a node from memory to a cache store).
+# TYPE wildfly_infinispan_passivations_total counter
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="authorization"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_passivations_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="keys"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="realms"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="users"} 0.0
+wildfly_infinispan_passivations_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_prepares_total The number of transaction prepares.
+# TYPE wildfly_infinispan_prepares_total counter
+wildfly_infinispan_prepares_total{cache_container="ejb",cache="http-remoting-connector",component="transaction"} 0.0
+# HELP wildfly_infinispan_read_write_ratio The read/write ratio of the cache ((hits+misses)/stores).
+# TYPE wildfly_infinispan_read_write_ratio gauge
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_read_write_ratio{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_remove_hits_total The number of cache attribute remove hits.
+# TYPE wildfly_infinispan_remove_hits_total counter
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_remove_hits_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_remove_misses_total The number of cache attribute remove misses.
+# TYPE wildfly_infinispan_remove_misses_total counter
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_remove_misses_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_replication_count_total The number of times data was replicated around the cluster.
+# TYPE wildfly_infinispan_replication_count_total counter
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="actionTokens"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="authenticationSessions"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="clientSessions"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="ejb",cache="http-remoting-connector"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="loginFailures"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="offlineClientSessions"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="offlineSessions"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="sessions"} -1.0
+wildfly_infinispan_replication_count_total{cache_container="keycloak",cache="work"} -1.0
+# HELP wildfly_infinispan_replication_failures_total The number of data replication failures.
+# TYPE wildfly_infinispan_replication_failures_total counter
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="actionTokens"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="authenticationSessions"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="clientSessions"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="ejb",cache="http-remoting-connector"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="loginFailures"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="offlineClientSessions"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="offlineSessions"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="sessions"} -1.0
+wildfly_infinispan_replication_failures_total{cache_container="keycloak",cache="work"} -1.0
+# HELP wildfly_infinispan_rollbacks_total The number of transaction rollbacks.
+# TYPE wildfly_infinispan_rollbacks_total counter
+wildfly_infinispan_rollbacks_total{cache_container="ejb",cache="http-remoting-connector",component="transaction"} 0.0
+# HELP wildfly_infinispan_success_ratio The data replication success ratio (successes/successes+failures).
+# TYPE wildfly_infinispan_success_ratio gauge
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_success_ratio{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_success_ratio{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_infinispan_time_since_reset_seconds Time (in secs) since cache statistics were reset.
+# TYPE wildfly_infinispan_time_since_reset_seconds gauge
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="actionTokens"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="authenticationSessions"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="clientSessions"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="ejb",cache="http-remoting-connector"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="loginFailures"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="offlineClientSessions"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="offlineSessions"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="sessions"} 87.0
+wildfly_infinispan_time_since_reset_seconds{cache_container="keycloak",cache="work"} 87.0
+# HELP wildfly_infinispan_time_since_start_seconds Time (in secs) since cache was started.
+# TYPE wildfly_infinispan_time_since_start_seconds gauge
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="actionTokens"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="authenticationSessions"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="clientSessions"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="ejb",cache="http-remoting-connector"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="loginFailures"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="offlineClientSessions"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="offlineSessions"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="sessions"} 87.0
+wildfly_infinispan_time_since_start_seconds{cache_container="keycloak",cache="work"} 87.0
+# HELP wildfly_infinispan_writes_total The number of cache attribute put operations.
+# TYPE wildfly_infinispan_writes_total counter
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="actionTokens"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="authenticationSessions"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="clientSessions"} 0.0
+wildfly_infinispan_writes_total{cache_container="ejb",cache="http-remoting-connector"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="loginFailures"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="offlineClientSessions"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="offlineSessions"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="sessions"} 0.0
+wildfly_infinispan_writes_total{cache_container="keycloak",cache="work"} 0.0
+# HELP wildfly_io_busy_task_thread_count An estimate of busy threads in the task worker thread pool
+# TYPE wildfly_io_busy_task_thread_count gauge
+wildfly_io_busy_task_thread_count{worker="default"} 0.0
+# HELP wildfly_io_connection_count Estimate of the current connection count
+# TYPE wildfly_io_connection_count gauge
+wildfly_io_connection_count{worker="default",server="/0.0.0.0:8009"} 0.0
+wildfly_io_connection_count{worker="default",server="/0.0.0.0:8080"} 0.0
+wildfly_io_connection_count{worker="default",server="/0.0.0.0:8443"} 0.0
+# HELP wildfly_io_core_pool_size Minimum number of threads to keep in the underlying thread pool even if they are idle. Threads over this limit will be terminated over time specified by task-keepalive attribute.
+# TYPE wildfly_io_core_pool_size gauge
+wildfly_io_core_pool_size{worker="default"} 2.0
+# HELP wildfly_io_io_thread_count I/O thread count
+# TYPE wildfly_io_io_thread_count gauge
+wildfly_io_io_thread_count{worker="default"} 24.0
+# HELP wildfly_io_max_pool_size The maximum number of threads allowed in the worker task thread pool. Depending on the pool implementation, when this limit is reached tasks which cannot be queued may be rejected. This can be configured using the 'task-max-threads' attribute; see the description of that attribute for details on how this value is determined.
+# TYPE wildfly_io_max_pool_size gauge
+wildfly_io_max_pool_size{worker="default"} 192.0
+# HELP wildfly_io_queue_size An estimate of the number of tasks in the worker queue.
+# TYPE wildfly_io_queue_size gauge
+wildfly_io_queue_size{worker="default"} 0.0
+# HELP wildfly_jca_current_thread_count The current number of threads in the pool.
+# TYPE wildfly_jca_current_thread_count gauge
+wildfly_jca_current_thread_count{workmanager="default",long_running_threads="default"} 0.0
+wildfly_jca_current_thread_count{workmanager="default",short_running_threads="default"} 0.0
+# HELP wildfly_jca_largest_thread_count The largest number of threads that have ever simultaneously been in the pool.
+# TYPE wildfly_jca_largest_thread_count gauge
+wildfly_jca_largest_thread_count{workmanager="default",long_running_threads="default"} 0.0
+wildfly_jca_largest_thread_count{workmanager="default",short_running_threads="default"} 0.0
+# HELP wildfly_jca_local_dowork_accepted Number of doWork calls accepted
+# TYPE wildfly_jca_local_dowork_accepted gauge
+wildfly_jca_local_dowork_accepted{workmanager="default"} 0.0
+# HELP wildfly_jca_local_dowork_rejected Number of doWork calls rejected
+# TYPE wildfly_jca_local_dowork_rejected gauge
+wildfly_jca_local_dowork_rejected{workmanager="default"} 0.0
+# HELP wildfly_jca_local_schedulework_accepted Number of scheduleWork calls accepted
+# TYPE wildfly_jca_local_schedulework_accepted gauge
+wildfly_jca_local_schedulework_accepted{workmanager="default"} 0.0
+# HELP wildfly_jca_local_schedulework_rejected Number of scheduleWork calls rejected
+# TYPE wildfly_jca_local_schedulework_rejected gauge
+wildfly_jca_local_schedulework_rejected{workmanager="default"} 0.0
+# HELP wildfly_jca_local_startwork_accepted Number of startWork calls accepted
+# TYPE wildfly_jca_local_startwork_accepted gauge
+wildfly_jca_local_startwork_accepted{workmanager="default"} 0.0
+# HELP wildfly_jca_local_startwork_rejected Number of startWork calls rejected
+# TYPE wildfly_jca_local_startwork_rejected gauge
+wildfly_jca_local_startwork_rejected{workmanager="default"} 0.0
+# HELP wildfly_jca_local_work_active Number of current active works
+# TYPE wildfly_jca_local_work_active gauge
+wildfly_jca_local_work_active{workmanager="default"} 0.0
+# HELP wildfly_jca_local_work_failed Number of works failed
+# TYPE wildfly_jca_local_work_failed gauge
+wildfly_jca_local_work_failed{workmanager="default"} 0.0
+# HELP wildfly_jca_local_work_successful Number of works completed successfully
+# TYPE wildfly_jca_local_work_successful gauge
+wildfly_jca_local_work_successful{workmanager="default"} 0.0
+# HELP wildfly_jca_queue_size The queue size.
+# TYPE wildfly_jca_queue_size gauge
+wildfly_jca_queue_size{workmanager="default",long_running_threads="default"} 0.0
+wildfly_jca_queue_size{workmanager="default",short_running_threads="default"} 0.0
+# HELP wildfly_jca_rejected_count The number of tasks that have been passed to the handoff-executor (if one is specified) or discarded.
+# TYPE wildfly_jca_rejected_count gauge
+wildfly_jca_rejected_count{workmanager="default",long_running_threads="default"} 0.0
+wildfly_jca_rejected_count{workmanager="default",short_running_threads="default"} 0.0
+# HELP wildfly_jgroups_ack_threshold Send an ack immediately when a batch of ack_threshold (or more) messages is received. Otherwise send delayed acks. If 1, ack single messages (similar to UNICAST)
+# TYPE wildfly_jgroups_ack_threshold gauge
+wildfly_jgroups_ack_threshold{channel="ee",protocol="UNICAST3"} 100.0
+# HELP wildfly_jgroups_age_out_cache_size
+# TYPE wildfly_jgroups_age_out_cache_size gauge
+wildfly_jgroups_age_out_cache_size{channel="ee",protocol="UNICAST3"} 0.0
+# HELP wildfly_jgroups_all_clients_retry_timeout Time (in ms) to wait for another discovery round when all discovery responses were clients. A timeout of 0 means don't wait at all.
+# TYPE wildfly_jgroups_all_clients_retry_timeout gauge
+wildfly_jgroups_all_clients_retry_timeout{channel="ee",protocol="pbcast.GMS"} 100.0
+# HELP wildfly_jgroups_average_time_blocked Average time blocked (in ms) in flow control when trying to send a message
+# TYPE wildfly_jgroups_average_time_blocked gauge
+wildfly_jgroups_average_time_blocked{channel="ee",protocol="MFC"} 0.0
+wildfly_jgroups_average_time_blocked{channel="ee",protocol="UFC"} 0.0
+# HELP wildfly_jgroups_become_server_queue_size Size of the queue to hold messages received after creating the channel, but before being connected (is_server=false). After becoming the server, the messages in the queue are fed into up() and the queue is cleared. The motivation is to avoid retransmissions (see https://issues.jboss.org/browse/JGRP-1509 for details). 0 disables the queue.
+# TYPE wildfly_jgroups_become_server_queue_size gauge
+wildfly_jgroups_become_server_queue_size{channel="ee",protocol="pbcast.NAKACK2"} 50.0
+# HELP wildfly_jgroups_become_server_queue_size_actual Actual size of the become_server_queue
+# TYPE wildfly_jgroups_become_server_queue_size_actual gauge
+wildfly_jgroups_become_server_queue_size_actual{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_bind_port The port to which the transport binds. Default of 0 binds to any (ephemeral) port. See also port_range
+# TYPE wildfly_jgroups_bind_port gauge
+wildfly_jgroups_bind_port{channel="ee",protocol="UDP"} 55200.0
+# HELP wildfly_jgroups_bundler_buffer_size
+# TYPE wildfly_jgroups_bundler_buffer_size gauge
+wildfly_jgroups_bundler_buffer_size{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_bundler_capacity The max number of elements in a bundler if the bundler supports size limitations
+# TYPE wildfly_jgroups_bundler_capacity gauge
+wildfly_jgroups_bundler_capacity{channel="ee",protocol="UDP"} 16384.0
+# HELP wildfly_jgroups_bundler_num_spins Number of spins before a real lock is acquired
+# TYPE wildfly_jgroups_bundler_num_spins gauge
+wildfly_jgroups_bundler_num_spins{channel="ee",protocol="UDP"} 5.0
+# HELP wildfly_jgroups_cache_max_age Max age (in ms) an element marked as removed has to have until it is removed
+# TYPE wildfly_jgroups_cache_max_age gauge
+wildfly_jgroups_cache_max_age{channel="ee",protocol="FD_SOCK"} 10000.0
+# HELP wildfly_jgroups_cache_max_elements Max number of elements in the cache until deleted elements are removed
+# TYPE wildfly_jgroups_cache_max_elements gauge
+wildfly_jgroups_cache_max_elements{channel="ee",protocol="FD_SOCK"} 200.0
+# HELP wildfly_jgroups_check_interval Interval (in ms) after which we check for view inconsistencies
+# TYPE wildfly_jgroups_check_interval gauge
+wildfly_jgroups_check_interval{channel="ee",protocol="MERGE3"} 48000.0
+# HELP wildfly_jgroups_client_bind_port Start port for client socket. Default value of 0 picks a random port
+# TYPE wildfly_jgroups_client_bind_port gauge
+wildfly_jgroups_client_bind_port{channel="ee",protocol="FD_SOCK"} 0.0
+# HELP wildfly_jgroups_client_bind_port_actual The actual client_bind_port
+# TYPE wildfly_jgroups_client_bind_port_actual gauge
+wildfly_jgroups_client_bind_port_actual{channel="ee",protocol="FD_SOCK"} 55767.0
+# HELP wildfly_jgroups_conn_close_timeout Time (in ms) until a connection marked to be closed will get removed. 0 disables this
+# TYPE wildfly_jgroups_conn_close_timeout gauge
+wildfly_jgroups_conn_close_timeout{channel="ee",protocol="UNICAST3"} 240000.0
+# HELP wildfly_jgroups_conn_expiry_timeout Time (in milliseconds) after which an idle incoming or outgoing connection is closed. The connection will get re-established when used again. 0 disables connection reaping. Note that this creates lingering connection entries, which increases memory over time.
+# TYPE wildfly_jgroups_conn_expiry_timeout gauge
+wildfly_jgroups_conn_expiry_timeout{channel="ee",protocol="UNICAST3"} 120000.0
+# HELP wildfly_jgroups_current_seqno
+# TYPE wildfly_jgroups_current_seqno gauge
+wildfly_jgroups_current_seqno{channel="ee",protocol="pbcast.NAKACK2"} 100.0
+# HELP wildfly_jgroups_desired_avg_gossip Average time to send a STABLE message
+# TYPE wildfly_jgroups_desired_avg_gossip gauge
+wildfly_jgroups_desired_avg_gossip{channel="ee",protocol="pbcast.STABLE"} 5000.0
+# HELP wildfly_jgroups_diagnostics_port Port for diagnostic probing. Default is 7500
+# TYPE wildfly_jgroups_diagnostics_port gauge
+wildfly_jgroups_diagnostics_port{channel="ee",protocol="UDP"} 7500.0
+# HELP wildfly_jgroups_diagnostics_port_range The number of ports to be probed for an available port (TCP)
+# TYPE wildfly_jgroups_diagnostics_port_range gauge
+wildfly_jgroups_diagnostics_port_range{channel="ee",protocol="UDP"} 50.0
+# HELP wildfly_jgroups_diagnostics_ttl TTL of the diagnostics multicast socket
+# TYPE wildfly_jgroups_diagnostics_ttl gauge
+wildfly_jgroups_diagnostics_ttl{channel="ee",protocol="UDP"} 8.0
+# HELP wildfly_jgroups_different_cluster_messages Number of messages from members in a different cluster
+# TYPE wildfly_jgroups_different_cluster_messages gauge
+wildfly_jgroups_different_cluster_messages{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_different_version_messages Number of messages from members with a different JGroups version
+# TYPE wildfly_jgroups_different_version_messages gauge
+wildfly_jgroups_different_version_messages{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_discovery_rsp_expiry_time Expiry time of discovery responses in ms
+# TYPE wildfly_jgroups_discovery_rsp_expiry_time gauge
+wildfly_jgroups_discovery_rsp_expiry_time{channel="ee",protocol="PING"} 60000.0
+# HELP wildfly_jgroups_dropped_messages Number of messages dropped when sending because of insufficient buffer space
+# TYPE wildfly_jgroups_dropped_messages gauge
+wildfly_jgroups_dropped_messages{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_external_port Used to map the internal port (bind_port) to an external port. Only used if > 0
+# TYPE wildfly_jgroups_external_port gauge
+wildfly_jgroups_external_port{channel="ee",protocol="FD_SOCK"} 0.0
+wildfly_jgroups_external_port{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_frag_size The max number of bytes in a message. Larger messages will be fragmented
+# TYPE wildfly_jgroups_frag_size gauge
+wildfly_jgroups_frag_size{channel="ee",protocol="FRAG3"} 60000.0
+# HELP wildfly_jgroups_get_cache_timeout Timeout for getting socket cache from coordinator
+# TYPE wildfly_jgroups_get_cache_timeout gauge
+wildfly_jgroups_get_cache_timeout{channel="ee",protocol="FD_SOCK"} 1000.0
+# HELP wildfly_jgroups_id Give the protocol a different ID if needed so we can have multiple instances of it in the same stack
+# TYPE wildfly_jgroups_id gauge
+wildfly_jgroups_id{channel="ee",protocol="FD_ALL"} 20.0
+wildfly_jgroups_id{channel="ee",protocol="FD_SOCK"} 2.0
+wildfly_jgroups_id{channel="ee",protocol="FRAG3"} 62.0
+wildfly_jgroups_id{channel="ee",protocol="MERGE3"} 38.0
+wildfly_jgroups_id{channel="ee",protocol="MFC"} 30.0
+wildfly_jgroups_id{channel="ee",protocol="PING"} 5.0
+wildfly_jgroups_id{channel="ee",protocol="UDP"} 57.0
+wildfly_jgroups_id{channel="ee",protocol="UFC"} 31.0
+wildfly_jgroups_id{channel="ee",protocol="UNICAST3"} 48.0
+wildfly_jgroups_id{channel="ee",protocol="VERIFY_SUSPECT"} 11.0
+wildfly_jgroups_id{channel="ee",protocol="pbcast.GMS"} 12.0
+wildfly_jgroups_id{channel="ee",protocol="pbcast.NAKACK2"} 41.0
+wildfly_jgroups_id{channel="ee",protocol="pbcast.STABLE"} 13.0
+# HELP wildfly_jgroups_internal_thread_pool_size Current number of threads in the internal thread pool
+# TYPE wildfly_jgroups_internal_thread_pool_size gauge
+wildfly_jgroups_internal_thread_pool_size{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_internal_thread_pool_size_largest Largest number of threads in the internal thread pool
+# TYPE wildfly_jgroups_internal_thread_pool_size_largest gauge
+wildfly_jgroups_internal_thread_pool_size_largest{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_interval Interval at which a HEARTBEAT is sent to the cluster
+# TYPE wildfly_jgroups_interval gauge
+wildfly_jgroups_interval{channel="ee",protocol="FD_ALL"} 15000.0
+# HELP wildfly_jgroups_ip_ttl The time-to-live (TTL) for multicast datagram packets. Default is 8
+# TYPE wildfly_jgroups_ip_ttl gauge
+wildfly_jgroups_ip_ttl{channel="ee",protocol="UDP"} 2.0
+# HELP wildfly_jgroups_join_timeout Join timeout
+# TYPE wildfly_jgroups_join_timeout gauge
+wildfly_jgroups_join_timeout{channel="ee",protocol="pbcast.GMS"} 3000.0
+# HELP wildfly_jgroups_leave_timeout Max time (in ms) to wait for a LEAVE response after a LEAVE req has been sent to the coord
+# TYPE wildfly_jgroups_leave_timeout gauge
+wildfly_jgroups_leave_timeout{channel="ee",protocol="pbcast.GMS"} 2000.0
+# HELP wildfly_jgroups_logical_addr_cache_expiration Time (in ms) after which entries in the logical address cache marked as removable can be removed. 0 never removes any entries (not recommended)
+# TYPE wildfly_jgroups_logical_addr_cache_expiration gauge
+wildfly_jgroups_logical_addr_cache_expiration{channel="ee",protocol="UDP"} 360000.0
+# HELP wildfly_jgroups_logical_addr_cache_max_size Max number of elements in the logical address cache before eviction starts
+# TYPE wildfly_jgroups_logical_addr_cache_max_size gauge
+wildfly_jgroups_logical_addr_cache_max_size{channel="ee",protocol="UDP"} 2000.0
+# HELP wildfly_jgroups_logical_addr_cache_reaper_interval Interval (in ms) at which the reaper task scans logical_addr_cache and removes entries marked as removable. 0 disables reaping.
+# TYPE wildfly_jgroups_logical_addr_cache_reaper_interval gauge
+wildfly_jgroups_logical_addr_cache_reaper_interval{channel="ee",protocol="UDP"} 60000.0
+# HELP wildfly_jgroups_max_block_time Max time (in ms) to block
+# TYPE wildfly_jgroups_max_block_time gauge
+wildfly_jgroups_max_block_time{channel="ee",protocol="MFC"} 500.0
+wildfly_jgroups_max_block_time{channel="ee",protocol="UFC"} 500.0
+# HELP wildfly_jgroups_max_bundle_size Maximum number of bytes for messages to be queued until they are sent
+# TYPE wildfly_jgroups_max_bundle_size gauge
+wildfly_jgroups_max_bundle_size{channel="ee",protocol="UDP"} 64000.0
+# HELP wildfly_jgroups_max_bundling_time Max view bundling timeout if view bundling is turned on
+# TYPE wildfly_jgroups_max_bundling_time gauge
+wildfly_jgroups_max_bundling_time{channel="ee",protocol="pbcast.GMS"} 50.0
+# HELP wildfly_jgroups_max_bytes Maximum number of bytes received in all messages before sending a STABLE message is triggered
+# TYPE wildfly_jgroups_max_bytes gauge
+wildfly_jgroups_max_bytes{channel="ee",protocol="pbcast.STABLE"} 1000000.0
+# HELP wildfly_jgroups_max_credits Max number of bytes to send per receiver until an ack must be received to proceed
+# TYPE wildfly_jgroups_max_credits gauge
+wildfly_jgroups_max_credits{channel="ee",protocol="MFC"} 2000000.0
+wildfly_jgroups_max_credits{channel="ee",protocol="UFC"} 2000000.0
+# HELP wildfly_jgroups_max_interval Interval (in milliseconds) when the next info message will be sent. A random value is picked from range [1..max_interval]
+# TYPE wildfly_jgroups_max_interval gauge
+wildfly_jgroups_max_interval{channel="ee",protocol="MERGE3"} 30000.0
+# HELP wildfly_jgroups_max_join_attempts Number of join attempts before we give up and become a singleton. 0 means 'never give up'.
+# TYPE wildfly_jgroups_max_join_attempts gauge
+wildfly_jgroups_max_join_attempts{channel="ee",protocol="pbcast.GMS"} 10.0
+# HELP wildfly_jgroups_max_leave_attempts Number of times a LEAVE request is sent to the coordinator (without receiving a LEAVE response, before giving up and leaving anyway (failure detection will eventually exclude the left member). A value of 0 means wait forever
+# TYPE wildfly_jgroups_max_leave_attempts gauge
+wildfly_jgroups_max_leave_attempts{channel="ee",protocol="pbcast.GMS"} 10.0
+# HELP wildfly_jgroups_max_members_in_discovery_request Max size of the member list shipped with a discovery request. If we have more, the mbrs field in the discovery request header is nulled and members return the entire membership, not individual members
+# TYPE wildfly_jgroups_max_members_in_discovery_request gauge
+wildfly_jgroups_max_members_in_discovery_request{channel="ee",protocol="PING"} 500.0
+# HELP wildfly_jgroups_max_participants_in_merge The max number of merge participants to be involved in a merge. 0 sets this to unlimited.
+# TYPE wildfly_jgroups_max_participants_in_merge gauge
+wildfly_jgroups_max_participants_in_merge{channel="ee",protocol="MERGE3"} 100.0
+# HELP wildfly_jgroups_max_rank_to_reply The max rank of this member to respond to discovery requests, e.g. if max_rank_to_reply=2 in {A,B,C,D,E}, only A (rank 1) and B (rank 2) will reply. A value <= 0 means everybody will reply. This attribute is ignored if TP.use_ip_addrs is false.
+# TYPE wildfly_jgroups_max_rank_to_reply gauge
+wildfly_jgroups_max_rank_to_reply{channel="ee",protocol="PING"} 0.0
+# HELP wildfly_jgroups_max_rebroadcast_timeout Timeout to rebroadcast messages. Default is 2000 msec
+# TYPE wildfly_jgroups_max_rebroadcast_timeout gauge
+wildfly_jgroups_max_rebroadcast_timeout{channel="ee",protocol="pbcast.NAKACK2"} 2000.0
+# HELP wildfly_jgroups_max_xmit_req_size Max number of messages to ask for in a retransmit request. 0 disables this and uses the max bundle size in the transport
+# TYPE wildfly_jgroups_max_xmit_req_size gauge
+wildfly_jgroups_max_xmit_req_size{channel="ee",protocol="UNICAST3"} 511600.0
+wildfly_jgroups_max_xmit_req_size{channel="ee",protocol="pbcast.NAKACK2"} 511600.0
+# HELP wildfly_jgroups_mcast_port The multicast port used for sending and receiving packets. Default is 7600
+# TYPE wildfly_jgroups_mcast_port gauge
+wildfly_jgroups_mcast_port{channel="ee",protocol="UDP"} 45688.0
+# HELP wildfly_jgroups_mcast_receiver_threads Number of multicast receiver threads, all reading from the same MulticastSocket. If de-serialization is slow, increasing the number of receiver threads might yield better performance.
+# TYPE wildfly_jgroups_mcast_receiver_threads gauge
+wildfly_jgroups_mcast_receiver_threads{channel="ee",protocol="UDP"} 1.0
+# HELP wildfly_jgroups_mcast_recv_buf_size Receive buffer size of the multicast datagram socket
+# TYPE wildfly_jgroups_mcast_recv_buf_size gauge
+wildfly_jgroups_mcast_recv_buf_size{channel="ee",protocol="UDP"} 2.5E7
+# HELP wildfly_jgroups_mcast_send_buf_size Send buffer size of the multicast datagram socket
+# TYPE wildfly_jgroups_mcast_send_buf_size gauge
+wildfly_jgroups_mcast_send_buf_size{channel="ee",protocol="UDP"} 1000000.0
+# HELP wildfly_jgroups_merge_timeout Timeout (in ms) to complete merge
+# TYPE wildfly_jgroups_merge_timeout gauge
+wildfly_jgroups_merge_timeout{channel="ee",protocol="pbcast.GMS"} 5000.0
+# HELP wildfly_jgroups_message_processing_policy_max_buffer_size Max number of messages buffered for consumption of the delivery thread in MaxOneThreadPerSender. 0 creates an unbounded buffer
+# TYPE wildfly_jgroups_message_processing_policy_max_buffer_size gauge
+wildfly_jgroups_message_processing_policy_max_buffer_size{channel="ee",protocol="UDP"} 5000.0
+# HELP wildfly_jgroups_min_credits Computed as max_credits x min_theshold unless explicitly set
+# TYPE wildfly_jgroups_min_credits gauge
+wildfly_jgroups_min_credits{channel="ee",protocol="MFC"} 800000.0
+wildfly_jgroups_min_credits{channel="ee",protocol="UFC"} 800000.0
+# HELP wildfly_jgroups_min_interval Minimum time in ms before sending an info message
+# TYPE wildfly_jgroups_min_interval gauge
+wildfly_jgroups_min_interval{channel="ee",protocol="MERGE3"} 10000.0
+# HELP wildfly_jgroups_min_threshold The threshold (as a percentage of max_credits) at which a receiver sends more credits to a sender. Example: if max_credits is 1'000'000, and min_threshold 0.25, then we send ca. 250'000 credits to P once we've got only 250'000 credits left for P (we've received 750'000 bytes from P)
+# TYPE wildfly_jgroups_min_threshold gauge
+wildfly_jgroups_min_threshold{channel="ee",protocol="MFC"} 0.4
+wildfly_jgroups_min_threshold{channel="ee",protocol="UFC"} 0.4
+# HELP wildfly_jgroups_non_member_messages Number of messages from non-members
+# TYPE wildfly_jgroups_non_member_messages gauge
+wildfly_jgroups_non_member_messages{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_num_acks_received
+# TYPE wildfly_jgroups_num_acks_received gauge
+wildfly_jgroups_num_acks_received{channel="ee",protocol="UNICAST3"} 64.0
+# HELP wildfly_jgroups_num_acks_sent
+# TYPE wildfly_jgroups_num_acks_sent gauge
+wildfly_jgroups_num_acks_sent{channel="ee",protocol="UNICAST3"} 61.0
+# HELP wildfly_jgroups_num_bytes_received Bytes accumulated so far
+# TYPE wildfly_jgroups_num_bytes_received gauge
+wildfly_jgroups_num_bytes_received{channel="ee",protocol="pbcast.STABLE"} 0.0
+# HELP wildfly_jgroups_num_connections Returns the total number of outgoing (send) and incoming (receive) connections
+# TYPE wildfly_jgroups_num_connections gauge
+wildfly_jgroups_num_connections{channel="ee",protocol="UNICAST3"} 2.0
+# HELP wildfly_jgroups_num_discovery_requests Total number of discovery requests sent
+# TYPE wildfly_jgroups_num_discovery_requests gauge
+wildfly_jgroups_num_discovery_requests{channel="ee",protocol="PING"} 1.0
+# HELP wildfly_jgroups_num_discovery_runs The number of times a discovery process is executed when finding initial members (https://issues.jboss.org/browse/JGRP-2317)
+# TYPE wildfly_jgroups_num_discovery_runs gauge
+wildfly_jgroups_num_discovery_runs{channel="ee",protocol="PING"} 1.0
+# HELP wildfly_jgroups_num_heartbeats_received Number of heartbeats received
+# TYPE wildfly_jgroups_num_heartbeats_received gauge
+wildfly_jgroups_num_heartbeats_received{channel="ee",protocol="FD_ALL"} 3.0
+# HELP wildfly_jgroups_num_heartbeats_sent Number of heartbeats sent
+# TYPE wildfly_jgroups_num_heartbeats_sent gauge
+wildfly_jgroups_num_heartbeats_sent{channel="ee",protocol="FD_ALL"} 0.0
+# HELP wildfly_jgroups_num_members
+# TYPE wildfly_jgroups_num_members gauge
+wildfly_jgroups_num_members{channel="ee",protocol="pbcast.GMS"} 2.0
+# HELP wildfly_jgroups_num_merge_events Number of times a MERGE event was sent up the stack
+# TYPE wildfly_jgroups_num_merge_events gauge
+wildfly_jgroups_num_merge_events{channel="ee",protocol="MERGE3"} 0.0
+# HELP wildfly_jgroups_num_messages_received Number of messages received
+# TYPE wildfly_jgroups_num_messages_received gauge
+wildfly_jgroups_num_messages_received{channel="ee",protocol="UNICAST3"} 320.0
+wildfly_jgroups_num_messages_received{channel="ee",protocol="pbcast.NAKACK2"} 43.0
+# HELP wildfly_jgroups_num_messages_sent Number of messages sent
+# TYPE wildfly_jgroups_num_messages_sent gauge
+wildfly_jgroups_num_messages_sent{channel="ee",protocol="UNICAST3"} 292.0
+wildfly_jgroups_num_messages_sent{channel="ee",protocol="pbcast.NAKACK2"} 98.0
+# HELP wildfly_jgroups_num_msgs Number of verify heartbeats sent to a suspected member
+# TYPE wildfly_jgroups_num_msgs gauge
+wildfly_jgroups_num_msgs{channel="ee",protocol="VERIFY_SUSPECT"} 1.0
+# HELP wildfly_jgroups_num_prev_mbrs Max number of old members to keep in history. Default is 50
+# TYPE wildfly_jgroups_num_prev_mbrs gauge
+wildfly_jgroups_num_prev_mbrs{channel="ee",protocol="pbcast.GMS"} 50.0
+# HELP wildfly_jgroups_num_prev_views Number of views to store in history
+# TYPE wildfly_jgroups_num_prev_views gauge
+wildfly_jgroups_num_prev_views{channel="ee",protocol="pbcast.GMS"} 10.0
+# HELP wildfly_jgroups_num_receive_connections Returns the number of incoming (receive) connections
+# TYPE wildfly_jgroups_num_receive_connections gauge
+wildfly_jgroups_num_receive_connections{channel="ee",protocol="UNICAST3"} 1.0
+# HELP wildfly_jgroups_num_send_connections Returns the number of outgoing (send) connections
+# TYPE wildfly_jgroups_num_send_connections gauge
+wildfly_jgroups_num_send_connections{channel="ee",protocol="UNICAST3"} 1.0
+# HELP wildfly_jgroups_num_suspect_events Number of suspected events received
+# TYPE wildfly_jgroups_num_suspect_events gauge
+wildfly_jgroups_num_suspect_events{channel="ee",protocol="FD_ALL"} 0.0
+# HELP wildfly_jgroups_num_suspect_events_generated Number of suspect event generated
+# TYPE wildfly_jgroups_num_suspect_events_generated gauge
+wildfly_jgroups_num_suspect_events_generated{channel="ee",protocol="FD_SOCK"} 0.0
+# HELP wildfly_jgroups_num_suspected_members The number of currently suspected members
+# TYPE wildfly_jgroups_num_suspected_members gauge
+wildfly_jgroups_num_suspected_members{channel="ee",protocol="FD_SOCK"} 0.0
+# HELP wildfly_jgroups_num_tasks_in_timer The current number of timer tasks.
+# TYPE wildfly_jgroups_num_tasks_in_timer gauge
+wildfly_jgroups_num_tasks_in_timer{channel="ee"} 0.0
+# HELP wildfly_jgroups_num_threads Returns the number of live threads in the JVM
+# TYPE wildfly_jgroups_num_threads gauge
+wildfly_jgroups_num_threads{channel="ee",protocol="UDP"} 157.0
+# HELP wildfly_jgroups_num_timer_threads The number of timer threads.
+# TYPE wildfly_jgroups_num_timer_threads gauge
+wildfly_jgroups_num_timer_threads{channel="ee"} 0.0
+# HELP wildfly_jgroups_num_tries Number of attempts coordinator is solicited for socket cache until we give up
+# TYPE wildfly_jgroups_num_tries gauge
+wildfly_jgroups_num_tries{channel="ee",protocol="FD_SOCK"} 3.0
+# HELP wildfly_jgroups_num_unacked_messages
+# TYPE wildfly_jgroups_num_unacked_messages gauge
+wildfly_jgroups_num_unacked_messages{channel="ee",protocol="UNICAST3"} 0.0
+# HELP wildfly_jgroups_num_xmits
+# TYPE wildfly_jgroups_num_xmits gauge
+wildfly_jgroups_num_xmits{channel="ee",protocol="UNICAST3"} 0.0
+# HELP wildfly_jgroups_number_of_blockings Number of times flow control blocks sender
+# TYPE wildfly_jgroups_number_of_blockings gauge
+wildfly_jgroups_number_of_blockings{channel="ee",protocol="MFC"} 0.0
+wildfly_jgroups_number_of_blockings{channel="ee",protocol="UFC"} 0.0
+# HELP wildfly_jgroups_number_of_credit_requests_received Number of credit requests received
+# TYPE wildfly_jgroups_number_of_credit_requests_received gauge
+wildfly_jgroups_number_of_credit_requests_received{channel="ee",protocol="MFC"} 0.0
+wildfly_jgroups_number_of_credit_requests_received{channel="ee",protocol="UFC"} 0.0
+# HELP wildfly_jgroups_number_of_credit_requests_sent Number of credit requests sent
+# TYPE wildfly_jgroups_number_of_credit_requests_sent gauge
+wildfly_jgroups_number_of_credit_requests_sent{channel="ee",protocol="MFC"} 0.0
+wildfly_jgroups_number_of_credit_requests_sent{channel="ee",protocol="UFC"} 0.0
+# HELP wildfly_jgroups_number_of_credit_responses_received Number of credit responses received
+# TYPE wildfly_jgroups_number_of_credit_responses_received gauge
+wildfly_jgroups_number_of_credit_responses_received{channel="ee",protocol="MFC"} 0.0
+wildfly_jgroups_number_of_credit_responses_received{channel="ee",protocol="UFC"} 0.0
+# HELP wildfly_jgroups_number_of_credit_responses_sent Number of credit responses sent
+# TYPE wildfly_jgroups_number_of_credit_responses_sent gauge
+wildfly_jgroups_number_of_credit_responses_sent{channel="ee",protocol="MFC"} 0.0
+wildfly_jgroups_number_of_credit_responses_sent{channel="ee",protocol="UFC"} 0.0
+# HELP wildfly_jgroups_number_of_thread_dumps Number of thread dumps
+# TYPE wildfly_jgroups_number_of_thread_dumps gauge
+wildfly_jgroups_number_of_thread_dumps{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_number_of_views
+# TYPE wildfly_jgroups_number_of_views gauge
+wildfly_jgroups_number_of_views{channel="ee",protocol="pbcast.GMS"} 0.0
+# HELP wildfly_jgroups_port_range The range of valid ports: [bind_port .. bind_port+port_range ]. 0 only binds to bind_port and fails if taken
+# TYPE wildfly_jgroups_port_range gauge
+wildfly_jgroups_port_range{channel="ee",protocol="FD_SOCK"} 50.0
+wildfly_jgroups_port_range{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_received_bytes The number of bytes received by this channel.
+# TYPE wildfly_jgroups_received_bytes gauge
+wildfly_jgroups_received_bytes{channel="ee"} 0.0
+# HELP wildfly_jgroups_received_messages The number of messages received by this channel.
+# TYPE wildfly_jgroups_received_messages gauge
+wildfly_jgroups_received_messages{channel="ee"} 0.0
+# HELP wildfly_jgroups_resend_last_seqno_max_times Max number of times the last seqno is resent before acquiescing if last seqno isn't incremented
+# TYPE wildfly_jgroups_resend_last_seqno_max_times gauge
+wildfly_jgroups_resend_last_seqno_max_times{channel="ee",protocol="pbcast.NAKACK2"} 1.0
+# HELP wildfly_jgroups_sent_bytes The number of bytes sent by this channel.
+# TYPE wildfly_jgroups_sent_bytes gauge
+wildfly_jgroups_sent_bytes{channel="ee"} 0.0
+# HELP wildfly_jgroups_sent_messages The number of messages sent by this channel.
+# TYPE wildfly_jgroups_sent_messages gauge
+wildfly_jgroups_sent_messages{channel="ee"} 0.0
+# HELP wildfly_jgroups_size_of_all_messages Returns the number of bytes of all messages in all retransmit buffers. To compute the size, Message.getLength() is used
+# TYPE wildfly_jgroups_size_of_all_messages gauge
+wildfly_jgroups_size_of_all_messages{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_size_of_all_messages_incl_headers Returns the number of bytes of all messages in all retransmit buffers. To compute the size, Message.size() is used
+# TYPE wildfly_jgroups_size_of_all_messages_incl_headers gauge
+wildfly_jgroups_size_of_all_messages_incl_headers{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_sock_conn_timeout Max time in millis to wait for ping Socket.connect() to return
+# TYPE wildfly_jgroups_sock_conn_timeout gauge
+wildfly_jgroups_sock_conn_timeout{channel="ee",protocol="FD_SOCK"} 1000.0
+# HELP wildfly_jgroups_stability_delay Delay before stability message is sent
+# TYPE wildfly_jgroups_stability_delay gauge
+wildfly_jgroups_stability_delay{channel="ee",protocol="pbcast.STABLE"} 0.0
+# HELP wildfly_jgroups_stability_received
+# TYPE wildfly_jgroups_stability_received gauge
+wildfly_jgroups_stability_received{channel="ee",protocol="pbcast.STABLE"} 12.0
+# HELP wildfly_jgroups_stability_sent
+# TYPE wildfly_jgroups_stability_sent gauge
+wildfly_jgroups_stability_sent{channel="ee",protocol="pbcast.STABLE"} 12.0
+# HELP wildfly_jgroups_stable_received
+# TYPE wildfly_jgroups_stable_received gauge
+wildfly_jgroups_stable_received{channel="ee",protocol="pbcast.STABLE"} 25.0
+# HELP wildfly_jgroups_stable_sent
+# TYPE wildfly_jgroups_stable_sent gauge
+wildfly_jgroups_stable_sent{channel="ee",protocol="pbcast.STABLE"} 0.0
+# HELP wildfly_jgroups_stagger_timeout If greater than 0, we'll wait a random number of milliseconds in range [0..stagger_timeout] before sending a discovery response. This prevents traffic spikes in large clusters when everyone sends their discovery response at the same time
+# TYPE wildfly_jgroups_stagger_timeout gauge
+wildfly_jgroups_stagger_timeout{channel="ee",protocol="PING"} 0.0
+# HELP wildfly_jgroups_start_port Start port for server socket. Default value of 0 picks a random port
+# TYPE wildfly_jgroups_start_port gauge
+wildfly_jgroups_start_port{channel="ee",protocol="FD_SOCK"} 54200.0
+# HELP wildfly_jgroups_suppress_time_different_cluster_warnings Time during which identical warnings about messages from a member from a different cluster will be suppressed. 0 disables this (every warning will be logged). Setting the log level to ERROR also disables this.
+# TYPE wildfly_jgroups_suppress_time_different_cluster_warnings gauge
+wildfly_jgroups_suppress_time_different_cluster_warnings{channel="ee",protocol="UDP"} 60000.0
+# HELP wildfly_jgroups_suppress_time_different_version_warnings Time during which identical warnings about messages from a member with a different version will be suppressed. 0 disables this (every warning will be logged). Setting the log level to ERROR also disables this.
+# TYPE wildfly_jgroups_suppress_time_different_version_warnings gauge
+wildfly_jgroups_suppress_time_different_version_warnings{channel="ee",protocol="UDP"} 60000.0
+# HELP wildfly_jgroups_suppress_time_non_member_warnings Time during which identical warnings about messages from a non member will be suppressed. 0 disables this (every warning will be logged). Setting the log level to ERROR also disables this.
+# TYPE wildfly_jgroups_suppress_time_non_member_warnings gauge
+wildfly_jgroups_suppress_time_non_member_warnings{channel="ee",protocol="pbcast.NAKACK2"} 60000.0
+# HELP wildfly_jgroups_suppress_time_out_of_buffer_space Suppresses warnings on Mac OS (for now) about not enough buffer space when sending a datagram packet
+# TYPE wildfly_jgroups_suppress_time_out_of_buffer_space gauge
+wildfly_jgroups_suppress_time_out_of_buffer_space{channel="ee",protocol="UDP"} 60000.0
+# HELP wildfly_jgroups_suspect_msg_interval Interval for broadcasting suspect messages
+# TYPE wildfly_jgroups_suspect_msg_interval gauge
+wildfly_jgroups_suspect_msg_interval{channel="ee",protocol="FD_SOCK"} 5000.0
+# HELP wildfly_jgroups_sync_min_interval Min time (in ms) to elapse for successive SEND_FIRST_SEQNO messages to be sent to the same sender
+# TYPE wildfly_jgroups_sync_min_interval gauge
+wildfly_jgroups_sync_min_interval{channel="ee",protocol="UNICAST3"} 2000.0
+# HELP wildfly_jgroups_thread_dumps_threshold The number of times a thread pool needs to be full before a thread dump is logged
+# TYPE wildfly_jgroups_thread_dumps_threshold gauge
+wildfly_jgroups_thread_dumps_threshold{channel="ee",protocol="UDP"} 1.0
+# HELP wildfly_jgroups_thread_pool_keep_alive_time Timeout in milliseconds to remove idle threads from pool
+# TYPE wildfly_jgroups_thread_pool_keep_alive_time gauge
+wildfly_jgroups_thread_pool_keep_alive_time{channel="ee",protocol="UDP"} 30000.0
+# HELP wildfly_jgroups_thread_pool_max_threads Maximum thread pool size for the thread pool
+# TYPE wildfly_jgroups_thread_pool_max_threads gauge
+wildfly_jgroups_thread_pool_max_threads{channel="ee",protocol="UDP"} 100.0
+# HELP wildfly_jgroups_thread_pool_min_threads Minimum thread pool size for the thread pool
+# TYPE wildfly_jgroups_thread_pool_min_threads gauge
+wildfly_jgroups_thread_pool_min_threads{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_thread_pool_size Current number of threads in the thread pool
+# TYPE wildfly_jgroups_thread_pool_size gauge
+wildfly_jgroups_thread_pool_size{channel="ee",protocol="UDP"} 3.0
+# HELP wildfly_jgroups_thread_pool_size_active Current number of active threads in the thread pool
+# TYPE wildfly_jgroups_thread_pool_size_active gauge
+wildfly_jgroups_thread_pool_size_active{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_thread_pool_size_largest Largest number of threads in the thread pool
+# TYPE wildfly_jgroups_thread_pool_size_largest gauge
+wildfly_jgroups_thread_pool_size_largest{channel="ee",protocol="UDP"} 8.0
+# HELP wildfly_jgroups_time_service_interval Interval (in ms) at which the time service updates its timestamp. 0 disables the time service
+# TYPE wildfly_jgroups_time_service_interval gauge
+wildfly_jgroups_time_service_interval{channel="ee",protocol="UDP"} 500.0
+# HELP wildfly_jgroups_timeout Timeout after which a node P is suspected if neither a heartbeat nor data were received from P
+# TYPE wildfly_jgroups_timeout gauge
+wildfly_jgroups_timeout{channel="ee",protocol="FD_ALL"} 60000.0
+wildfly_jgroups_timeout{channel="ee",protocol="VERIFY_SUSPECT"} 1000.0
+# HELP wildfly_jgroups_timeout_check_interval Interval at which the HEARTBEAT timeouts are checked
+# TYPE wildfly_jgroups_timeout_check_interval gauge
+wildfly_jgroups_timeout_check_interval{channel="ee",protocol="FD_ALL"} 5000.0
+# HELP wildfly_jgroups_timer_tasks Number of timer tasks queued up for execution
+# TYPE wildfly_jgroups_timer_tasks gauge
+wildfly_jgroups_timer_tasks{channel="ee",protocol="UDP"} 9.0
+# HELP wildfly_jgroups_timer_threads Number of threads currently in the pool
+# TYPE wildfly_jgroups_timer_threads gauge
+wildfly_jgroups_timer_threads{channel="ee",protocol="UDP"} 3.0
+# HELP wildfly_jgroups_timestamper Next seqno issued by the timestamper
+# TYPE wildfly_jgroups_timestamper gauge
+wildfly_jgroups_timestamper{channel="ee",protocol="UNICAST3"} 61.0
+# HELP wildfly_jgroups_tos Traffic class for sending unicast and multicast datagrams. Default is 0
+# TYPE wildfly_jgroups_tos gauge
+wildfly_jgroups_tos{channel="ee",protocol="UDP"} 0.0
+# HELP wildfly_jgroups_ucast_receiver_threads Number of unicast receiver threads, all reading from the same DatagramSocket. If de-serialization is slow, increasing the number of receiver threads might yield better performance.
+# TYPE wildfly_jgroups_ucast_receiver_threads gauge
+wildfly_jgroups_ucast_receiver_threads{channel="ee",protocol="UDP"} 1.0
+# HELP wildfly_jgroups_ucast_recv_buf_size Receive buffer size of the unicast datagram socket
+# TYPE wildfly_jgroups_ucast_recv_buf_size gauge
+wildfly_jgroups_ucast_recv_buf_size{channel="ee",protocol="UDP"} 2.0E7
+# HELP wildfly_jgroups_ucast_send_buf_size Send buffer size of the unicast datagram socket
+# TYPE wildfly_jgroups_ucast_send_buf_size gauge
+wildfly_jgroups_ucast_send_buf_size{channel="ee",protocol="UDP"} 1000000.0
+# HELP wildfly_jgroups_view_ack_collection_timeout Time in ms to wait for all VIEW acks (0 == wait forever. Default is 2000 msec
+# TYPE wildfly_jgroups_view_ack_collection_timeout gauge
+wildfly_jgroups_view_ack_collection_timeout{channel="ee",protocol="pbcast.GMS"} 2000.0
+# HELP wildfly_jgroups_view_handler_size
+# TYPE wildfly_jgroups_view_handler_size gauge
+wildfly_jgroups_view_handler_size{channel="ee",protocol="pbcast.GMS"} 0.0
+# HELP wildfly_jgroups_views Number of cached ViewIds
+# TYPE wildfly_jgroups_views gauge
+wildfly_jgroups_views{channel="ee",protocol="MERGE3"} 1.0
+# HELP wildfly_jgroups_who_has_cache_timeout Timeout (in ms) to determine how long to wait until a request to fetch the physical address for a given logical address will be sent again. Subsequent requests for the same physical address will therefore be spaced at least who_has_cache_timeout ms apart
+# TYPE wildfly_jgroups_who_has_cache_timeout gauge
+wildfly_jgroups_who_has_cache_timeout{channel="ee",protocol="UDP"} 2000.0
+# HELP wildfly_jgroups_xmit_interval Interval (in milliseconds) at which missing messages (from all retransmit buffers) are retransmitted
+# TYPE wildfly_jgroups_xmit_interval gauge
+wildfly_jgroups_xmit_interval{channel="ee",protocol="UNICAST3"} 100.0
+wildfly_jgroups_xmit_interval{channel="ee",protocol="pbcast.NAKACK2"} 100.0
+# HELP wildfly_jgroups_xmit_table_capacity Capacity of the retransmit buffer. Computed as xmit_table_num_rows * xmit_table_msgs_per_row
+# TYPE wildfly_jgroups_xmit_table_capacity gauge
+wildfly_jgroups_xmit_table_capacity{channel="ee",protocol="pbcast.NAKACK2"} 51200.0
+# HELP wildfly_jgroups_xmit_table_deliverable_messages Total number of deliverable messages in all receive windows
+# TYPE wildfly_jgroups_xmit_table_deliverable_messages gauge
+wildfly_jgroups_xmit_table_deliverable_messages{channel="ee",protocol="UNICAST3"} 0.0
+# HELP wildfly_jgroups_xmit_table_max_compaction_time Number of milliseconds after which the matrix in the retransmission table is compacted (only for experts)
+# TYPE wildfly_jgroups_xmit_table_max_compaction_time gauge
+wildfly_jgroups_xmit_table_max_compaction_time{channel="ee",protocol="UNICAST3"} 600000.0
+wildfly_jgroups_xmit_table_max_compaction_time{channel="ee",protocol="pbcast.NAKACK2"} 10000.0
+# HELP wildfly_jgroups_xmit_table_missing_messages Total number of missing (= not received) messages in all retransmit buffers
+# TYPE wildfly_jgroups_xmit_table_missing_messages gauge
+wildfly_jgroups_xmit_table_missing_messages{channel="ee",protocol="UNICAST3"} 0.0
+wildfly_jgroups_xmit_table_missing_messages{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_xmit_table_msgs_per_row Number of elements of a row of the matrix in the retransmission table; gets rounded to the next power of 2 (only for experts). The capacity of the matrix is xmit_table_num_rows * xmit_table_msgs_per_row
+# TYPE wildfly_jgroups_xmit_table_msgs_per_row gauge
+wildfly_jgroups_xmit_table_msgs_per_row{channel="ee",protocol="UNICAST3"} 1024.0
+wildfly_jgroups_xmit_table_msgs_per_row{channel="ee",protocol="pbcast.NAKACK2"} 1024.0
+# HELP wildfly_jgroups_xmit_table_num_compactions Number of retransmit table compactions
+# TYPE wildfly_jgroups_xmit_table_num_compactions gauge
+wildfly_jgroups_xmit_table_num_compactions{channel="ee",protocol="UNICAST3"} 0.0
+wildfly_jgroups_xmit_table_num_compactions{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_xmit_table_num_current_rows Prints the number of rows currently allocated in the matrix. This value will not be lower than xmit_table_now_rows
+# TYPE wildfly_jgroups_xmit_table_num_current_rows gauge
+wildfly_jgroups_xmit_table_num_current_rows{channel="ee",protocol="pbcast.NAKACK2"} 50.0
+# HELP wildfly_jgroups_xmit_table_num_moves Number of retransmit table moves
+# TYPE wildfly_jgroups_xmit_table_num_moves gauge
+wildfly_jgroups_xmit_table_num_moves{channel="ee",protocol="UNICAST3"} 0.0
+wildfly_jgroups_xmit_table_num_moves{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_xmit_table_num_purges Number of retransmit table purges
+# TYPE wildfly_jgroups_xmit_table_num_purges gauge
+wildfly_jgroups_xmit_table_num_purges{channel="ee",protocol="UNICAST3"} 64.0
+wildfly_jgroups_xmit_table_num_purges{channel="ee",protocol="pbcast.NAKACK2"} 5.0
+# HELP wildfly_jgroups_xmit_table_num_resizes Number of retransmit table resizes
+# TYPE wildfly_jgroups_xmit_table_num_resizes gauge
+wildfly_jgroups_xmit_table_num_resizes{channel="ee",protocol="UNICAST3"} 0.0
+wildfly_jgroups_xmit_table_num_resizes{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_jgroups_xmit_table_num_rows Number of rows of the matrix in the retransmission table (only for experts)
+# TYPE wildfly_jgroups_xmit_table_num_rows gauge
+wildfly_jgroups_xmit_table_num_rows{channel="ee",protocol="UNICAST3"} 50.0
+wildfly_jgroups_xmit_table_num_rows{channel="ee",protocol="pbcast.NAKACK2"} 50.0
+# HELP wildfly_jgroups_xmit_table_resize_factor Resize factor of the matrix in the retransmission table (only for experts)
+# TYPE wildfly_jgroups_xmit_table_resize_factor gauge
+wildfly_jgroups_xmit_table_resize_factor{channel="ee",protocol="UNICAST3"} 1.2
+wildfly_jgroups_xmit_table_resize_factor{channel="ee",protocol="pbcast.NAKACK2"} 1.2
+# HELP wildfly_jgroups_xmit_table_undelivered_messages Total number of undelivered messages in all receive windows
+# TYPE wildfly_jgroups_xmit_table_undelivered_messages gauge
+wildfly_jgroups_xmit_table_undelivered_messages{channel="ee",protocol="UNICAST3"} 0.0
+# HELP wildfly_jgroups_xmit_table_undelivered_msgs Total number of undelivered messages in all retransmit buffers
+# TYPE wildfly_jgroups_xmit_table_undelivered_msgs gauge
+wildfly_jgroups_xmit_table_undelivered_msgs{channel="ee",protocol="pbcast.NAKACK2"} 0.0
+# HELP wildfly_request_controller_active_requests The number of requests that are currently running in the server
+# TYPE wildfly_request_controller_active_requests gauge
+wildfly_request_controller_active_requests 0.0
+# HELP wildfly_transactions_average_commit_time_seconds The average time of transaction commit, measured from the moment the client calls commit until the transaction manager determines that the commit attempt was successful.
+# TYPE wildfly_transactions_average_commit_time_seconds gauge
+wildfly_transactions_average_commit_time_seconds 4.5295000000000006E-5
+# HELP wildfly_transactions_number_of_aborted_transactions_total The number of aborted (i.e. rolledback) transactions.
+# TYPE wildfly_transactions_number_of_aborted_transactions_total counter
+wildfly_transactions_number_of_aborted_transactions_total 0.0
+# HELP wildfly_transactions_number_of_application_rollbacks_total The number of transactions that have been rolled back by application request. This includes those that timeout, since the timeout behavior is considered an attribute of the application configuration.
+# TYPE wildfly_transactions_number_of_application_rollbacks_total counter
+wildfly_transactions_number_of_application_rollbacks_total 0.0
+# HELP wildfly_transactions_number_of_committed_transactions_total The number of committed transactions.
+# TYPE wildfly_transactions_number_of_committed_transactions_total counter
+wildfly_transactions_number_of_committed_transactions_total 309.0
+# HELP wildfly_transactions_number_of_heuristics_total The number of transactions which have terminated with heuristic outcomes.
+# TYPE wildfly_transactions_number_of_heuristics_total counter
+wildfly_transactions_number_of_heuristics_total 0.0
+# HELP wildfly_transactions_number_of_inflight_transactions The number of transactions that have begun but not yet terminated.
+# TYPE wildfly_transactions_number_of_inflight_transactions gauge
+wildfly_transactions_number_of_inflight_transactions 0.0
+# HELP wildfly_transactions_number_of_nested_transactions_total The total number of nested (sub) transactions created.
+# TYPE wildfly_transactions_number_of_nested_transactions_total counter
+wildfly_transactions_number_of_nested_transactions_total 0.0
+# HELP wildfly_transactions_number_of_resource_rollbacks_total The number of transactions that rolled back due to resource (participant) failure.
+# TYPE wildfly_transactions_number_of_resource_rollbacks_total counter
+wildfly_transactions_number_of_resource_rollbacks_total 0.0
+# HELP wildfly_transactions_number_of_system_rollbacks_total The number of transactions that have been rolled back due to internal system errors.
+# TYPE wildfly_transactions_number_of_system_rollbacks_total counter
+wildfly_transactions_number_of_system_rollbacks_total 0.0
+# HELP wildfly_transactions_number_of_timed_out_transactions_total The number of transactions that have rolled back due to timeout.
+# TYPE wildfly_transactions_number_of_timed_out_transactions_total counter
+wildfly_transactions_number_of_timed_out_transactions_total 0.0
+# HELP wildfly_transactions_number_of_transactions_total The total number of transactions (top-level and nested) created
+# TYPE wildfly_transactions_number_of_transactions_total counter
+wildfly_transactions_number_of_transactions_total 309.0
+# HELP wildfly_undertow_active_sessions Number of active sessions
+# TYPE wildfly_undertow_active_sessions gauge
+wildfly_undertow_active_sessions{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_bytes_received_total The number of bytes that have been received by this listener
+# TYPE wildfly_undertow_bytes_received_total counter
+wildfly_undertow_bytes_received_total_bytes{server="default-server",ajp_listener="ajp"} 0.0
+wildfly_undertow_bytes_received_total_bytes{server="default-server",http_listener="default"} 0.0
+wildfly_undertow_bytes_received_total_bytes{server="default-server",https_listener="https"} 319697.0
+# HELP wildfly_undertow_bytes_sent_total The number of bytes that have been sent out on this listener
+# TYPE wildfly_undertow_bytes_sent_total counter
+wildfly_undertow_bytes_sent_total_bytes{server="default-server",ajp_listener="ajp"} 0.0
+wildfly_undertow_bytes_sent_total_bytes{server="default-server",http_listener="default"} 0.0
+wildfly_undertow_bytes_sent_total_bytes{server="default-server",https_listener="https"} 3658992.0
+# HELP wildfly_undertow_error_count_total The number of 500 responses that have been sent by this listener
+# TYPE wildfly_undertow_error_count_total counter
+wildfly_undertow_error_count_total{server="default-server",ajp_listener="ajp"} 0.0
+wildfly_undertow_error_count_total{server="default-server",http_listener="default"} 0.0
+wildfly_undertow_error_count_total{server="default-server",https_listener="https"} 0.0
+# HELP wildfly_undertow_expired_sessions_total Number of sessions that have expired
+# TYPE wildfly_undertow_expired_sessions_total counter
+wildfly_undertow_expired_sessions_total{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_highest_session_count The maximum number of sessions that have been active simultaneously
+# TYPE wildfly_undertow_highest_session_count gauge
+wildfly_undertow_highest_session_count{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_max_active_sessions The maximum allowed number of concurrent sessions that this session manager supports
+# TYPE wildfly_undertow_max_active_sessions gauge
+wildfly_undertow_max_active_sessions{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} -1.0
+# HELP wildfly_undertow_max_processing_time_seconds The maximum processing time taken by a request on this listener
+# TYPE wildfly_undertow_max_processing_time_seconds gauge
+wildfly_undertow_max_processing_time_seconds{server="default-server",ajp_listener="ajp"} 0.0
+wildfly_undertow_max_processing_time_seconds{server="default-server",http_listener="default"} 0.0
+wildfly_undertow_max_processing_time_seconds{server="default-server",https_listener="https"} 0.0
+# HELP wildfly_undertow_max_request_time_seconds Maximal time for processing request
+# TYPE wildfly_undertow_max_request_time_seconds gauge
+wildfly_undertow_max_request_time_seconds{deployment="keycloak-server.war",servlet="Keycloak REST Interface",subdeployment="keycloak-server.war"} 1.048
+# HELP wildfly_undertow_min_request_time_seconds Minimal time for processing request
+# TYPE wildfly_undertow_min_request_time_seconds gauge
+wildfly_undertow_min_request_time_seconds{deployment="keycloak-server.war",servlet="Keycloak REST Interface",subdeployment="keycloak-server.war"} 0.001
+# HELP wildfly_undertow_processing_time_total The total processing time of all requests handed by this listener
+# TYPE wildfly_undertow_processing_time_total counter
+wildfly_undertow_processing_time_total_seconds{server="default-server",ajp_listener="ajp"} 0.0
+wildfly_undertow_processing_time_total_seconds{server="default-server",http_listener="default"} 0.0
+wildfly_undertow_processing_time_total_seconds{server="default-server",https_listener="https"} 0.0
+# HELP wildfly_undertow_rejected_sessions_total Number of rejected sessions
+# TYPE wildfly_undertow_rejected_sessions_total counter
+wildfly_undertow_rejected_sessions_total{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_request_count_total Number of all requests
+# TYPE wildfly_undertow_request_count_total counter
+wildfly_undertow_request_count_total{server="default-server",ajp_listener="ajp"} 0.0
+wildfly_undertow_request_count_total{server="default-server",http_listener="default"} 0.0
+wildfly_undertow_request_count_total{server="default-server",https_listener="https"} 276.0
+wildfly_undertow_request_count_total{deployment="keycloak-server.war",servlet="Keycloak REST Interface",subdeployment="keycloak-server.war"} 276.0
+# HELP wildfly_undertow_session_avg_alive_time_seconds Average time that expired sessions had been alive
+# TYPE wildfly_undertow_session_avg_alive_time_seconds gauge
+wildfly_undertow_session_avg_alive_time_seconds{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_session_max_alive_time_seconds The longest time that an expired session had been alive
+# TYPE wildfly_undertow_session_max_alive_time_seconds gauge
+wildfly_undertow_session_max_alive_time_seconds{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_sessions_created_total Total sessions created
+# TYPE wildfly_undertow_sessions_created_total counter
+wildfly_undertow_sessions_created_total{deployment="keycloak-server.war",subdeployment="keycloak-server.war"} 0.0
+# HELP wildfly_undertow_total_request_time_total Total time spend in processing all requests
+# TYPE wildfly_undertow_total_request_time_total counter
+wildfly_undertow_total_request_time_total_seconds{deployment="keycloak-server.war",servlet="Keycloak REST Interface",subdeployment="keycloak-server.war"} 4.434
