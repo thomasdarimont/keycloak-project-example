@@ -17,7 +17,7 @@ public class MetricRequestRecorder implements RequestMetricsUpdater {
     }
 
     @Override
-    public void recordResponse(int status, String method, String uri) {
+    public void recordResponse(String uri, String method, int status) {
 
         Tag[] tags = {
                 tag("status", String.valueOf(status)),
@@ -30,7 +30,7 @@ public class MetricRequestRecorder implements RequestMetricsUpdater {
     }
 
     @Override
-    public void recordRequestDuration(int status, long requestDurationMillis, String method, String uri) {
+    public void recordRequestDuration(String uri, String method, int status, long requestDurationMillis) {
 
         Tag[] tags = {
                 tag("status", String.valueOf(status)),

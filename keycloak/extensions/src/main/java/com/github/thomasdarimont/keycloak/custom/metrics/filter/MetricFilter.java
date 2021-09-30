@@ -54,7 +54,7 @@ public class MetricFilter implements ContainerRequestFilter, ContainerResponseFi
 
         int status = responseContext.getStatus();
         if (uriMetricsEnabled) {
-            requestMetricsUpdater.recordResponse(status, requestContext.getMethod(), uri);
+            requestMetricsUpdater.recordResponse(uri, requestContext.getMethod(), status);
         }
 
         Long metricsRequestTimestampMillis = (Long) requestContext.getProperty(METRICS_REQUEST_TIMESTAMP);
@@ -68,7 +68,7 @@ public class MetricFilter implements ContainerRequestFilter, ContainerResponseFi
 
         long requestDurationMillis = System.currentTimeMillis() - metricsRequestTimestampMillis;
         if (uriMetricsEnabled) {
-            requestMetricsUpdater.recordRequestDuration(status, requestDurationMillis, requestContext.getMethod(), uri);
+            requestMetricsUpdater.recordRequestDuration(uri, requestContext.getMethod(), status, requestDurationMillis);
         }
     }
 
