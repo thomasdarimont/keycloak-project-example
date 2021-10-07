@@ -1,0 +1,14 @@
+{
+  "de": {
+    "signOut": "Abmelden",
+    "signIn": "Anmelden",
+    "errorInvalidUsernameOrEmail": "Ungültiger Benutzername oder E-Mail.",
+    "errorInvalidPassword": "Ungültiges Passwort."
+  },
+  "en": {
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "errorInvalidUsernameOrEmail": "Invalid username or email.",
+    "errorInvalidPassword": "Invalid password."
+  }
+}
