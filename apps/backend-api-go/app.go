@@ -72,9 +72,14 @@ type JSONWebKeys struct {
 	X5c []string `json:"x5c"`
 }
 
-func (a *App) getPemCert(token *jwt.Token) (string, error) {
+func (a *App) getJwkCertForToken(token *jwt.Token) (string, error) {
+	kid := token.Header["kid"]
+	return a.lookupJwkForKid(kid)
+}
 
-	// TODO add support for dynamic JWKS lookup and introduce JWK caching
+func (a *App) lookupJwkForKid(kid interface{}) (string, error) {
+
+	// TODO add support for caching JWKS
 
 	cert := ""
 	resp, err := http.Get(a.Config.JwksUri)
@@ -92,7 +97,7 @@ func (a *App) getPemCert(token *jwt.Token) (string, error) {
 	}
 
 	for k, _ := range jwks.Keys {
-		if token.Header["kid"] == jwks.Keys[k].Kid {
+		if kid == jwks.Keys[k].Kid {
 			cert = "-----BEGIN CERTIFICATE-----\n" + jwks.Keys[k].X5c[0] + "\n-----END CERTIFICATE-----"
 		}
 	}
@@ -108,22 +113,31 @@ func (a *App) getPemCert(token *jwt.Token) (string, error) {
 func (a *App) createJwtMiddleware() *jwtmiddleware.JWTMiddleware {
 	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+
 			// Verify 'aud' claim
 			//aud := "${apiIdentifier}"
 			//checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(aud, false)
 			//if !checkAud {
 			//	return token, errors.New("Invalid audience.")
 			//}
+
 			// Verify 'iss' claim
 			iss := a.Config.IssuerUri
-			checkIss := token.Claims.(jwt.MapClaims).VerifyIssuer(iss, false)
+			claims := token.Claims.(jwt.MapClaims)
+			checkIss := claims.VerifyIssuer(iss, true)
 			if !checkIss {
 				return token, errors.New("Invalid issuer.")
 			}
 
-			cert, err := a.getPemCert(token)
+			// check iat, exp, nbf
+			err := claims.Valid()
 			if err != nil {
-				panic(err.Error())
+				return nil, err
+			}
+
+			cert, err := a.getJwkCertForToken(token)
+			if err != nil {
+				return nil, err
 			}
 
 			result, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(cert))
