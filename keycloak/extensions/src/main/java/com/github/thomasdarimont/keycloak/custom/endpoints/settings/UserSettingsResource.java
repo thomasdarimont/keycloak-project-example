@@ -85,7 +85,7 @@ public class UserSettingsResource {
         }
 
         String value1 = settings.containsKey(SETTINGS_KEY1) ? String.valueOf(settings.get(SETTINGS_KEY1)) : null;
-        if (value1 != null && !Pattern.matches("[\\w\\d]{0,20}", value1)) {
+        if (value1 != null && !Pattern.matches("[\\w\\d]{0,32}", value1)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         user.setSingleAttribute(SETTINGS_KEY1, Objects.requireNonNullElse(value1, ""));
