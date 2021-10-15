@@ -27,8 +27,10 @@ jobs:
 
       - name: Build the docker-compose stack
         run: |
-          export USER=`id -u`
-          export GROUP=
+          USER="$(id -u)"
+          GROUP=""
+          export USER
+          export GROUP
           echo "Running as ${USER}:${GROUP}"
           java bin/envcheck.java
           java start.java --http --extensions=jar --ci=github --detach
@@ -52,7 +54,7 @@ jobs:
         working-directory: ./keycloak/e2e-tests
         run: |
           yarn install
-          docker run --network container:dev_acme-keycloak_1 --rm -v ${PWD}:/e2e -w /e2e --entrypoint=cypress cypress/included:8.3.0 run
+          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:8.3.0 run
 
       - name: Archive testrun video
         if: ${{ always() }}
