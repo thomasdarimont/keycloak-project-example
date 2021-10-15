@@ -72,7 +72,7 @@ public class SmsCodeSender {
 
     protected String appendWebOtpFragment(String code, String domain, String smsAuthFragment) {
         String webOtpFragment = String.format("@%s #%s", domain, code);
-        return smsAuthFragment + "\n" + webOtpFragment;
+        return smsAuthFragment + "\n\n" + webOtpFragment;
     }
 
     protected String computeExpireAt(int ttlSeconds) {
