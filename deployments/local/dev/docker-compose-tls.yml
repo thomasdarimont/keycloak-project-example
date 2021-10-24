@@ -12,7 +12,7 @@ services:
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
 
   acme-account-console:
-    image: httpd:2.4
+    image: httpd:2.4.51-bullseye
     volumes:
       - ../../../apps/acme-account-console:/usr/local/apache2/htdocs/acme-account:z
       - ../../../apps/acme-greetme:/usr/local/apache2/htdocs/acme-greetme:z
