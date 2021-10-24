@@ -6,7 +6,6 @@ services:
       service: acme-keycloak
     environment:
       KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
-    # IntelliJ currently does not support the depends_on condition syntax
     ports:
       - "8080"
       - "8443"
@@ -16,14 +15,12 @@ services:
       acme-keycloak-db:
         condition: service_healthy
 
-
   acme-keycloak-2:
     extends:
       file: ../docker-compose.yml
       service: acme-keycloak
     environment:
       KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
-    # IntelliJ currently does not support the depends_on condition syntax
     depends_on:
       acme-keycloak-db:
         condition: service_healthy
