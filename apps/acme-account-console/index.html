@@ -514,21 +514,29 @@
 
     function showProfile() {
 
+        let firstName = keycloak.tokenParsed['given_name'];
+        let lastName = keycloak.tokenParsed['family_name'];
+        let email = keycloak.tokenParsed['email'];
+
+        if (!email) {
+            email = "";
+        }
+
         let profileHtml = `
             <table class="profile">
                 <tr>
                     <td class="label">First name</td>
-                    <td><span id="firstName">${keycloak.tokenParsed['given_name']}</span></td>
+                    <td><span id="firstName">${firstName}</span></td>
                     <td></td>
                 </tr>
                 <tr>
                     <td class="label">Last name</td>
-                    <td><span id="lastName">${keycloak.tokenParsed['family_name']}</span></td>
+                    <td><span id="lastName">${lastName}</span></td>
                     <td></td>
                 </tr>
                 <tr>
                     <td class="label">Email</td>
-                    <td><span id="email">${keycloak.tokenParsed['email']}</span></td>
+                    <td><span id="email">${email}</span></td>
                     <td><a href="#" onclick="changeEmail();return false">Update</a></td>
                 </tr>
             </table>
@@ -560,16 +568,19 @@
             settingsData = {error: error.message};
         }
 
+        let setting1 = settingsData.setting1;
+        let setting2 = settingsData.setting2;
+
         let settingsHtml = `
         <form id="frmSettings" name="frmSettings" action="" onsubmit="return false" onkeydown="return event.key !== 'Enter';">
             <table>
                 <tr>
                     <td class="label"><label for="setting1">Setting 1</label></td>
-                    <td><input type="text" id="setting1" name="setting1" value="${settingsData.setting1}" pattern="[\d\w]{0,20}"></td>
+                    <td><input type="text" id="setting1" name="setting1" value="${setting1}" pattern="[\d\w]{0,20}"></td>
                 </tr>
                 <tr>
                     <td class="label"><label for="setting2">Setting 2</label></td>
-                    <td><input type="checkbox" id="setting2" name="setting2" ${settingsData.setting2 ? "checked" : ""}></td>
+                    <td><input type="checkbox" id="setting2" name="setting2" ${setting2 ? "checked" : ""}></td>
                 </tr>
             </table>
             <button id="btnSaveSettings" onClick="saveSettings(); return false">Save</button>
