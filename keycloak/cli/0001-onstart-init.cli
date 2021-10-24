@@ -100,6 +100,10 @@ echo SETUP: Infinispan: Configure "authenticationSessions" provider to mitigate 
 /subsystem=keycloak-server/spi=authenticationSessions/provider=infinispan:add(properties={authSessionsLimit => ${env.KEYCLOAK_AUTH_SESSIONS_LIMIT:10}},enabled=true)
 end-if
 
+### Transactions
+echo SETUP: Transactions: Increasing default transaction timeout to 15 minutes
+/subsystem=transactions/:write-attribute(name=default-timeout,value=${env.KEYCLOAK_TRANSACTION_TIMEOUT:900})
+
 ### MISC
 
 echo SETUP: Avoid ... WARN...
