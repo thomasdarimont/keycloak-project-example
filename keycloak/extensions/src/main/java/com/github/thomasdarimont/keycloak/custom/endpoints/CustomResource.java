@@ -4,6 +4,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.applications.Applicat
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.representations.AccessToken;
 
@@ -36,7 +37,8 @@ public class CustomResource {
     public Response ping() {
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("realm", session.getContext().getRealm().getName());
+        KeycloakContext context = session.getContext();
+        payload.put("realm", context.getRealm().getName());
         payload.put("user", token == null ? "anonymous" : token.getPreferredUsername());
         payload.put("timestamp", System.currentTimeMillis());
 
