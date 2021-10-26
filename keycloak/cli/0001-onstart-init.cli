@@ -104,10 +104,6 @@ end-if
 echo SETUP: Transactions: Increasing default transaction timeout to 15 minutes
 /subsystem=transactions/:write-attribute(name=default-timeout,value=${env.KEYCLOAK_TRANSACTION_TIMEOUT:900})
 
-### Client Truststore
-echo SETUP: Truststore: Configure "truststore" SPI
-/subsystem=keycloak-server/spi=truststore:write-attribute(name=default-provider,value=file)
-
 ### MISC
 
 echo SETUP: Avoid ... WARN...
