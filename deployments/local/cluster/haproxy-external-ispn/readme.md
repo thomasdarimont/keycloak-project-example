@@ -92,3 +92,8 @@ See: https://issues.redhat.com/browse/WFLY-15046
 
 A possible workaround is using [wildfly-clustering-infinispan-extension-patch](/keycloak/patches/wildfly-clustering-infinispan-extension-patch), which 
 contains a patched version of `wildfly-clustering-infinispan-extension.jar` with support for configuring `connect-timeouts`.
+
+### Infinispan store type hotrod not supported by Keycloak
+
+The current Keycloak implementation (as of Keycloak 15.0.2) doesn't seem to support the remote cache store type hotrod.
+Only the hotrod serialization protocol seems to be supported, see: https://github.com/thomasdarimont/keycloak-project-example/issues/22

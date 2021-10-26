@@ -41,8 +41,8 @@ docker-compose --env-file ../../../keycloak.env --file haproxy-database-ispn/doc
 The haproxy example can also be started with a dedicated infinispan cluster where the 
 distributed and replicated caches in Keycloak will be stored in an external infinispan cluster with cache store type `remote`. 
 
-Note that this example uses a patched version of the `wildfly-clustering-infinispan-extension.jar` in order to
-allow to configure a `connect-timeout`.
+Note that this example uses a [patched version](../../../keycloak/patches/wildfly-clustering-infinispan-extension-patch) of the `wildfly-clustering-infinispan-extension.jar` in order to
+allow to configure a `connect-timeout` on the remote-store.
 
 To start the environment with a dedicated infinispan cluster, just run:
 ```
@@ -50,6 +50,8 @@ docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/doc
 ```
 
 ## Run with dedicated Infinispan Cluster with Hotrod store
+
+[This doesn't work at the moment](https://github.com/thomasdarimont/keycloak-project-example/issues/22) try to use the [Infinispan Cluster with Remote store](##Run with dedicated Infinispan Cluster with Remote store) variant.
 
 The haproxy example can also be started with a dedicated infinispan cluster where the
 distributed and replicated caches in Keycloak will be stored in an external infinispan cluster with cache store type `hotrod`
