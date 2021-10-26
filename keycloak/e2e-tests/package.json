@@ -13,10 +13,10 @@
     "devDependencies": {
         "@testing-library/cypress": "^8.0.1",
         "@types/testing-library__cypress": "^5.0.9",
-        "cypress": "^8.5.0",
-        "cypress-terminal-report": "^3.3.3",
+        "cypress": "^8.7.0",
+        "cypress-terminal-report": "^3.3.4",
         "cypress-xpath": "^1.6.2",
         "dotenv": "^10.0.0",
-        "typescript": "^4.4.3"
+        "typescript": "^4.4.4"
     }
 }
