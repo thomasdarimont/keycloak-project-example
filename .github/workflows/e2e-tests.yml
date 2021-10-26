@@ -38,10 +38,10 @@ jobs:
       - name: Sleep
         uses: jakejarvis/wait-action@master
         with:
-          time: '120s'
+          time: '240s'
 
       - name: Check keycloak is reachable
-        run: docker run --network container:dev_acme-keycloak_1 --rm appropriate/curl -s --retry 10 --max-time 120 --retry-connrefused http://localhost:8080/
+        run: docker run --network container:dev_acme-keycloak_1 --rm appropriate/curl -s --retry 15 --max-time 180 --retry-connrefused http://localhost:8080/
 
       - name: Check docker-compose stack
         if: ${{ always() }}
