@@ -51,7 +51,7 @@ docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/doc
 
 ## Run with dedicated Infinispan Cluster with Hotrod store
 
-[This doesn't work at the moment](https://github.com/thomasdarimont/keycloak-project-example/issues/22) try to use the [Infinispan Cluster with Remote store](##Run with dedicated Infinispan Cluster with Remote store) variant.
+[This doesn't work at the moment](https://github.com/thomasdarimont/keycloak-project-example/issues/22) try to use the [Infinispan Cluster with Remote store](#run-with-dedicated-infinispan-cluster-with-remote-store) variant.
 
 The haproxy example can also be started with a dedicated infinispan cluster where the
 distributed and replicated caches in Keycloak will be stored in an external infinispan cluster with cache store type `hotrod`
