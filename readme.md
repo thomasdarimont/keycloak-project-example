@@ -96,7 +96,7 @@ java bin/createTlsCerts.java
 ```
 This will generate a TLS certificate and key file in `.pem` format in `config/stage/dev/tls`.
 
-Register map the following host names in your hosts configuration:
+Register map the following host names in your hosts file configuration, e.g. `/etc/hosts` on linux / OSX or `c:\Windows\System32\Drivers\etc\hosts` on Windows:
 ```
 127.0.0.1 acme.test id.acme.test apps.acme.test admin.acme.test ops.acme.test
 ```
