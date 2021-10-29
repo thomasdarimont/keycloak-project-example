@@ -1,5 +1,0 @@
-embed-server --server-config=${env.KEYCLOAK_CONFIG_FILE:standalone-ha.xml} --std-out=echo
-
-### Client Truststore
-echo SETUP: Truststore: Configure "truststore" SPI
-/subsystem=keycloak-server/spi=truststore:write-attribute(name=default-provider,value=file)
