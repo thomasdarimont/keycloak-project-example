@@ -42,7 +42,7 @@ clients:
     #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
-    baseUrl: "/?realm=acme-apps"
+    baseUrl: "/?realm=acme-apps&show=profile,settings,apps,logout"
     adminUrl: ""
     redirectUris:
       - "/*"
