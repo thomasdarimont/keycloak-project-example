@@ -1,9 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
-import com.github.thomasdarimont.keycloak.custom.endpoints.filters.GlobalRequestResponseFilter;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -30,13 +28,6 @@ public class CustomResourceProviderFactory implements RealmResourceProviderFacto
     public void init(Config.Scope config) {
         // NOOP
 
-        ResteasyProviderFactory rpf = ResteasyProviderFactory.getInstance();
-
-        rpf.getContainerRequestFilterRegistry()
-                .registerSingleton(GlobalRequestResponseFilter.INSTANCE);
-
-        rpf.getContainerResponseFilterRegistry()
-                .registerSingleton(GlobalRequestResponseFilter.INSTANCE);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.github.thomasdarimont.keycloak.custom.endpoints;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.representations.AccessToken;
@@ -11,6 +10,8 @@ import org.keycloak.representations.AccessToken;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ResourceContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -25,6 +26,9 @@ public class CustomResource {
 
     private final KeycloakSession session;
     private final AccessToken token;
+
+    @Context
+    private ResourceContext resourceContext;
 
     public CustomResource(KeycloakSession session, AccessToken accessToken) {
         this.session = session;
@@ -47,25 +51,16 @@ public class CustomResource {
 
     @Path("me/settings")
     public UserSettingsResource settings() {
-
-        var resource = new UserSettingsResource(session, token);
-        ResteasyProviderFactory.getInstance().injectProperties(resource);
-        return resource;
+        return resourceContext.initResource(new UserSettingsResource(session, token));
     }
 
     @Path("me/credentials")
     public UserCredentialsInfoResource credentials() {
-
-        var resource = new UserCredentialsInfoResource(session, token);
-        ResteasyProviderFactory.getInstance().injectProperties(resource);
-        return resource;
+        return resourceContext.initResource(new UserCredentialsInfoResource(session, token));
     }
 
     @Path("me/applications")
     public ApplicationsInfoResource applications() {
-
-        var resource = new ApplicationsInfoResource(session, token);
-        ResteasyProviderFactory.getInstance().injectProperties(resource);
-        return resource;
+        return resourceContext.initResource(new ApplicationsInfoResource(session, token));
     }
 }

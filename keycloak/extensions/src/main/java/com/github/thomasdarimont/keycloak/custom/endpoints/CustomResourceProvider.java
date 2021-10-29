@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.support.KeycloakSessionLookup;
 import lombok.RequiredArgsConstructor;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.authorization.util.Tokens;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -44,7 +45,9 @@ public class CustomResourceProvider implements RealmResourceProvider {
             return null;
         }
 
-        return new CustomResource(session, accessToken);
+        CustomResource customResource = new CustomResource(session, accessToken);
+        ResteasyProviderFactory.getInstance().injectProperties(customResource);
+        return customResource;
     }
 
 
