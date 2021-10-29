@@ -1,6 +1,7 @@
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -169,6 +170,12 @@ class start {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-provisioning.yml");
             envFiles.add("deployments/local/dev/keycloak-provisioning.env");
+        }
+
+
+        if(Files.exists(Path.of("local.env"))) {
+            System.out.println("Adding local.env");
+            envFiles.add("local.env");
         }
 
         StringBuilder envVariables = new StringBuilder();
