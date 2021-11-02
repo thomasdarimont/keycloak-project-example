@@ -77,8 +77,7 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        // return session.userCredentialManager().isConfiguredFor(realm, user, TrustedDeviceCredentialModel.TYPE);
-        return true;
+        return session.userCredentialManager().isConfiguredFor(realm, user, TrustedDeviceCredentialModel.TYPE);
     }
 
     @Override
