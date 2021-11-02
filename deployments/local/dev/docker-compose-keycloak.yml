@@ -1,0 +1,58 @@
+services:
+  acme-keycloak:
+    #image: quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+
+    build:
+      context: "./keycloak"
+      dockerfile: "./Dockerfile"
+
+    #    user: "${USER}:${GROUP}"
+    env_file:
+      - ./keycloak-common.env
+      - ./keycloak-http.env
+    environment:
+#      KEYCLOAK_USER: "admin"
+#      KEYCLOAK_PASSWORD: "admin"
+      DB_VENDOR: "h2"
+      KEYCLOAK_THEME_CACHING: "false"
+      KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
+      PROXY_ADDRESS_FORWARDING: "true"
+# force usage for standalone.xml for local dev
+      KEYCLOAK_CONFIG_FILE: "standalone.xml"
+
+# Exposes Metrics via http://localhost:9990/metrics
+      KEYCLOAK_STATISTICS: all
+
+#      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
+# use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
+    command:
+      - "--debug"
+      - "*:8787"
+      - "--server-config"
+      - "$KEYCLOAK_CONFIG_FILE"
+      - "-b"
+      - "0.0.0.0"
+      - "-bmanagement"
+      - "0.0.0.0"
+      - "-Dwildfly.statistics-enabled=true"
+#      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
+    extra_hosts:
+      # 172.17.0.1 is host.docker.internal
+      - "id.acme.test:172.17.0.1"
+      - "apps.acme.test:172.17.0.1"
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9990:9990"
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
+      - ../../../keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
+      - ../../../keycloak/themes/internal-modern:/opt/jboss/keycloak/themes/internal-modern:z
+      - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
+      - ../../../keycloak/imex:/opt/jboss/imex:z
+# This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
+      - ../../../keycloak/cli:/opt/jboss/startup-scripts:z
+      - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
+      - ./run/keycloak/logs:/opt/jboss/keycloak/standalone/logs:z
+      - ./run/keycloak/perf:/opt/jboss/keycloak/standalone/perf:z

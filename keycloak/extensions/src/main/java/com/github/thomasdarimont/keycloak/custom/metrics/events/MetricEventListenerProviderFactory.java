@@ -33,12 +33,11 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     @Override
     public void postInit(KeycloakSessionFactory factory) {
 
-        MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
-
-        registerMetrics(factory, metricRegistry);
-
+        // TODO Add support for metrics in Keycloak.X - we need to uncomment
+        // MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
+        // registerMetrics(factory, metricRegistry);
         // TODO configure robust request metrics collection
-//        registerMetricsFilter(metricRegistry);
+        // registerMetricsFilter(metricRegistry);
     }
 
     private void registerMetrics(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {

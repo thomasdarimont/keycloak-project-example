@@ -34,6 +34,8 @@ class start {
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-keycloak.yml");
+        commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-tls.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-openldap.yml");

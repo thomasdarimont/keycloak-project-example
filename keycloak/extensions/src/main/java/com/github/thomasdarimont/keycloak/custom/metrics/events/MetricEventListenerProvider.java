@@ -9,17 +9,18 @@ public class MetricEventListenerProvider implements EventListenerProvider {
     private final MetricEventRecorder recorder;
 
     public MetricEventListenerProvider() {
-        this.recorder = new MetricEventRecorder();
+       //  this.recorder = new MetricEventRecorder();
+        this.recorder = null;
     }
 
     @Override
     public void onEvent(Event event) {
-        recorder.lookupUserEventHandler(event).accept(event);
+//        recorder.lookupUserEventHandler(event).accept(event);
     }
 
     @Override
     public void onEvent(AdminEvent event, boolean includeRepresentation) {
-        recorder.onEvent(event, includeRepresentation);
+//        recorder.onEvent(event, includeRepresentation);
     }
 
     @Override
