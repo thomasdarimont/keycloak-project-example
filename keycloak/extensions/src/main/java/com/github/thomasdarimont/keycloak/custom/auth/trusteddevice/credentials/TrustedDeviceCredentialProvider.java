@@ -142,9 +142,10 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
         }
 
         TrustedDeviceCredentialInput tdci = (TrustedDeviceCredentialInput) credentialInput;
+        String deviceId = tdci.getChallengeResponse();
 
         CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
-                .filter(cm -> cm.getSecretData().equals(tdci.getChallengeResponse()))
+                .filter(cm -> cm.getSecretData().equals(deviceId))
                 .findAny().orElse(null);
 
         return credentialModel != null;
