@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -292,6 +293,7 @@
             let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
                 timeout: 2000,
                 method: "GET",
+                credentials: "include", // send KEYCLOAK_DEVICE cookie
                 headers: {
                     "Authorization": "Bearer " + keycloak.token,
                     "Accept": "application/json",
@@ -311,6 +313,7 @@
         let passwordInfo = credentialsData.credentialInfos['password'];
         let otpInfo = credentialsData.credentialInfos['otp'];
         let smsInfo = credentialsData.credentialInfos['mfa-sms'];
+        let trustedDeviceInfo = credentialsData.credentialInfos['acme-trusted-device'];
         let backupCodeInfo = credentialsData.credentialInfos['backup-code'];
 
         let otpAuthHtml = "";
@@ -320,7 +323,7 @@
                 <tr>
                     <td>${!!optInfoItem ? "&check;" : ""}</td>
                     <td>MFA OTP</td>
-                    <td>${!!optInfoItem ? optInfoItem.credentialLabel : ''}</td>
+                    <td>${!!optInfoItem ? escapeHtml(optInfoItem.credentialLabel) : ''}</td>
                     <td>${!!optInfoItem ? formatDate(optInfoItem.createdAt) : '-'}</td>
                     <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
                     <td>${!!optInfoItem ? '<a href="#" onclick="removeMfa(\'otp\',\'' + optInfoItem.credentialId + '\');return false">Remove</a>' : ''}</td>
@@ -334,6 +337,39 @@
                     <td></td>
                     <td>-</td>
                     <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
+                    <td></td>
+                </tr>`;
+        }
+
+        let trustedDeviceAuthHtml = "";
+        if (trustedDeviceInfo) {
+            for (let trustedDeviceInfoItem of trustedDeviceInfo) {
+
+                if (!trustedDeviceInfoItem) {
+                    continue;
+                }
+
+                let trustedDeviceLabel = escapeHtml(trustedDeviceInfoItem.credentialLabel);
+                let currentBrowserIsTrustedDevice = trustedDeviceInfoItem.metadata.current;
+                let currentDeviceMarker = currentBrowserIsTrustedDevice ? '(*)' : '';
+                trustedDeviceAuthHtml += `
+                <tr>
+                    <td>&check;</td>
+                    <td>Trusted Device</td>
+                    <td>${trustedDeviceLabel + ' ' + currentDeviceMarker}</td>
+                    <td>${formatDate(trustedDeviceInfoItem.createdAt)}</td>
+                    <td><a href="#" onclick="changeMfa('acme-trusted-device');return false">Add</a></td>
+                    <td><a href="#" onclick="removeMfa('acme-trusted-device','${trustedDeviceInfoItem.credentialId}');return false">Remove</a></td>
+                </tr>`;
+            }
+        } else {
+            trustedDeviceAuthHtml += `
+                <tr>
+                    <td></td>
+                    <td>Trusted Device</td>
+                    <td></td>
+                    <td>-</td>
+                    <td><a href="#" onclick="changeMfa('acme-trusted-device');return false">Add</a></td>
                     <td></td>
                 </tr>`;
         }
@@ -359,15 +395,16 @@
             <tr>
                 <td>${!!smsInfo ? "&check;" : ""}</td>
                 <td>MFA SMS</td>
-                <td>${!!smsInfo ? smsInfo[0].credentialLabel : ''}</td>
+                <td>${!!smsInfo ? escapeHtml(smsInfo[0].credentialLabel) : ''}</td>
                 <td>${!!smsInfo ? formatDate(smsInfo[0].createdAt) : '-'}</td>
                 <td><a href="#" onclick="changeMfa('mfa-sms');return false">Update</a></td>
                 <td>${!!smsInfo ? '<a href="#" onclick="removeMfa(\'mfa-sms\');return false">Remove</a>' : ''}</td>
             </tr>
+            ${trustedDeviceAuthHtml}
             <tr>
                  <td>${!!backupCodeInfo ? "&check;" : ""}</td>
                  <td>Backup Code</td>
-                 <td>${!!backupCodeInfo ? backupCodeInfo[0].credentialLabel : ''}</td>
+                 <td>${!!backupCodeInfo ? escapeHtml(backupCodeInfo[0].credentialLabel) : ''}</td>
                  <td>${!!backupCodeInfo ? formatDate(backupCodeInfo[0].createdAt) : '-'}</td>
                  <td><a href="#" onclick="changeMfa('backup-code');return false">Update</a></td>
                  <td>${!!backupCodeInfo ? '<a href="#" onclick="removeMfa(\'backup-code\');return false">Remove</a>' : ''}</td>
@@ -416,8 +453,8 @@
             for (let client of clients) {
                 appEntriesHtml += `
                 <tr>
-                    <td>${client.clientName ? client.clientName : client.clientId}</td>
-                    <td>${client.description ? client.description : '-'}</td>
+                    <td>${escapeHtml(client.clientName ? client.clientName : client.clientId)}</td>
+                    <td>${escapeHtml(client.description ? client.description : '-')}</td>
                     <td><a href="${client.effectiveUrl}" target="_blank">Browse</a></td>
                 </tr>`;
             }
@@ -466,6 +503,7 @@
         let actions = {
             "otp": "CONFIGURE_TOTP",
             "mfa-sms": "acme-update-phonenumber",
+            "acme-trusted-device": "acme-manage-trusted-device",
             "backup-code": "acme-generate-backup-codes",
         }
 
@@ -482,7 +520,7 @@
 
     async function removeMfa(credentialType, credentialId) {
 
-        if (!(["otp", "mfa-sms", "backup-code"].includes(credentialType))) {
+        if (!(["otp", "mfa-sms", "acme-trusted-device", "backup-code"].includes(credentialType))) {
             return;
         }
 
@@ -491,6 +529,7 @@
             let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
                 timeout: 2000,
                 method: "DELETE",
+                credentials: "include", // send KEYCLOAK_DEVICE cookie
                 headers: {
                     "Authorization": "Bearer " + keycloak.token,
                     "Accept": "application/json",
@@ -514,9 +553,9 @@
 
     function showProfile() {
 
-        let firstName = keycloak.tokenParsed['given_name'];
-        let lastName = keycloak.tokenParsed['family_name'];
-        let email = keycloak.tokenParsed['email'];
+        let firstName = escapeHtml(keycloak.tokenParsed['given_name']);
+        let lastName = escapeHtml(keycloak.tokenParsed['family_name']);
+        let email = escapeHtml(keycloak.tokenParsed['email']);
 
         if (!email) {
             email = "";
@@ -568,8 +607,8 @@
             settingsData = {error: error.message};
         }
 
-        let setting1 = settingsData.setting1;
-        let setting2 = settingsData.setting2;
+        let setting1 = escapeHtml(settingsData.setting1);
+        let setting2 = escapeHtml(settingsData.setting2);
 
         let settingsHtml = `
         <form id="frmSettings" name="frmSettings" action="" onsubmit="return false" onkeydown="return event.key !== 'Enter';">
@@ -740,6 +779,14 @@
         dataElement.innerHTML = data;
         dataElement.classList.remove(["message-content", "token-content"]);
         dataElement.classList.add(cssClass);
+    }
+
+    // Use the browser's built-in functionality to quickly and safely escape
+    // the string
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
     }
 </script>
 </body>

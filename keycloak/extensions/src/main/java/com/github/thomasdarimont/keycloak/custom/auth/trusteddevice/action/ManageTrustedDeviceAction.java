@@ -3,7 +3,6 @@ package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceName;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.auth.TrustedDeviceAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProviderFactory;
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
@@ -34,7 +33,10 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
     public static final String ID = "acme-manage-trusted-device";
 
-    private static final int NUMBER_OF_DAYS_TO_TRUST_DEVICE = Integer.getInteger("keycloak.acme.auth.trusteddevice.trustdays", 120);
+    // TODO move to centralized configuration
+    public static final int NUMBER_OF_DAYS_TO_TRUST_DEVICE = Integer.getInteger("keycloak.auth.trusteddevice.trustdays", 120);
+
+    private static final boolean ENABLE_HEADLESS_TRUSTED_DEVICE_REGISTRATION = Boolean.parseBoolean(System.getProperty("keycloak.auth.trusteddevice.headless", "true"));
 
     @Override
     public InitiatedActionSupport initiatedActionSupport() {
@@ -48,6 +50,21 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+
+        if (ENABLE_HEADLESS_TRUSTED_DEVICE_REGISTRATION) {
+
+            KeycloakSession session = context.getSession();
+            RealmModel realm = context.getRealm();
+            UserModel user = context.getUser();
+
+            // automatically generated device name based on Browser and OS.
+            String deviceName = TrustedDeviceName.generateDeviceName(context.getHttpRequest());
+
+            registerNewTrustedDevice(session, realm, user, deviceName, null);
+            afterTrustedDeviceRegistration(context);
+            return;
+        }
+
         context.challenge(generateRegisterTrustedDeviceForm(context));
     }
 
@@ -77,7 +94,6 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
             return;
         }
 
-        EventBuilder event = context.getEvent();
         KeycloakSession session = context.getSession();
         RealmModel realm = context.getRealm();
         UserModel user = context.getUser();
@@ -91,10 +107,12 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
             removeTrustedDevices(context);
         }
 
+        var receivedTrustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(httpRequest, session);
+
         if (formParams.containsKey("dont-trust-device")) {
             log.info("Remove trusted device registration");
 
-            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceAuthenticator.lookupTrustedDeviceCredentialModelFromCookie(session, realm, user, httpRequest);
+            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceCredentialModel.lookupTrustedDevice(session, realm, user, receivedTrustedDeviceToken);
             if (trustedDeviceModel != null) {
                 session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
                         .deleteCredential(realm, user, trustedDeviceModel.getId());
@@ -102,42 +120,52 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         }
 
         if (formParams.containsKey("trust-device")) {
-            TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceAuthenticator.lookupTrustedDeviceCredentialModelFromCookie(session, realm, user, httpRequest);
-
-            if (currentTrustedDevice == null) {
-                log.info("Register new trusted device");
-            } else {
-                log.info("Update existing trusted device");
-            }
-
-            int numberOfDaysToTrustDevice = NUMBER_OF_DAYS_TO_TRUST_DEVICE; //FIXME make name of days to remember deviceToken configurable
-
-            String deviceId = currentTrustedDevice == null ? null : currentTrustedDevice.getDeviceId();
-            TrustedDeviceToken trustedDeviceToken = createDeviceToken(deviceId, numberOfDaysToTrustDevice);
             String deviceName = TrustedDeviceName.sanitizeDeviceName(formParams.getFirst("device"));
-
-            if (currentTrustedDevice == null) {
-                TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(null, deviceName, trustedDeviceToken.getDeviceId());
-                session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
-            } else {
-                // update label name for existing device
-                session.userCredentialManager().updateCredentialLabel(realm, user, currentTrustedDevice.getId(), deviceName);
-            }
-
-            String deviceTokenString = session.tokens().encode(trustedDeviceToken);
-            int maxAge = numberOfDaysToTrustDevice * 24 * 60 * 60;
-            TrustedDeviceCookie.addDeviceCookie(deviceTokenString, maxAge, session, realm);
-            log.info("Registered trusted device");
+            registerNewTrustedDevice(session, realm, user, deviceName, receivedTrustedDeviceToken);
         }
 
+        afterTrustedDeviceRegistration(context);
+    }
+
+    private void afterTrustedDeviceRegistration(RequiredActionContext context) {
         // remove required action if present
         context.getUser().removeRequiredAction(ID);
         context.success();
 
+        EventBuilder event = context.getEvent();
         event.event(EventType.CUSTOM_REQUIRED_ACTION);
         event.detail("action_id", ID);
         event.detail("register_trusted_device", "true");
         event.success();
+    }
+
+    private void registerNewTrustedDevice(KeycloakSession session, RealmModel realm, UserModel user, String deviceName, TrustedDeviceToken receivedTrustedDeviceToken) {
+
+        TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceCredentialModel.lookupTrustedDevice(session, realm, user, receivedTrustedDeviceToken);
+
+        if (currentTrustedDevice == null) {
+            log.info("Register new trusted device");
+        } else {
+            log.info("Update existing trusted device");
+        }
+
+        int numberOfDaysToTrustDevice = NUMBER_OF_DAYS_TO_TRUST_DEVICE; //FIXME make name of days to remember deviceToken configurable
+
+        String deviceId = currentTrustedDevice == null ? null : currentTrustedDevice.getDeviceId();
+        TrustedDeviceToken newTrustedDeviceToken = createDeviceToken(deviceId, numberOfDaysToTrustDevice);
+
+        if (currentTrustedDevice == null) {
+            TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(null, deviceName, newTrustedDeviceToken.getDeviceId());
+            session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
+        } else {
+            // update label name for existing device
+            session.userCredentialManager().updateCredentialLabel(realm, user, currentTrustedDevice.getId(), deviceName);
+        }
+
+        String deviceTokenString = session.tokens().encode(newTrustedDeviceToken);
+        int maxAge = numberOfDaysToTrustDevice * 24 * 60 * 60;
+        TrustedDeviceCookie.addDeviceCookie(deviceTokenString, maxAge, session, realm);
+        log.info("Registered trusted device");
     }
 
     private void removeTrustedDevices(RequiredActionContext context) {

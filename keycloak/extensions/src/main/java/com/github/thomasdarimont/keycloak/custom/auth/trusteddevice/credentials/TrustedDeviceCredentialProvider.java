@@ -50,6 +50,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
         // TODO make userlabel configurable
         model.setUserLabel(trustedDeviceCredentialModel.getUserLabel());
         model.setSecretData(trustedDeviceCredentialModel.getDeviceId());
+        // TODO compute expiration and add to credential data
         model.setCredentialData(null);
 
         return model;
@@ -131,7 +132,12 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-        return session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().orElse(null) != null;
+
+        // we need to run this authenticator every time in order to be able to detect
+        // dangling trusted device cookies in the case that the user removed all trusted devices.
+        // return session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().orElse(null) != null;
+
+        return true;
     }
 
     @Override
@@ -142,9 +148,10 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
         }
 
         TrustedDeviceCredentialInput tdci = (TrustedDeviceCredentialInput) credentialInput;
+        String deviceId = tdci.getChallengeResponse();
 
         CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
-                .filter(cm -> cm.getSecretData().equals(tdci.getChallengeResponse()))
+                .filter(cm -> cm.getSecretData().equals(deviceId))
                 .findAny().orElse(null);
 
         return credentialModel != null;

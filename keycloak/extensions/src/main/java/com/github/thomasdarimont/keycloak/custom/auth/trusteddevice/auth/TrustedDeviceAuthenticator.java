@@ -20,52 +20,48 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
 
     static final String ID = "acme-auth-trusted-device";
 
-    public static TrustedDeviceCredentialModel lookupTrustedDeviceCredentialModelFromCookie(KeycloakSession session, RealmModel realm, UserModel user, HttpRequest httpRequest) {
-
-        if (user == null) {
-            return null;
-        }
-
-        var trustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(httpRequest, session);
-        if (trustedDeviceToken == null) {
-            return null;
-        }
-
-        if (Time.currentTime() >= trustedDeviceToken.getExp()) {
-            // token expired
-            return null;
-        }
-
-        var credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
-                .filter(cm -> cm.getSecretData().equals(trustedDeviceToken.getDeviceId()))
-                .findAny().orElse(null);
-
-        if (credentialModel == null) {
-            return null;
-        }
-
-        return new TrustedDeviceCredentialModel(credentialModel.getId(), credentialModel.getUserLabel(), credentialModel.getSecretData());
-    }
-
     @Override
     public void authenticate(AuthenticationFlowContext context) {
 
-        var trustedDeviceCredentialModel = lookupTrustedDeviceCredentialModelFromCookie( //
-                context.getSession(), //
-                context.getRealm(),  //
-                context.getAuthenticationSession().getAuthenticatedUser(), //
-                context.getHttpRequest() //
-        );
+        KeycloakSession session = context.getSession();
+        RealmModel realm = context.getRealm();
+        UserModel user = context.getAuthenticationSession().getAuthenticatedUser();
+        HttpRequest request = context.getHttpRequest();
 
-        if (trustedDeviceCredentialModel == null) {
-            log.info("Unknown device detected!");
+        var receivedTrustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(request, session);
+
+        var credentialModel = TrustedDeviceCredentialModel.lookupTrustedDevice(session, realm, user, receivedTrustedDeviceToken);
+
+        if (credentialModel == null) {
+            log.debugf("Could not find trusted device device for user. realm=%s userId=%s", realm.getName(), user.getId());
+
+            if (receivedTrustedDeviceToken != null) {
+                // remove dangling invalid trusted device cookie
+                TrustedDeviceCookie.removeDeviceCookie(session, realm);
+            }
+
             context.attempted();
             return;
         }
 
+        if (Time.currentTime() >= receivedTrustedDeviceToken.getExp()) {
+            // token expired / remove existing credential
+            boolean removed = session.userCredentialManager().removeStoredCredential(realm, user, credentialModel.getId());
+            log.debugf("Detected expired trusted device. realm=%s userId=%s removed=%s", realm.getName(), user.getId(), removed);
+
+            // remove dangling expired trusted device cookie
+            TrustedDeviceCookie.removeDeviceCookie(session, realm);
+
+            context.attempted();
+            return;
+        }
+
+        // TODO invalidate trusted device if expired.
+        // ManageTrustedDeviceAction.NUMBER_OF_DAYS_TO_TRUST_DEVICE
+
         log.info("Found trusted device.");
         context.getEvent().detail("trusted_device", "true");
-        context.getEvent().detail("trusted_device_id", trustedDeviceCredentialModel.getDeviceId());
+        context.getEvent().detail("trusted_device_id", credentialModel.getDeviceId());
         context.success();
     }
 
@@ -81,7 +77,8 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        return session.userCredentialManager().isConfiguredFor(realm, user, TrustedDeviceCredentialModel.TYPE);
+        // return session.userCredentialManager().isConfiguredFor(realm, user, TrustedDeviceCredentialModel.TYPE);
+        return true;
     }
 
     @Override
@@ -96,6 +93,6 @@ public class TrustedDeviceAuthenticator implements Authenticator, CredentialVali
 
     @Override
     public TrustedDeviceCredentialProvider getCredentialProvider(KeycloakSession session) {
-        return (TrustedDeviceCredentialProvider)session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID);
+        return (TrustedDeviceCredentialProvider) session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID);
     }
 }
