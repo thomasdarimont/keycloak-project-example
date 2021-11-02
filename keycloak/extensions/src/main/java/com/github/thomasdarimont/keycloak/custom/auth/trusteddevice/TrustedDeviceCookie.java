@@ -9,10 +9,11 @@ import org.keycloak.services.util.CookieHelper;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.UriBuilder;
+import java.util.Optional;
 
 public class TrustedDeviceCookie {
 
-    public static final String COOKIE_NAME = "ACME_KEYCLOAK_DEVICE";
+    public static final String COOKIE_NAME = Optional.ofNullable(System.getenv("KEYCLOAK_AUTH_TRUSTED_DEVICE_COOKIE_NAME")).orElse("ACME_KEYCLOAK_DEVICE");
 
     public static void removeDeviceCookie(KeycloakSession session, RealmModel realm) {
         // maxAge = 1 triggers legacy cookie removal
@@ -27,7 +28,11 @@ public class TrustedDeviceCookie {
 
         UriBuilder baseUriBuilder = session.getContext().getUri().getBaseUriBuilder();
         // TODO think about narrowing the cookie-path to only contain the /auth path.
-        String path = baseUriBuilder.path("realms").path(realm.getName()).path("/").build().getPath();
+        String path = baseUriBuilder.path("realms")
+                .path(realm.getName())
+                .path("/")
+                .build()
+                .getPath();
 
         ClientConnection connection = session.getContext().getConnection();
         boolean secure = realm.getSslRequired().isRequired(connection);

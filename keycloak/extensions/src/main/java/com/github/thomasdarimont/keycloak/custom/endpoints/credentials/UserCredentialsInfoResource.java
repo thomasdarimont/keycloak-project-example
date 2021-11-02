@@ -2,6 +2,9 @@ package com.github.thomasdarimont.keycloak.custom.endpoints.credentials;
 
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import lombok.Data;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.credential.CredentialModel;
@@ -43,10 +46,12 @@ public class UserCredentialsInfoResource {
             PasswordCredentialModel.TYPE,
             SmsCredentialModel.TYPE,
             OTPCredentialModel.TYPE,
+            TrustedDeviceCredentialModel.TYPE,
             BackupCodeCredentialModel.TYPE);
 
     private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(
             SmsCredentialModel.TYPE,
+            TrustedDeviceCredentialModel.TYPE,
             OTPCredentialModel.TYPE,
             BackupCodeCredentialModel.TYPE);
 
@@ -153,7 +158,14 @@ public class UserCredentialsInfoResource {
     }
 
     private boolean removeCredentialForUser(RealmModel realm, UserModel user, CredentialModel credentialModel) {
-        return session.userCredentialManager().removeStoredCredential(realm, user, credentialModel.getId());
+        boolean removed = session.userCredentialManager().removeStoredCredential(realm, user, credentialModel.getId());
+        if (removed
+                && TrustedDeviceCredentialModel.TYPE.equals(credentialModel.getType())
+                && isCurrentRequestFromGivenTrustedDevice(credentialModel)) {
+            // remove dangling trusted device cookie
+            TrustedDeviceCookie.removeDeviceCookie(session, realm);
+        }
+        return removed;
     }
 
     private Map<String, List<CredentialInfo>> loadCredentialInfosForUser(RealmModel realm, UserModel user) {
@@ -167,12 +179,8 @@ public class UserCredentialsInfoResource {
             if (!RELEVANT_CREDENTIAL_TYPES.contains(type)) {
                 continue;
             }
-            String userLabel = credential.getUserLabel();
-            if (userLabel == null) {
-                userLabel = type;
-            }
-            credentialData.computeIfAbsent(type, s -> new ArrayList<>()).add(
-                    new CredentialInfo(credential.getId(), type, userLabel, credential.getCreatedDate()));
+
+            credentialData.computeIfAbsent(type, s -> new ArrayList<>()).add(newCredentialInfo(credential, type));
         }
 
         var credentialInfoData = new HashMap<String, List<CredentialInfo>>();
@@ -194,6 +202,34 @@ public class UserCredentialsInfoResource {
         }
 
         return credentialInfoData;
+    }
+
+    private CredentialInfo newCredentialInfo(CredentialModel credential, String type) {
+
+        String userLabel = credential.getUserLabel();
+        if (userLabel == null) {
+            userLabel = type;
+        }
+
+        CredentialInfo credentialInfo = new CredentialInfo(credential.getId(), type, userLabel, credential.getCreatedDate());
+        if (TrustedDeviceCredentialModel.TYPE.equals(credential.getType())) {
+
+            if (isCurrentRequestFromGivenTrustedDevice(credential)) {
+                credentialInfo.getMetadata().put("current", "true");
+            }
+        }
+
+        return credentialInfo;
+    }
+
+    private boolean isCurrentRequestFromGivenTrustedDevice(CredentialModel credential) {
+
+        TrustedDeviceToken trustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(request, session);
+        if (trustedDeviceToken == null) {
+            return false;
+        }
+
+        return credential.getSecretData().equals(trustedDeviceToken.getDeviceId());
     }
 
     private boolean shouldAggregate(String credentialType) {
@@ -225,7 +261,7 @@ public class UserCredentialsInfoResource {
         private boolean collection;
         private int count;
 
-        private Map<String, Object> metadata;
+        private Map<String, Object> metadata = new HashMap<>();
     }
 
     @Data
