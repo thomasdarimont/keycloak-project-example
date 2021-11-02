@@ -1,11 +1,12 @@
+import java.io.BufferedReader;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * Controller script to start the Keycloak environment.
@@ -178,9 +179,15 @@ class start {
             envFiles.add("local.env");
         }
 
+        //-begin env vars
         StringBuilder envVariables = new StringBuilder();
         for (String envFile : envFiles) {
             envVariables.append(Files.readString(Paths.get(envFile))).append("\n");
+        }
+
+        if(useHttps) {
+            envVariables.append("CA_ROOT_CERT=" + getRootCALocation() + "/rootCA.pem");
+            envVariables.append("\n");
         }
 
         if (!envVariables.toString().isBlank()) {
@@ -189,6 +196,7 @@ class start {
             commandLine.add("--env-file");
             commandLine.add(generatedEnvFile);
         }
+        //-END env vars
 
         commandLine.add("up");
         if (useDetach) {
@@ -253,4 +261,13 @@ class start {
                     , folderPath, folder.getAbsolutePath(), folder.mkdirs());
         }
     }
+
+    private static String getRootCALocation() throws IOException {
+        Runtime rt = Runtime.getRuntime();
+        String[] mkcertCommand = {"mkcert", "-CAROOT"};
+        Process proc = rt.exec(mkcertCommand);
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        return stdInput.readLine();
+    }
+
 }
