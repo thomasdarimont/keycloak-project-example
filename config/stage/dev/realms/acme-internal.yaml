@@ -26,8 +26,8 @@ failureFactor: 10
 
 eventsListeners:
   - "jboss-logging"
-  - "acme-audit-listener"
   - "email"
+  - "acme-audit-listener"
   - "metrics"
 
 eventsEnabled: true

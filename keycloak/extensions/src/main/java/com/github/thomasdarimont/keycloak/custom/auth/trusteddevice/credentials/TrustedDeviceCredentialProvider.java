@@ -5,7 +5,7 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDevic
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.keycloak.common.util.Resteasy;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
@@ -77,7 +77,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
      */
     private boolean deleteMatchingDeviceCookieIfPresent(RealmModel realm, CredentialModel credentialModel) {
 
-        HttpRequest httpRequest = ResteasyProviderFactory.getContextData(HttpRequest.class);
+        HttpRequest httpRequest = Resteasy.getContextData(HttpRequest.class);
 
         if (httpRequest == null) {
             return false;

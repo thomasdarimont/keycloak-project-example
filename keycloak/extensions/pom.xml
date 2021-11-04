@@ -49,14 +49,14 @@
             <groupId>io.smallrye</groupId>
             <artifactId>smallrye-metrics</artifactId>
             <version>${smallrye-metrics.version}</version>
-<!--            <scope>provided</scope>-->
+            <!--            <scope>provided</scope>-->
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.microprofile.metrics</groupId>
             <artifactId>microprofile-metrics-api</artifactId>
             <version>${microprofile-metrics-api.version}</version>
-<!--            <scope>provided</scope>-->
+            <!--            <scope>provided</scope>-->
         </dependency>
 
 

@@ -11,25 +11,23 @@ services:
       - ./keycloak-common.env
       - ./keycloak-http.env
     environment:
-#      KEYCLOAK_USER: "admin"
-#      KEYCLOAK_PASSWORD: "admin"
       DB_VENDOR: "h2"
       KEYCLOAK_THEME_CACHING: "false"
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
       PROXY_ADDRESS_FORWARDING: "true"
 
-# Exposes Metrics via http://localhost:9990/metrics
-      KEYCLOAK_STATISTICS: all
-      DEBUG_MODE: "true"
+    # Enable remote debugging
+      DEBUG: "true"
       DEBUG_PORT: "*:8787"
 
-#      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
-# use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
     command:
       - "--http-port=8080"
-      - "--auto-config"
       - "--http-enabled=true"
-#      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
+      - "--metrics-enabled=true"
+      - "--cluster=local"
+      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
+      - "--auto-config"
+    #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
       # 172.17.0.1 is host.docker.internal
       - "id.acme.test:172.17.0.1"
@@ -44,8 +42,8 @@ services:
       - ../../../keycloak/themes/internal-modern:/opt/jboss/keycloak/themes/internal-modern:z
       - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/conf/profile.properties:z
       - ../../../keycloak/imex:/opt/jboss/imex:z
-# This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
       - ./run/keycloakx/data:/opt/jboss/keycloak/data:z
       - ./run/keycloakx/logs:/opt/jboss/keycloak/logs:z
       - ./run/keycloakx/perf:/opt/jboss/keycloak/perf:z
+      - ./keycloakx/keycloak_default.properties:/opt/jboss/keycloak/conf/keycloak.properties:z
       - ../../../keycloak/extensions/target/extensions.jar:/opt/jboss/keycloak/providers/extensions.jar:z

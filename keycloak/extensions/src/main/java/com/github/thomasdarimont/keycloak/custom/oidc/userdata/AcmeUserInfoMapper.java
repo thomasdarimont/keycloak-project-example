@@ -2,8 +2,6 @@ package com.github.thomasdarimont.keycloak.custom.oidc.userdata;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
@@ -19,7 +17,6 @@ import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.representations.IDToken;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @JBossLog
 @AutoService(ProtocolMapper.class)
@@ -67,14 +64,14 @@ public class AcmeUserInfoMapper extends AbstractOIDCProtocolMapper implements Us
 
         KeycloakContext context = session.getContext();
 
-        // ResteasyProviderFactory.getContextData(HttpRequest.class).getFormParameters().getFirst("acme_supplier_id");
+        // Resteasy.getContextData(HttpRequest.class).getFormParameters().getFirst("acme_supplier_id");
 
         boolean userInfoEndpointRequest = context.getUri().getPath().endsWith("/userinfo");
         if (userInfoEndpointRequest) {
             var clientId = context.getClient().getClientId();
             token.getOtherClaims().put("acme-userdata",
 //                    Stream.iterate(1, i -> i + 1).limit(100).map(i -> "User Data: " + i)
-                    List.of(1,2,3)
+                    List.of(1, 2, 3)
             );
         }
     }

@@ -1,8 +1,8 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.support.KeycloakSessionLookup;
+import com.github.thomasdarimont.keycloak.custom.support.ResteasyUtil;
 import lombok.RequiredArgsConstructor;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.authorization.util.Tokens;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -17,9 +17,7 @@ public class CustomResourceProvider implements RealmResourceProvider {
 
     public static final String ID = "custom-resources";
 
-    private static final Pattern ALLOWED_REALM_NAMES_PATTERN = Pattern.compile(
-            Optional.ofNullable(System.getenv("KEYCLOAK_CUSTOM_ENDPOINT_REALM_PATTERN"))
-                    .orElse("acme-.*"));
+    private static final Pattern ALLOWED_REALM_NAMES_PATTERN = Pattern.compile(Optional.ofNullable(System.getenv("KEYCLOAK_CUSTOM_ENDPOINT_REALM_PATTERN")).orElse("acme-.*"));
 
     @Override
     public Object getResource() {
@@ -46,7 +44,7 @@ public class CustomResourceProvider implements RealmResourceProvider {
         }
 
         CustomResource customResource = new CustomResource(session, accessToken);
-        ResteasyProviderFactory.getInstance().injectProperties(customResource);
+        ResteasyUtil.injectProperties(customResource);
         return customResource;
     }
 

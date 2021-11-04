@@ -8,8 +8,6 @@ import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.http.HttpHeaders;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakContext;
@@ -128,7 +126,7 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
     @Override
     protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession, KeycloakSession session, ClientSessionContext clientSessionCtx) {
 
-        HttpRequest httpRequest = ResteasyProviderFactory.getContextData(HttpRequest.class);
+        // HttpRequest httpRequest = Resteasy.getContextData(HttpRequest.class);
         // extract information from httpRequest
 
         KeycloakContext context = session.getContext();

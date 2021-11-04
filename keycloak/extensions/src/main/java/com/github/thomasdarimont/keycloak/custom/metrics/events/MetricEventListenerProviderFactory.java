@@ -4,21 +4,31 @@ import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetricStore;
 import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetrics;
 import com.github.thomasdarimont.keycloak.custom.metrics.filter.MetricFilter;
 import com.github.thomasdarimont.keycloak.custom.metrics.filter.MetricRequestRecorder;
+import com.github.thomasdarimont.keycloak.custom.support.KeycloakUtil;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.Config;
+import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
 import org.keycloak.events.EventListenerProviderFactory;
+import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 
 @JBossLog
-@AutoService({EventListenerProviderFactory.class})
+@AutoService(EventListenerProviderFactory.class)
 public class MetricEventListenerProviderFactory implements EventListenerProviderFactory {
 
-    private static final MetricEventListenerProvider INSTANCE = new MetricEventListenerProvider();
+    private static final EventListenerProvider INSTANCE = getEventListenerProvider();
+
+    private static EventListenerProvider getEventListenerProvider() {
+        if (KeycloakUtil.isRunningOnKeycloak()) {
+            return new MetricEventListenerProvider();
+        }
+        return new NoopEventListenerProvider();
+    }
 
     @Override
     public EventListenerProvider create(KeycloakSession session) {
@@ -34,10 +44,14 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     public void postInit(KeycloakSessionFactory factory) {
 
         // TODO Add support for metrics in Keycloak.X - we need to uncomment
-        // MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
-        // registerMetrics(factory, metricRegistry);
-        // TODO configure robust request metrics collection
-        // registerMetricsFilter(metricRegistry);
+        MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
+//        registerMetrics(factory, metricRegistry);
+//
+//        // TODO configure robust request metrics collection
+//        if (Resteasy.getProvider().getClass().getSimpleName().equals("Resteasy3Provider")) {
+//            // metrics filter registration is only supported for Resteasy3
+//            registerMetricsFilter(metricRegistry);
+//        }
     }
 
     private void registerMetrics(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {
@@ -75,4 +89,29 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     public String getId() {
         return "metrics";
     }
+
+    private static class NoopEventListenerProvider implements EventListenerProvider {
+
+        @Override
+        public void onEvent(Event event) {
+            // NOOP
+            assert true;
+        }
+
+        @Override
+        public void onEvent(AdminEvent event, boolean includeRepresentation) {
+            // NOOP
+            assert true;
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+            assert true;
+        }
+
+    }
+
+    ;
+
 }
