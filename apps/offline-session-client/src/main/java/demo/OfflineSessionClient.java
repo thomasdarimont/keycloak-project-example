@@ -1,6 +1,20 @@
 package demo;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import javax.net.ssl.SSLContext;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -25,44 +39,32 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLContext;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 /**
- * keytool -importcert -noprompt -cacerts -alias "id.acme.test" -storepass changeit -file './config/stage/dev/tls/acme.test+1.pem'
+ * keytool -importcert -noprompt -cacerts -alias "id.acme.test" -storepass changeit -file
+ * './config/stage/dev/tls/acme.test+1.pem'
  */
 @Slf4j
 @SpringBootApplication
 public class OfflineSessionClient {
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(OfflineSessionClient.class).web(WebApplicationType.NONE).run(args);
+        new SpringApplicationBuilder(OfflineSessionClient.class)
+                .web(WebApplicationType.NONE)
+                .run(args);
     }
 
     @Bean
     CommandLineRunner clr(TlsRestTemplateCustomizer tlsRestTemplateCustomizer) {
         return args -> {
-
-            var oauthInfo = OAuthInfo.builder()
-                    .issuer("https://id.acme.test:8443/auth/realms/acme-internal")
-                    .clientId("app-mobile")
-                    .scope("profile offline_access")
-                    .grantType("password")
-                    .username("tester")
-                    .password("test")
-                    .build();
+            var oauthInfo =
+                    OAuthInfo.builder()
+                            .issuer("https://id.acme.test:8443/auth/realms/acme-internal")
+                            .clientId("app-mobile")
+                            .scope("profile offline_access")
+                            .grantType("password")
+                            .username("tester")
+                            .password("test")
+                            .build();
 
             var rt = new RestTemplateBuilder(tlsRestTemplateCustomizer).build();
 
@@ -100,7 +102,6 @@ public class OfflineSessionClient {
 
         final String username;
         final String password;
-
 
         public String getUserInfoUrl() {
             return getIssuer() + "/protocol/openid-connect/userinfo";
@@ -161,7 +162,11 @@ public class OfflineSessionClient {
             if (success) {
                 log.info("Obtain new offline token...");
                 try {
-                    Files.write(offlineTokenPath, accessTokenResponse.getRefresh_token().getBytes(StandardCharsets.UTF_8));
+                    Files.write(
+                            offlineTokenPath,
+                            accessTokenResponse
+                                    .getRefresh_token()
+                                    .getBytes(StandardCharsets.UTF_8));
                     return true;
                 } catch (IOException e) {
                     log.error("Could not write offline_token", e);
@@ -178,7 +183,12 @@ public class OfflineSessionClient {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.setBearerAuth(accessTokenResponse.getAccess_token());
 
-            var userInfoResponseEntity = rt.exchange(oauthInfo.getUserInfoUrl(), HttpMethod.GET, new HttpEntity<>(headers), UserInfoResponse.class);
+            var userInfoResponseEntity =
+                    rt.exchange(
+                            oauthInfo.getUserInfoUrl(),
+                            HttpMethod.GET,
+                            new HttpEntity<>(headers),
+                            UserInfoResponse.class);
             return userInfoResponseEntity.getBody();
         }
 
@@ -193,7 +203,11 @@ public class OfflineSessionClient {
             requestBody.add("refresh_token", refreshToken);
             requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity = rt.postForEntity(oauthInfo.getTokenUrl(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
+            var responseEntity =
+                    rt.postForEntity(
+                            oauthInfo.getTokenUrl(),
+                            new HttpEntity<>(requestBody, headers),
+                            AccessTokenResponse.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 return false;
             }
@@ -220,7 +234,11 @@ public class OfflineSessionClient {
             requestBody.add("password", oauthInfo.password);
             requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity = rt.postForEntity(oauthInfo.getTokenUrl(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
+            var responseEntity =
+                    rt.postForEntity(
+                            oauthInfo.getTokenUrl(),
+                            new HttpEntity<>(requestBody, headers),
+                            AccessTokenResponse.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 return false;
             }
@@ -237,7 +255,8 @@ public class OfflineSessionClient {
         public void ensureTokenValidSeconds(int minSecondsValid) {
 
             Objects.requireNonNull(accessTokenResponse, "accessTokenResponse");
-            long accessTokenExpiresAtSeconds = accessTokenResponse.getCreatedAtSeconds() + accessTokenResponse.getExpires_in();
+            long accessTokenExpiresAtSeconds =
+                    accessTokenResponse.getCreatedAtSeconds() + accessTokenResponse.getExpires_in();
             long nowSeconds = System.currentTimeMillis() / 1000;
             long remainingLifetimeSeconds = accessTokenExpiresAtSeconds - nowSeconds;
             if (remainingLifetimeSeconds < minSecondsValid) {
@@ -264,7 +283,11 @@ public class OfflineSessionClient {
             requestBody.add("client_id", oauthInfo.clientId);
             requestBody.add("refresh_token", accessTokenResponse.getRefresh_token());
 
-            var responseEntity = rt.postForEntity(oauthInfo.getLogoutUrl(), new HttpEntity<>(requestBody, headers), Map.class);
+            var responseEntity =
+                    rt.postForEntity(
+                            oauthInfo.getLogoutUrl(),
+                            new HttpEntity<>(requestBody, headers),
+                            Map.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error("Could not logout offline-client: logout failed");
                 return false;
@@ -291,9 +314,10 @@ public class OfflineSessionClient {
         @Override
         public void customize(RestTemplate restTemplate) {
 
-            var httpClient = HttpClients.custom()
-                    .setSSLSocketFactory(new SSLConnectionSocketFactory(createSslContext()))
-                    .build();
+            var httpClient =
+                    HttpClients.custom()
+                            .setSSLSocketFactory(new SSLConnectionSocketFactory(createSslContext()))
+                            .build();
 
             var requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
@@ -305,10 +329,12 @@ public class OfflineSessionClient {
             SSLContext sslContext = null;
 
             try {
-                TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-                sslContext = SSLContexts.custom()
-                        .loadTrustMaterial(null, acceptingTrustStrategy)
-                        .build();
+                TrustStrategy acceptingTrustStrategy =
+                        (X509Certificate[] chain, String authType) -> true;
+                sslContext =
+                        SSLContexts.custom()
+                                .loadTrustMaterial(null, acceptingTrustStrategy)
+                                .build();
             } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
                 e.printStackTrace();
             }
