@@ -17,6 +17,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
 
 @JBossLog
 public class TrustedDeviceCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
@@ -37,7 +38,16 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
 
         CredentialModel trustedDeviceCredentialModel = createTrustedDeviceCredentialModel((TrustedDeviceCredentialModel) credentialModel);
 
-        session.userCredentialManager().createCredential(realm, user, trustedDeviceCredentialModel);
+        UserCredentialManager ucm = session.userCredentialManager();
+        CredentialModel trustedDeviceModel = ucm.createCredential(realm, user, trustedDeviceCredentialModel);
+
+        // The execution order of the credential backed authenticators is controlled by the order of the stored credentials
+        // not only by the order of the authenticator. There fore, we need to move the new device-credential right after the password credential.
+        ucm.getStoredCredentialsByTypeStream(realm, user, PasswordCredentialModel.TYPE)
+                .findFirst()
+                .ifPresent(passwordModel ->
+                        ucm.moveCredentialTo(realm, user, trustedDeviceModel.getId(), passwordModel.getId()));
+
 
         return trustedDeviceCredentialModel;
     }
