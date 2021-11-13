@@ -6,7 +6,6 @@ services:
       service: acme-keycloak
     environment:
       KEYCLOAK_FRONTEND_URL: https://id.acme.test:5443/auth
-    # IntelliJ currently does not support the depends_on condition syntax
     depends_on:
       acme-keycloak-db:
         condition: service_healthy
@@ -18,7 +17,6 @@ services:
       service: acme-keycloak
     environment:
       KEYCLOAK_FRONTEND_URL: https://id.acme.test:5443/auth
-    # IntelliJ currently does not support the depends_on condition syntax
     depends_on:
       acme-keycloak-db:
         condition: service_healthy
