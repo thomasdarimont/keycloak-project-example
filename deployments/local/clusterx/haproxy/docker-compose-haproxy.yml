@@ -3,9 +3,9 @@ services:
   acme-keycloak-1:
     extends:
       file: ../docker-compose.yml
-      service: "${ACME_KEYCLOAK:-acme-keycloak}"
+      service: acme-keycloakx
     environment:
-      KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
+      KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:1443/auth
     ports:
       - "8080"
       - "8443"
@@ -18,9 +18,9 @@ services:
   acme-keycloak-2:
     extends:
       file: ../docker-compose.yml
-      service: "${ACME_KEYCLOAK:-acme-keycloak}"
+      service: acme-keycloakx
     environment:
-      KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
+      KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:1443/auth
     depends_on:
       acme-keycloak-db:
         condition: service_healthy

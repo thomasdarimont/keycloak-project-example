@@ -1,0 +1,64 @@
+services:
+
+  acme-keycloakx:
+    build:
+      context: "./keycloakx"
+      dockerfile: "./Dockerfile"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      KC_DB: postgres
+      KC_DB_URL_HOST: acme-keycloak-db
+      KC_DB_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_DB_SCHEMA: public
+
+#      KC_CLUSTER: default
+      KC_CLUSTER: custom
+
+    volumes:
+      # This configures the key and certificate for HTTPS.
+      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/https/tls.crt:z
+      - ../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/x509/https/tls.key:z
+      # Allow TLS connection to ourselves, this is necessary for cross realm Identity Brokering
+      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
+      - ./keycloakx/keycloak_default.properties:/opt/jboss/keycloak/conf/keycloak.properties:z
+    command:
+#      - "start"
+      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
+      - "--https-certificate-file=/etc/x509/https/tls.crt"
+      - "--https-certificate-key-file=/etc/x509/https/tls.key"
+      - "--http-port=8080"
+      - "--http-enabled=true"
+#      - "--cluster=default"
+#      - "--hostname-frontend-url=https://id.acme.test:2443/auth"
+#      - "--db=postgres"
+#      - "--db-username=keycloak"
+#      - "--db-password=keycloak"
+#      - "--db-schema=public"
+#      - "-Dkc.db.url.host=acme-keycloak-db"
+      - "--auto-config"
+
+    ports:
+      - "8080"
+      - "8443"
+      - "8787"
+
+
+  acme-keycloak-db:
+    image: postgres:11.12
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: keycloak
+    ports:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./run/postgres/data:/var/lib/postgresql/data:z
