@@ -22,6 +22,9 @@ services:
       DEBUG: "true"
       DEBUG_PORT: "*:8787"
 
+      # Allow access via visualvm and jmc (remote jmx connection to localhost 8790 without ssl)
+      JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+
 ## Keycloak.X 16.0.0
 #    command:
 #      - "start-dev"
@@ -50,6 +53,7 @@ services:
     ports:
       - "8080:8080"
       - "8443:8443"
+      - "8790:8790"
       - "127.0.0.1:8787:8787"
     volumes:
       - ../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z

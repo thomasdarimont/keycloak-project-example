@@ -1,6 +1,14 @@
 Keycloak.X Clustering Examples
 ----
 
+# Prepare
+Copy `../../../config/stage/dev/tls/*.pem` to `{./haproxy ./keycloakx ./nginx}`.
+
+```
+cp ../../../config/stage/dev/tls/*.pem ./haproxy 
+cp ../../../config/stage/dev/tls/*.pem ./keycloakx
+cp ../../../config/stage/dev/tls/*.pem ./nginx
+```
 
 # Run Keycloak.X cluster behind Nginx
 Start:
