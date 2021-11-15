@@ -11,7 +11,9 @@ services:
       - ./keycloak-common.env
       - ./keycloak-http.env
     environment:
-      DB_VENDOR: "h2"
+      KC_DB: "h2-file"
+      KC_HTTP_RELATIVE_PATH: "/auth"
+
       KEYCLOAK_THEME_CACHING: "false"
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
       PROXY_ADDRESS_FORWARDING: "true"
@@ -20,6 +22,18 @@ services:
       DEBUG: "true"
       DEBUG_PORT: "*:8787"
 
+## Keycloak.X 16.0.0
+#    command:
+#      - "start-dev"
+#      - "--http-enabled=true"
+#      - "--http-port=8080"
+#      - "--http-relative-path=/auth"
+#      - "--cluster=local"
+#      - "--metrics-enabled=true"
+#      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
+#      - "--verbose"
+
+# Keycloak.X 15.0.2
     command:
       - "--http-port=8080"
       - "--http-enabled=true"
@@ -27,6 +41,7 @@ services:
       - "--cluster=local"
       - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
       - "--auto-config"
+      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
       # 172.17.0.1 is host.docker.internal

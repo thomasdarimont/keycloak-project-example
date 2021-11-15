@@ -33,6 +33,8 @@ services:
       - ./keycloak-db.env
     environment:
       DB_VENDOR: MYSQL
+      # keycloak-x
+      KC_DB: MYSQL
 #      DB_ADDR: acme-keycloak-db
 #      DB_DATABASE: keycloak
 #      DB_USER: keycloak

@@ -6,6 +6,11 @@ services:
       service: acme-keycloakx
     environment:
       KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:2443/auth
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
       acme-keycloak-db:
         condition: service_healthy
@@ -17,8 +22,11 @@ services:
       service: acme-keycloakx
     environment:
       KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:2443/auth
+    #    depends_on:
+    #      acme-keycloak-db:
+    #        condition: service_healthy
     depends_on:
-      acme-keycloak-db:
+      acme-keycloak-1:
         condition: service_healthy
 
   acme-keycloak-db:
