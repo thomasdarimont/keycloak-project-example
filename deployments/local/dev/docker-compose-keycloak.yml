@@ -23,9 +23,6 @@ services:
 # Exposes Metrics via http://localhost:9990/metrics
       KEYCLOAK_STATISTICS: all
 
-      # Allow access via visualvm and jmc (remote jmx connection to localhost 8790 without ssl)
-      #JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
-
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
     command:
