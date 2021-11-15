@@ -37,26 +37,27 @@ services:
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
       - ./keycloakx/keycloak_default.properties:/opt/jboss/keycloak/conf/keycloak.properties:z
 # Keycloak.X 15.0.2 command
-#    command:
-##      - "start"
-#      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
-#      - "--https-certificate-file=/etc/x509/https/tls.crt"
-#      - "--https-certificate-key-file=/etc/x509/https/tls.key"
-#      - "--http-port=8080"
-#      - "--http-enabled=true"
-#      - "--auto-config"
-
-# Keycloak.X 16.0.0 command
     command:
-      - "start"
-      - "--auto-build"
+#      - "start"
       - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
-      - "--http-enabled=true"
-      - "--http-relative-path=/auth"
       - "--http-port=8080"
+      - "--http-enabled=true"
       - "--proxy=passthrough"
+      - "--auto-config"
+
+# Keycloak.X 16.0.0 command
+#    command:
+#      - "start"
+#      - "--auto-build"
+#      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
+#      - "--https-certificate-file=/etc/x509/https/tls.crt"
+#      - "--https-certificate-key-file=/etc/x509/https/tls.key"
+#      - "--http-enabled=true"
+#      - "--http-relative-path=/auth"
+#      - "--http-port=8080"
+#      - "--proxy=passthrough"
 
     ports:
       - "8080"
