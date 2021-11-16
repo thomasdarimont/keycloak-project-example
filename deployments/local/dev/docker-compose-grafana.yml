@@ -1,6 +1,6 @@
 services:
   acme-grafana:
-    image: grafana/grafana:8.0.2
+    image: grafana/grafana:8.2.4
     ports:
       - 3000:3000
     user: "1000:1000"
