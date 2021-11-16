@@ -43,18 +43,24 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     @Override
     public void postInit(KeycloakSessionFactory factory) {
 
-        // TODO Add support for metrics in Keycloak.X - we need to uncomment
-        MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
-//        registerMetrics(factory, metricRegistry);
-//
-//        // TODO configure robust request metrics collection
-//        if (Resteasy.getProvider().getClass().getSimpleName().equals("Resteasy3Provider")) {
-//            // metrics filter registration is only supported for Resteasy3
-//            registerMetricsFilter(metricRegistry);
-//        }
+        // TODO configure robust request metrics collection
+        // TODO Add support for metrics in Keycloak.X
+
+        // see workaround for Metrics with Keycloak and Keycloak.X
+        // https://github.com/aerogear/keycloak-metrics-spi/pull/120/files
+        if (KeycloakUtil.isRunningOnKeycloak()) {
+
+            MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
+            registerMetricsWithResteasy3(factory, metricRegistry);
+
+            // This registers the MetricsFilter within environments that use Resteasy < 4.x, e.g. Keycloak on Wildfly / JBossEAP
+            if (Boolean.getBoolean("acme.keycloak.metrics.record-uri-metrics")) {
+                registerMetricsFilterWithResteasy3(metricRegistry);
+            }
+        }
     }
 
-    private void registerMetrics(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {
+    private void registerMetricsWithResteasy3(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {
         log.info("Begin register metrics...");
         KeycloakMetrics metrics = new KeycloakMetrics();
 
@@ -63,9 +69,9 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
         log.info("Finished register metrics.");
     }
 
-    protected void registerMetricsFilter(MetricRegistry metricRegistry) {
+    protected void registerMetricsFilterWithResteasy3(MetricRegistry metricRegistry) {
         log.info("Begin register metrics-filter...");
-        MetricFilter metricFilter = new MetricFilter(true, new MetricRequestRecorder(metricRegistry));
+        MetricFilter metricFilter = new MetricFilter(new MetricRequestRecorder(metricRegistry));
 
         ResteasyProviderFactory instance = ResteasyProviderFactory.getInstance();
         instance.getContainerRequestFilterRegistry().registerSingleton(metricFilter);
@@ -87,7 +93,7 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
 
     @Override
     public String getId() {
-        return "metrics";
+        return "acme-metrics";
     }
 
     private static class NoopEventListenerProvider implements EventListenerProvider {

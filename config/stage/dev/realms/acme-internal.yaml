@@ -28,7 +28,7 @@ eventsListeners:
   - "jboss-logging"
   - "email"
   - "acme-audit-listener"
-  - "metrics"
+  - "acme-metrics"
 
 eventsEnabled: true
 # 120 days

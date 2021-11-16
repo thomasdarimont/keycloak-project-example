@@ -8,7 +8,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.util.Set;
 
 @JBossLog
@@ -30,32 +29,31 @@ public class MetricFilter implements ContainerRequestFilter, ContainerResponseFi
 
     private final RequestMetricsUpdater requestMetricsUpdater;
 
-    private final boolean uriMetricsEnabled;
-
-    public MetricFilter(boolean uriMetricsEnabled, RequestMetricsUpdater requestMetricsUpdater) {
-        this.uriMetricsEnabled = uriMetricsEnabled;
+    public MetricFilter(RequestMetricsUpdater requestMetricsUpdater) {
         this.requestMetricsUpdater = requestMetricsUpdater;
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
+
+        if (shouldIgnoreRequest(requestContext)) {
+            return;
+        }
+
         requestContext.setProperty(METRICS_REQUEST_TIMESTAMP, System.currentTimeMillis());
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
 
-        String uri = requestContext.getUriInfo().getPath();
-        for (String ignoredPathPrefix : IGNORED_PATH_PREFIXES) {
-            if (uri.startsWith(ignoredPathPrefix)) {
-                return;
-            }
+        if (shouldIgnoreRequest(requestContext)) {
+            return;
         }
 
+        // TODO strip userIds, componentIds, etc. from uri paths to avoid accidental dimension explosion
         int status = responseContext.getStatus();
-        if (uriMetricsEnabled) {
-            requestMetricsUpdater.recordResponse(uri, requestContext.getMethod(), status);
-        }
+        String uri = requestContext.getUriInfo().getPath();
+        requestMetricsUpdater.recordResponse(uri, requestContext.getMethod(), status);
 
         Long metricsRequestTimestampMillis = (Long) requestContext.getProperty(METRICS_REQUEST_TIMESTAMP);
         if (metricsRequestTimestampMillis == null) {
@@ -67,9 +65,19 @@ public class MetricFilter implements ContainerRequestFilter, ContainerResponseFi
         }
 
         long requestDurationMillis = System.currentTimeMillis() - metricsRequestTimestampMillis;
-        if (uriMetricsEnabled) {
-            requestMetricsUpdater.recordRequestDuration(uri, requestContext.getMethod(), status, requestDurationMillis);
+        requestMetricsUpdater.recordRequestDuration(uri, requestContext.getMethod(), status, requestDurationMillis);
+    }
+
+    private boolean shouldIgnoreRequest(ContainerRequestContext requestContext) {
+
+        String uri = requestContext.getUriInfo().getPath();
+
+        for (String ignoredPathPrefix : IGNORED_PATH_PREFIXES) {
+            if (uri.startsWith(ignoredPathPrefix)) {
+                return true;
+            }
         }
+        return false;
     }
 
     private boolean contentTypeIsRelevant(ContainerResponseContext responseContext) {
