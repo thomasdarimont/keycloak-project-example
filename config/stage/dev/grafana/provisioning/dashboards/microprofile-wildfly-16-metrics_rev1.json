@@ -168,7 +168,7 @@
       "targets": [
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_cpu_process_cpu_load{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_cpu_processCpuLoad{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -438,7 +438,7 @@
       "targets": [
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_cpu_available_processors{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_cpu_availableProcessors{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -750,7 +750,7 @@
       "targets": [
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_cpu_system_load_average{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_cpu_systemLoadAverage{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -862,7 +862,7 @@
       "targets": [
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_classloader_current_loaded_class_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_classloader_loadedClasses_count{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1637,7 +1637,7 @@
       "targets": [
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_memory_used_non_heap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_memory_usedNonHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "format": "time_series",
           "hide": false,
           "interval": "",
@@ -1647,7 +1647,7 @@
         },
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_memory_max_non_heap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_memory_maxNonHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1658,7 +1658,7 @@
         },
         {
           "datasource": "$PROMETHEUS_DS",
-          "expr": "base_memory_committed_non_heap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
+          "expr": "base_memory_commitedNonHeap_bytes{env=\"$env\",job=\"$job\",instance=~\"$instance\"}",
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "a{{ __name__ }}/{{instance}}",

@@ -14,7 +14,7 @@ global:
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
 
-  - job_name: 'acme-keycloak'
+  - job_name: 'keycloak'
 
     # Override the global default and scrape targets from this job every 5 seconds.
     scrape_interval: 5s
@@ -23,3 +23,10 @@ scrape_configs:
       - targets: [ 'acme-keycloak:9990' ]
         labels:
           env:   dev
+
+#  - job_name: 'acme-keycloak-metrics-spi'
+#    metrics_path: 'auth/realms/master/metrics'
+#    static_configs:
+#      - targets: ['acme-keycloak:8080']
+#        labels:
+#          env:   dev

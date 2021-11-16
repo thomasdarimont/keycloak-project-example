@@ -26,11 +26,12 @@ services:
       # Generic client role mapping does not work because of '-' in the client name
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "resource_access.grafana.roles[0]"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT: "true"
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel"
     volumes:
 #      - ./run/grafana:/var/lib/grafana:z
 #      - ../../../config/stage/dev/grafana/provisioning:/etc/grafana/provisioning:z
       - ../../../config/stage/dev/grafana/provisioning/dashboards/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml:z
-      - ../../../config/stage/dev/grafana/provisioning/dashboards/microprofile-wildfly-16-metrics_rev1.json:/etc/grafana/provisioning/dashboards/dashboard1.json:z
+      - ../../../config/stage/dev/grafana/provisioning/dashboards/microprofile-wildfly-16-metrics_rev1.json:/etc/grafana/provisioning/dashboards/microprofile-wildfly-metrics.json:z
       - ../../../config/stage/dev/grafana/provisioning/datasources/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:z
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/grafana/cert.pem:z
       - ../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/grafana/key.pem:z
