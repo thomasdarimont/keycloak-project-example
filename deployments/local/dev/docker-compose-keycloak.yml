@@ -23,6 +23,12 @@ services:
 # Exposes Metrics via http://localhost:9990/metrics
       KEYCLOAK_STATISTICS: all
 
+      JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+DisableExplicitGC -XX:+UseStringDeduplication -Djava.net.preferIPv4Stack=true"
+
+    mem_limit: 1024m
+    mem_reservation: 1024m
+    cpus: 2
+
 #      KEYCLOAK_IMPORT: "/opt/jboss/imex/custom-realm.json"
 # use `docker-compose --env-file custom-keycloak.env up` to populate the KEYCLOAK_CONFIG_FILE variable.
     command:
