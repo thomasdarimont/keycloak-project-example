@@ -66,4 +66,4 @@ services:
       - ./run/keycloakx/perf:/opt/jboss/keycloak/perf:z
       - ./keycloakx/keycloak_default.properties:/opt/jboss/keycloak/conf/keycloak.properties:z
       - ../../../keycloak/extensions/target/extensions.jar:/opt/jboss/keycloak/providers/extensions.jar:z
-      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
+#      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
