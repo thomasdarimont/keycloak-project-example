@@ -52,6 +52,7 @@ services:
       - ../../../keycloak/themes/internal-modern:/opt/jboss/keycloak/themes/internal-modern:z
       - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/standalone/configuration/profile.properties:z
       - ../../../keycloak/imex:/opt/jboss/imex:z
+      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
 # This will exposes *.sh and *.cli startup scripts that are executed by Keycloak.
       - ../../../keycloak/cli:/opt/jboss/startup-scripts:z
       - ./run/keycloak/data:/opt/jboss/keycloak/standalone/data:z
