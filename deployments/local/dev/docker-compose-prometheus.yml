@@ -2,6 +2,8 @@ services:
   acme-prometheus:
     image: prom/prometheus:v2.28.0
     user: "65534:1000"
+    ports:
+    - "9090:9090"
     volumes:
       - ../../../config/stage/dev/prometheus:/etc/prometheus:z
 #      - ./run/prometheus:/prometheus:z
