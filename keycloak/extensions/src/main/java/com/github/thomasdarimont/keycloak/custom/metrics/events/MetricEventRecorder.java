@@ -287,7 +287,7 @@ public class MetricEventRecorder {
         String realmName = resolveRealmName(event.getRealmId());
         Tag[] tags = {
                 tag("realm", realmName),
-//                tag("client_id", event.getClientId()),
+                tag("client_id", event.getClientId()),
                 tag("error", event.getError()),
                 tag("provider", provider),
         };
@@ -300,7 +300,7 @@ public class MetricEventRecorder {
         Tag[] tags = {
                 tag("realm", realmName),
                 tag("provider", provider),
-//                tag("client_id", event.getClientId()),
+                tag("client_id", event.getClientId()),
         };
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_SUCCESS_TOTAL.getMetadata(), tags).inc();
     }
