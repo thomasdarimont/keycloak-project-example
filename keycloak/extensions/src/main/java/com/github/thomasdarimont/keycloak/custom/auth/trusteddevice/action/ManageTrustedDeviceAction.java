@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action;
 
+import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceName;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
@@ -62,7 +63,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
             String deviceName = TrustedDeviceName.generateDeviceName(context.getHttpRequest());
 
             registerNewTrustedDevice(session, realm, user, deviceName, null);
-            afterTrustedDeviceRegistration(context);
+            afterTrustedDeviceRegistration(context, new TrustedDeviceInfo(deviceName));
             return;
         }
 
@@ -113,12 +114,16 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         if (formParams.containsKey("trust-device")) {
             String deviceName = TrustedDeviceName.sanitizeDeviceName(formParams.getFirst("device"));
             registerNewTrustedDevice(session, realm, user, deviceName, receivedTrustedDeviceToken);
+            afterTrustedDeviceRegistration(context, new TrustedDeviceInfo(deviceName));
         }
 
-        afterTrustedDeviceRegistration(context);
+
+        // remove required action if present
+        context.getUser().removeRequiredAction(ID);
+        context.success();
     }
 
-    private void afterTrustedDeviceRegistration(RequiredActionContext context) {
+    private void afterTrustedDeviceRegistration(RequiredActionContext context, TrustedDeviceInfo trustedDeviceInfo) {
         // remove required action if present
         context.getUser().removeRequiredAction(ID);
         context.success();
@@ -128,6 +133,8 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         event.detail("action_id", ID);
         event.detail("register_trusted_device", "true");
         event.success();
+
+        AccountActivity.onTrustedDeviceAdded(context.getSession(), context.getRealm(), context.getUser(), trustedDeviceInfo);
     }
 
     private void registerNewTrustedDevice(KeycloakSession session, RealmModel realm, UserModel user, String deviceName, TrustedDeviceToken receivedTrustedDeviceToken) {

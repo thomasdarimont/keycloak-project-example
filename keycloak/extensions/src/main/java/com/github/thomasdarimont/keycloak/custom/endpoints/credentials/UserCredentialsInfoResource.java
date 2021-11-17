@@ -1,9 +1,11 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.credentials;
 
+import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.TrustedDeviceInfo;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import lombok.Data;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -164,6 +166,8 @@ public class UserCredentialsInfoResource {
                 && isCurrentRequestFromGivenTrustedDevice(credentialModel)) {
             // remove dangling trusted device cookie
             TrustedDeviceCookie.removeDeviceCookie(session, realm);
+
+            AccountActivity.onTrustedDeviceRemoved(session, realm, user, new TrustedDeviceInfo(credentialModel.getUserLabel()));
         }
         return removed;
     }
