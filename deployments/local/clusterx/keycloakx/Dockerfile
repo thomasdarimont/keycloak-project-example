@@ -5,7 +5,13 @@ FROM quay.io/keycloak/keycloak-x:15.0.2
 
 USER 0
 
+# Add simple custom JGroups configuration
 COPY --chown=jboss:jboss ./cluster-custom.xml /opt/jboss/keycloak/conf/cluster-custom.xml
+
+# Add enhanced custom JGroups configuration with encryption support
+COPY --chown=jboss:jboss ./cluster-custom-jgroups.xml /opt/jboss/keycloak/conf/cluster-custom-jgroups.xml
+COPY --chown=jboss:jboss ./jgroups-multicast-enc.xml /opt/jboss/keycloak/conf/jgroups-multicast-enc.xml
+COPY --chown=jboss:jboss ./jgroups.p12 /opt/jboss/keycloak/conf/jgroups.p12
 
 ## Workaround for adding the current certifcate to the cacerts truststore
 # Import certificate into cacerts truststore

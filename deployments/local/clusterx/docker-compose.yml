@@ -16,7 +16,12 @@ services:
       KC_DB_SCHEMA: public
 
 #      KC_CLUSTER: default
+
+      # uses keycloakx/cluster-custom.xml
       KC_CLUSTER: custom
+
+      # uses keycloakx/cluster-custom-jgroups.xml
+      # KC_CLUSTER: custom-jgroups
 
 # Default JAVA_OPTS
       #JAVA_OPTS: -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true
@@ -45,6 +50,7 @@ services:
       - "--http-port=8080"
       - "--http-enabled=true"
       - "--proxy=passthrough"
+      - "--verbose"
       - "--auto-config"
 
 # Keycloak.X 16.0.0 command

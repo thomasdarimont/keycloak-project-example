@@ -2,6 +2,7 @@ Keycloak.X Clustering Examples
 ----
 
 # Prepare
+
 Copy `../../../config/stage/dev/tls/*.pem` to `{./haproxy ./keycloakx ./nginx}`.
 
 ```
