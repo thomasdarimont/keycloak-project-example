@@ -106,8 +106,11 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
             TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceCredentialModel.lookupTrustedDevice(session, realm, user, receivedTrustedDeviceToken);
             if (trustedDeviceModel != null) {
-                session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
+                boolean deleted = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
                         .deleteCredential(realm, user, trustedDeviceModel.getId());
+                if (deleted) {
+                    AccountActivity.onTrustedDeviceRemoved(session, realm, user, new TrustedDeviceInfo(trustedDeviceModel.getUserLabel()));
+                }
             }
         }
 
