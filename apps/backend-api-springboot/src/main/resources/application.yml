@@ -22,6 +22,6 @@ server:
   port: 4643
   ssl:
     enabled: true
-    key-store: ../../config/stage/dev/tls/acme.test+1.p12
+    key-store: ./config/stage/dev/tls/acme.test+1.p12
     key-store-password: changeit
     key-store-type: PKCS12
