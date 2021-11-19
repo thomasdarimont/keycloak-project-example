@@ -95,11 +95,11 @@ public class AccessFilter implements ContainerRequestFilter {
         InetSocketAddress address = new InetSocketAddress(remoteIp.host(), remoteIp.port());
         for (IpFilterRule filterRule : adminPathIpFilterRules.getIpFilterRules()) {
             if (filterRule.matches(address)) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     @Data
