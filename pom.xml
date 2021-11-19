@@ -12,6 +12,7 @@
 
     <modules>
         <module>keycloak/extensions</module>
+        <module>keycloak/extensionsx</module>
         <module>keycloak/docker</module>
         <module>apps/backend-api-quarkus</module>
         <module>apps/backend-api-springboot</module>
@@ -51,7 +52,7 @@
 
         <!-- Tooling -->
         <auto-service.version>1.0</auto-service.version>
-        <lombok.version>1.18.20</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
         <docker-maven-plugin.version>0.36.1</docker-maven-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
