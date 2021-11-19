@@ -23,7 +23,7 @@ services:
       DEBUG_PORT: "*:8787"
 
       # Allow access via visualvm and jmc (remote jmx connection to localhost 8790 without ssl)
-      JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+      JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dquarkus-log-max-startup-records=10000"
 
 ## Keycloak.X 16.0.0
 #    command:
