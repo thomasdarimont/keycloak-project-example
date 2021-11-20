@@ -51,7 +51,7 @@
         <testcontainers-keycloak.version>1.8.0</testcontainers-keycloak.version>
 
         <!-- Tooling -->
-        <auto-service.version>1.0</auto-service.version>
+        <auto-service.version>1.0.1</auto-service.version>
         <lombok.version>1.18.22</lombok.version>
         <docker-maven-plugin.version>0.36.1</docker-maven-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
