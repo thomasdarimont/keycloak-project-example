@@ -227,7 +227,7 @@ public class SmsAuthenticator implements Authenticator {
         LoginFormsProvider form = context.form();
         generateLoginForm(context, form);
 
-        if (error == null) {
+        if (error != null) {
             form.setError(error);
         }
 
