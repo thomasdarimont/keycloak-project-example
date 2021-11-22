@@ -1,0 +1,69 @@
+# Keycloak
+
+JAVA_TOOL_OPTIONS= java -cp /opt/jboss/keycloak/modules/system/layers/base/org/jgroups/main/jgroups-*.Final.jar org.jgroups.tests.Probe -v
+
+# Keycloak.X
+
+JAVA_TOOL_OPTIONS= java -cp /opt/jboss/keycloak/lib/lib/main/org.jgroups.jgroups-*.Final.jar org.jgroups.tests.Probe -v jmx
+
+
+----
+
+Keycloak Wildfly config (Not working!)
+
+/socket-binding-group=standard-sockets/socket-binding=jgroups-diagnostics:add(multicast-address="${jboss.jgroups.diagnostics_addr:224.0.0.75}",multicast-port="${jboss.jgroups.diagnostics_port:7500}")
+
+/subsystem=jgroups/stack=tcp/transport=TCP:write-attribute(name=diagnostics-socket-binding,value=jgroups-diagnostics)
+/subsystem=jgroups/stack=tcp/transport=TCP:write-attribute(name=properties.diag_enable_tcp,value=true)
+/subsystem=jgroups/stack=tcp/transport=TCP:write-attribute(name=properties.diagnostics_addr,value="224.0.0.75")
+
+/subsystem=jgroups/stack=udp/transport=UDP:write-attribute(name=diagnostics-socket-binding,value=jgroups-diagnostics)
+/subsystem=jgroups/stack=udp/transport=UDP:write-attribute(name=properties.diag_enable_udp,value=true)
+/subsystem=jgroups/stack=udp/transport=UDP:write-attribute(name=properties.diagnostics_addr,value="224.0.0.75")
+
+transport
+
+---
+
+Probe output on Keycloak.x with jgroups-multicast-diag.xml
+
+```
+bash-4.4$ JAVA_TOOL_OPTIONS= java -cp /opt/jboss/keycloak/lib/lib/main/org.jgroups.jgroups-*.Final.jar org.jgroups.tests.Probe -v
+Picked up JAVA_TOOL_OPTIONS:
+addrs: [/224.0.75.75]
+udp: true, tcp: false
+
+#1 (176 bytes):
+local_addr=e78a8195221d-33544
+physical_addr=172.18.0.3:35427
+view=[e78a8195221d-33544|1] (2) [e78a8195221d-33544, 80a8d38a5520-59062]
+cluster=ISPN
+version=4.2.9.Final (Julier)
+
+#2 (176 bytes):
+local_addr=80a8d38a5520-59062
+physical_addr=172.18.0.4:58324
+view=[e78a8195221d-33544|1] (2) [e78a8195221d-33544, 80a8d38a5520-59062]
+cluster=ISPN
+version=4.2.9.Final (Julier)
+
+2 responses (2 matches, 0 non matches)
+```
+
+```
+bash-4.4$ JAVA_TOOL_OPTIONS= java -cp /opt/jboss/keycloak/lib/lib/main/org.jgroups.jgroups-*.Final.jar org.jgroups.tests.Probe keys
+Picked up JAVA_TOOL_OPTIONS:
+#1 (445 bytes):
+local_addr=e78a8195221d-33544 [ip=172.18.0.3:35427, version=4.2.9.Final (Julier), cluster=ISPN, 2 mbr(s)]
+keys=digest-history dump-digest fix-digests dump keys uuids member-addrs props max-list-print-size[=number] print-protocols
+remove-protocol=<name>
+insert-protocol=<name>=above | below=<name> reset-stats jmx op=<operation>[<args>] ops threads[=<filter>[=<limit>]] enable-cpu enable-contention disable-cpu disable-contention ispn-remote
+
+#2 (445 bytes):
+local_addr=80a8d38a5520-59062 [ip=172.18.0.4:58324, version=4.2.9.Final (Julier), cluster=ISPN, 2 mbr(s)]
+keys=digest-history dump-digest fix-digests dump keys uuids member-addrs props max-list-print-size[=number] print-protocols
+remove-protocol=<name>
+insert-protocol=<name>=above | below=<name> reset-stats jmx op=<operation>[<args>] ops threads[=<filter>[=<limit>]] enable-cpu enable-contention disable-cpu disable-contention ispn-remote
+
+2 responses (2 matches, 0 non matches)
+```

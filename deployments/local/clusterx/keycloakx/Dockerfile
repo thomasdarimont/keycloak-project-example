@@ -11,6 +11,7 @@ COPY --chown=jboss:jboss ./cluster-custom.xml /opt/jboss/keycloak/conf/cluster-c
 # Add enhanced custom JGroups configuration with encryption support
 COPY --chown=jboss:jboss ./cluster-custom-jgroups.xml /opt/jboss/keycloak/conf/cluster-custom-jgroups.xml
 COPY --chown=jboss:jboss ./jgroups-multicast-enc.xml /opt/jboss/keycloak/conf/jgroups-multicast-enc.xml
+COPY --chown=jboss:jboss ./jgroups-multicast-diag.xml /opt/jboss/keycloak/conf/jgroups-multicast-diag.xml
 COPY --chown=jboss:jboss ./jgroups.p12 /opt/jboss/keycloak/conf/jgroups.p12
 
 ## Workaround for adding the current certifcate to the cacerts truststore

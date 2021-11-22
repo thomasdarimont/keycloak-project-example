@@ -105,6 +105,13 @@
             <scope>provided</scope>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>org.jgroups</groupId>-->
+<!--            <artifactId>jgroups</artifactId>-->
+<!--            <version>4.2.11.Final</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
         <!-- Tooling Dependencies -->
 
         <dependency>
