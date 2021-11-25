@@ -12,6 +12,7 @@ batch
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=expiration:add(lifespan=900000000000000000)
 
 # You can use this to limit the number of cache items in memory
+# See https://infinispan.org/docs/stable/titles/configuring/configuring.html#eviction_configuring-memory-usage
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/memory=heap:add(max-entries=1000)
 
 # Enable statistics for sessions cache
