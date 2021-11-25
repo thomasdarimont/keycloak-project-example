@@ -93,14 +93,14 @@
     };
 
     function showWelcome() {
-        $("#loginBtn").classList.toggle("hidden");
-        $("#logoutBtn").classList.toggle("hidden");
+        $("#loginBtn").classList.remove("hidden");
+        $("#logoutBtn").classList.add("hidden");
     }
 
     function showGreeting() {
 
-        $("#loginBtn").classList.toggle("hidden");
-        $("#logoutBtn").classList.toggle("hidden");
+        $("#loginBtn").classList.add("hidden");
+        $("#logoutBtn").classList.remove("hidden");
 
         $("#greeting").classList.toggle("hidden");
 
