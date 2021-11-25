@@ -24,6 +24,8 @@ services:
       CACHE_OWNERS_COUNT: 2
       CACHE_OWNERS_AUTH_SESSIONS_COUNT: 2
 
+      JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+UseStringDeduplication -Djava.net.preferIPv4Stack=true"
+
 #    depends_on:
 #      acme-keycloak-db:
 #        condition: service_healthy
@@ -42,6 +44,7 @@ services:
       - "-Dwildfly.statistics-enabled=true"
     ports:
       - "8080"
+      - "9990"
       - "8443"
       - "8787"
 

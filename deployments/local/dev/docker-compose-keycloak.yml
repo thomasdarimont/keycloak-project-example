@@ -23,7 +23,7 @@ services:
 # Exposes Metrics via http://localhost:9990/metrics
       KEYCLOAK_STATISTICS: all
 
-      JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+DisableExplicitGC -XX:+UseStringDeduplication -Djava.net.preferIPv4Stack=true"
+      JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+UseStringDeduplication -Djava.net.preferIPv4Stack=true"
 
     mem_limit: 1024m
     mem_reservation: 1024m

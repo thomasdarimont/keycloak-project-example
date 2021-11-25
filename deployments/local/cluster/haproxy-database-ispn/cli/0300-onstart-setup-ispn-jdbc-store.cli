@@ -12,7 +12,10 @@ batch
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=expiration:add(lifespan=900000000000000000)
 
 # You can use this to limit the number of cache items in memory
-# /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/component=eviction:add(max-entries=1)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/memory=heap:add(max-entries=1000)
+
+# Enable statistics for sessions cache
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:write-attribute(name=statistics-enabled,value=true)
 
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc:add( \
   datasource="java:jboss/datasources/KeycloakDS", \
@@ -38,6 +41,7 @@ batch
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc/write=behind:add( \
   modification-queue-size=1024 \
 )
+
 run-batch
 
 echo SETUP: Finished Infinispan jdbc-store configuration.
