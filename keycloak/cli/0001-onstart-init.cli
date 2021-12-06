@@ -86,6 +86,7 @@ if (outcome == failed) of /subsystem=keycloak-server/spi=userSessions/provider=i
 echo SETUP: Add missing "infinispan" provider with disabled offlineSession preloading
 /subsystem=keycloak-server/spi=userSessions/provider=infinispan:add(enabled=true)
 /subsystem=keycloak-server/spi=userSessions/provider=infinispan:write-attribute(name=properties.preloadOfflineSessionsFromDatabase,value=${env.KEYCLOAK_INFINISPAN_SESSIONS_PRELOAD_DATABASE:false})
+/subsystem=keycloak-server/spi=userSessions/provider=infinispan:write-attribute(name=properties.sessionsPerSegment,value=${env.KEYCLOAK_INFINISPAN_USER_SESSIONS_SESSIONS_PER_SEGMENT:512})
 /subsystem=keycloak-server/spi=userSessions:write-attribute(name=default-provider,value=infinispan)
 echo
 end-if
