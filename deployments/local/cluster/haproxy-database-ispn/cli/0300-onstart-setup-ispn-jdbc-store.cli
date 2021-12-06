@@ -13,7 +13,7 @@ batch
 
 # You can use this to limit the number of cache items in memory
 # See https://infinispan.org/docs/stable/titles/configuring/configuring.html#eviction_configuring-memory-usage
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/memory=heap:add(max-entries=1000)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/memory=heap:add(max-entries=${env.KEYCLOAK_ISPN_CACHE_SESSION_MEMORY_MAX_ITEMS:50000})
 
 # Enable statistics for sessions cache
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions:write-attribute(name=statistics-enabled,value=true)
@@ -39,11 +39,49 @@ batch
   prefix=ispn \
 )
 
-/subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=jdbc/write=behind:add( \
-  modification-queue-size=1024 \
+# Optionally also persist clientSessions in the jdbc-store
+run-batch
+
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:remove()
+
+batch
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:add(owners=1)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/component=expiration:add(lifespan=900000000000000000)
+
+# You can use this to limit the number of cache items in memory
+# See https://infinispan.org/docs/stable/titles/configuring/configuring.html#eviction_configuring-memory-usage
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/memory=heap:add(max-entries=${env.KEYCLOAK_ISPN_CACHE_CLIENTSESSIONS_MEMORY_MAX_ITEMS:50000})
+
+# Enable statistics for sessions cache
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions:write-attribute(name=statistics-enabled,value=true)
+
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=jdbc:add( \
+  datasource="java:jboss/datasources/KeycloakDS", \
+  passivation=false, \
+  fetch-state=true, \
+  preload=false, \
+  purge=false, \
+  shared=true, \
+  max-batch-size=1000 \
+)
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=jdbc:write-attribute( \
+  name=properties.databaseType, \
+  value=POSTGRES \
 )
 
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=jdbc/table=string:add( \
+  data-column={type=bytea}, \
+  drop-on-stop=false, \
+  fetch-size=5000, \
+  prefix=ispn \
+)
+
+# Note we need to use a custom Key2StringMapper here, since the keys are UUIDs which
+# are not supported by jdbc-store in the infinispan version used by keycloak 15.0.2
+/subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=jdbc:write-attribute(name=properties.key2StringMapper,value=org.keycloak.patch.infinispan.keymappers.CustomDefaultTwoWayKey2StringMapper)
+
 run-batch
+
 
 echo SETUP: Finished Infinispan jdbc-store configuration.
 

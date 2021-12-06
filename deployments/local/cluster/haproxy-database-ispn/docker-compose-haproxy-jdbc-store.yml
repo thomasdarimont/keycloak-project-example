@@ -12,6 +12,8 @@ services:
       - ./cli/0300-onstart-setup-ispn-jdbc-store.cli:/opt/jboss/startup-scripts/0300-onstart-setup-ispn-jdbc-store.cli:z
       - ./patch/keycloak-model-infinispan-15.0.2-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.0.2.jar:z
     command:
+      - "--debug"
+      - "*:8787"
       - "-b"
       - "0.0.0.0"
       - "-bmanagement"
@@ -23,6 +25,7 @@ services:
         condition: service_healthy
     ports:
       - "9990:9990"
+      - "8787:8787"
 
   acme-keycloak-2:
     extends:
