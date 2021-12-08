@@ -9,6 +9,8 @@ class deployExtensions {
         commandLine.add("docker-compose");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-keycloak.yml");
         commandLine.add("exec");
         commandLine.add("-T");
         commandLine.add("acme-keycloak");
