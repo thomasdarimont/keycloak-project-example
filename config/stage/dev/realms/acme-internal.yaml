@@ -303,6 +303,7 @@ authenticatorConfig:
       useWebOtp: true
 
 roles:
+# Realm specific roles
   realm:
   - name: "acme-user"
     description: "Acme User"
@@ -327,6 +328,13 @@ roles:
         "account":
         - "manage-account"
         - "view-profile"
+
+# Client specific roles
+  client:
+    "test-client-ropc":
+      - name: "role4"
+        description: "Role 4 Description"
+        clientRole: true
 
 groups:
   - "name": "Users"
