@@ -20,6 +20,9 @@ services:
       # uses keycloakx/cluster-custom.xml
       KC_CLUSTER: custom
 
+      # In Keycloak 16.x KC_CLUSTER is changed to KC_CACHE and looks for cache-custom.xml
+      # KC_CACHE: custom
+
       # uses keycloakx/cluster-custom-jgroups.xml
       # KC_CLUSTER: custom-jgroups
 
