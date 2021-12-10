@@ -5,7 +5,7 @@ services:
       file: ../docker-compose.yml
       service: acme-keycloakx
     environment:
-      KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:1443/auth
+      KC_HOSTNAME: id.acme.test:1443
     ports:
       - "8080"
       - "8443"
@@ -26,7 +26,7 @@ services:
       file: ../docker-compose.yml
       service: acme-keycloakx
     environment:
-      KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:1443/auth
+      KC_HOSTNAME: id.acme.test:1443
 #    depends_on:
 #      acme-keycloak-db:
 #        condition: service_healthy

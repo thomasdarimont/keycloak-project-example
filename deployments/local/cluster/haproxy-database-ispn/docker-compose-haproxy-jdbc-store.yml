@@ -10,7 +10,7 @@ services:
     volumes:
       - ./cli/0010-add-jmx-user.sh:/opt/jboss/startup-scripts/0010-add-jmx-user.sh:z
       - ./cli/0300-onstart-setup-ispn-jdbc-store.cli:/opt/jboss/startup-scripts/0300-onstart-setup-ispn-jdbc-store.cli:z
-      - ./patch/keycloak-model-infinispan-15.0.2-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.0.2.jar:z
+      - ./patch/keycloak-model-infinispan-15.1.0-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.1.0.jar:z
     command:
       - "--debug"
       - "*:8787"
@@ -35,7 +35,7 @@ services:
       KEYCLOAK_FRONTEND_URL: https://id.acme.test:1443/auth
     volumes:
       - ./cli/0300-onstart-setup-ispn-jdbc-store.cli:/opt/jboss/startup-scripts/0300-onstart-setup-ispn-jdbc-store.cli:z
-      - ./patch/keycloak-model-infinispan-15.0.2-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.0.2.jar:z
+      - ./patch/keycloak-model-infinispan-15.1.0-patch.jar:/opt/jboss/keycloak/modules/system/layers/keycloak/org/keycloak/keycloak-model-infinispan/main/keycloak-model-infinispan-15.1.0.jar:z
     command: [ "-Dwildfly.statistics-enabled=true", "-Dkeycloak.infinispan.ignoreSkipCacheStore=true" ]
     depends_on:
       acme-keycloak-db:

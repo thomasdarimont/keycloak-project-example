@@ -23,7 +23,7 @@
 
     <jgroups>
         <!-- Allows custom jgroups configuration -->
-        <stack-file path="/opt/jboss/keycloak/conf/jgroups-multicast-enc.xml" name="custom"/>
+        <stack-file path="/opt/keycloak/conf/jgroups-multicast-enc.xml" name="custom"/>
         <!-- <stack-file path="/opt/jboss/keycloak/conf/jgroups-multicast-diag.xml" name="custom"/> -->
     </jgroups>
 

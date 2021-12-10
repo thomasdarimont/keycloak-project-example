@@ -5,7 +5,7 @@ services:
       file: ../docker-compose.yml
       service: acme-keycloakx
     environment:
-      KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:2443/auth
+      KC_HOSTNAME: id.acme.test:2443
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/auth/"]
       interval: 10s
@@ -21,7 +21,7 @@ services:
       file: ../docker-compose.yml
       service: acme-keycloakx
     environment:
-      KC_HOSTNAME_FRONTEND_URL: https://id.acme.test:2443/auth
+      KC_HOSTNAME: id.acme.test:2443
     #    depends_on:
     #      acme-keycloak-db:
     #        condition: service_healthy
