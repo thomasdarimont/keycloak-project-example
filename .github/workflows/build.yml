@@ -25,13 +25,13 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Maven - verify
-        run:  mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn verify --file pom.xml
+        run:  mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn verify --file pom.xml --settings maven-settings.xml
 
       - name: Maven - integration-test
-        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Pwith-integration-tests test --file pom.xml
+        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Pwith-integration-tests test --file pom.xml  --settings maven-settings.xml
 
       - name: Maven - build image
-        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DskipTests io.fabric8:docker-maven-plugin:build --file pom.xml
+        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DskipTests io.fabric8:docker-maven-plugin:build --file pom.xml  --settings maven-settings.xml
 
       - name: Run trivy scanner
         run: java bin/scanImage.java --image-name=acme/acme-keycloak:latest
