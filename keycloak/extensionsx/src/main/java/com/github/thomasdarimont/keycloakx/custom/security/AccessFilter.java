@@ -6,7 +6,7 @@ import io.vertx.core.http.HttpServerRequest;
 import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.config.Config;
-import org.keycloak.configuration.Configuration;
+import org.keycloak.quarkus.runtime.configuration.Configuration;
 import org.keycloak.utils.StringUtil;
 
 import javax.ws.rs.ForbiddenException;

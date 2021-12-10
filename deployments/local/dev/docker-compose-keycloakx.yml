@@ -38,14 +38,14 @@ services:
 
 # Keycloak.X 15.0.2
     command:
-      - "--http-port=8080"
+      - "start-dev"
       - "--http-enabled=true"
+      - "--http-port=8080"
       - "--metrics-enabled=true"
-      - "--cluster=local"
+      - "--cache=local"
       - "--proxy=passthrough"
-      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
-      - "--auto-config"
-      - "--verbose"
+#      - "--config-file=/opt/keycloak/conf/keycloak.properties"
+#      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
       # 172.17.0.1 is host.docker.internal
@@ -57,17 +57,17 @@ services:
       - "8790:8790"
       - "127.0.0.1:8787:8787"
     volumes:
-      - ../../../keycloak/themes/apps:/opt/jboss/keycloak/themes/apps:z
-      - ../../../keycloak/themes/internal:/opt/jboss/keycloak/themes/internal:z
-      - ../../../keycloak/themes/internal-modern:/opt/jboss/keycloak/themes/internal-modern:z
-      - ../../../keycloak/config/profile.properties:/opt/jboss/keycloak/conf/profile.properties:z
-      - ../../../keycloak/imex:/opt/jboss/imex:z
-      - ./run/keycloakx/data:/opt/jboss/keycloak/data:z
-      - ./run/keycloakx/logs:/opt/jboss/keycloak/logs:z
-      - ./run/keycloakx/perf:/opt/jboss/keycloak/perf:z
-      - ./keycloakx/keycloak_default.properties:/opt/jboss/keycloak/conf/keycloak.properties:z
-      - ../../../keycloak/extensions/target/extensions.jar:/opt/jboss/keycloak/providers/extensions.jar:z
+      - ../../../keycloak/themes/apps:/opt/keycloak/themes/apps:z
+      - ../../../keycloak/themes/internal:/opt/keycloak/themes/internal:z
+      - ../../../keycloak/themes/internal-modern:/opt/keycloak/themes/internal-modern:z
+      - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
+      - ../../../keycloak/imex:/opt/keycloak/imex:z
+      - ./run/keycloakx/data:/opt/keycloak/data:z
+      - ./run/keycloakx/logs:/opt/keycloak/logs:z
+      - ./run/keycloakx/perf:/opt/keycloak/perf:z
+      - ./keycloakx/keycloak_default.properties:/opt/keycloak/conf/keycloak.properties:z
+      - ../../../keycloak/extensions/target/extensions.jar:/opt/keycloak/providers/extensions.jar:z
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
 # Add Keycloak.X specific extensions
-      - ../../../keycloak/extensionsx/target/extensionsx.jar:/opt/jboss/keycloak/providers/extensionsx.jar:z
+      - ../../../keycloak/extensionsx/target/extensionsx.jar:/opt/keycloak/providers/extensionsx.jar:z

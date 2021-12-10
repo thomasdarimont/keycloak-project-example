@@ -1,17 +1,23 @@
 package com.github.thomasdarimont.keycloak.custom.metrics.filter;
 
+import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetrics;
 import com.github.thomasdarimont.keycloak.custom.metrics.RequestMetricsUpdater;
 import lombok.extern.jbosslog.JBossLog;
+import org.eclipse.microprofile.metrics.MetricRegistry;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Provider;
 import java.util.Set;
 
+@Provider // needed for Keycloak.X
 @JBossLog
 public class MetricFilter implements ContainerRequestFilter, ContainerResponseFilter {
+
+    public static final boolean RECORD_URI_METRICS_ENABLED;
 
     private static final String METRICS_REQUEST_TIMESTAMP = "metrics.requestTimestamp";
 
@@ -20,17 +26,18 @@ public class MetricFilter implements ContainerRequestFilter, ContainerResponseFi
     private static final Set<MediaType> CONTENT_TYPES;
 
     static {
-        CONTENT_TYPES = Set.of(
-                MediaType.APPLICATION_JSON_TYPE,
-                MediaType.APPLICATION_XML_TYPE,
-                MediaType.TEXT_HTML_TYPE
-        );
+        CONTENT_TYPES = Set.of(MediaType.APPLICATION_JSON_TYPE, MediaType.APPLICATION_XML_TYPE, MediaType.TEXT_HTML_TYPE);
+        RECORD_URI_METRICS_ENABLED = Boolean.getBoolean("acme.keycloak.metrics.record-uri-metrics");
     }
 
     private final RequestMetricsUpdater requestMetricsUpdater;
 
-    public MetricFilter(RequestMetricsUpdater requestMetricsUpdater) {
-        this.requestMetricsUpdater = requestMetricsUpdater;
+    public MetricFilter() {
+        this(KeycloakMetrics.lookupMetricRegistry());
+    }
+
+    public MetricFilter(MetricRegistry metricRegistry) {
+        this.requestMetricsUpdater = new MetricRequestRecorder(metricRegistry);
     }
 
     @Override
@@ -64,11 +71,16 @@ public class MetricFilter implements ContainerRequestFilter, ContainerResponseFi
             return;
         }
 
+        // TODO make request duration recording optional
         long requestDurationMillis = System.currentTimeMillis() - metricsRequestTimestampMillis;
         requestMetricsUpdater.recordRequestDuration(uri, requestContext.getMethod(), status, requestDurationMillis);
     }
 
     private boolean shouldIgnoreRequest(ContainerRequestContext requestContext) {
+
+        if (!RECORD_URI_METRICS_ENABLED) {
+            return true;
+        }
 
         String uri = requestContext.getUriInfo().getPath();
 

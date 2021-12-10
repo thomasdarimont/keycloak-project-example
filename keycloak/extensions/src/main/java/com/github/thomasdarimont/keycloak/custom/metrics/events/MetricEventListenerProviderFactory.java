@@ -3,7 +3,6 @@ package com.github.thomasdarimont.keycloak.custom.metrics.events;
 import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetricStore;
 import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetrics;
 import com.github.thomasdarimont.keycloak.custom.metrics.filter.MetricFilter;
-import com.github.thomasdarimont.keycloak.custom.metrics.filter.MetricRequestRecorder;
 import com.github.thomasdarimont.keycloak.custom.support.KeycloakUtil;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
@@ -24,10 +23,7 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     private static final EventListenerProvider INSTANCE = getEventListenerProvider();
 
     private static EventListenerProvider getEventListenerProvider() {
-        if (KeycloakUtil.isRunningOnKeycloak()) {
-            return new MetricEventListenerProvider();
-        }
-        return new NoopEventListenerProvider();
+        return new MetricEventListenerProvider();
     }
 
     @Override
@@ -43,24 +39,19 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     @Override
     public void postInit(KeycloakSessionFactory factory) {
 
-        // TODO configure robust request metrics collection
-        // TODO Add support for metrics in Keycloak.X
+        MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
+        registerMetricsWithKeycloak(factory, metricRegistry);
 
+        // This registers the MetricsFilter within environments that use Resteasy < 4.x, e.g. Keycloak on Wildfly / JBossEAP
         // see workaround for Metrics with Keycloak and Keycloak.X
         // https://github.com/aerogear/keycloak-metrics-spi/pull/120/files
+
         if (KeycloakUtil.isRunningOnKeycloak()) {
-
-            MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
-            registerMetricsWithResteasy3(factory, metricRegistry);
-
-            // This registers the MetricsFilter within environments that use Resteasy < 4.x, e.g. Keycloak on Wildfly / JBossEAP
-            if (Boolean.getBoolean("acme.keycloak.metrics.record-uri-metrics")) {
-                registerMetricsFilterWithResteasy3(metricRegistry);
-            }
+            registerMetricsFilterWithResteasy3(metricRegistry);
         }
     }
 
-    private void registerMetricsWithResteasy3(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {
+    private void registerMetricsWithKeycloak(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {
         log.info("Begin register metrics...");
         KeycloakMetrics metrics = new KeycloakMetrics();
 
@@ -70,8 +61,13 @@ public class MetricEventListenerProviderFactory implements EventListenerProvider
     }
 
     protected void registerMetricsFilterWithResteasy3(MetricRegistry metricRegistry) {
+
+        if (!MetricFilter.RECORD_URI_METRICS_ENABLED) {
+            return;
+        }
+
         log.info("Begin register metrics-filter...");
-        MetricFilter metricFilter = new MetricFilter(new MetricRequestRecorder(metricRegistry));
+        MetricFilter metricFilter = new MetricFilter(metricRegistry);
 
         ResteasyProviderFactory instance = ResteasyProviderFactory.getInstance();
         instance.getContainerRequestFilterRegistry().registerSingleton(metricFilter);

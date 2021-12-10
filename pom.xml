@@ -35,7 +35,7 @@
         <docker.file>keycloak/Dockerfile.smallrye.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>15.0.2</keycloak.version>
+        <keycloak.version>15.1.0</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
         <buildNumber>0-SNAPSHOT</buildNumber>
@@ -48,7 +48,7 @@
         <!-- Testing -->
         <junit-jupiter.version>5.7.2</junit-jupiter.version>
         <assertj-core.version>3.20.2</assertj-core.version>
-        <testcontainers-keycloak.version>1.8.0</testcontainers-keycloak.version>
+        <testcontainers-keycloak.version>1.8.1</testcontainers-keycloak.version>
 
         <!-- Tooling -->
         <auto-service.version>1.0.1</auto-service.version>
