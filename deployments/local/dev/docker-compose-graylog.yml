@@ -18,7 +18,7 @@ services:
       - http.host=0.0.0.0
       - transport.host=localhost
       - network.host=0.0.0.0
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.formatMsgNoLookups=true"
     ulimits:
       memlock:
         soft: -1
@@ -58,6 +58,7 @@ services:
       - GRAYLOG_TRANSPORT_EMAIL_FROM_EMAIL=graylog@id.acme.test
 # Install keycloak message extractors
       - GRAYLOG_CONTENT_PACKS_AUTO_INSTALL=iam-keycloak-content-pack-v1.json
+      - JAVA_TOOL_OPTIONS=-Dlog4j2.formatMsgNoLookups=true
     entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
     volumes:
       - graylog_journal:/usr/share/graylog/data/journal

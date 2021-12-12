@@ -1,4 +1,4 @@
-FROM graylog/graylog:4.1.3-2@sha256:3a784dfddab02380059abfbc29855a11b670ec31af535db9d5410c853696bc51
+FROM graylog/graylog:4.2.3-1-jre11@sha256:0f277b217c988cd4a0ce6f536271edde61e8b610ede0a96c9a214cbf0f86b4bf
 
 COPY --chown=1100:0 "./acme.test+1.pem" /usr/share/graylog/data/config/ssl/cert.crt
 COPY --chown=1100:0 "./acme.test+1-key.pem" /usr/share/graylog/data/config/ssl/key.key
@@ -9,7 +9,7 @@ RUN echo "Import Acme cert into truststore" && \
     keytool \
     -import \
     -noprompt \
-    -keystore /usr/local/openjdk-8/lib/security/cacerts \
+    -keystore /usr/local/openjdk-11/lib/security/cacerts \
     -storetype JKS \
     -storepass changeit \
     -alias acmecert \
