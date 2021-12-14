@@ -20,6 +20,7 @@
             <module name="org.apache.commons.io"/>
             <module name="javax.api"/>
             <module name="javax.transaction.api"/>
+            <module name="javax.enterprise.api"/>
             <module name="org.freemarker"/>
             <module name="com.googlecode.owasp-java-html-sanitizer"/>
             <module name="com.fasterxml.jackson.core.jackson-core"/>
