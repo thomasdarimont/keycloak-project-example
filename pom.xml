@@ -7,7 +7,7 @@
     <groupId>com.github.thomasdarimont.keycloak</groupId>
     <artifactId>keycloak-project-example</artifactId>
     <packaging>pom</packaging>
-    <version>${revision}</version>
+    <version>${revision}.${changelist}</version>
     <name>${project.organization.name} Keycloak Project</name>
 
     <modules>
@@ -38,9 +38,8 @@
         <keycloak.version>15.1.0</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
-        <buildNumber>0-SNAPSHOT</buildNumber>
-        <customizations.version>0.0.1</customizations.version>
-        <revision>${keycloak.version}.${customizations.version}.${buildNumber}</revision>
+        <revision>1.0.0</revision>
+        <changelist>0-SNAPSHOT</changelist>
 
         <!-- Dependencies for extensions -->
         <freemarker.version>2.3.31</freemarker.version>
