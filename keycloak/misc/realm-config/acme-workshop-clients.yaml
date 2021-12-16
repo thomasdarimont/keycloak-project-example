@@ -1,0 +1,30 @@
+realm: acme-workshop
+clients:
+  - clientId: acme-standard-client
+    protocol: openid-connect
+    name: Standard Client
+    description: "Standard Client Description v2"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: acme-standard-client-1-secret
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/acme-standard-client/login*"
+
+  - clientId: client1
+#    protocol: openid-connect
+#    name: Client 1
+    description: "Client1 Description v2"
+#    enabled: true
+#    publicClient: true
+#    standardFlowEnabled: true
+#    directAccessGrantsEnabled: false
+#    serviceAccountsEnabled: false
+#    fullScopeAllowed: false
+#    rootUrl: "http://localhost:20002/webapp"
+    redirectUris:
+      - "http://localhost:20002/webapp/*"
+      - "http://localhost/acme-standard-client/login*"
