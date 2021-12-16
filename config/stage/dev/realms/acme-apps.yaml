@@ -3,8 +3,8 @@ enabled: true
 displayName: Acme Apps
 displayNameHtml: Acme Apps
 loginWithEmailAllowed: true
-registrationAllowed: true
-registrationEmailAsUsername: true
+registrationAllowed: false
+registrationEmailAsUsername: false
 loginTheme: apps
 accountTheme: keycloak
 adminTheme: keycloak
