@@ -1,5 +1,9 @@
 /* acme internal-modern login css */
 
+.login-pf {
+    background: none;
+}
+
 body {
     font-size: 16px;
 }
@@ -52,7 +56,7 @@ body {
 /*}*/
 
 .cc-main-realm {
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: bold;
     color: #000000;
     font-size: 28px;
@@ -64,7 +68,7 @@ body {
 }
 
 #cc-kc-page-title {
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: bold;
     color: #000000;
     font-size: 30px;
@@ -86,7 +90,7 @@ body {
 }
 
 .cc-control-label {
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: normal;
     font-size: 18px;
     margin-bottom: 0px;
@@ -106,7 +110,7 @@ body {
     border-radius: 1px;
     box-shadow: inset 0px 0px 3px #22f4ae;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: normal;
 }
 
@@ -119,7 +123,7 @@ body {
 }
 
 #cc-kc-form-options label {
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: 200;
     font-size: 18px;
     color: #000000;
@@ -136,7 +140,7 @@ body {
 }
 
 .cc-forgot-password a {
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: normal;
     font-size: 16px;
     color: #707070 !important;
@@ -163,7 +167,7 @@ body {
     height: 76px;
     width: 527px;
     background: #22f4ae;
-    font-family: "Open Sans",Helvetica,Arial,sans-serif;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
     font-weight: bold;
     font-size: 32px;
     color: #000000;
@@ -532,11 +536,11 @@ a.zocial {
     border-radius: 5px;
 }
 
-.legal-links > ul{
+.legal-links > ul {
     list-style: none;
 }
 
-.legal-links > ul > li{
+.legal-links > ul > li {
     display: inline;
     font-size: smaller;
 }
