@@ -97,6 +97,7 @@
                         </div>
                     </#if>
                 </#if>
+                <h1 id="cc-kc-app-name">${client.name}</h1>
             </header>
             <div id="cc-kc-content">
                 <div id="kc-content-wrapper">
