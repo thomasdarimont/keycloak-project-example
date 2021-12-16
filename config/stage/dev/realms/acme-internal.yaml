@@ -232,6 +232,32 @@ clients:
       - "acme.profile"
       - "acme.ageinfo"
 
+  - clientId: app-keycloak-demo
+    protocol: openid-connect
+    name: Keycloak Demo App
+    description: "Keycloak Demo App Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: false
+    rootUrl: "https://www.keycloak.org/app"
+    baseUrl: "/#url=https://id.acme.test:8443/auth&realm=acme-internal&client=app-keycloak-demo"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
 authenticationFlows:
 ## Identity First Browser Login Flow
   - alias: "Browser Identity First"
