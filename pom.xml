@@ -35,7 +35,7 @@
         <docker.file>keycloak/Dockerfile.smallrye.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>15.1.0</keycloak.version>
+        <keycloak.version>15.1.1</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
         <revision>1.0.0</revision>
