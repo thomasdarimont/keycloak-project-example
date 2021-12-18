@@ -18,8 +18,8 @@ echo SETUP: Create remote remote-destination-outbound-socket-binding for accessi
 )
 
 echo SETUP: Create remote cache container keycloak-hotrod-cache
-# see https://docs.wildfly.org/23/wildscribe/subsystem/infinispan/index.html
-# see https://docs.wildfly.org/23/wildscribe/subsystem/infinispan/remote-cache-container/index.html
+# see https://docs.wildfly.org/25/wildscribe/subsystem/infinispan/index.html
+# see https://docs.wildfly.org/25/wildscribe/subsystem/infinispan/remote-cache-container/index.html
 # TODO configure sslContext explicitly
 batch
 /subsystem=infinispan/remote-cache-container=keycloak-hotrod-container:add( \

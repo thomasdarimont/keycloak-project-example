@@ -39,7 +39,7 @@ batch
    preload=false, \
    shared=true, \
    socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+   connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/replicated-cache=work/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -66,8 +66,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=sessions/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -94,8 +94,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=clientSessions/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -122,8 +122,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=authenticationSessions/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -150,8 +150,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineSessions/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -178,8 +178,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=offlineClientSessions/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -206,8 +206,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=actionTokens/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
@@ -234,8 +234,8 @@ batch
   purge=false, \
   preload=false, \
   shared=true, \
-   socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
-   connect-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
+  socket-timeout=${env.KEYCLOAK_REMOTE_ISPN_SOCK_TIMEOUT}, \
+  connection-timeout=${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT} \
 )
 /subsystem=infinispan/cache-container=keycloak/distributed-cache=loginFailures/store=remote:write-attribute(name=properties,value={ \
     rawValues=true, \
