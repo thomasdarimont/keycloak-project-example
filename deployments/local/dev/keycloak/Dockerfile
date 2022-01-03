@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:16.0.0
+FROM quay.io/keycloak/keycloak:16.1.0
 
 # Add local JMX user for testing
 RUN /opt/jboss/keycloak/bin/add-user.sh jmxuser password
