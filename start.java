@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Controller script to start the Keycloak environment.
@@ -36,6 +37,8 @@ import java.util.Arrays;
 class start {
 
     static final String HELP_CMD = "--help";
+
+    static final String VERBOSE_OPT = "--verbose";
 
     static final String CI_OPT = "--ci";
     static final String HTTP_OPT = "--http";
@@ -70,6 +73,7 @@ class start {
         var extension = argList.stream().filter(s -> s.startsWith(EXTENSIONS_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(EXTENSIONS_OPT_CLASSES);
         var ci = argList.stream().filter(s -> s.startsWith(CI_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(null);
         var useDetach = argList.contains(DETACH_OPT);
+        var verbose = argList.contains(VERBOSE_OPT);
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
@@ -236,6 +240,11 @@ class start {
 
         commandLine.add("--remove-orphans");
 
+        if (verbose) {
+            System.out.printf("Generated command: %n```%n%s%n```%n",
+                    commandLine.stream().collect(Collectors.joining(" \\\n")));
+        }
+
         System.exit(runCommandAndWait(commandLine));
     }
 
@@ -251,7 +260,8 @@ class start {
         System.out.printf("  %s: %s%n", MYSQL_OPT, "enables MySQL database support. (Optional) If no other database is provided, H2 database is used");
         System.out.printf("  %s: %s%n", GRAYLOG_OPT, "enables Graylog database support. (Optional)");
         System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
-        System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background, print ew container name.. (Optional)");
+        System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background and prints the container name.. (Optional)");
+        System.out.printf("  %s: %s%n", VERBOSE_OPT, "Shows debug information, such as the generated command");
 
         System.out.printf("%n%s supports the following commands: %n", "start.java");
         System.out.println("");
@@ -261,6 +271,7 @@ class start {
         System.out.println("");
         System.out.printf("  %s %s%n", "java start.java", "# Start Keycloak Environment with http");
         System.out.printf("  %s %s%n", "java start.java --https", "# Start Keycloak Environment with https");
+        System.out.printf("  %s %s%n", "java start.java --https --verbose", "# Start Keycloak Environment with https and print command");
         System.out.printf("  %s %s%n", "java start.java --provision=false", "# Start Keycloak Environment without provisioning");
         System.out.printf("  %s %s%n", "java start.java --https --database=postgres", "# Start Keycloak Environment with PostgreSQL database");
         System.out.printf("  %s %s%n", "java start.java --https --openldap --database=postgres", "# Start Keycloak Environment with PostgreSQL database and OpenLDAP");
