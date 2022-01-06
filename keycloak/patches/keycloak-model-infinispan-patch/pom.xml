@@ -6,14 +6,14 @@
 
     <groupId>org.example</groupId>
     <artifactId>keycloak-model-infinispan-patch</artifactId>
-    <version>16.0.0.0-SNAPSHOT</version>
+    <version>16.1.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
 
-        <version.keycloak>16.0.0</version.keycloak>
+        <version.keycloak>16.1.0</version.keycloak>
     </properties>
 
     <dependencies>

@@ -46,7 +46,7 @@ services:
 # Patched wildfly infinispan extension to support connect-timeout on remote-store
 #      - ../../../../keycloak/patches/wildfly-clustering-infinispan-extension-patch/target/wildfly-clustering-infinispan-extension-patch.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-23.0.2.Final.jar:z
 #      - ./patch/wildfly-clustering-infinispan-extension-patch.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-23.0.2.Final.jar:z
-      - ./patch/wildfly-clustering-infinispan-extension-patch-25.0.x.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-25.0.1.Final.jar:z
+      - ./patch/wildfly-clustering-infinispan-extension-patch-26.0.x.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-26.0.0.Final.jar:z
 # Patched cacerts without the expired certificates
       - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
     command: [ "--debug", "*:8787", "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
@@ -71,7 +71,7 @@ services:
       # Patched wildfly infinispan extension to support connect-timeout on remote-store
 #      - ../../../../keycloak/patches/wildfly-clustering-infinispan-extension-patch/target/wildfly-clustering-infinispan-extension-patch.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-23.0.2.Final.jar:z
 #      - ./patch/wildfly-clustering-infinispan-extension-patch.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-23.0.2.Final.jar:z
-      - ./patch/wildfly-clustering-infinispan-extension-patch-25.0.x.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-25.0.1.Final.jar:z
+      - ./patch/wildfly-clustering-infinispan-extension-patch-26.0.x.jar:/opt/jboss/keycloak/modules/system/layers/base/org/jboss/as/clustering/infinispan/main/wildfly-clustering-infinispan-extension-26.0.0.Final.jar:z
 # Patched cacerts without the expired certificates
       - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
     command: [ "-Dwildfly.statistics-enabled=true", "-Djboss.site.name=site1" ]
