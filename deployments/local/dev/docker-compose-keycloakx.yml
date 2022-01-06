@@ -36,8 +36,9 @@ services:
 #      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
 #      - "--verbose"
 
-# Keycloak.X 15.0.2
+# Keycloak.X 15.1.1
     command:
+      - "--verbose"
       - "start-dev"
       - "--http-enabled=true"
       - "--http-port=8080"
