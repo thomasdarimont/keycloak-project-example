@@ -38,28 +38,17 @@ services:
       # Allow TLS connection to ourselves, this is necessary for cross realm Identity Brokering
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
       - ./keycloakx/keycloak_default.properties:/opt/keycloak/conf/keycloak.properties:z
-# Keycloak.X 15.0.2 command
     command:
       - "start"
       - "--auto-build"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
       - "--http-enabled=true"
-      - "--http-port=8080"
       - "--http-relative-path=/auth"
+      - "--http-port=8080"
       - "--proxy=passthrough"
-
-# Keycloak.X 16.0.0 command
-#    command:
-#      - "start"
-#      - "--auto-build"
-#      - "--config-file=/opt/jboss/keycloak/conf/keycloak.properties"
-#      - "--https-certificate-file=/etc/x509/https/tls.crt"
-#      - "--https-certificate-key-file=/etc/x509/https/tls.key"
-#      - "--http-enabled=true"
-#      - "--http-relative-path=/auth"
-#      - "--http-port=8080"
-#      - "--proxy=passthrough"
+# Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
+      - "--hostname=id.acme.test:1443"
 
     ports:
       - "8080"
