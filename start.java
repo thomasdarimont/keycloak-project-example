@@ -203,7 +203,8 @@ class start {
         }
 
         if (useHttps) {
-            envVariables.append("CA_ROOT_CERT=" + getRootCALocation() + "/rootCA.pem");
+            // add quotes around path in case of spaces in path
+            envVariables.append("CA_ROOT_CERT=\"" + getRootCALocation() + "/rootCA.pem\"");
             envVariables.append("\n");
         }
 
