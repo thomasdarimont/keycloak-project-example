@@ -258,6 +258,22 @@ clients:
     optionalClientScopes:
       - "phone"
 
+  - clientId: app-demo-service
+    protocol: openid-connect
+    name: Demo Service
+    description: "Demo Service Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    secret: "$(env:ACME_APPS_DEMO_SERVICE_SECRET:-secret)"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
 authenticationFlows:
 ## Identity First Browser Login Flow
   - alias: "Browser Identity First"
@@ -418,3 +434,10 @@ users:
     - "acme-user-support"
     groups:
       - "Users"
+
+  - username: service-account-app-demo-service
+    enabled: true
+    clientRoles:
+      realm-management:
+        - view-identity-providers
+        - view-users
