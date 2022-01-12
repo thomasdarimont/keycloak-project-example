@@ -25,10 +25,10 @@ visualvm -cp:a ./jboss-client.jar
 
 ## Create new JMX Connection in VisualVM
 
-JMX URL: `service:jmx:remote+http://localhost:9990`
-Username: `jmxuser`
-Password: `password`
-Do not require SSL: on (for the demo...)
+- JMX URL: `service:jmx:remote+http://localhost:9990`
+- Username: `jmxuser`
+- Password: `password`
+- Do not require SSL: `on` (for the demo...)
 
 # Java Mission Control (JMC)
 
@@ -74,6 +74,6 @@ See:
 
 ## Create new JMX Connection in Java Mission Control
 
-JMX URL: `service:jmx:remote+http://localhost:9990`
-Username: `jmxuser`
-Password: `password`
+- JMX URL: `service:jmx:remote+http://localhost:9990`
+- Username: `jmxuser`
+- Password: `password`
