@@ -5,20 +5,20 @@ How to connect to Keycloak via JMX
 ## Create a management user for JMX
 See deployments/local/dev/keycloak/Dockerfile
 ```
-docker exec -it keycloak-jmx /opt/jboss/keycloak/bin/add-user.sh jmxuser password
+docker exec -it dev_acme-keycloak_1 /opt/jboss/keycloak/bin/add-user.sh jmxuser password
 ```
 
 
 ## Export jboss-cli-client.jar locally
 ```
-docker cp keycloak-jmx:/opt/jboss/keycloak/bin/client/jboss-cli-client.jar .
+docker cp dev_acme-keycloak_1:/opt/jboss/keycloak/bin/client/jboss-client.jar .
 ```
 
 # VisualVM
 
-## Start VisualVM with jboss-cli-client.jar
+## Start VisualVM with jboss-client.jar
 ```
-visualvm -cp:a ./jboss-cli-client.jar
+visualvm -cp:a ./jboss-client.jar
 ```
 
 ## Create new JMX Connection in VisualVM
@@ -32,9 +32,9 @@ Do not require SSL: on (for the demo...)
 
 ## Add jboss-cli-client.jar bundle to JMC
 
-Currently JMC cannot be used with the plain `jboss-cli-client.jar` since it is lacking some osgi bundle metadata. 
+Currently JMC cannot be used with the plain `jboss-client.jar` since it is lacking some osgi bundle metadata. 
 
-As a workaround we create a patched `jboss-cli-client.jar` with the missing osgi bundle metadata.
+As a workaround we create a patched `jboss-client.jar` with the missing osgi bundle metadata.
 
 We create a file with the additional osgi bundle metadata, e.g.: `jboss-jmx.mf`:
 ```
@@ -47,7 +47,7 @@ Export-Package: *
 Automatic-Module-Name: org.jboss.client
 ```
 
-Then we create a patched local version of the `jboss-cli-client.jar`.
+Then we create a patched local version of the `jboss-client.jar`.
 ```
 cp /home/tom/dev/playground/keycloak/keycloak-16.1.0/bin/client/jboss-client.jar .
 
@@ -56,7 +56,7 @@ jar -ufm ./jboss-client.jar jboss-jmx.mf
 cp ./jboss-client.jar "/home/tom/.sdkman/candidates/jmc/8.1.1.51-zulu/Azul Mission Control/dropins"
 ```
 
-We then copy that file into the `dropins` folder of JMC:
+We then copy the `jboss-client.jar` file into the `dropins` folder of JMC:
 ```
 cp ./jboss-client.jar /path/to/jmc/dropins/
 ```
