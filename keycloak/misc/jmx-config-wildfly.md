@@ -9,12 +9,14 @@ docker exec -it dev_acme-keycloak_1 /opt/jboss/keycloak/bin/add-user.sh jmxuser 
 ```
 
 
-## Export jboss-cli-client.jar locally
+## Export jboss-client.jar locally
 ```
 docker cp dev_acme-keycloak_1:/opt/jboss/keycloak/bin/client/jboss-client.jar .
 ```
 
 # VisualVM
+
+[VisualVM](https://visualvm.github.io/)
 
 ## Start VisualVM with jboss-client.jar
 ```
@@ -23,12 +25,14 @@ visualvm -cp:a ./jboss-client.jar
 
 ## Create new JMX Connection in VisualVM
 
-JMX URL: `service:jmx:http-remoting-jmx://localhost:9990`
+JMX URL: `service:jmx:remote+http://localhost:9990`
 Username: `jmxuser`
 Password: `password`
 Do not require SSL: on (for the demo...)
 
 # Java Mission Control (JMC)
+
+[Java Mission Control](https://openjdk.java.net/projects/jmc/)
 
 ## Add jboss-client.jar bundle to JMC
 
