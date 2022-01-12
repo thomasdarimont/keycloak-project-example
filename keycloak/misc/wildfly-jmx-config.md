@@ -30,9 +30,9 @@ Do not require SSL: on (for the demo...)
 
 # Java Mission Control (JMC)
 
-## Add jboss-cli-client.jar bundle to JMC
+## Add jboss-client.jar bundle to JMC
 
-Currently JMC cannot be used with the plain `jboss-client.jar` since it is lacking some osgi bundle metadata. 
+Currently, JMC cannot be used with the plain `jboss-client.jar` since it is lacking some osgi bundle metadata. 
 
 As a workaround we create a patched `jboss-client.jar` with the missing osgi bundle metadata.
 
@@ -50,6 +50,7 @@ Automatic-Module-Name: org.jboss.client
 Then we create a patched local version of the `jboss-client.jar`.
 ```
 cp /home/tom/dev/playground/keycloak/keycloak-16.1.0/bin/client/jboss-client.jar .
+# docker cp dev_acme-keycloak_1:/opt/jboss/keycloak/bin/client/jboss-client.jar .
 
 jar -ufm ./jboss-client.jar jboss-jmx.mf
 
@@ -69,6 +70,6 @@ See:
 
 ## Create new JMX Connection in Java Mission Control
 
-JMX URL: `service:jmx:http-remoting-jmx://localhost:9990`
+JMX URL: `service:jmx:remote+http://localhost:9990`
 Username: `jmxuser`
 Password: `password`
