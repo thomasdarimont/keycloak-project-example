@@ -1,6 +1,9 @@
 FROM quay.io/keycloak/keycloak-x:16.1.0
 
-USER 0
+USER root
+
+# Add java-11-openjdk-devel JDK for debugging
+RUN microdnf update -y && microdnf install -y java-11-openjdk-devel && microdnf clean all
 
 ## Workaround for adding the current certifcate to the cacerts truststore
 # Import certificate into cacerts truststore
