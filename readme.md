@@ -260,6 +260,11 @@ mvn clean verify -Pwith-integration-tests io.fabric8:docker-maven-plugin:build
 The dockerfile can be customized via `-Ddocker.file=keycloak/Dockerfile.alpine-slim` after `mvn clean verify`.
 It is also possible to configure the image name via `-Ddocker.image=acme/acme-keycloak2`.
 
+To build the image with Keycloak.X use:
+```
+mvn clean package -DskipTests -Ddocker.file=keycloakx/Dockerfile.plain io.fabric8:docker-maven-plugin:build
+```
+
 ### Running the custom Docker Image locally
 
 The custom docker image created during the build can be stared with the following command:
