@@ -1,0 +1,23 @@
+ARG KEYCLOAK_VERSION=16.1.0
+FROM quay.io/keycloak/keycloak-x:$KEYCLOAK_VERSION
+
+USER root
+
+## Workaround for adding the current certifcate to the cacerts truststore
+# Import certificate into cacerts truststore
+#COPY --chown=keycloak:keycloak "./acme.test+1.pem" "/etc/x509/tls.crt.pem"
+#RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass changeit
+
+USER keycloak
+
+# Add feature configuration
+COPY --chown=keycloak:root maven/config/profile.properties /opt/keycloak/conf/profile.properties
+
+# Add Keycloak Extensions
+COPY --chown=keycloak:root maven/extensions/extensions.jar /opt/keycloak/providers/extensions.jar
+
+# Add custom Theme
+COPY --chown=keycloak:root maven/themes/apps/ /opt/keycloak/themes/apps
+COPY --chown=keycloak:root maven/themes/internal/ /opt/keycloak/themes/internal
+COPY --chown=keycloak:root maven/themes/internal-modern/ /opt/keycloak/themes/internal-modern
+COPY --chown=keycloak:root maven/themes/custom/ /opt/keycloak/themes/custom
