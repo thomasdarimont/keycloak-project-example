@@ -72,7 +72,7 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
 
     public static final String ROOT_OBJECT = "$ROOT$";
 
-    private static ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     static {
 
