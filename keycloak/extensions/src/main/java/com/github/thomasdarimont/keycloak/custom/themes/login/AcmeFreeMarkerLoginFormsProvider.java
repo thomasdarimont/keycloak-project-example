@@ -3,6 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.themes.login;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.forms.login.freemarker.FreeMarkerLoginFormsProvider;
 import org.keycloak.forms.login.freemarker.model.AuthenticationContextBean;
+import org.keycloak.forms.login.freemarker.model.ClientBean;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.theme.FreeMarkerUtil;
 import org.keycloak.theme.Theme;
@@ -24,8 +25,11 @@ public class AcmeFreeMarkerLoginFormsProvider extends FreeMarkerLoginFormsProvid
     protected Response processTemplate(Theme theme, String templateName, Locale locale) {
         // expose custom objects in the template rendering via super.attributes
 
-        AuthenticationContextBean authBean = (AuthenticationContextBean)attributes.get("auth");
-        attributes.put("acme", new AcmeLoginBean(session, authBean));
+        var authBean = (AuthenticationContextBean) attributes.get("auth");
+        attributes.put("acmeLogin", new AcmeLoginBean(session, authBean));
+
+        var clientBean = (ClientBean) attributes.get("client");
+        attributes.put("acmeUrl", new AcmeUrlBean(clientBean));
 
         return super.processTemplate(theme, templateName, locale);
     }

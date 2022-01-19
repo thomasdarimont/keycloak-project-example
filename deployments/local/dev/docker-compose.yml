@@ -14,6 +14,7 @@ services:
     volumes:
       - ../../../apps/acme-account-console:/usr/local/apache2/htdocs/acme-account:z
       - ../../../apps/acme-greetme:/usr/local/apache2/htdocs/acme-greetme:z
+      - ../../../apps/site:/usr/local/apache2/htdocs/site:z
     ports:
       - "4000:80"
       - "4443:443"

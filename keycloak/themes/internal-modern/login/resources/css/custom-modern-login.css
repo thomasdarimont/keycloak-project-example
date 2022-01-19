@@ -20,6 +20,10 @@ body {
     border-top: 1px solid #707070;
 }
 
+#kc-registration {
+    margin-top: 10px;
+}
+
 #cc-kc-header-wrapper {
     font-size: 29px;
     text-transform: uppercase;

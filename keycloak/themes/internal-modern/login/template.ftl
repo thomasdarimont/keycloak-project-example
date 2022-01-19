@@ -1,4 +1,10 @@
-<#macro registrationLayout bodyClass="" displayInfo=false displayMessage=true displayRequiredFields=false displayWide=false showAnotherWayIfPresent=true>
+<#macro registrationLayout
+        bodyClass=""
+        displayInfo=false
+        displayMessage=true
+        displayRequiredFields=false
+        displayWide=false
+        showAnotherWayIfPresent=true>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" class="${properties.kcHtmlClass!}">
@@ -44,7 +50,6 @@
                 <div class="cc-main-realm">${kcSanitize(msg("loginTitleHtml",(realm.displayNameHtml!'')))?no_esc}</div>
             </div>
         </div>
-        <hr class="cc-hr">
         <div class="${properties.kcFormCardClass!} <#if displayWide>${properties.kcFormCardAccountClass!}</#if>">
             <header class="${properties.kcFormHeaderClass!}">
                 <#if !(auth?has_content && auth.showUsername() && !auth.showResetCredentials())>
@@ -98,19 +103,11 @@
                     </#if>
                 </#if>
                 <#if client??>
-                <h1 id="cc-kc-app-name">${client.name}</h1>
+                <h1 id="cc-kc-app-name">${advancedMsg(client.name)}</h1>
                 </#if>
             </header>
             <div id="cc-kc-content">
                 <div id="kc-content-wrapper">
-
-                    <#if displayInfo>
-                        <div id="kc-info" class="${properties.kcSignUpClass!}">
-                            <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">
-                                <#nested "info">
-                            </div>
-                        </div>
-                    </#if>
 
                     <#-- App-initiated actions should not see warning messages about the need to complete the action -->
                     <#-- during login.                                                                               -->
@@ -137,6 +134,16 @@
                             </div>
                         </form>
                     </#if>
+
+                    <#if displayInfo>
+                        <div id="kc-info" class="${properties.kcSignUpClass!}">
+                            <div id="kc-info-wrapper" class="${properties.kcInfoAreaWrapperClass!}">
+                                <#nested "info">
+                            </div>
+                        </div>
+                    </#if>
+
+                    <#nested "idpList">
                 </div>
             </div>
 
@@ -160,9 +167,9 @@
 
                 <div class="legal-links">
                     <ul>
-                        <li><a href="#">${msg("legalImprint")}</a></li>
-                        <li><a href="#">${msg("legalTerms")}</a></li>
-                        <li><a href="#">${msg("legalPrivacy")}</a></li>
+                        <li><a href="${acmeUrl.imprintUrl}">${msg("legalImprint")}</a></li>
+                        <li><a href="${acmeUrl.termsUrl}">${msg("legalTerms")}</a></li>
+                        <li><a href="${acmeUrl.privacyUrl}">${msg("legalPrivacy")}</a></li>
                     </ul>
                 </div>
             </div>

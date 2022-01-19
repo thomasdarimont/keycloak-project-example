@@ -134,7 +134,7 @@
                             <div id="kc-terms-text">
                                 <strong>${msg("termsTitle")}</strong>
                                 <div>
-                                    ${kcSanitize(msg("termsText"))?no_esc}
+                                    ${kcSanitize(msg("termsText", acmeUrl.termsUrl))?no_esc}
                                 </div>
                             </div>
 

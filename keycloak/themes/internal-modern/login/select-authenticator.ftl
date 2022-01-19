@@ -16,7 +16,7 @@
               method="post">
             <div class="${properties.kcSelectAuthListClass!}">
                 <#-- auth.authenticationSelections changed to acme.authenticationSelections to narrow down authenticator selections-->
-                <#list acme.authenticationSelections as authenticationSelection>
+                <#list acmeLogin.authenticationSelections as authenticationSelection>
                     <div class="${properties.kcSelectAuthListItemClass!}"
                          onclick="fillAndSubmit('${authenticationSelection.authExecId}')">
 

@@ -3,12 +3,16 @@ enabled: true
 displayName: Acme Apps
 displayNameHtml: Acme Apps
 loginWithEmailAllowed: true
-registrationAllowed: false
-registrationEmailAsUsername: false
-loginTheme: apps
+registrationAllowed: true
+registrationEmailAsUsername: true
+#loginTheme: apps
+loginTheme: internal-modern
 accountTheme: keycloak
 adminTheme: keycloak
 emailTheme: keycloak
+internationalizationEnabled: true
+supportedLocales: ["en","de"]
+defaultLocale: "en"
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "browser"
 registrationFlow: "Custom Registration"
@@ -128,6 +132,7 @@ identityProviders:
     config:
 # FIXME the acme-saml realm certificate changes on every deployment, disabling the certificate validation for now
 #      validateSignature: 'true'
+      hideOnLoginPage: true
       guiOrder: "2000"
       validateSignature: 'false'
       signingCertificate: "MIICoTCCAYkCBgF5PnCbNTANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlhY21lLXNhbWwwHhcNMjEwNTA1MjEyODU3WhcNMzEwNTA1MjEzMDM3WjAUMRIwEAYDVQQDDAlhY21lLXNhbWwwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwYJ+z47Xsll8pptApv8qhbVeCG6pA3/hX45fVPnNlnpXv9AeQNDBTptluoRw3OOsBdZ+jp7j7xfkJIsaGwMbcIM0gMVRFVnWImDXZT+3IeQZbZHQ/Jx0NrfmU7Cj7TR/PvK9o+hNVlyxMH5YgitHbbZwhx0Y0bJ3TuTkiAYORfPmaZ7j7sdl8RIOnnMUmSrx5JOj5Sc08OY2HHsLy0W33w0ix6Elw8sxzMIEL6Zepkw4Z5XsID0dvsbv7mlAcpsXe6aKu7amYDwbjt6pr6sbYi/PbxBlcNaP3YH0si6bTFnpBuRK52mxpv6xzDhycbQLC0H3MYyBRhXsliCNCCRxDAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAF5Nquu6FYl6AiKfVMZlbJfzr+S80uiYXf7pZM4Z6n0U7oMHzd2WH8orlWF1698Bksi83Wtlsl89fXtP5/vUOtaZn4GNEP0BQqXdATgGU9KirJG4ISSdq2xbLYcXSVXEmR5fEFsZQhUkuq5it6pu2oFMiJcEJ2IMzX9KPcnQrK+tuujAr/t8Te7IcAyqMuQGvy/OCd4ErdA+u31vetkeG+kTeFj9fYmJprZTVkSEiVNrJI86ON1xeB8ltcKLH3/UxJBPCX6noppBICEZHcPSUBw5BOATC8BCRd02zebPfJZTrB8G3siL7FwzWEl1NNoxse/VjRJIjhKP3EM005ad4FM="
@@ -162,6 +167,7 @@ identityProviders:
     firstBrokerLoginFlowAlias: "first broker login"
     #    postBrokerLoginFlowAlias: "Custom Post Broker Login"
     config:
+      hideOnLoginPage: true
       guiOrder: "3000"
       issuer: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap"
       tokenUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-ldap/protocol/openid-connect/token"
@@ -212,7 +218,7 @@ identityProviders:
   - alias: "Google"
     displayName: "Acme Google Login"
     providerId: "google"
-    enabled: false
+    enabled: true
     updateProfileFirstLoginMode: on
     trustEmail: true
     storeToken: false
