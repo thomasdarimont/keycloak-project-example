@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
@@ -62,5 +63,10 @@ public class CustomResource {
     @Path("me/applications")
     public ApplicationsInfoResource applications() {
         return resourceContext.initResource(new ApplicationsInfoResource(session, token));
+    }
+
+    @Path("me/profile")
+    public UserProfileResource profile() {
+        return resourceContext.initResource(new UserProfileResource(session, token));
     }
 }

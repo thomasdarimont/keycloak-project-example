@@ -290,15 +290,10 @@
 
         let credentialsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
-                timeout: 2000,
-                method: "GET",
+
+            let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
                 credentials: "include", // send KEYCLOAK_DEVICE cookie
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json",
-                }
-            });
+            })
 
             if (response.ok) {
                 credentialsData = await response.json();
@@ -422,14 +417,8 @@
 
         let appsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/applications`, {
-                timeout: 2000,
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json",
-                }
-            });
+
+            let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/applications`)
 
             if (response.ok) {
                 appsData = await response.json();
@@ -526,17 +515,12 @@
 
         let credentialsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
-                timeout: 2000,
+
+            let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/credentials`, {
                 method: "DELETE",
                 credentials: "include", // send KEYCLOAK_DEVICE cookie
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                },
                 body: JSON.stringify({credentialType, credentialId})
-            });
+            })
 
             if (response.ok) {
                 credentialsData = await response.json();
@@ -551,10 +535,33 @@
         showSecurity();
     }
 
-    function showProfile() {
+    async function showProfile() {
 
-        let firstName = escapeHtml(keycloak.tokenParsed['given_name']);
-        let lastName = escapeHtml(keycloak.tokenParsed['family_name']);
+        await keycloak.updateToken(5);
+
+        let profileData;
+        try {
+
+            let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/profile`)
+
+            if (response.ok) {
+                profileData = await response.json();
+            } else {
+                profileData = {error: "status " + response.status};
+            }
+        } catch (error) {
+            console.log(error);
+            profileData = {error: error.message};
+        }
+
+        let firstName = escapeHtml(profileData.firstName) || "";
+        let lastName = escapeHtml(profileData.lastName) || "";
+
+        // Alternatively we could also read the values from the IDToken
+        // let firstName = escapeHtml(keycloak.tokenParsed['given_name']);
+        // let lastName = escapeHtml(keycloak.tokenParsed['family_name']);
+
+        // use email from ID token directly
         let email = escapeHtml(keycloak.tokenParsed['email']);
 
         if (!email) {
@@ -565,12 +572,12 @@
             <table class="profile">
                 <tr>
                     <td class="label">First name</td>
-                    <td><span id="firstName">${firstName}</span></td>
+                    <td><input type="text" id="firstName" name="firstName" value="${firstName}" pattern="[\w\d][\w\d\s]{0,64}" placeholder="Firstname" required></td>
                     <td></td>
                 </tr>
                 <tr>
                     <td class="label">Last name</td>
-                    <td><span id="lastName">${lastName}</span></td>
+                    <td><input type="text" id="lastName" name="lastName" value="${lastName}" pattern="[\w\d][\w\d\s]{0,64}" placeholder="Lastname" required></td>
                     <td></td>
                 </tr>
                 <tr>
@@ -579,8 +586,59 @@
                     <td><a href="#" onclick="changeEmail();return false">Update</a></td>
                 </tr>
             </table>
+            <button id="btnSaveProfile" onClick="saveProfile(); return false">Save</button>
+            <span id="profileStatus"></span>
         `;
         show(profileHtml, "message-content");
+    }
+
+    async function saveProfile() {
+
+        await keycloak.updateToken(5);
+
+        let profileData = {
+            firstName: $("#firstName").value,
+            lastName: $("#lastName").value
+        };
+
+        try {
+
+            let profileStatus = document.getElementById("profileStatus");
+            profileStatus.innerText = "Saving profile ...";
+
+            let btnSave = document.getElementById("btnSaveProfile");
+            btnSave.disabled = true;
+
+            try {
+
+                let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/profile`, {
+                    method: "PUT",
+                    body: JSON.stringify(profileData)
+                })
+
+                let newProfileData;
+                if (response.ok) {
+                    newProfileData = await response.json();
+                    profileStatus.innerText = "Profile saved";
+                } else {
+                    newProfileData = {error: "status " + response.status};
+                    profileStatus.innerText = "Could not save profile";
+                }
+            } catch (exception) {
+                newProfileData = {error: "status " + exception};
+                profileStatus.innerText = "Could not save profile";
+            }
+            setTimeout(() => {
+                profileStatus.innerText = "";
+                btnSave.disabled = false;
+            }, 1000)
+        } catch (error) {
+            console.log(error);
+            newProfileData = {error: error.message};
+        }
+
+        // update token to reflect name changes in ID Token
+        await keycloak.updateToken(5);
     }
 
     async function showSettings() {
@@ -589,13 +647,8 @@
 
         let settingsData;
         try {
-            let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
-                timeout: 2000,
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json"
-                }
-            });
+
+            let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`)
 
             if (response.ok) {
                 settingsData = await response.json();
@@ -647,16 +700,11 @@
             btnSave.disabled = true;
 
             try {
-                let response = await fetch(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
-                    timeout: 2000,
+
+                let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/settings`, {
                     method: "PUT",
-                    headers: {
-                        "Authorization": "Bearer " + keycloak.token,
-                        "Accept": "application/json",
-                        'Content-Type': 'application/json'
-                    },
                     body: JSON.stringify(settings)
-                });
+                })
 
                 if (response.ok) {
                     newSettingsData = await response.json();
@@ -677,6 +725,22 @@
             console.log(error);
             newSettingsData = {error: error.message};
         }
+    }
+
+    function sendRequest(url, requestOptions) {
+
+        let requestData = {
+            timeout: 2000,
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + keycloak.token,
+                "Accept": "application/json",
+                'Content-Type': 'application/json'
+            }
+            , ...requestOptions
+        }
+
+        return fetch(url, requestData);
     }
 
     function showToken() {
@@ -709,13 +773,8 @@
 
         let meData;
         try {
-            let response = await fetch(`${meInfo.getCurrentBackendUrl()}/api/users/me`, {
-                timeout: 2000,
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json"
-                }
-            });
+
+            let response = await sendRequest(`${meInfo.getCurrentBackendUrl()}/api/users/me`)
 
             if (response.ok) {
                 meData = await response.json();
