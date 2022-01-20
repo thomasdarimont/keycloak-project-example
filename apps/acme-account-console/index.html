@@ -583,13 +583,18 @@
                 <tr>
                     <td class="label">Email</td>
                     <td><span id="email">${email}</span></td>
-                    <td><a href="#" onclick="changeEmail();return false">Update</a></td>
+                    <td><a id="changeEmail" href="#" onclick="changeEmail();return false">Update</a></td>
                 </tr>
             </table>
             <button id="btnSaveProfile" onClick="saveProfile(); return false">Save</button>
             <span id="profileStatus"></span>
         `;
+
         show(profileHtml, "message-content");
+
+        if (realm.includes("-apps")) {
+            document.getElementById("changeEmail").remove();
+        }
     }
 
     async function saveProfile() {
