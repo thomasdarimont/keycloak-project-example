@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="backend-api-springboot-reactive" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="backend-api-springboot-reactive" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.acme.backend.springreactive.BackendApiSpringbootReactiveApp" />
+    <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
