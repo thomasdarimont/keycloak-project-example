@@ -284,13 +284,10 @@ authenticationFlows:
     authenticationExecutions:
       - authenticator: auth-cookie
         requirement: ALTERNATIVE
-        priority: 1010
       - authenticator: identity-provider-redirector
         requirement: ALTERNATIVE
-        priority: 1020
-      - requirement: ALTERNATIVE
-        priority: 1030
-        flowAlias: "Identity Forms"
+      - flowAlias: "Identity Forms"
+        requirement: ALTERNATIVE
         autheticatorFlow: true
 
   - alias: "Identity Forms"
@@ -299,16 +296,13 @@ authenticationFlows:
     topLevel: false
     builtIn: false
     authenticationExecutions:
-      - requirement: REQUIRED
-        authenticator: auth-username-form
-        priority: 2010
-      - requirement: REQUIRED
-        authenticator: auth-password-form
-        priority: 2020
-      - requirement: CONDITIONAL
+      - authenticator: auth-username-form
+        requirement: REQUIRED
+      - authenticator: auth-password-form
+        requirement: REQUIRED
+      - flowAlias: "2FA Forms"
+        requirement: CONDITIONAL
         autheticatorFlow: true
-        flowAlias: "2FA Forms"
-        priority: 2030
 
   - alias: "2FA Forms"
     description: "Sub-Flow to ask user for 2FA"
@@ -318,20 +312,15 @@ authenticationFlows:
     authenticationExecutions:
       - authenticator: conditional-user-configured
         requirement: REQUIRED
-        priority: 3010
       - authenticator: acme-auth-trusted-device
         requirement: ALTERNATIVE
-        priority: 3015
       - authenticator: acme-auth-otp-form
         requirement: ALTERNATIVE
-        priority: 3020
       - authenticator: acme-sms-authenticator
         requirement: ALTERNATIVE
-        priority: 3030
         authenticatorConfig: "acme-sms-auth-default"
       - authenticator: acme-auth-backup-code
         requirement: ALTERNATIVE
-        priority: 3040
 
 authenticatorConfig:
   - alias: "acme-sms-auth-default"
@@ -437,6 +426,7 @@ users:
 
   - username: service-account-app-demo-service
     enabled: true
+    serviceAccountClientId: app-demo-service
     clientRoles:
       realm-management:
         - view-identity-providers

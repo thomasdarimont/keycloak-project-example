@@ -123,13 +123,10 @@ authenticationFlows:
     authenticationExecutions:
       - authenticator: auth-cookie
         requirement: ALTERNATIVE
-        priority: 1010
       - authenticator: identity-provider-redirector
         requirement: ALTERNATIVE
-        priority: 1020
-      - requirement: ALTERNATIVE
-        priority: 1030
-        flowAlias: "Identity Forms"
+      - flowAlias: "Identity Forms"
+        requirement: ALTERNATIVE
         autheticatorFlow: true
 
   - alias: "Identity Forms"
@@ -140,14 +137,12 @@ authenticationFlows:
     authenticationExecutions:
       - requirement: REQUIRED
         authenticator: auth-username-form
-        priority: 2010
       - requirement: REQUIRED
         authenticator: auth-password-form
-        priority: 2020
-      - requirement: CONDITIONAL
+      - flowAlias: "2FA Forms"
+        requirement: CONDITIONAL
         autheticatorFlow: true
-        flowAlias: "2FA Forms"
-        priority: 2030
+
 
   - alias: "2FA Forms"
     description: "Sub-Flow to ask user for 2FA"
@@ -157,10 +152,8 @@ authenticationFlows:
     authenticationExecutions:
       - authenticator: conditional-user-configured
         requirement: REQUIRED
-        priority: 3010
       - authenticator: auth-otp-form
         requirement: REQUIRED
-        priority: 3020
 
 components:
   org.keycloak.storage.UserStorageProvider:

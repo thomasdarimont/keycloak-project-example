@@ -265,7 +265,6 @@ authenticationFlows:
         requirement: REQUIRED
         flowAlias: "Custom Registration Forms"
         autheticatorFlow: true
-        priority: 1010
 
   - alias: "Custom Registration Forms"
     description: "registration form"
@@ -275,16 +274,13 @@ authenticationFlows:
     authenticationExecutions:
       - authenticator: "custom-registration-user-creation"
         requirement: "REQUIRED"
-        priority: 2020
         userSetupAllowed: false
         autheticatorFlow: false
       - authenticator: "registration-profile-action"
         requirement: "REQUIRED"
-        priority: 2040
         userSetupAllowed: false
         autheticatorFlow: false
       - authenticator: "registration-password-action"
         requirement: "REQUIRED"
-        priority: 2050
         userSetupAllowed: false
         autheticatorFlow: false

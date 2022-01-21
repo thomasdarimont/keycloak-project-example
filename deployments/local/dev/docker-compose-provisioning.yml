@@ -10,5 +10,6 @@ services:
       IMPORT_PATH: "/config"
       IMPORT_FORCE: "false"
       IMPORT_VARSUBSTITUTION: "true"
+      IMPORT_VALIDATE: "true"
     volumes:
       - ../../../config/stage/dev/realms:/config:z
