@@ -4,7 +4,6 @@
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.acme.backend.springboot.users.BackendApiSpringbootApp" />
     <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
     <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

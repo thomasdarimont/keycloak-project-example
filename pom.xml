@@ -16,6 +16,7 @@
         <module>keycloak/docker</module>
         <module>apps/backend-api-quarkus</module>
         <module>apps/backend-api-springboot</module>
+        <module>apps/backend-api-springboot-reactive</module>
         <module>apps/offline-session-client</module>
         <module>keycloak/patches/keycloak-model-infinispan-patch</module>
         <module>keycloak/patches/wildfly-clustering-infinispan-extension-patch-25.0.x</module>
