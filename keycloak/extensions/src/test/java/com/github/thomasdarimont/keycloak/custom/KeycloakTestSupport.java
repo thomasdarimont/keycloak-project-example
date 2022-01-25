@@ -3,6 +3,8 @@ package com.github.thomasdarimont.keycloak.custom;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -51,7 +53,7 @@ public class KeycloakTestSupport {
             keycloakContainer = new KeycloakContainer(imageName);
         } else {
             // building custom Keycloak docker image with additional libraries
-            String customDockerFileName = "../docker/src/main/docker/keycloak/Dockerfile.smallrye-ci.plain";
+            String customDockerFileName = "../docker/src/main/docker/keycloak/Dockerfile.ci.plain";
             ImageFromDockerfile imageFromDockerfile = new ImageFromDockerfile();
             imageFromDockerfile.withDockerfile(Paths.get(customDockerFileName));
             keycloakContainer = new KeycloakContainer();
@@ -133,7 +135,7 @@ public class KeycloakTestSupport {
 
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
-        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:v4.5.0-16.0.0");
+        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:v4.6.1-16.1.0");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
         keycloakConfigCli.addEnv("IMPORT_PATH", "/config");
@@ -161,7 +163,8 @@ public class KeycloakTestSupport {
         String username;
     }
 
-    @Data
+    @Getter
+    @Setter
     @AllArgsConstructor
     public static class CustomKeycloak extends KeycloakContainer {
 
