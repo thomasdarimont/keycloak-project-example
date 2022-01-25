@@ -136,6 +136,8 @@ end-if
 
 if (outcome == success) of /subsystem=undertow/server=default-server/ajp-listener=ajp:read-resource
   echo SETUP: Remove AJP Listener
+  # Mitigate CVE-2018-1048
+  # See: https://nvd.nist.gov/vuln/detail/CVE-2018-1048
   /subsystem=undertow/server=default-server/ajp-listener=ajp:remove()
   /socket-binding-group=standard-sockets/socket-binding=ajp:remove()
   echo
