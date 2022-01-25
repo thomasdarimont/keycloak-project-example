@@ -123,6 +123,8 @@ clients:
       - "acme.profile"
     optionalClientScopes:
       - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
 
   - clientId: app-greetme
     protocol: openid-connect
