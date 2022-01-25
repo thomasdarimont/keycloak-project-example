@@ -67,6 +67,7 @@ users:
     enabled: true
     credentials:
       - type: password
+        userLabel: initial
         value: test
         temporary: false
     clientRoles:

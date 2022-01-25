@@ -389,6 +389,7 @@ users:
       locale: ["de"]
     credentials:
       - type: password
+        userLabel: initial
         value: test
         temporary: false
     groups:
@@ -405,6 +406,7 @@ users:
       phone_number_verified: ["true"]
     credentials:
       - type: password
+        userLabel: initial
         value: test
         temporary: false
     groups:
@@ -419,6 +421,7 @@ users:
       locale: ["de"]
     credentials:
       - type: password
+        userLabel: initial
         value: test
         temporary: false
     realmRoles:

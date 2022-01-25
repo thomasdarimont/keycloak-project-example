@@ -98,5 +98,6 @@ users:
       locale: ["de"]
     credentials:
       - type: password
+        userLabel: initial
         value: test
         temporary: false
