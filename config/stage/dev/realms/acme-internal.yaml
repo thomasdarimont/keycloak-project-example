@@ -152,6 +152,8 @@ clients:
       - "profile"
     optionalClientScopes:
       - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
 
   - clientId: app-mobile
     protocol: openid-connect
