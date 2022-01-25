@@ -30,7 +30,7 @@ services:
       - ./keycloak-db.env
     environment:
       DB_VENDOR: POSTGRES
-      KC_DB: POSTGRES
+      KC_DB: postgres
 #      DB_ADDR: acme-keycloak-db
 #      DB_DATABASE: keycloak
 #      DB_USER: keycloak
