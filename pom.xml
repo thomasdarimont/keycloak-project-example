@@ -36,7 +36,7 @@
 
         <!-- Docker Image -->
         <docker.image>acme/acme-keycloak</docker.image>
-        <docker.file>keycloak/Dockerfile.smallrye.plain</docker.file>
+        <docker.file>keycloak/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
         <keycloak.version>16.1.0</keycloak.version>
