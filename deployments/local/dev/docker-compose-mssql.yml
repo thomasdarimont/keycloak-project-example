@@ -1,0 +1,44 @@
+services:
+  acme-keycloak-db:
+    build:
+      context: "../../../config/stage/dev/tls"
+      dockerfile: "../../../../deployments/local/dev/sqlserver/Dockerfile"
+    environment:
+      SA_PASSWORD: "Keycloak123"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Standard"
+    ports:
+      - "5434:1433"
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$$SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: /bin/bash /var/opt/mssql/docker-entrypoint.sh
+    volumes:
+#      - ./run/mssql/data:/var/opt/mssql/data:z
+      - ./sqlserver/mssql.conf:/var/opt/mssql/mssql.conf:z
+      - ./sqlserver/docker-entrypoint.sh:/var/opt/mssql/docker-entrypoint.sh:z
+      - ./sqlserver/db-init.sh:/opt/mssql/bin/db-init.sh:z
+      - ./sqlserver/db-init.sql:/opt/mssql-tools/bin/db-init.sql:z
+
+  acme-keycloak:
+    env_file:
+      - ./keycloak-db.env
+    environment:
+      # keycloak-x
+      KC_DB: mssql
+      KC_DB_PASSWORD: Keycloak123
+      KC_DB_SCHEMA: dbo
+
+      DB_VENDOR: mssql
+      DB_PASSWORD: Keycloak123
+      DB_SCHEMA: dbo
+# See MSSQL JDBC URL parameters: https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-with-ssl-encryption?view=sql-server-ver15
+      JDBC_PARAMS: encrypt=true;trustServerCertificate=true
+    volumes:
+      # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
+      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy

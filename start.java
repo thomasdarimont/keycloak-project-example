@@ -47,6 +47,7 @@ class start {
     static final String OPENLDAP_OPT = "--openldap";
     static final String KEYCLOAK_OPT = "--keycloak=keycloakx";
     static final String POSTGRES_OPT = "--database=postgres";
+    static final String MSSQL_OPT = "--database=mssql";
     static final String MYSQL_OPT = "--database=mysql";
     static final String GRAYLOG_OPT = "--logging=graylog";
     static final String GRAFANA_OPT = "--grafana";
@@ -66,7 +67,9 @@ class start {
         var useProvision = !argList.contains(PROVISION_OPT + "=false");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
+        var useMssql = argList.contains(MSSQL_OPT);
         var useMysql = argList.contains(MYSQL_OPT);
+        var useDatabase = usePostgres || useMysql || useMssql;
         var useGraylog = argList.contains(GRAYLOG_OPT);
         var useGrafana = argList.contains(GRAFANA_OPT);
         var usePrometheus = argList.contains(PROMETHEUS_OPT);
@@ -82,7 +85,7 @@ class start {
             return;
         }
 
-        if (useMysql && useGraylog) {
+        if (useDatabase && !(useMysql ^ usePostgres ^ useMssql)) {
             System.out.println("Invalid database configuration detected. Only one --database parameter is allowed!");
             showHelp();
             System.exit(-1);
@@ -167,6 +170,11 @@ class start {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-mysql.yml");
             createFolderIfMissing("deployments/local/dev/run/mysql/data/");
+            requiresBuild = true;
+        } else if (useMssql) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-mssql.yml");
+            createFolderIfMissing("deployments/local/dev/run/mssql/data/");
             requiresBuild = true;
         }
 
