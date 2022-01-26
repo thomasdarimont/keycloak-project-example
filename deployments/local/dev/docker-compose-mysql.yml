@@ -34,7 +34,7 @@ services:
     environment:
       DB_VENDOR: MYSQL
       # keycloak-x
-      KC_DB: MYSQL
+      KC_DB: mysql
 #      DB_ADDR: acme-keycloak-db
 #      DB_DATABASE: keycloak
 #      DB_USER: keycloak
