@@ -14,7 +14,7 @@
         <maven.compiler.target>11</maven.compiler.target>
 
         <!-- see https://search.maven.org/artifact/org.wildfly/wildfly-parent/25.0.1.Final/pom -->
-        <version.wildfly>26.0.0.Final</version.wildfly>
+        <version.wildfly>26.0.1.Final</version.wildfly>
         <version.org.wildfly.transaction.client>2.0.0.Final</version.org.wildfly.transaction.client>
         <version.org.infinispan>12.1.7.Final</version.org.infinispan>
         <version.org.infinispan.protostream>4.4.1.Final</version.org.infinispan.protostream>
