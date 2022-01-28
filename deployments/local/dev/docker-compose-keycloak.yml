@@ -65,3 +65,4 @@ services:
       - ./run/keycloak/perf:/opt/jboss/keycloak/standalone/perf:z
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
+      - ./keycloak-ext/keycloak-home-idp-discovery-16.0.0.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-home-idp-discovery-16.0.0.jar:z

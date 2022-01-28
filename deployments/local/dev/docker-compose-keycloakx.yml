@@ -67,5 +67,6 @@ services:
       - ../../../keycloak/extensions/target/extensions.jar:/opt/keycloak/providers/extensions.jar:z
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
+      - ./keycloak-ext/keycloak-home-idp-discovery-16.0.0.jar:/opt/jboss/keycloak/providers/keycloak-home-idp-discovery-16.0.0.jar:z
 # Add Keycloak.X specific extensions
       - ../../../keycloak/extensionsx/target/extensionsx.jar:/opt/keycloak/providers/extensionsx.jar:z
