@@ -46,6 +46,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
         // NOOP
+        log.info("ManageTrustedDeviceAction evaluateTriggers");
     }
 
     @Override
