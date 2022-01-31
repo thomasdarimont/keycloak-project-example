@@ -1,5 +1,5 @@
 ARG KEYCLOAK_VERSION=16.1.1
-ARG ALPINE_VERSION=3.14.0
+ARG ALPINE_VERSION=3.15.0
 
 #####################################################
 # Base keycloak image with binary keycloak release
@@ -11,12 +11,9 @@ FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as keycloak
 # see https://hub.docker.com/layers/alpine/library/alpine/3.15.0/images/sha256-c74f1b1166784193ea6c8f9440263b9be6cae07dfe35e32a5df7a31358ac2060?context=explore
 FROM alpine:$ALPINE_VERSION as java
 
-ENV OPENJDK_VERSION=11.0.13_p8-r0
+ENV OPENJDK_VERSION=11.0.14_p9-r0
 
-RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.15/community/x86_64/openjdk11-jdk-${OPENJDK_VERSION}.apk
-RUN wget https://dl-cdn.alpinelinux.org/alpine/v3.15/community/x86_64/openjdk11-jmods-${OPENJDK_VERSION}.apk
-
-RUN apk add binutils --no-cache --allow-untrusted --no-cache openjdk11-jdk-${OPENJDK_VERSION}.apk openjdk11-jmods-${OPENJDK_VERSION}.apk
+RUN apk add binutils --no-cache --allow-untrusted --no-cache openjdk11-jdk=${OPENJDK_VERSION} openjdk11-jmods=${OPENJDK_VERSION}
 
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
