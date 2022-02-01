@@ -76,6 +76,62 @@ ou: Planning
 objectClass: top
 objectClass: organizationalUnit
 
+dn: cn=Walter Laurentius,ou=Planning,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Walter Laurentius
+sn: Laurentius
+description: This is Walter Laurentius's description
+facsimileTelephoneNumber: +1 510 315-3162
+l: Sunnyvale
+ou: Planning
+postalAddress: Accounting$Sunnyvale
+telephoneNumber: +1 510 408-1538
+title: Head of Planning
+userPassword: Password1
+uid: LaurentiusW
+givenName: Walter
+mail: LaurentiusW@ns-mail8.com
+carLicense: BDGU314
+departmentNumber: 1224
+employeeType: Manager
+homePhone: +1 510 464-1671
+initials: A. L.
+mobile: +1 510 180-1671
+pager: +1 510 699-1671
+roomNumber: 7051
+
+dn: cn=Anne Laurentius,ou=Accounting,dc=corp,dc=acme,dc=local
+changetype: add
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Anne Laurentius
+sn: Laurentius
+description: This is Anne Laurentius's description
+facsimileTelephoneNumber: +1 510 315-3162
+l: Sunnyvale
+ou: Accounting
+postalAddress: Accounting$Sunnyvale
+telephoneNumber: +1 510 408-1538
+title: Head of Accounting
+userPassword: Password1
+uid: LaurentiusA
+givenName: Anne
+mail: LaurentiusA@ns-mail8.com
+carLicense: BDGU314
+departmentNumber: 1224
+employeeType: Manager
+homePhone: +1 510 464-1670
+initials: A. L.
+mobile: +1 510 180-1670
+pager: +1 510 699-1670
+roomNumber: 7050
+
 dn: cn=Redgie Fleugel,ou=Janitorial,dc=corp,dc=acme,dc=local
 changetype: add
 objectClass: top
@@ -3071,3 +3127,163 @@ pager: +1 415 381-9637
 roomNumber: 9532
 manager: cn=Tilly Pilote,ou=Peons,dc=corp,dc=acme,dc=local
 secretary: cn=Evvy Gattrell,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Accountants,ou=Accounting,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Accountants
+member: uid=LaurentiusA,ou=Accounting,dc=corp,dc=acme,dc=local
+
+dn: cn=Developers,ou=Product Development,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Developers
+member: uid=ThornbeA,ou=Product Development,dc=corp,dc=acme,dc=local
+member: uid=MattiusG,ou=Product Development,dc=corp,dc=acme,dc=local
+member: uid=RuddleJ,ou=Product Development,dc=corp,dc=acme,dc=local
+member: uid=EnvironP,ou=Product Development,dc=corp,dc=acme,dc=local
+member: uid=Van VeeY,ou=Product Development,dc=corp,dc=acme,dc=local
+
+dn: cn=Testers,ou=Product Testing,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Testers
+member: uid=BasmadjC,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=CuthberA,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=Howe-PaA,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=ReddingC,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=HoaglanF,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=CentenoF,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=BlumenfH,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=VezinaL,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=SinananM,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=RosserO,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=ChiltonP,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=PrestonR,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=PiaseckW,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=BlesiW,ou=Product Testing,dc=corp,dc=acme,dc=local
+member: uid=ENGY,ou=Product Testing,dc=corp,dc=acme,dc=local
+
+dn: cn=Human Resources,ou=Human Resources,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Human Resources
+member: uid=MejiaD,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=GolshanD,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=MorelliH,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=GebhartH,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=KlingspK,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=KlebschL,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=ChauhanM,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=CiochonR,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=GohR,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=StandelT,ou=Human Resources,dc=corp,dc=acme,dc=local
+member: uid=RegimbaW,ou=Human Resources,dc=corp,dc=acme,dc=local
+
+dn: cn=Payroll,ou=Payroll,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Payroll
+member: uid=CharneyR,ou=Payroll,dc=corp,dc=acme,dc=local
+member: uid=HoehnF,ou=Payroll,dc=corp,dc=acme,dc=local
+member: uid=SmulderG,ou=Payroll,dc=corp,dc=acme,dc=local
+member: uid=PereiraG,ou=Payroll,dc=corp,dc=acme,dc=local
+member: uid=WortmanJ,ou=Payroll,dc=corp,dc=acme,dc=local
+member: uid=LoughJ,ou=Payroll,dc=corp,dc=acme,dc=local
+member: uid=BittenbL,ou=Payroll,dc=corp,dc=acme,dc=local
+
+dn: cn=Janitorial,ou=Janitorial,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Janitorial
+member: uid=FleugelR,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=NahmiasA,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=KakutaA,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=QuinnA,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=McMahonD,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=AskinsE,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=StachowF,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=LeoneG,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=JankowsG,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=TibiL,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=SchefflL,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=LinderP,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=MacLeanP,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=WitzmanQ,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=ButtreyS,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=FrederiS,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=VodickaV,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=CaruthV,ou=Janitorial,dc=corp,dc=acme,dc=local
+member: uid=DeligdiW,ou=Janitorial,dc=corp,dc=acme,dc=local
+
+dn: cn=Management,ou=Management,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Management
+member: uid=GattrelE,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=BoucourA,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=XmssuppB,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=OmanC,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=AcreeD,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=MichaloF,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=PetrickG,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=RoskoG,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=AdamsonG,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=AdamH,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=HaganH,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=ThibeauM,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=ShifferN,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=McElligS,ou=Management,dc=corp,dc=acme,dc=local
+member: uid=EverittT,ou=Management,dc=corp,dc=acme,dc=local
+
+dn: cn=Administrative,ou=Administrative,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Administrative
+member: uid=FujiwarK,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=BrosselA,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=ParhamA,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=HitchcoG,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=SoongK,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=RintoulK,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=KesslerL,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=LeClairL,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=RozumnaN,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=MarouchP,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=IEMR,ou=Administrative,dc=corp,dc=acme,dc=local
+member: uid=EflandS,ou=Administrative,dc=corp,dc=acme,dc=local
+
+dn: cn=Peons,ou=Peons,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Peons
+member: uid=PiloteT,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=ErkelA,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=CoverdaC,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=CoriatyD,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=NormentD,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=KelleheE,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=SentnerI,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=RouthieI,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=HiltonJ,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=HutsonK,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=BelcherK,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=ChaintrL,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=WinlowO,ou=Peons,dc=corp,dc=acme,dc=local
+member: uid=JarchowV,ou=Peons,dc=corp,dc=acme,dc=local
+
+dn: cn=Planning,ou=Planning,dc=corp,dc=acme,dc=local
+changetype: add
+objectclass: top
+objectclass: groupofnames
+cn: Planning
+member: uid=LaurentiusW,ou=Planning,dc=corp,dc=acme,dc=local
