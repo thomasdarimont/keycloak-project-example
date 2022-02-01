@@ -11,5 +11,9 @@ services:
       IMPORT_FORCE: "false"
       IMPORT_VARSUBSTITUTION: "true"
       IMPORT_VALIDATE: "true"
+
+# See https://github.com/adorsys/keycloak-config-cli#log-level
+#      LOGGING_LEVEL_KEYCLOAKCONFIGCLI: "debug"
+
     volumes:
       - ../../../config/stage/dev/realms:/config:z
