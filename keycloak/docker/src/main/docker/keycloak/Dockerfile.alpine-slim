@@ -11,9 +11,11 @@ FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION as keycloak
 # see https://hub.docker.com/layers/alpine/library/alpine/3.15.0/images/sha256-c74f1b1166784193ea6c8f9440263b9be6cae07dfe35e32a5df7a31358ac2060?context=explore
 FROM alpine:$ALPINE_VERSION as java
 
+# See https://wiki.alpinelinux.org/wiki/Package_management#Advanced_APK_Usage
+#ENV OPENJDK_VERSION=~11.0
 ENV OPENJDK_VERSION=11.0.14_p9-r0
 
-RUN apk add binutils --no-cache --allow-untrusted --no-cache openjdk11-jdk=${OPENJDK_VERSION} openjdk11-jmods=${OPENJDK_VERSION}
+RUN apk add binutils --no-cache --allow-untrusted --no-cache "openjdk11-jdk=${OPENJDK_VERSION}" "openjdk11-jmods=${OPENJDK_VERSION}"
 
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk
