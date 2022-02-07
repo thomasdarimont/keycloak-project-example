@@ -42,12 +42,12 @@ docker-compose --env-file ../../../keycloak.env --file haproxy/docker-compose-ha
 
 Start:
 ```
-ocker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml up --remove-orphans --build
+docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml up --remove-orphans --build
 ```
 
 Browse to: https://id.acme.test:1443/auth
 
 Stop:
 ```
-ocker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml down --remove-orphans
+docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml down --remove-orphans
 ```
