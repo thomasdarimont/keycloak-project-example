@@ -1,0 +1,114 @@
+<infinispan
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:infinispan:config:13.0"
+        xsi:schemaLocation="urn:infinispan:config:13.0 https://infinispan.org/schemas/infinispan-config-13.0.xsd urn:infinispan:server:13.0 https://infinispan.org/schemas/infinispan-server-13.0.xsd">
+
+    <!-- TODO configure JGROUPS tcp Stack with encryption -->
+
+    <!-- see https://docs.jboss.org/infinispan/13.0/configdocs/infinispan-config-13.0.html -->
+
+    <cache-container name="default" statistics="true">
+
+        <!-- TODO revise jgroups stack to use -->
+        <transport
+                cluster="${infinispan.cluster.name:REMOTE}"
+                stack="${infinispan.cluster.stack:udp}"
+                node-name="${infinispan.node.name:}"/>
+
+        <replicated-cache-configuration name="replicated-cache-cfg">
+            <encoding>
+                <key media-type="application/x-jboss-marshalling"/>
+                <value media-type="application/x-jboss-marshalling"/>
+            </encoding>
+
+            <expiration lifespan="900000000000000000"/>
+        </replicated-cache-configuration>
+
+        <distributed-cache-configuration name="distributed-cache-cfg">
+            <encoding>
+                <key media-type="application/x-jboss-marshalling"/>
+                <value media-type="application/x-jboss-marshalling"/>
+            </encoding>
+
+            <expiration lifespan="900000000000000000"/>
+        </distributed-cache-configuration>
+
+        <replicated-cache name="work" configuration="replicated-cache-cfg">
+        </replicated-cache>
+
+        <distributed-cache name="sessions" owners="2" configuration="distributed-cache-cfg">
+            <persistence passivation="true">
+                <!-- purge="false" fetch-state="false" see:  https://infinispan.org/docs/stable/titles/configuring/configuring.html#configuring_cache_stores-persistence-->
+                <file-store preload="true" purge="false" fetch-state="false" path="../mydata/sessions">
+                </file-store>
+            </persistence>
+        </distributed-cache>
+
+        <distributed-cache name="authenticationSessions" owners="2" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="offlineSessions" owners="2" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="clientSessions" owners="2" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="offlineClientSessions" owners="2" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="loginFailures" owners="2" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="actionTokens" owners="2" configuration="distributed-cache-cfg">
+            <memory max-count="-1">
+            </memory>
+            <expiration interval="300000" max-idle="-1"/>
+        </distributed-cache>
+    </cache-container>
+
+    <!-- https://docs.jboss.org/infinispan/13.0/configdocs/infinispan-server-13.0.html# -->
+    <server xmlns="urn:infinispan:server:13.0">
+
+        <interfaces>
+            <interface name="public">
+                <!-- we bind to the eth0 interface instead of a specific ip address to ease access -->
+                <!--                <inet-address value="${infinispan.bind.address:127.0.0.1}"/>-->
+                <match-interface value="eth0"/>
+            </interface>
+        </interfaces>
+
+        <socket-bindings default-interface="public" port-offset="${infinispan.socket.binding.port-offset:0}">
+            <socket-binding name="default" port="${infinispan.bind.port:11222}"/>
+            <socket-binding name="memcached" port="11221"/>
+        </socket-bindings>
+
+        <security>
+            <security-realms>
+                <security-realm name="default">
+                    <!--  Uncomment to enable TLS on the realm  -->
+                    <server-identities>
+                        <ssl>
+                            <keystore path="ispn-server.jks" relative-to="infinispan.server.config.path"
+                                      password="password" alias="server" key-password="password"
+                                      generate-self-signed-certificate-host="localhost"/>
+                        </ssl>
+                    </server-identities>
+                    <properties-realm groups-attribute="Roles">
+                        <user-properties path="users.properties" relative-to="infinispan.server.config.path"
+                                         plain-text="true"/>
+                        <group-properties path="groups.properties" relative-to="infinispan.server.config.path"/>
+                    </properties-realm>
+                </security-realm>
+            </security-realms>
+        </security>
+
+        <!-- see https://docs.jboss.org/infinispan/13.0/configdocs/infinispan-server-13.0.html#endpoints -->
+        <endpoints>
+            <endpoint socket-binding="default" security-realm="default">
+                <hotrod-connector security-realm="default"></hotrod-connector>
+                <rest-connector></rest-connector>
+            </endpoint>
+        </endpoints>
+    </server>
+
+</infinispan>

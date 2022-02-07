@@ -37,3 +37,17 @@ Stop:
 ```
 docker-compose --env-file ../../../keycloak.env --file haproxy/docker-compose-haproxy.yml down --remove-orphans
 ```
+
+# Run Keycloak.X cluster behind HA-Proxy with external Infinispan
+
+Start:
+```
+ocker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml up --remove-orphans --build
+```
+
+Browse to: https://id.acme.test:1443/auth
+
+Stop:
+```
+ocker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml down --remove-orphans
+```

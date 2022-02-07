@@ -4,7 +4,12 @@ testrun/
 run/
 deployments/local/dev/run/
 
-deployments/local/cluster/haproxy-external-ispn/ispn/data/
+deployments/local/cluster/haproxy-external-ispn/ispn/data/ispn-1/
+deployments/local/cluster/haproxy-external-ispn/ispn/data/ispn-2/
+
+deployments/local/clusterx/haproxy-external-ispn/ispn/data/ispn-1/
+deployments/local/clusterx/haproxy-external-ispn/ispn/data/ispn-2/
+
 
 !deployments/local/cluster/run/.gitkeep
 deployments/local/cluster/run/
