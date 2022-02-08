@@ -422,3 +422,4 @@ temp/
 
 # End of https://www.toptal.com/developers/gitignore/api/node
 /apps/offline-session-client/data/
+/deployments/local/cluster/haproxy-external-ispn/ispn/data/sessions/
