@@ -10,8 +10,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 @AutoService(EventListenerProviderFactory.class)
 public class AcmeAuditListenerFactory implements EventListenerProviderFactory {
 
-    private static final AcmeAuditListener INSTANCE = new AcmeAuditListener();
-
     @Override
     public String getId() {
         return AcmeAuditListener.ID;
@@ -19,7 +17,7 @@ public class AcmeAuditListenerFactory implements EventListenerProviderFactory {
 
     @Override // return singleton instance, create new AcmeAuditListener(session) or use lazy initialization
     public EventListenerProvider create(KeycloakSession session) {
-        return INSTANCE;
+        return new AcmeAuditListener(session);
     }
 
     @Override // we could read settings from the provider config in standalone(-ha).xml or keycloak.properties
