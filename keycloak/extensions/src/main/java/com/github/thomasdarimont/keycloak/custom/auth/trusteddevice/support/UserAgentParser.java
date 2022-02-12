@@ -5,8 +5,6 @@ import ua_parser.OS;
 import ua_parser.Parser;
 import ua_parser.UserAgent;
 
-import java.io.IOException;
-
 @JBossLog
 public class UserAgentParser {
 
@@ -16,7 +14,7 @@ public class UserAgentParser {
         Parser parser = null;
         try {
             parser = new Parser();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.errorf(e, "Could not initialize user_agent parser");
         }
         USER_AGENT_PARSER = parser;

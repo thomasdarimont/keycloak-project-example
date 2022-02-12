@@ -1,7 +1,4 @@
-FROM quay.io/keycloak/keycloak-x:16.1.1
-#FROM thomasdarimont/keycloak-x:16.1.1-SNAPSHOT
-
-# TODO Add smallrye metrics support
+FROM quay.io/keycloak/keycloak:17.0.0
 
 USER 0
 

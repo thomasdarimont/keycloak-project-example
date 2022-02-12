@@ -1,3 +1,9 @@
-ARG KEYCLOAK_VERSION=16.1.1
+# TODO Update to Keycloak legacy docker image for 17.0.0+
+ARG KEYCLOAK_VERSION=17.0.0
 
-FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+# TODO use version from KEYCLOAK_VERSION once legacy keycloak image is available
+#FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+# FIXME using hardcoded version for CI build until legacy keycloak image is available
+#FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy
+FROM quay.io/keycloak/keycloak:17.0.0-legacy
+
