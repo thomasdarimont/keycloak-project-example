@@ -44,6 +44,9 @@ smtpServer:
   from: "acme-internal-sso@local"
   fromDisplayName: "Acme Employee Account"
 
+attributes:
+  "acme.greeting": "Hello!"
+
 clientScopes:
   - name: acme.profile
     description: Acme Profile Access

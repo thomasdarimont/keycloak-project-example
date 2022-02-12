@@ -1,11 +1,13 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
+import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
 
 import javax.ws.rs.GET;
@@ -41,11 +43,14 @@ public class CustomResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response ping() {
 
-        Map<String, Object> payload = new HashMap<>();
         KeycloakContext context = session.getContext();
-        payload.put("realm", context.getRealm().getName());
+        RealmModel realm = context.getRealm();
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("realm", realm.getName());
         payload.put("user", token == null ? "anonymous" : token.getPreferredUsername());
         payload.put("timestamp", System.currentTimeMillis());
+        payload.put("greeting", new RealmConfig(realm).getString("acme.greeting", "Greetings!"));
 
         return Response.ok(payload).build();
     }

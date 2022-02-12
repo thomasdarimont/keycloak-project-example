@@ -15,8 +15,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class CustomResourceProvider implements RealmResourceProvider {
 
-    public static final String ID = "custom-resources";
-
     private static final Pattern ALLOWED_REALM_NAMES_PATTERN = Pattern.compile(Optional.ofNullable(System.getenv("KEYCLOAK_CUSTOM_ENDPOINT_REALM_PATTERN")).orElse("acme-.*"));
 
     @Override

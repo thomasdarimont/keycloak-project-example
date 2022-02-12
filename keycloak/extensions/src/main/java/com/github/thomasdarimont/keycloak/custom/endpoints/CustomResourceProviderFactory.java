@@ -12,11 +12,13 @@ import org.keycloak.services.resource.RealmResourceProviderFactory;
 @AutoService(RealmResourceProviderFactory.class)
 public class CustomResourceProviderFactory implements RealmResourceProviderFactory {
 
+    public static final String ID = "custom-resources";
+
     private static final CustomResourceProvider INSTANCE = new CustomResourceProvider();
 
     @Override
     public String getId() {
-        return CustomResourceProvider.ID;
+        return ID;
     }
 
     @Override
