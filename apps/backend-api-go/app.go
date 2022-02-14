@@ -34,6 +34,7 @@ func (a *App) Run() {
 	n := negroni.New(
 		negroni.NewLogger(),
 		negroni.NewRecovery(),
+
 		a.newCors(conf),
 		negroni.HandlerFunc(a.createJwtMiddleware().HandlerWithNext),
 	)
@@ -51,7 +52,7 @@ func (a *App) newCors(conf *config) *cors.Cors {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{conf.CorsAllowedOrigins},
 		AllowedMethods:   []string{http.MethodGet},
-		AllowedHeaders:   []string{"Authorization"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
 		// Enable Debugging for testing, consider disabling in production
 		Debug: true,
