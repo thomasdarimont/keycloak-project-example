@@ -1,9 +1,14 @@
+#see https://www.keycloak.org/server/containers
 FROM quay.io/keycloak/keycloak:17.0.0
 
 USER root
 
 # Add java-11-openjdk-devel JDK for debugging
-RUN microdnf update -y && microdnf install -y java-11-openjdk-devel && microdnf clean all
+#RUN microdnf update -y && microdnf install -y java-11-openjdk-devel && microdnf clean all
+RUN microdnf update -y && microdnf install -y java-17-openjdk-devel && microdnf clean all
+
+# Add nashorn javascript engine for new Java versions (JDK>14)
+# RUN curl -o /opt/keycloak/providers/nashorn-core-15.3.jar https://search.maven.org/remotecontent?filepath=org/openjdk/nashorn/nashorn-core/15.3/nashorn-core-15.3.jar
 
 ## Workaround for adding the current certifcate to the cacerts truststore
 # Import certificate into cacerts truststore
