@@ -118,12 +118,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-model-infinispan</artifactId>
-            <version>${keycloak.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.keycloak</groupId>-->
+<!--            <artifactId>keycloak-model-infinispan</artifactId>-->
+<!--            <version>${keycloak.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
 
 <!--        <dependency>-->
 <!--            <groupId>org.jgroups</groupId>-->

@@ -9,6 +9,7 @@ COPY --chown=keycloak:keycloak ./cache-custom.xml /opt/keycloak/conf/cache-custo
 COPY --chown=keycloak:keycloak ./cache-custom-jgroups.xml /opt/keycloak/conf/cache-custom-jgroups.xml
 COPY --chown=keycloak:keycloak ./jgroups-multicast-enc.xml /opt/keycloak/conf/jgroups-multicast-enc.xml
 COPY --chown=keycloak:keycloak ./jgroups-multicast-diag.xml /opt/keycloak/conf/jgroups-multicast-diag.xml
+COPY --chown=keycloak:keycloak ./jgroups-jdbcping-enc.xml /opt/keycloak/conf/jgroups-jdbcping-enc.xml
 COPY --chown=keycloak:keycloak ./jgroups.p12 /opt/keycloak/conf/jgroups.p12
 
 ## Workaround for adding the current certifcate to the cacerts truststore
