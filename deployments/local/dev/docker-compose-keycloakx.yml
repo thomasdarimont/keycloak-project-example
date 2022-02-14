@@ -14,6 +14,14 @@ services:
       KC_DB: "dev-file"
       KC_HTTP_RELATIVE_PATH: "/auth"
 
+#      KC_METRICS_ENABLED: true
+
+# see https://www.keycloak.org/server/features
+#      KC_FEATURES: impersonation,token-exchange,admin-fine-grained-authz,account-api,scripts,upload-scripts,ciba,client-policies,declarative-user-profile,admin2
+#      KC_FEATURES_DISABLED: impersonation
+
+#      KC_HTTPS_PROTOCOLS: "TLSv1.3,TLSv1.2"
+
       KEYCLOAK_THEME_CACHING: "false"
       KEYCLOAK_THEME_TEMPLATE_CACHING: "false"
       PROXY_ADDRESS_FORWARDING: "true"
@@ -41,6 +49,7 @@ services:
       - "--metrics-enabled=true"
       - "--cache=local"
       - "--proxy=passthrough"
+      - "--https-protocols=TLSv1.3,TLSv1.2"
 #      - "--config-file=/opt/keycloak/conf/keycloak.properties"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
