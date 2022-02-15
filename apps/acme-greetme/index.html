@@ -23,6 +23,7 @@
     <ul class="menu">
         <li>
             <button id="loginBtn" onclick="keycloak.login()">Login</button>
+            <button id="updateConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Update consent</button>
             <button id="logoutBtn" onclick="keycloak.logout()" class="hidden">Logout</button>
         </li>
     </ul>
@@ -34,7 +35,10 @@
         <h2>Username: <span id="username"></span></h2>
         <h2>Name: <span id="displayName"></span></h2>
         <h2>Email: <span id="email"></span></h2>
+        <h2>Phone: <span id="phone"></span></h2>
         <h2>Issuer: <span id="issuer"></span></h2>
+        <h2>Requested Scope: <span id="scopeRequested"></span></h2>
+        <h2>Granted Scope: <span id="scopeGranted"></span></h2>
     </div>
 </div>
 
@@ -52,7 +56,7 @@
     let clientId = searchParams.get("client_id") || 'app-greetme';
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
-    let scope = searchParams.get("scope") || 'openid email profile';
+    let scope = searchParams.get("scope") || 'openid email profile phone';
 
     document.getElementById("clientInfo").textContent = clientId;
 
@@ -67,7 +71,7 @@
         window.keycloak = new Keycloak({
             url: keycloakUrl,
             realm: realm,
-            clientId: clientId
+            clientId: clientId,
         });
 
         let initConfig = {
@@ -89,11 +93,13 @@
 
         keycloak.init(initConfig).success(onLoginSuccess);
 
+
         keycloak.onAuthLogout = showWelcome;
     };
 
     function showWelcome() {
         $("#loginBtn").classList.remove("hidden");
+        $("#updateConsentBtn").classList.add("hidden");
         $("#logoutBtn").classList.add("hidden");
     }
 
@@ -101,13 +107,17 @@
 
         $("#loginBtn").classList.add("hidden");
         $("#logoutBtn").classList.remove("hidden");
+        $("#updateConsentBtn").classList.remove("hidden");
 
         $("#greeting").classList.toggle("hidden");
 
         $("#username").innerText = keycloak.tokenParsed.preferred_username;
         $("#displayName").innerText = keycloak.tokenParsed.name;
         $("#email").innerText = keycloak.tokenParsed.email;
-        $("#issuer").innerText = keycloak.tokenParsed.iss
+        $("#phone").innerText = keycloak.tokenParsed.phone_number;
+        $("#issuer").innerText = keycloak.tokenParsed.iss;
+        $("#scopeRequested").innerText = scope;
+        $("#scopeGranted").innerText = keycloak.tokenParsed.scope;
     }
 
 </script>

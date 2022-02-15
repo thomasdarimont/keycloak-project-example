@@ -167,9 +167,9 @@
 
                 <div class="legal-links">
                     <ul>
-                        <li><a href="${acmeUrl.imprintUrl}">${msg("legalImprint")}</a></li>
-                        <li><a href="${acmeUrl.termsUrl}">${msg("legalTerms")}</a></li>
-                        <li><a href="${acmeUrl.privacyUrl}">${msg("legalPrivacy")}</a></li>
+                        <li><a href="${(acmeUrl.imprintUrl)!'#'}">${msg("legalImprint")}</a></li>
+                        <li><a href="${(acmeUrl.termsUrl)!'#'}">${msg("legalTerms")}</a></li>
+                        <li><a href="${(acmeUrl.privacyUrl)!'#'}">${msg("legalPrivacy")}</a></li>
                     </ul>
                 </div>
             </div>
