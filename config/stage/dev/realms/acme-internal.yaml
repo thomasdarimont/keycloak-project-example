@@ -72,6 +72,45 @@ clientScopes:
     description: Acme API Access
     protocol: openid-connect
 
+  - name: name
+    description: Name Details
+    protocol: openid-connect
+    protocolMappers:
+      - name: "Acme: Given Name"
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          "user.attribute": "firstName"
+          "claim.name": "given_name"
+          "userinfo.token.claim": "true"
+          "id.token.claim": "true"
+          "access.token.claim": "true"
+      - name: "Acme: Family Name"
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          "user.attribute": "lastName"
+          "claim.name": "family_name"
+          "userinfo.token.claim": "true"
+          "id.token.claim": "true"
+          "access.token.claim": "true"
+      - name: "Acme: Display Name"
+        protocol: openid-connect
+        protocolMapper: oidc-full-name-mapper
+        config:
+          "userinfo.token.claim": "true"
+          "id.token.claim": "true"
+          "access.token.claim": "true"
+      - name: "Acme: Username"
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-property-mapper
+        config:
+          "user.attribute": "username"
+          "claim.name": "preferred_username"
+          "userinfo.token.claim": "true"
+          "id.token.claim": "true"
+          "access.token.claim": "true"
+
 requiredActions:
   - alias: acme-update-phonenumber
     name: 'Acme: Update Mobile Phonenumber'

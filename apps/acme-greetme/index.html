@@ -34,6 +34,8 @@
     <div id="greeting" class="hidden">
         <h2>Username: <span id="username"></span></h2>
         <h2>Name: <span id="displayName"></span></h2>
+        <h2>Firstname: <span id="firstname"></span></h2>
+        <h2>Lastname: <span id="lastname"></span></h2>
         <h2>Email: <span id="email"></span></h2>
         <h2>Phone: <span id="phone"></span></h2>
         <h2>Issuer: <span id="issuer"></span></h2>
@@ -57,6 +59,7 @@
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     let scope = searchParams.get("scope") || 'openid email profile phone';
+    //let scope = searchParams.get("scope") || 'openid email name phone';
 
     document.getElementById("clientInfo").textContent = clientId;
 
@@ -113,6 +116,8 @@
 
         $("#username").innerText = keycloak.tokenParsed.preferred_username;
         $("#displayName").innerText = keycloak.tokenParsed.name;
+        $("#firstname").innerText = keycloak.tokenParsed.given_name;
+        $("#lastname").innerText = keycloak.tokenParsed.family_name;
         $("#email").innerText = keycloak.tokenParsed.email;
         $("#phone").innerText = keycloak.tokenParsed.phone_number;
         $("#issuer").innerText = keycloak.tokenParsed.iss;

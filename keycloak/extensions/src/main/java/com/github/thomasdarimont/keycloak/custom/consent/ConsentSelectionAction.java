@@ -12,10 +12,12 @@ import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.forms.login.freemarker.model.OAuthGrantBean;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.ClientScopeModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.OrderedModel;
 import org.keycloak.models.UserConsentModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
@@ -25,7 +27,6 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,7 @@ import static java.util.stream.Collectors.toList;
 @AutoService(RequiredActionFactory.class)
 public class ConsentSelectionAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
 
+    private static final OrderedModel.OrderedModelComparator<OAuthGrantBean.ClientScopeEntry> COMPARATOR_INSTANCE = new OrderedModel.OrderedModelComparator<>();
     private static final Map<String, List<ScopeField>> SCOPE_FIELD_MAPPING;
 
     static {
@@ -179,8 +181,8 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         var scopeInfo = getScopeInfo(context.getSession(), authSession, user);
         var grantedRequired = scopeInfo.getGrantedRequired();
-        var missingRequired = scopeInfo.getMissingRequired();
         var grantedOptional = scopeInfo.getGrantedOptional();
+        var missingRequired = scopeInfo.getMissingRequired();
         var missingOptional = scopeInfo.getMissingOptional();
 
         var scopes = new ArrayList<ScopeBean>();
@@ -193,13 +195,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             }
         }
 
-        scopes.sort(Comparator.comparing(s -> {
-            String guiOrder = s.getScopeModel().getGuiOrder();
-            if (guiOrder == null) {
-                return s.getName();
-            }
-            return guiOrder;
-        }));
+        scopes.sort(ScopeBean.DEFAULT_ORDER);
 
         form.setAttribute("scopes", scopes);
 
@@ -209,6 +205,9 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         // use form from src/main/resources/theme-resources/templates/
         return form.createForm("select-consent-form.ftl");
+    }
+
+    static class ScopeBeanOrdering {
     }
 
     @Override
@@ -240,19 +239,25 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         if (!scopesToAskForConsent.isEmpty()) {
             var client = authSession.getClient();
 
-            // TODO find a way to merge the existing consent with the new consent
-            var consentByClient = context.getSession().users().getConsentByClient(context.getRealm(), user.getId(), client.getId());
+            // TODO find a way to merge the existing consent with the new consent instead of replacing the existing consent
+            var users = context.getSession().users();
+            var realm = context.getRealm();
+
+            var consentByClient = users.getConsentByClient(realm, user.getId(), client.getId());
             if (consentByClient != null) {
-                context.getSession().users().revokeConsentForClient(context.getRealm(), user.getId(), client.getId());
+                users.revokeConsentForClient(realm, user.getId(), client.getId());
             }
             consentByClient = new UserConsentModel(client);
 
             scopesToAskForConsent.forEach(consentByClient::addGrantedClientScope);
 
-            context.getSession().users().addConsent(context.getRealm(), user.getId(), consentByClient);
+            users.addConsent(realm, user.getId(), consentByClient);
 
-            var grantedScopeNames = consentByClient.getGrantedClientScopes().stream().map(ClientScopeModel::getName).collect(Collectors.toSet());
-            var scope = OAuth2Constants.SCOPE_OPENID + " " + String.join(" ", grantedScopeNames);
+            var grantedScopeNames = consentByClient.getGrantedClientScopes().stream().map(ClientScopeModel::getName).collect(Collectors.toList());
+            grantedScopeNames.add(0, OAuth2Constants.SCOPE_OPENID);
+            var scope = String.join(" ", grantedScopeNames);
+
+            // TODO find a better way to propagate the selected scopes
             authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
             context.getEvent().client(client).user(user).event(EventType.GRANT_CONSENT).detail(OAuth2Constants.SCOPE, scope).success();
