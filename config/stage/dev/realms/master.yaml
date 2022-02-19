@@ -1,0 +1,3 @@
+realm: master
+enabled: true
+adminTheme: "keycloak"
