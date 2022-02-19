@@ -53,7 +53,7 @@ services:
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
       - "--spi-theme-static-max-age=-1"
-#      - "--config-file=/opt/keycloak/conf/keycloak.properties"
+#      - "--config-file=/opt/keycloak/conf/keycloak.conf"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
@@ -75,10 +75,11 @@ services:
       - ./run/keycloakx/data:/opt/keycloak/data:z
       - ./run/keycloakx/logs:/opt/keycloak/logs:z
       - ./run/keycloakx/perf:/opt/keycloak/perf:z
+# Add keycloak extensions
       - ../../../keycloak/extensions/target/extensions.jar:/opt/keycloak/providers/extensions.jar:z
-# Add third-party extensions
-#      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/jboss/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
-      - ./keycloak-ext/keycloak-home-idp-discovery-16.0.0.jar:/opt/jboss/keycloak/providers/keycloak-home-idp-discovery-16.0.0.jar:z
 # Add Keycloak.X specific extensions
       - ../../../keycloak/extensionsx/target/extensionsx.jar:/opt/keycloak/providers/extensionsx.jar:z
 #      - ../../../keycloak/extensionsx/target/classes:/opt/keycloak/providers/extensionsx.jar:z
+# Add third-party extensions
+#      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
+      - ./keycloak-ext/keycloak-home-idp-discovery-16.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery-16.0.0.jar:z
