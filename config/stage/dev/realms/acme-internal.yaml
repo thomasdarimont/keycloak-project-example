@@ -191,9 +191,9 @@ clients:
       - "+"
     defaultClientScopes:
       - "email"
-      - "profile"
     optionalClientScopes:
       - "phone"
+      - "name"
     attributes:
       "pkce.code.challenge.method": "S256"
 
