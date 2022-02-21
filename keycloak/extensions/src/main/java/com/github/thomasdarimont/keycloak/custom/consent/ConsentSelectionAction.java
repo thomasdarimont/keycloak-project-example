@@ -10,6 +10,7 @@ import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.forms.login.freemarker.model.OAuthGrantBean;
@@ -213,15 +214,27 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     @Override
     public void processAction(RequiredActionContext context) {
         // handle consent selection from user
+        var formParameters = context.getHttpRequest().getFormParameters();
 
         var authSession = context.getAuthenticationSession();
+        var session = context.getSession();
+        var users = context.getSession().users();
+        var realm = context.getRealm();
+        var event = context.getEvent();
+        var client = authSession.getClient();
         var user = context.getUser();
 
-        var formParameters = context.getHttpRequest().getFormParameters();
+        event.client(client).user(user).event(EventType.GRANT_CONSENT);
+
+        if (formParameters.getFirst("cancel") != null) {
+            event.error(Errors.CONSENT_DENIED);
+            // return to the application without consent update
+            context.success();
+            return;
+        }
+
         var scopeSelection = formParameters.get("scopeSelection");
-
-        var scopeInfo = getScopeInfo(context.getSession(), authSession, user);
-
+        var scopeInfo = getScopeInfo(session, authSession, user);
         var scopesToAskForConsent = new HashSet<ClientScopeModel>();
 
         for (var scopes : List.of( //
@@ -237,12 +250,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         }
 
         if (!scopesToAskForConsent.isEmpty()) {
-            var client = authSession.getClient();
-
             // TODO find a way to merge the existing consent with the new consent instead of replacing the existing consent
-            var users = context.getSession().users();
-            var realm = context.getRealm();
-
             var consentByClient = users.getConsentByClient(realm, user.getId(), client.getId());
             if (consentByClient != null) {
                 users.revokeConsentForClient(realm, user.getId(), client.getId());
@@ -260,7 +268,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             // TODO find a better way to propagate the selected scopes
             authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
-            context.getEvent().client(client).user(user).event(EventType.GRANT_CONSENT).detail(OAuth2Constants.SCOPE, scope).success();
+            event.detail(OAuth2Constants.SCOPE, scope).success();
         }
 
         // TODO ensure that required scopes are always consented

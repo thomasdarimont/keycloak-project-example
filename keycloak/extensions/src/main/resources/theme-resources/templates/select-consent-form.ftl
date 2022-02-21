@@ -20,7 +20,7 @@
                                        name="scopeSelection"
                                        value="${scope.name}"
                                        <#if !scope.optional>disabled</#if>
-                                       <#if scope.granted>checked</#if>
+                                        <#if scope.granted || !scope.optional>checked</#if>
                                 />
                                 <#if !scope.optional>
                                     <input type="hidden" name="scopeSelection" value="${scope.name}"/>
@@ -33,6 +33,7 @@
                                 </p>
                             </div>
 
+                            <#--
                             <div class="${properties.kcFormGroupClass!}">
                                 <#list scope.fields as scopeField>
                                     <div class="${properties.kcInputWrapperClass!}">
@@ -51,6 +52,7 @@
                                     </div>
                                 </#list>
                             </div>
+                            -->
 
                             <div></div>
                         </div>
@@ -60,16 +62,11 @@
 
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <#if isAppInitiatedAction??>
-                        <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                               type="submit" name="update" value="${msg("doSubmit")}"/>
-                        <button
-                        class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}"
-                        type="submit" name="cancel-aia" value="true" formnovalidate/>${msg("doCancel")}</button>
-                    <#else>
-                        <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
-                               name="update" type="submit" value="${msg("doSubmit")}"/>
-                    </#if>
+                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
+                           name="accept" id="kc-login" type="submit" value="${msg("doYes")}"/>
+                    <input class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}"
+                           name="cancel" id="kc-cancel" type="submit" value="${msg("doNo")}"/>
+
                 </div>
             </div>
         </form>
