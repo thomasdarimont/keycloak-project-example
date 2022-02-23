@@ -313,7 +313,7 @@ class start {
         String[] mkcertCommand = {"mkcert", "-CAROOT"};
         Process proc = rt.exec(mkcertCommand);
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        return stdInput.readLine();
+        return stdInput.readLine().replace('\\','/');
     }
 
 }
