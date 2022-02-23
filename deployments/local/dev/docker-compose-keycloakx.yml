@@ -36,7 +36,8 @@ services:
 
       # Allow access via visualvm and jmc (remote jmx connection to localhost 8790 without ssl)
       # see https://docs.oracle.com/en/java/javase/11/management/monitoring-and-management-using-jmx-technology.html#GUID-D4CBA2D6-2E24-4856-A7D8-62B3DFFB76EA
-      JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=/opt/keycloak/conf/jmxremote.password -Dcom.sun.management.jmxremote.ssl=false -XX:FlightRecorderOptions=stackdepth=256"
+      #JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=/opt/keycloak/conf/jmxremote.password -Dcom.sun.management.jmxremote.ssl=false -XX:FlightRecorderOptions=stackdepth=256"
+      JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:FlightRecorderOptions=stackdepth=256"
     mem_limit: 1024m
     mem_reservation: 1024m
     cpus: 2
@@ -83,3 +84,4 @@ services:
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
       - ./keycloak-ext/keycloak-home-idp-discovery-16.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery-16.0.0.jar:z
+      - ./keycloak-ext/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:/opt/keycloak/providers/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:z
