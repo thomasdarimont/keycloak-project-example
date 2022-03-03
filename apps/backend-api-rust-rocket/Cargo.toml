@@ -1,0 +1,17 @@
+[package]
+name = "backend-api-rust-rocket"
+version = "0.1.0"
+authors = ["Thomas Darimont <thomas.darimont@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+serde = { version ="1.0.136", features = ["derive"]}
+lazy_static = "1.4.0"
+log = "0.4.14"
+chrono = "0.4.19"
+jsonwebtoken = "7.2.0"
+rocket = { version = "0.5.0-rc.1", features = ["tls", "json", "serde_json"] }
+reqwest = { version = "0.10.6", features = ["blocking", "json"] }
+
+[dev-dependencies]
+cargo-watch = "8.1.1"
