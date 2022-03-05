@@ -1,8 +1,8 @@
+use crate::middleware::jwt_auth::{Accessor, FoundClaims};
 use actix_4_jwt_auth::AuthenticatedUser;
 use actix_web::{get, HttpResponse};
 use chrono::Utc;
 use serde::Serialize;
-use crate::middleware::jwt_auth::{Accessor, FoundClaims};
 
 #[derive(Serialize)]
 pub struct MeInfo {
