@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use actix_4_jwt_auth::{OIDCValidator, OIDCValidatorConfig};
 use actix_web::rt::task;
 use serde_json::Value;
+use std::collections::HashMap;
 
 pub type FoundClaims = HashMap<String, Value>;
 
@@ -11,10 +11,7 @@ pub trait Accessor {
 
 impl Accessor for FoundClaims {
     fn get_as_string(&self, key: &str) -> String {
-        self.get(key).unwrap()
-            .as_str()
-            .unwrap()
-            .to_string()
+        self.get(key).unwrap().as_str().unwrap().to_string()
     }
 }
 
@@ -27,8 +24,9 @@ pub async fn create_oidc_jwt_validator(issuer: &str) -> OIDCValidatorConfig {
             issuer: iss,
             validator,
         };
-    }).await
-        .unwrap();
+    })
+    .await
+    .unwrap();
 
     return config;
 }
