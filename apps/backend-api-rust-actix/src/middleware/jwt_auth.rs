@@ -20,10 +20,7 @@ pub async fn create_oidc_jwt_validator(issuer: &str) -> OIDCValidatorConfig {
 
     let config = task::spawn_blocking(move || {
         let validator = OIDCValidator::new_from_issuer(iss.clone()).unwrap();
-        return OIDCValidatorConfig {
-            issuer: iss,
-            validator,
-        };
+        return OIDCValidatorConfig { issuer: iss, validator };
     })
     .await
     .unwrap();
