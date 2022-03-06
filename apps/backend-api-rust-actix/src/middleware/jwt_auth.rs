@@ -7,11 +7,20 @@ pub type FoundClaims = HashMap<String, Value>;
 
 pub trait ClaimsAccessor {
     fn get_as_string(&self, key: &str) -> String;
+    fn has_scope(&self, scope: &str) -> bool;
 }
 
 impl ClaimsAccessor for FoundClaims {
     fn get_as_string(&self, key: &str) -> String {
-        self.get(key).unwrap().as_str().unwrap().to_string()
+        return self.get(key).unwrap().as_str().unwrap().to_string();
+    }
+
+    fn has_scope(&self, scope: &str) -> bool {
+        return self
+            .get_as_string("scope")
+            .split_ascii_whitespace()
+            .into_iter()
+            .any(|s| s == scope);
     }
 }
 

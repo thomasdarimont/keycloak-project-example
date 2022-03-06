@@ -11,13 +11,24 @@ pub struct MeInfo {
     pub datetime: String,
 }
 
+#[derive(Serialize)]
+pub struct ErrorInfo {
+    pub code: String,
+}
+
 #[get("/api/users/me")]
 pub async fn handle_me_info(user: AuthenticatedUser<FoundClaims>) -> HttpResponse {
+    if !user.claims.has_scope("email") {
+        return HttpResponse::Forbidden().json(ErrorInfo {
+            code: "invalid_scope".into(),
+        });
+    }
+
     let username = user.claims.get_as_string("preferred_username");
     let obj = MeInfo {
         message: format!("Hello, {}!", username),
-        backend: "rust-actix".to_string(),
-        datetime: Utc::now().to_string().clone(),
+        backend: "rust-actix".into(),
+        datetime: Utc::now().to_string().into(),
     };
     HttpResponse::Ok().json(obj)
 }
