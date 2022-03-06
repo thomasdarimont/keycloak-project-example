@@ -13,7 +13,7 @@ async fn main() -> std::io::Result<()> {
 
     env_logger::init_from_env(env_logger::Env::new().default_filter_or(&config.log_level_default));
 
-    let ssl_acceptor_builder = middleware::ssl::create_ssl_acceptor(&config.cert_location, &config.key_location);
+    let ssl_acceptor_builder = middleware::ssl::create_ssl_acceptor_builder(&config.cert_location, &config.key_location);
     let oidc_jwt_validator = middleware::jwt_auth::create_oidc_jwt_validator(&config.oidc_issuer).await;
 
     HttpServer::new(move || {
