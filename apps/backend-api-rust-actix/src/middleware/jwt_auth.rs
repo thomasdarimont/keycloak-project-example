@@ -5,11 +5,11 @@ use std::collections::HashMap;
 
 pub type FoundClaims = HashMap<String, Value>;
 
-pub trait Accessor {
+pub trait ClaimsAccessor {
     fn get_as_string(&self, key: &str) -> String;
 }
 
-impl Accessor for FoundClaims {
+impl ClaimsAccessor for FoundClaims {
     fn get_as_string(&self, key: &str) -> String {
         self.get(key).unwrap().as_str().unwrap().to_string()
     }
