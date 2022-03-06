@@ -19,16 +19,15 @@ pub struct FoundClaims {
 
 impl FoundClaims {
     pub fn has_scope(&self, scope: &str) -> bool {
-        return self.scope.split_ascii_whitespace().into_iter().any(|s| s == scope);
+        self.scope.split_ascii_whitespace().into_iter().any(|s| s == scope)
     }
 }
 
 pub async fn create_oidc_jwt_validator(issuer: String) -> OIDCValidatorConfig {
-    let config = task::spawn_blocking(move || {
+    task::spawn_blocking(move || {
         let validator = OIDCValidator::new_from_issuer(issuer.clone()).unwrap();
-        return OIDCValidatorConfig { issuer, validator };
+        OIDCValidatorConfig { issuer, validator }
     })
     .await
-    .unwrap();
-    return config;
+    .unwrap()
 }

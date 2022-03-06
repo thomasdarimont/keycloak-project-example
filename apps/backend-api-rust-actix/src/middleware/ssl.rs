@@ -4,5 +4,5 @@ pub fn create_ssl_acceptor_builder(cert_location: &str, key_location: &str) -> S
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder.set_private_key_file(key_location, SslFiletype::PEM).unwrap();
     builder.set_certificate_chain_file(cert_location).unwrap();
-    return builder;
+    builder
 }
