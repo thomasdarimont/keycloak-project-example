@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
 
     let ssl_acceptor_builder =
         middleware::ssl::create_ssl_acceptor_builder(&config.cert_location, &config.key_location);
-    let oidc_jwt_validator = middleware::jwt_auth::create_oidc_jwt_validator(&config.oidc_issuer).await;
+    let oidc_jwt_validator = middleware::jwt_auth::create_oidc_jwt_validator(config.oidc_issuer).await;
 
     HttpServer::new(move || {
         let cors = middleware::cors::create_cors_config(config.allowed_cors_origin.clone());
