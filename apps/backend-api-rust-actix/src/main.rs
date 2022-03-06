@@ -1,21 +1,21 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use actix_web::{App, HttpServer};
-use configuration::Configuration;
+use config::Config;
 
 mod api;
-mod configuration;
+mod config;
 mod middleware;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let Configuration {
+    let Config {
         server_bind_addr,
         cert_location,
         key_location,
         oidc_issuer,
         allowed_cors_origin,
-    } = configuration::Configuration::from_environment_with_defaults();
+    } = config::Config::from_environment_with_defaults();
 
     let ssl_acceptor_builder = middleware::ssl::create_ssl_acceptor(&cert_location, &key_location);
     let oidc_jwt_validator = middleware::jwt_auth::create_oidc_jwt_validator(&oidc_issuer).await;

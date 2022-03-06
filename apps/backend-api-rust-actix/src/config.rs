@@ -1,5 +1,5 @@
 use std::env;
-pub struct Configuration {
+pub struct Config {
     pub server_bind_addr: String,
     pub cert_location: String,
     pub key_location: String,
@@ -7,7 +7,7 @@ pub struct Configuration {
     pub allowed_cors_origin: String,
 }
 
-impl Configuration {
+impl Config {
     pub fn from_environment_with_defaults() -> Self {
         Self {
             server_bind_addr: env::var("SERVER_BIND_ADDRESS").unwrap_or("127.0.0.1:4863".into()),
