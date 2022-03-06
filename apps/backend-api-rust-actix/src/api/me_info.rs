@@ -5,14 +5,14 @@ use chrono::Utc;
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct MeInfo {
+struct MeInfo {
     pub message: String,
     pub backend: String,
     pub datetime: String,
 }
 
 #[derive(Serialize)]
-pub struct ErrorInfo {
+struct ErrorInfo {
     pub code: String,
 }
 
