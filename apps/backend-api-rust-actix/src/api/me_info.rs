@@ -1,4 +1,4 @@
-use crate::middleware::jwt_auth::{ClaimsAccessor, FoundClaims};
+use crate::middleware::jwt_auth::FoundClaims;
 use actix_4_jwt_auth::AuthenticatedUser;
 use actix_web::{get, HttpResponse};
 use chrono::Utc;
@@ -24,7 +24,7 @@ pub async fn handle_me_info(user: AuthenticatedUser<FoundClaims>) -> HttpRespons
         });
     }
 
-    let username = user.claims.get_as_string("preferred_username");
+    let username = user.claims.preferred_username.unwrap_or("anonymous".into());
     let obj = MeInfo {
         message: format!("Hello, {}!", username),
         backend: "rust-actix".into(),
