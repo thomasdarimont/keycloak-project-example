@@ -424,6 +424,7 @@ dependencies = [
  "actix-web",
  "cargo-watch",
  "chrono",
+ "env_logger",
  "openssl",
  "serde",
  "serde_json",

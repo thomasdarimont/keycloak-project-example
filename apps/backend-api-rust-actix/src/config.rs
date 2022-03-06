@@ -5,6 +5,7 @@ pub struct Config {
     pub key_location: String,
     pub oidc_issuer: String,
     pub allowed_cors_origin: String,
+    pub log_level_default: String,
 }
 
 impl Config {
@@ -16,6 +17,7 @@ impl Config {
             oidc_issuer: env::var("OIDC_ISSUER")
                 .unwrap_or("https://id.acme.test:8443/auth/realms/acme-internal".into()),
             allowed_cors_origin: env::var("ALLOWED_CORS_ORIGIN").unwrap_or("https://apps.acme.test:4443".into()),
+            log_level_default: env::var("LOG_LEVEL_DEFAULT").unwrap_or("info".into()),
         }
     }
 }
