@@ -24,13 +24,11 @@ impl FoundClaims {
 }
 
 pub async fn create_oidc_jwt_validator(issuer: String) -> OIDCValidatorConfig {
-
     let config = task::spawn_blocking(move || {
         let validator = OIDCValidator::new_from_issuer(issuer.clone()).unwrap();
         return OIDCValidatorConfig { issuer, validator };
     })
     .await
     .unwrap();
-
     return config;
 }
