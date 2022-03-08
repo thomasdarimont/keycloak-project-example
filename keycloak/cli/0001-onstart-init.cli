@@ -61,6 +61,7 @@ echo SETUP: Theme configuration
 echo SETUP: Hostname configuration
 # Configure Keycloak to use the frontend-URL as the base URL for backend endpoints
 /subsystem=keycloak-server/spi=hostname/provider=default:write-attribute(name=properties.forceBackendUrlToFrontendUrl, value=${env.KEYCLOAK_FORCE_FRONTEND_TO_BACKEND_URL:true})
+/subsystem=keycloak-server/spi=hostname/provider=default:write-attribute(name=properties.adminUrl, value=${env.KEYCLOAK_ADMIN_URL:})
 
 ### Datasource Configuration ###
 

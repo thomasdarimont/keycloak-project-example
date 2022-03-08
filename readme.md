@@ -104,7 +104,7 @@ Register map the following host names in your hosts file configuration, e.g. `/e
 ```
 java start.java --https
 ```
-Keycloak will be available on https://id.acme.test:8443/auth.
+The Keycloak admin-console will be available on https://admin.acme.test:8443/auth/admin.
 
 Note that after changing extensions code you need to run the `java bin/triggerDockerExtensionDeploy.java` script to trigger a redeployment of the custom extension by Keycloak.
 
@@ -224,7 +224,7 @@ Users:
 - Username `support` and password `test` (from database)
 
 The support user has access to a [dedicated realm scoped admin-console](https://www.keycloak.org/docs/latest/server_admin/index.html#_per_realm_admin_permissions) and can perform user and group lookups.
-An example for a realm scoped admin-console URL is: `https://id.acme.test:8443/auth/admin/acme-internal/console`.
+An example for a realm scoped admin-console URL is: `https://admin.acme.test:8443/auth/admin/acme-internal/console`.
 
 #### Acme-LDAP Realm
 
