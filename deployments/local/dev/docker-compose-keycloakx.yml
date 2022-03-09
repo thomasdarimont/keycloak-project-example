@@ -11,9 +11,9 @@ services:
       - ./keycloak-common.env
       - ./keycloak-http.env
     environment:
-      KC_DB: "dev-file"
-      KC_DB_USER: "sa"
-      KC_DB_PASSWORD: ""
+#      KC_DB: "dev-file"
+#      KC_DB_USERNAME: "sa"
+#      KC_DB_PASSWORD: ""
       KC_HTTP_RELATIVE_PATH: "/auth"
 
 #      KC_METRICS_ENABLED: true

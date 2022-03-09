@@ -30,14 +30,11 @@ services:
       - ./keycloak-db.env
     environment:
       DB_VENDOR: POSTGRES
-      KC_DB: postgres
-#      DB_ADDR: acme-keycloak-db
-#      DB_DATABASE: keycloak
-#      DB_USER: keycloak
-#      DB_PASSWORD: keycloak
-#      DB_SCHEMA: public
 # See postgres JDBC URL parameters: https://jdbc.postgresql.org/documentation/head/connect.html
       JDBC_PARAMS: ApplicationName=keycloak&ssl=true&sslmode=verify-ca&sslrootcert=/etc/x509/ca/tls.crt
+
+      KC_DB: postgres
+      KC_DB_URL_PROPERTIES: "?ApplicationName=keycloak&ssl=true&sslmode=verify-ca&sslrootcert=/etc/x509/ca/tls.crt"
     volumes:
       # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z

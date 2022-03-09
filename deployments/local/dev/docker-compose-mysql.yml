@@ -32,15 +32,14 @@ services:
     env_file:
       - ./keycloak-db.env
     environment:
+      # See MySQL JDBC URL parameters: https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
       DB_VENDOR: MYSQL
+      JDBC_PARAMS: requireSSL=true&enabledTLSProtocols=TLSv1.2
+
       # keycloak-x
       KC_DB: mysql
-#      DB_ADDR: acme-keycloak-db
-#      DB_DATABASE: keycloak
-#      DB_USER: keycloak
-#      DB_PASSWORD: keycloak
-# See MySQL JDBC URL parameters: https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
-      JDBC_PARAMS: requireSSL=true&enabledTLSProtocols=TLSv1.2
+      KC_DB_URL_PROPERTIES: "?requireSSL=true&enabledTLSProtocols=TLSv1.2"
+      KC_DB_SCHEMA: "keycloak"
     volumes:
       # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z

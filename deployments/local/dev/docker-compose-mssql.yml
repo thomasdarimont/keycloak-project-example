@@ -26,16 +26,20 @@ services:
     env_file:
       - ./keycloak-db.env
     environment:
+      # See MSSQL JDBC URL parameters: https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-with-ssl-encryption?view=sql-server-ver15
+      DB_VENDOR: mssql
+      DB_PASSWORD: Keycloak123
+      DB_SCHEMA: dbo
+      JDBC_PARAMS: encrypt=true;trustServerCertificate=true;applicationName=keycloak
+
       # keycloak-x
       KC_DB: mssql
       KC_DB_PASSWORD: Keycloak123
       KC_DB_SCHEMA: dbo
-
-      DB_VENDOR: mssql
-      DB_PASSWORD: Keycloak123
-      DB_SCHEMA: dbo
-# See MSSQL JDBC URL parameters: https://docs.microsoft.com/en-us/sql/connect/jdbc/connecting-with-ssl-encryption?view=sql-server-ver15
-      JDBC_PARAMS: encrypt=true;trustServerCertificate=true
+      KC_DB_URL_PROPERTIES: ";encrypt=true;trustServerCertificate=true;applicationName=keycloak"
+      # Workaround for Keycloak.X and MSSQL, see: https://groups.google.com/g/keycloak-dev/c/ZGuX0CFWqwo/m/fhhT8qnOBgAJ?utm_medium=email&utm_source=footer&pli=1
+      KC_DB_TX_TYPE: "enabled"
+      KC_DB_DRIVER: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
     volumes:
       # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z

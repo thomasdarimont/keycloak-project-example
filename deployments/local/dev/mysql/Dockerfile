@@ -1,4 +1,4 @@
-FROM mysql/mysql-server:8.0.21
+FROM mysql/mysql-server:8.0.28
 
 # Copy certificates into image to adjust permissions as necessary
 # 27 uid of mysql user
