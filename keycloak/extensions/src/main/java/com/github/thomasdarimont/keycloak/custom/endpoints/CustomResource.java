@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
+import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
@@ -73,5 +74,10 @@ public class CustomResource {
     @Path("me/profile")
     public UserProfileResource profile() {
         return resourceContext.initResource(new UserProfileResource(session, token));
+    }
+
+    @Path("me/account")
+    public AcmeAccountResource account() {
+        return resourceContext.initResource(new AcmeAccountResource(session, token));
     }
 }

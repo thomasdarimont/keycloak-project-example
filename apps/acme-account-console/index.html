@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -214,8 +213,8 @@
 
     };
 
-    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout"];
-    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account"];
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount"];
+    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
         return !contextClassesToHideDefault.includes(value);
     });
@@ -599,6 +598,7 @@
                 </tr>
             </table>
             <button id="btnSaveProfile" onClick="saveProfile(); return false">Save</button>
+            <button name="deleteAccountBtn" onclick="requestAccountDeletion()" class="accountDeletion">Delete</button>
             <span id="profileStatus"></span>
         `;
 
@@ -776,6 +776,35 @@
 
         let data = JSON.stringify(userInfoData, null, '    ');
         show(data, "token-content");
+    }
+
+    async function requestAccountDeletion() {
+
+        console.log("Requesting account deletion");
+
+        let settingsStatus = document.getElementById("profileStatus");
+
+        await keycloak.updateToken(5);
+
+        let accountDeletionData;
+        try {
+            settingsStatus.innerText = "Requesting account deletion ...";
+            let response = await sendRequest(`${keycloakUrl}/realms/${realm}/custom-resources/me/account`, {
+                method: "DELETE"
+            });
+
+            if (response.ok) {
+                accountDeletionData = await response.json();
+                settingsStatus.innerText = "Account deletion pending.";
+            } else {
+                accountDeletionData = {error: "status " + response.status};
+            }
+        } catch (error) {
+            console.log(error);
+            accountDeletionData = {error: error.message};
+        }
+
+        return accountDeletionData;
     }
 
     async function fetchMeInfoData() {

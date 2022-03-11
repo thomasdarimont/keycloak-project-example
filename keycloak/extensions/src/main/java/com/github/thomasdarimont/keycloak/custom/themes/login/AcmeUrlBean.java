@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.themes.login;
 
 import org.keycloak.forms.login.freemarker.model.ClientBean;
-import org.keycloak.models.KeycloakSession;
 
 import java.util.Optional;
 
@@ -15,9 +14,15 @@ public class AcmeUrlBean {
 
     private static final String DEFAULT_PRIVACY_URL = optionalOrElse(System.getenv("ACME_PRIVACY_URL"), DEFAULT_SITE_URL + "/site/privacy.html");
 
+    private static final String DEFAULT_ACCOUNT_DELETED_URL = optionalOrElse(System.getenv("ACME_ACCOUNT_DELETED_URL"), DEFAULT_SITE_URL + "/site/accountdeleted.html");
+
     private static final String DEFAULT_LOGO_URL = optionalOrElse(System.getenv("ACME_LOGO_URL"), null);
 
     private final ClientBean clientBean;
+
+    public AcmeUrlBean() {
+        this(null);
+    }
 
     public AcmeUrlBean(ClientBean clientBean) {
         this.clientBean = clientBean;
@@ -62,5 +67,9 @@ public class AcmeUrlBean {
         }
 
         return DEFAULT_LOGO_URL;
+    }
+
+    public String getAccountDeletedUrl() {
+        return DEFAULT_ACCOUNT_DELETED_URL;
     }
 }
