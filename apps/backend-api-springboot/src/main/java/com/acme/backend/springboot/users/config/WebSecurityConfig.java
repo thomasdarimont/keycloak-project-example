@@ -4,11 +4,11 @@ import com.acme.backend.springboot.users.support.access.AccessController;
 import com.acme.backend.springboot.users.support.keycloak.KeycloakJwtAuthenticationConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -19,9 +19,9 @@ import java.util.List;
  * application. Any configuration on specific resources is applied
  * in addition to these global rules.
  */
-@EnableWebSecurity
+@Configuration
 @RequiredArgsConstructor
-class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+class WebSecurityConfig {
 
     private final KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter;
 
@@ -38,22 +38,25 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @param http security configuration
      * @throws Exception any error
      */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .cors(this::configureCors)
-                .authorizeRequests()
-                // declarative route configuration
-//                .mvcMatchers("/api").hasAuthority("ROLE_ACCESS")
-                .mvcMatchers("/api/**").access("@accessController.checkAccess()")
-                //...
-                .anyRequest().fullyAuthenticated()
-                .and()
-                .oauth2ResourceServer()
-                .jwt().jwtAuthenticationConverter(keycloakJwtAuthenticationConverter);
+        http.sessionManagement(smc -> {
+            smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        });
+        http.cors(this::configureCors);
+        http.authorizeRequests(arc -> {
+            // declarative route configuration
+            // .mvcMatchers("/api").hasAuthority("ROLE_ACCESS")
+            arc.mvcMatchers("/api/**").access("@accessController.checkAccess()");
+            // add additional routes
+            arc.anyRequest().fullyAuthenticated(); //
+        });
+        http.oauth2ResourceServer(arsc -> {
+            arsc.jwt().jwtAuthenticationConverter(keycloakJwtAuthenticationConverter);
+        });
+
+        return http.build();
     }
 
     @Bean
