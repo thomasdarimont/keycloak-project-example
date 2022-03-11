@@ -1,0 +1,98 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!-- common metadata header for all application  -->
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <title>Account Console</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <link rel="stylesheet" href="/webapp/webjars/bootstrap/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webapp/webjars/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"/>
+    <link rel="stylesheet" href="/webapp/webjars/font-awesome/css/all.css">
+
+    <script src="/webapp/webjars/jquery/jquery.min.js" defer></script>
+    <script src="/webapp/webjars/momentjs/min/moment.min.js" defer></script>
+    <script src="/webapp/webjars/momentjs/locale/de.js" defer></script>
+
+    <script src="/webapp/webjars/bootstrap/js/bootstrap.min.js" defer></script>
+    <script src="/webapp/webjars/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js" defer></script>
+    <script src="/webapp/webjars/font-awesome/js/all.js" defer></script>
+</head>
+
+<body>
+<div th:fragment="navbar2 (current)">
+
+    <!-- /* see: https://mdbootstrap.com/docs/standard/navigation/navbar/# */ -->
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Toggle button -->
+            <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-mdb-toggle="collapse"
+                    data-mdb-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+            >
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Collapsible wrapper -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <!-- Left links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/webapp/" th:classappend="${current == 'index' ? 'active' : ''}">
+                            Home <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/webapp/profile" th:classappend="${current == 'profile' ? 'active' : ''}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/webapp/settings" th:classappend="${current == 'settings' ? 'active' : ''}">Settings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/webapp/security" th:classappend="${current == 'security' ? 'active' : ''}">Security</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/webapp/applications" th:classappend="${current == 'applications' ? 'active' : ''}">Applications</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Collapsible wrapper -->
+
+            <!-- Right elements -->
+            <div class="d-flex align-items-center">
+                <!-- Avatar -->
+                <div class="dropdown">
+                    <button id="navbarDropdownMenuAvatar" class="btn btn-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown"  data-bs-auto-close="true"
+                            aria-expanded="false">
+                        <i class="fas fa-user"></i>
+                        <span sec:authentication="name">Anonymous</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="logoutForm.submit(); return false;">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Right elements -->
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+
+    <form id="logoutForm" th:action="@{/logout}" method="POST" class="visually-hidden">
+        <!--/* CSRF token will be emitted by Spring Security */-->
+    </form>
+    <!-- Navbar -->
+
+</div>
+
+</body>
+</html>
