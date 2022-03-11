@@ -1,75 +1,82 @@
 package com.github.thomasdarimont.keycloak.custom.themes.login;
 
+import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
+import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import org.keycloak.forms.login.freemarker.model.ClientBean;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 
 import java.util.Optional;
 
 public class AcmeUrlBean {
+    private static final String ACME_SITE_URL_KEY = "acme_site_url";
 
-    private static final String DEFAULT_SITE_URL = optionalOrElse(System.getenv("ACME_SITE_URL"), "http://example.org");
+    private static final String ACME_TERMS_URL_REALM_ATTRIBUTE_KEY = "acme_terms_url";
+    private static final String ACME_TERMS_URL_CLIENT_ATTRIBUTE_KEY = "tosUri";
 
-    private static final String DEFAULT_TERMS_URL = optionalOrElse(System.getenv("ACME_TERMS_URL"), DEFAULT_SITE_URL + "/site/terms.html");
+    private static final String ACME_IMPRINT_URL_KEY = "acme_imprint_url";
 
-    private static final String DEFAULT_IMPRINT_URL = optionalOrElse(System.getenv("ACME_IMPRINT_URL"), DEFAULT_SITE_URL + "/site/imprint.html");
+    private static final String ACME_PRIVACY_URL_REALM_ATTRIBUTE_KEY = "acme_privacy_url";
+    public static final String ACME_PRIVACY_URL_CLIENT_ATTRIBUTE_KEY = "policyUri";
 
-    private static final String DEFAULT_PRIVACY_URL = optionalOrElse(System.getenv("ACME_PRIVACY_URL"), DEFAULT_SITE_URL + "/site/privacy.html");
+    private static final String ACME_LOGO_URL_REALM_ATTRIBUTE_KEY = "acme_logo_url";
+    public static final String ACME_LOGO_URL_CLIENT_ATTRIBUTE_KEY = "logoUri";
 
-    private static final String DEFAULT_ACCOUNT_DELETED_URL = optionalOrElse(System.getenv("ACME_ACCOUNT_DELETED_URL"), DEFAULT_SITE_URL + "/site/accountdeleted.html");
+    private static final String ACME_ACCOUNT_DELETE_URL_KEY = "acme_account_deleted_url";
 
-    private static final String DEFAULT_LOGO_URL = optionalOrElse(System.getenv("ACME_LOGO_URL"), null);
+    private final ClientConfig clientConfig;
+    private final RealmConfig realmConfig;
 
-    private final ClientBean clientBean;
-
-    public AcmeUrlBean() {
-        this(null);
+    public AcmeUrlBean(KeycloakSession session) {
+        this(session, null);
     }
 
-    public AcmeUrlBean(ClientBean clientBean) {
-        this.clientBean = clientBean;
+    public AcmeUrlBean(KeycloakSession session, ClientBean clientBean) {
+        RealmModel realm = session.getContext().getRealm();
+        this.realmConfig = new RealmConfig(realm);
+
+        if(clientBean != null) {
+            this.clientConfig = new ClientConfig(realm.getClientByClientId(clientBean.getClientId()));
+        } else {
+            this.clientConfig = null;
+        }
     }
 
-    private static String optionalOrElse(String value, String fallback) {
-        return Optional.ofNullable(value).orElse(fallback);
-    }
-
+    /** BEGIN: Used from freemarker */
     public String getSiteUrl() {
-        return DEFAULT_SITE_URL;
+        return realmConfig.getValue(ACME_SITE_URL_KEY);
     }
 
     public String getTermsUrl() {
-
-        if (clientBean != null) {
-            return optionalOrElse(clientBean.getAttribute("tosUri"), DEFAULT_TERMS_URL);
-        }
-
-        return DEFAULT_TERMS_URL;
+        return clientAttribute(ACME_TERMS_URL_CLIENT_ATTRIBUTE_KEY).orElse(realmConfig.getValue(ACME_TERMS_URL_REALM_ATTRIBUTE_KEY));
     }
 
     public String getPrivacyUrl() {
-
-        if (clientBean != null) {
-            return optionalOrElse(clientBean.getAttribute("policyUri"), DEFAULT_PRIVACY_URL);
-        }
-
-        return DEFAULT_PRIVACY_URL;
+        return clientAttribute(ACME_PRIVACY_URL_CLIENT_ATTRIBUTE_KEY).orElse(realmConfig.getValue(ACME_PRIVACY_URL_REALM_ATTRIBUTE_KEY));
     }
-
 
     public String getImprintUrl() {
         // there is no client specific imprint
-        return DEFAULT_IMPRINT_URL;
+        return realmConfig.getValue(ACME_IMPRINT_URL_KEY);
     }
 
     public String getLogoUrl() {
-
-        if (clientBean != null) {
-            return optionalOrElse(clientBean.getAttribute("logoUri"), DEFAULT_LOGO_URL);
-        }
-
-        return DEFAULT_LOGO_URL;
+        return clientAttribute(ACME_LOGO_URL_CLIENT_ATTRIBUTE_KEY).orElse(realmConfig.getValue(ACME_LOGO_URL_REALM_ATTRIBUTE_KEY));
     }
 
     public String getAccountDeletedUrl() {
-        return DEFAULT_ACCOUNT_DELETED_URL;
+        // there is no client specific delete url
+        return realmConfig.getValue(ACME_ACCOUNT_DELETE_URL_KEY);
     }
+
+    /** END: Used from freemarker */
+
+    private Optional<String> clientAttribute(String key) {
+        if(this.clientConfig != null) {
+            return Optional.ofNullable(this.clientConfig.getValue(key));
+        }
+        return Optional.empty();
+    }
+
+
 }

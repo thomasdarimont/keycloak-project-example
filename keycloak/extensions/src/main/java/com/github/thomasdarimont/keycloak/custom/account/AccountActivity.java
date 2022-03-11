@@ -107,7 +107,7 @@ public class AccountActivity {
         String userId = user.getId();
         int validityInSecs = realm.getActionTokenGeneratedByAdminLifespan();
         int absoluteExpirationInSecs = Time.currentTime() + validityInSecs;
-        RequestAccountDeletionActionToken requestAccountDeletionActionToken = new RequestAccountDeletionActionToken(userId, absoluteExpirationInSecs, Constants.ACCOUNT_MANAGEMENT_CLIENT_ID, new AcmeUrlBean().getAccountDeletedUrl());
+        RequestAccountDeletionActionToken requestAccountDeletionActionToken = new RequestAccountDeletionActionToken(userId, absoluteExpirationInSecs, Constants.ACCOUNT_MANAGEMENT_CLIENT_ID, new AcmeUrlBean(session).getAccountDeletedUrl());
         String token = requestAccountDeletionActionToken.serialize(session, realm, uriInfo);
         UriBuilder builder = LoginActionsService.actionTokenProcessor(session.getContext().getUri());
         builder.queryParam("key", token);
