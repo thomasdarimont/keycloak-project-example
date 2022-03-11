@@ -17,6 +17,15 @@ sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "browser"
 registrationFlow: "Custom Registration"
 
+attributes:
+  # for http variant: http://apps.acme.test:4000
+  "acme_site_url": "https://apps.acme.test:4443"
+  "acme_terms_url": "https://apps.acme.test:4443/site/terms.html"
+  "acme_imprint_url": "https://apps.acme.test:4443/site/imprint.html"
+  "acme_privacy_url": "https://apps.acme.test:4443/site/privacy.html"
+  #"acme_logo_url": "no example, should be taken from client or null"
+  "acme_account_deleted_url": "https://apps.acme.test:4443/site/accountdeleted.html"
+
 smtpServer:
   replyToDisplayName: "Acme APPS Support"
   port: 1025
