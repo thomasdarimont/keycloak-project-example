@@ -13,6 +13,14 @@
     <artifactId>extensions</artifactId>
     <name>${project.organization.name} Keycloak Extensions</name>
 
+    <properties>
+        <cdi-api.version>2.0.2</cdi-api.version>
+        <smallrye-metrics.version>3.0.1</smallrye-metrics.version>
+        <smallrye-health.version>3.0.0</smallrye-health.version>
+        <microprofile-health-api.version>3.0</microprofile-health-api.version>
+        <microprofile-metrics-api.version>3.0</microprofile-metrics-api.version>
+    </properties>
+
     <dependencies>
 
         <dependency>
@@ -33,6 +41,13 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-services</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-model-infinispan</artifactId>
             <version>${keycloak.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -119,13 +134,6 @@
         </dependency>
 
 <!--        <dependency>-->
-<!--            <groupId>org.keycloak</groupId>-->
-<!--            <artifactId>keycloak-model-infinispan</artifactId>-->
-<!--            <version>${keycloak.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
 <!--            <groupId>org.jgroups</groupId>-->
 <!--            <artifactId>jgroups</artifactId>-->
 <!--            <version>4.2.11.Final</version>-->
@@ -150,13 +158,6 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
-    <properties>
-        <cdi-api.version>2.0.2</cdi-api.version>
-        <smallrye-metrics.version>3.0.1</smallrye-metrics.version>
-        <smallrye-health.version>3.0.0</smallrye-health.version>
-        <microprofile-health-api.version>3.0</microprofile-health-api.version>
-        <microprofile-metrics-api.version>3.0</microprofile-metrics-api.version>
-    </properties>
     <profiles>
         <profile>
             <id>with-integration-tests</id>

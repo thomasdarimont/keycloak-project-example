@@ -1,14 +1,10 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice;
 
+import com.github.thomasdarimont.keycloak.custom.support.CookieUtils;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.keycloak.common.ClientConnection;
-import org.keycloak.common.util.ServerCookie;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.services.util.CookieHelper;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.UriBuilder;
 import java.util.Optional;
 
 public class TrustedDeviceCookie {
@@ -17,48 +13,22 @@ public class TrustedDeviceCookie {
 
     public static void removeDeviceCookie(KeycloakSession session, RealmModel realm) {
         // maxAge = 1 triggers legacy cookie removal
-        addCookie("", session, realm, 1);
+        CookieUtils.addCookie(COOKIE_NAME, "", session, realm, 1);
     }
 
     public static void addDeviceCookie(String deviceTokenString, int maxAge, KeycloakSession session, RealmModel realm) {
-        addCookie(deviceTokenString, session, realm, maxAge);
-    }
-
-    private static void addCookie(String deviceTokenString, KeycloakSession session, RealmModel realm, int maxAge) {
-
-        UriBuilder baseUriBuilder = session.getContext().getUri().getBaseUriBuilder();
-        // TODO think about narrowing the cookie-path to only contain the /auth path.
-        String path = baseUriBuilder.path("realms")
-                .path(realm.getName())
-                .path("/")
-                .build()
-                .getPath();
-
-        ClientConnection connection = session.getContext().getConnection();
-        boolean secure = realm.getSslRequired().isRequired(connection);
-
-        ServerCookie.SameSiteAttributeValue sameSiteValue = secure ? ServerCookie.SameSiteAttributeValue.NONE : null;
-        CookieHelper.addCookie(
-                COOKIE_NAME,
-                deviceTokenString,
-                path,
-                null,// domain
-                null, // comment
-                maxAge,
-                secure,
-                true, // httponly
-                sameSiteValue
-        );
+        CookieUtils.addCookie(COOKIE_NAME, deviceTokenString, session, realm, maxAge);
     }
 
     public static TrustedDeviceToken parseDeviceTokenFromCookie(HttpRequest httpRequest, KeycloakSession session) {
+        String cookieValue = CookieUtils.parseCookie(COOKIE_NAME, httpRequest, session);
 
-        Cookie deviceCookie = httpRequest.getHttpHeaders().getCookies().get(COOKIE_NAME);
-        if (deviceCookie == null) {
+        if(cookieValue == null) {
             return null;
         }
 
         // decodes and validates device cookie
-        return session.tokens().decode(deviceCookie.getValue(), TrustedDeviceToken.class);
+        return session.tokens().decode(cookieValue, TrustedDeviceToken.class);
     }
+
 }

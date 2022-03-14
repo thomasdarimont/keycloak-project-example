@@ -12,6 +12,7 @@
             <module name="org.jboss.resteasy.resteasy-jaxrs"/>
             <module name="org.apache.httpcomponents"/>
             <module name="org.keycloak.keycloak-services"/>
+            <module name="org.keycloak.keycloak-model-infinispan" export="true"/>
             <module name="io.smallrye.metrics" export="true"/>
             <module name="org.eclipse.microprofile.metrics.api" export="true"/>
             <module name="org.bouncycastle"/>
@@ -26,6 +27,13 @@
             <module name="com.fasterxml.jackson.core.jackson-core"/>
             <module name="com.fasterxml.jackson.core.jackson-annotations"/>
             <module name="com.fasterxml.jackson.core.jackson-databind"/>
+            <module name="com.google.zxing.core"/>
+            <module name="com.google.zxing.javase"/>
+            <module name="org.infinispan"/>
+            <module name="org.infinispan.commons"/>
+            <module name="org.infinispan.persistence.remote"/>
+            <module name="org.infinispan.client.hotrod"/>
+            <module name="org.infinispan.jboss-marshalling"/>
         </dependencies>
     </deployment>
 </jboss-deployment-structure>
