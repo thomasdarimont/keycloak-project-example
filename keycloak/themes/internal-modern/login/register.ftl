@@ -1,4 +1,5 @@
 <#import "template.ftl" as layout>
+<#import "user-profile-commons.ftl" as userProfileCommons>
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('firstName','lastName','email','username','password','password-confirm'); section>
     <#if section = "header">
         ${msg("registerTitle")}
@@ -121,6 +122,11 @@
                         </#if>
                     </div>
                 </div>
+            </#if>
+
+            <#if customProfile??>
+            <#-- for support dynamic custom profile fields in registration -->
+            <@userProfileCommons.userProfileFormFields/>
             </#if>
 
             <!-- customization:start -->

@@ -31,6 +31,11 @@ public class AcmeFreeMarkerLoginFormsProvider extends FreeMarkerLoginFormsProvid
         var clientBean = (ClientBean) attributes.get("client");
         attributes.put("acmeUrl", new AcmeUrlBean(clientBean));
 
+        // TODO remove hack for custom profile fields
+        if (attributes.containsKey("customProfile")) {
+            attributes.put("profile", attributes.get("customProfile"));
+        }
+
         return super.processTemplate(theme, templateName, locale);
     }
 }

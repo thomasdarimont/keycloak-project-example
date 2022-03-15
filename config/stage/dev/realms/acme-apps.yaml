@@ -32,6 +32,22 @@ clientScopes:
   - name: acme.api
     description: Acme API Access
     protocol: openid-connect
+  - name: acme.ageinfo
+    description: Acme Profile AgeInfo
+    protocol: openid-connect
+    protocolMappers:
+      - name: "Acme: Audience Resolve"
+        protocol: openid-connect
+        protocolMapper: oidc-audience-resolve-mapper
+        consentRequired: false
+      - name: "Acme: AgeInfo"
+        protocol: openid-connect
+        protocolMapper: oidc-acme-ageinfo-mapper
+        consentRequired: false
+        config:
+          userinfo.token.claim: "true"
+          id.token.claim: "true"
+          access.token.claim: "false"
   - name: name
     description: Name Details
     protocol: openid-connect
