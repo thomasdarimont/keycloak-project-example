@@ -24,11 +24,13 @@
 
                     <input name="resend"
                            class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                           type="submit" value="${msg("resendCode")}"/>
+                           type="submit" value="${msg("resendCode")}"
+                           formnovalidate="formnovalidate"/>
 
                     <input name="cancel"
                            class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                           type="submit" value="${msg("doCancel")}"/>
+                           type="submit" value="${msg("doCancel")}"
+                           formnovalidate="formnovalidate"/>
                 </div>
             </div>
         </form>
