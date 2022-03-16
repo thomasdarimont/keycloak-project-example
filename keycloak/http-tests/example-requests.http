@@ -40,3 +40,14 @@ client_id={{TEST_CLIENT_ID}}&client_secret={{TEST_CLIENT_SECRET}}&grant_type=cli
 client.global.set("KC_ACCESS_TOKEN", response.body.access_token);
 client.global.set("KC_REFRESH_TOKEN", response.body.refresh_token);
 %}
+
+### Obtain tokens via ROPC Grant Flow for Public CLient
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{TEST_CLIENT2_ID}}&username={{USER_USERNAME}}&password={{USER_PASSWORD}}&grant_type=password&scope=profile
+
+> {%
+client.global.set("KC_ACCESS_TOKEN", response.body.access_token);
+client.global.set("KC_REFRESH_TOKEN", response.body.refresh_token);
+%}
