@@ -23,6 +23,7 @@
     <ul class="menu">
         <li>
             <button id="loginBtn" onclick="keycloak.login()">Login</button>
+            <button id="registerBtn" onclick="keycloak.register()">Register</button>
             <button id="updateConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Update consent</button>
             <button id="logoutBtn" onclick="keycloak.logout()" class="hidden">Logout</button>
         </li>
@@ -102,6 +103,7 @@
 
     function showWelcome() {
         $("#loginBtn").classList.remove("hidden");
+        $("#registerBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.add("hidden");
         $("#logoutBtn").classList.add("hidden");
     }
@@ -109,6 +111,7 @@
     function showGreeting() {
 
         $("#loginBtn").classList.add("hidden");
+        $("#registerBtn").classList.add("hidden");
         $("#logoutBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.remove("hidden");
 
