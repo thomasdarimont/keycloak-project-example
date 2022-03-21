@@ -170,6 +170,8 @@ identityProviders:
       validateSignature: "true"
       useJwksUrl: "true"
       syncMode: "FORCE"
+      pkceMethod: "S256"
+      pkceEnabled: "true"
 
   - alias: idp-acme-saml
     displayName: Acme SAML Login
@@ -237,6 +239,8 @@ identityProviders:
       validateSignature: "true"
       useJwksUrl: "true"
       syncMode: "FORCE"
+      pkceMethod: "S256"
+      pkceEnabled: "true"
 
   - alias: "idp-acme-azuread"
     displayName: "Acme AzureAD Login"
@@ -267,6 +271,8 @@ identityProviders:
       validateSignature: "true"
       useJwksUrl: "true"
       syncMode: "FORCE"
+      pkceMethod: "S256"
+      pkceEnabled: "true"
 
   - alias: "Google"
     displayName: "Acme Google Login"
