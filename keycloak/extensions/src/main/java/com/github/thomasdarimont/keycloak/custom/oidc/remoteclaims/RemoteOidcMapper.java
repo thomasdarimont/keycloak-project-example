@@ -126,8 +126,11 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
     @Override
     protected void setClaim(IDToken token, ProtocolMapperModel mappingModel, UserSessionModel userSession, KeycloakSession session, ClientSessionContext clientSessionCtx) {
 
-        // HttpRequest httpRequest = Resteasy.getContextData(HttpRequest.class);
-        // extract information from httpRequest
+        // extract information from httpRequest as necessary
+//        HttpRequest httpRequest = Resteasy.getContextData(HttpRequest.class);
+//        httpRequest.getFormParameters().getFirst("formParam");
+//        httpRequest.getUri().getQueryParameters().getFirst("queryParam")
+
 
         KeycloakContext context = session.getContext();
         boolean userInfoEndpointRequest = context.getUri().getPath().endsWith("/userinfo");
