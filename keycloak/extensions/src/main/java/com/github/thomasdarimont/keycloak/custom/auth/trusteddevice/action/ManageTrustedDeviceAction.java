@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceName;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
@@ -110,7 +111,8 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
                 boolean deleted = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
                         .deleteCredential(realm, user, trustedDeviceModel.getId());
                 if (deleted) {
-                    AccountActivity.onTrustedDeviceRemoved(session, realm, user, new TrustedDeviceInfo(trustedDeviceModel.getUserLabel()));
+
+                    AccountActivity.onTrustedDeviceChange(session, realm, user, new TrustedDeviceInfo(trustedDeviceModel.getUserLabel()), MfaChange.REMOVE);
                 }
             }
         }
@@ -138,7 +140,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         event.detail("register_trusted_device", "true");
         event.success();
 
-        AccountActivity.onTrustedDeviceAdded(context.getSession(), context.getRealm(), context.getUser(), trustedDeviceInfo);
+        AccountActivity.onTrustedDeviceChange(context.getSession(), context.getRealm(), context.getUser(), trustedDeviceInfo, MfaChange.ADD);
     }
 
     private void registerNewTrustedDevice(KeycloakSession session, RealmModel realm, UserModel user, String deviceName, TrustedDeviceToken receivedTrustedDeviceToken) {

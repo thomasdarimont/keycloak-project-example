@@ -1,12 +1,14 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.credentials;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.TrustedDeviceInfo;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
 import lombok.Data;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.credential.CredentialModel;
@@ -30,7 +32,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -150,6 +151,7 @@ public class UserCredentialsInfoResource {
             }
             if (removeCredentialForUser(realm, user, credential)) {
                 removedCredentialCount++;
+                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE);
             }
         }
 
@@ -167,7 +169,7 @@ public class UserCredentialsInfoResource {
             // remove dangling trusted device cookie
             TrustedDeviceCookie.removeDeviceCookie(session, realm);
 
-            AccountActivity.onTrustedDeviceRemoved(session, realm, user, new TrustedDeviceInfo(credentialModel.getUserLabel()));
+            AccountActivity.onTrustedDeviceChange(session, realm, user, new TrustedDeviceInfo(credentialModel.getUserLabel()), MfaChange.REMOVE);
         }
         return removed;
     }
@@ -241,17 +243,7 @@ public class UserCredentialsInfoResource {
     }
 
     private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-
-        URI baseUri = URI.create(request.getHttpHeaders().getHeaderString("origin"));
-        String origin = baseUri.getHost();
-        boolean trustedDomain = origin.endsWith(".acme.test");
-
-        Cors cors = Cors.add(request, responseBuilder);
-        if (trustedDomain) {
-            cors.allowedOrigins(baseUri.getScheme() + "://" + origin + ":" + baseUri.getPort()); //
-        }
-
-        return cors.auth().allowedMethods("GET", "DELETE", "OPTIONS").preflight();
+        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "DELETE", "OPTIONS"), null);
     }
 
     @Data

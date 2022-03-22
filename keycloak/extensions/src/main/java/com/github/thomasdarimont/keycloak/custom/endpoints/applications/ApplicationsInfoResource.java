@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.applications;
 
+import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.common.util.StringPropertyReplacer;
 import org.keycloak.models.AccountRoles;
@@ -27,7 +28,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -167,16 +167,7 @@ public class ApplicationsInfoResource {
     }
 
     private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-
-        URI baseUri = URI.create(request.getHttpHeaders().getHeaderString("origin"));
-        String origin = baseUri.getHost();
-        boolean trustedDomain = origin.endsWith(".acme.test");
-
-        Cors cors = Cors.add(request, responseBuilder);
-        if (trustedDomain) {
-            cors.allowedOrigins(baseUri.getScheme() + "://" + origin + ":" + baseUri.getPort()); //
-        }
-
-        return cors.auth().allowedMethods("GET", "OPTIONS").preflight();
+        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "OPTIONS"), null);
     }
+
 }

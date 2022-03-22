@@ -1,5 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone;
 
+import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticatorFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
@@ -11,6 +13,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.credential.CredentialModel;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
@@ -198,7 +201,10 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         // TODO add support for referencing the phoneNumber from the user profile.
         model.setPhoneNumber(phoneNumber);
 
-        ucm.createCredentialThroughProvider(realm, user, model);
+        var credential = ucm.createCredentialThroughProvider(realm, user, model);
+        if (credential != null) {
+            AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD);
+        }
     }
 
     protected boolean isCancelApplicationInitiatedAction(RequiredActionContext context) {
