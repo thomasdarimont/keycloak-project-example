@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.credentials;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
@@ -150,6 +151,7 @@ public class UserCredentialsInfoResource {
             }
             if (removeCredentialForUser(realm, user, credential)) {
                 removedCredentialCount++;
+                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE);
             }
         }
 
@@ -167,7 +169,7 @@ public class UserCredentialsInfoResource {
             // remove dangling trusted device cookie
             TrustedDeviceCookie.removeDeviceCookie(session, realm);
 
-            AccountActivity.onTrustedDeviceRemoved(session, realm, user, new TrustedDeviceInfo(credentialModel.getUserLabel()));
+            AccountActivity.onTrustedDeviceChange(session, realm, user, new TrustedDeviceInfo(credentialModel.getUserLabel()), MfaChange.REMOVE);
         }
         return removed;
     }

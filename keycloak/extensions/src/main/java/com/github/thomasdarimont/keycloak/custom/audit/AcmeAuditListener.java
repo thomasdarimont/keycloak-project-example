@@ -1,5 +1,8 @@
 package com.github.thomasdarimont.keycloak.custom.audit;
 
+import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
+import com.github.thomasdarimont.keycloak.custom.support.CredentialUtils;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
@@ -36,6 +39,21 @@ public class AcmeAuditListener implements EventListenerProvider {
     private void processUserEventAfterTransaction(Event event) {
         // called for each UserEvent’s
         log.infof("Forward to audit service: audit userEvent %s", event.getType());
+
+        var context = session.getContext();
+        var realm = context.getRealm();
+        var user = context.getAuthenticationSession().getAuthenticatedUser();
+
+        switch (event.getType()) {
+            case UPDATE_TOTP:
+                CredentialUtils.findFirstOtpCredential(session, realm, user).ifPresent(credential -> //
+                        AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD));
+                break;
+            case REMOVE_TOTP:
+                CredentialUtils.findFirstOtpCredential(session, realm, user).ifPresent(credential -> //
+                        AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
+                break;
+        }
     }
 
     private void processAdminEventAfterTransaction(AdminEvent event, boolean includeRep) {

@@ -55,6 +55,8 @@ services:
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
       - "--spi-theme-static-max-age=-1"
+      - "--spi-events-listener-email-exclude-events=LOGIN,LOGIN_ERROR,UPDATE_TOTP,REMOVE_TOTP"
+      - "--spi-events-listener-email-include-events=UPDATE_PASSWORD"
 #      - "--config-file=/opt/keycloak/conf/keycloak.conf"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
