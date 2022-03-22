@@ -17,6 +17,7 @@ sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "browser"
 registrationFlow: "Custom Registration"
 
+# Custom realm attributes
 attributes:
   # for http variant: http://apps.acme.test:4000
   "acme_site_url": "https://apps.acme.test:4443"
