@@ -7,6 +7,7 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDevic
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.TrustedDeviceInfo;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
 import lombok.Data;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.credential.CredentialModel;
@@ -30,7 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -241,17 +241,7 @@ public class UserCredentialsInfoResource {
     }
 
     private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-
-        URI baseUri = URI.create(request.getHttpHeaders().getHeaderString("origin"));
-        String origin = baseUri.getHost();
-        boolean trustedDomain = origin.endsWith(".acme.test");
-
-        Cors cors = Cors.add(request, responseBuilder);
-        if (trustedDomain) {
-            cors.allowedOrigins(baseUri.getScheme() + "://" + origin + ":" + baseUri.getPort()); //
-        }
-
-        return cors.auth().allowedMethods("GET", "DELETE", "OPTIONS").preflight();
+        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "DELETE", "OPTIONS"), null);
     }
 
     @Data

@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.profile;
 
+import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
@@ -15,7 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
@@ -102,16 +103,6 @@ public class UserProfileResource {
     }
 
     private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-
-        URI baseUri = URI.create(request.getHttpHeaders().getHeaderString("origin"));
-        String origin = baseUri.getHost();
-        boolean trustedDomain = origin.endsWith(".acme.test");
-
-        Cors cors = Cors.add(request, responseBuilder);
-        if (trustedDomain) {
-            cors.allowedOrigins(baseUri.getScheme() + "://" + origin + ":" + baseUri.getPort()); //
-        }
-
-        return cors.auth().allowedMethods("GET", "PUT", "OPTIONS").preflight();
+        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "PUT", "OPTIONS"), null);
     }
 }

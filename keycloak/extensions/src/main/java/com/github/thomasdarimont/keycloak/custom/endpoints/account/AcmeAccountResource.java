@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.account;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.Constants;
@@ -13,15 +14,13 @@ import org.keycloak.services.resources.Cors;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.net.URI;
 import java.util.HashMap;
+import java.util.Set;
 
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
@@ -76,19 +75,7 @@ public class AcmeAccountResource {
         return withCors(request, Response.ok(responseBody)).build();
     }
 
-
     private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-
-        URI baseUri = URI.create(request.getHttpHeaders().getHeaderString("origin"));
-        String origin = baseUri.getHost();
-        // TODO use frontend url hostname here
-        boolean trustedDomain = origin.endsWith(".acme.test");
-
-        Cors cors = Cors.add(request, responseBuilder);
-        if (trustedDomain) {
-            cors.allowedOrigins(baseUri.getScheme() + "://" + origin + ":" + baseUri.getPort()); //
-        }
-
-        return cors.auth().allowedMethods("GET", "OPTIONS", "DELETE").preflight();
+        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "OPTIONS", "DELETE"), null);
     }
 }
