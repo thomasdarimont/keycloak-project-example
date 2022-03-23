@@ -1,6 +1,6 @@
 services:
   acme-keycloak-provisioning:
-    image: quay.io/adorsys/keycloak-config-cli:v4.7.0-17.0.0
+    image: quay.io/adorsys/keycloak-config-cli:4.9.0-17.0.0
     env_file:
 # generated via start.java
       - ./../../../generated.env.tmp
