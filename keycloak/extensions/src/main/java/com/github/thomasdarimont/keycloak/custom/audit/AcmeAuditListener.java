@@ -10,7 +10,6 @@ import org.keycloak.events.EventListenerTransaction;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 
-
 @JBossLog
 public class AcmeAuditListener implements EventListenerProvider {
 
@@ -40,19 +39,28 @@ public class AcmeAuditListener implements EventListenerProvider {
         // called for each UserEvent’s
         log.infof("Forward to audit service: audit userEvent %s", event.getType());
 
-        var context = session.getContext();
-        var realm = context.getRealm();
-        var user = context.getAuthenticationSession().getAuthenticatedUser();
+        try {
+            var context = session.getContext();
+            var realm = context.getRealm();
+            var authSession = context.getAuthenticationSession();
+            var user = authSession == null ? null : authSession.getAuthenticatedUser();
 
-        switch (event.getType()) {
-            case UPDATE_TOTP:
-                CredentialUtils.findFirstOtpCredential(session, realm, user).ifPresent(credential -> //
-                        AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD));
-                break;
-            case REMOVE_TOTP:
-                CredentialUtils.findFirstOtpCredential(session, realm, user).ifPresent(credential -> //
-                        AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
-                break;
+            switch (event.getType()) {
+                case UPDATE_TOTP:
+                    if (user != null) {
+                        CredentialUtils.findFirstOtpCredential(session, realm, user).ifPresent(credential -> //
+                                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD));
+                    }
+                    break;
+                case REMOVE_TOTP:
+                    if (user != null) {
+                        CredentialUtils.findFirstOtpCredential(session, realm, user).ifPresent(credential -> //
+                                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
+                    }
+                    break;
+            }
+        } catch (Exception ex) {
+            log.errorf(ex, "Failed to handle userEvent %s", event.getType());
         }
     }
 
