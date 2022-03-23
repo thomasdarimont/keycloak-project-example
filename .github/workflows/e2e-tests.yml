@@ -58,7 +58,7 @@ jobs:
         working-directory: ./keycloak/e2e-tests
         run: |
           yarn install
-          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:8.3.0 run
+          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:9.5.2 run
 
       - name: Archive testrun video
         if: ${{ always() }}
