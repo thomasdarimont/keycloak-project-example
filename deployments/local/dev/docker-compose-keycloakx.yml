@@ -57,6 +57,8 @@ services:
       - "--spi-theme-static-max-age=-1"
       - "--spi-events-listener-email-exclude-events=LOGIN,LOGIN_ERROR,UPDATE_TOTP,REMOVE_TOTP"
       - "--spi-events-listener-email-include-events=UPDATE_PASSWORD"
+      - "--spi-events-listener-jboss-logging-success-level=info"
+      - "--spi-events-listener-jboss-logging-error-level=warn"
 #      - "--config-file=/opt/keycloak/conf/keycloak.conf"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
