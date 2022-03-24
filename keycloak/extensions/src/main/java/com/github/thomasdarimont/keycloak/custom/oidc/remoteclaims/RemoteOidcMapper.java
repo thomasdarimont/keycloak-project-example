@@ -133,7 +133,8 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
 
 
         KeycloakContext context = session.getContext();
-        boolean userInfoEndpointRequest = context.getUri().getPath().endsWith("/userinfo");
+        boolean userInfoEndpointRequest = context.getUri().getPath().endsWith("/userinfo")
+                || context.getUri().getPath().endsWith("/generate-example-userinfo");
 
         String issuer = token.getIssuedFor();
         String clientId = token.getIssuedFor();
