@@ -38,6 +38,8 @@ public class KeycloakTestSupport {
 
     public static final String ADMIN_CLI = "admin-cli";
 
+    public static final String CONTEXT_PATH = "/auth";
+
     public static KeycloakContainer createKeycloakContainer() {
         return createKeycloakContainer(null, null);
     }
@@ -58,43 +60,10 @@ public class KeycloakTestSupport {
             imageFromDockerfile.withDockerfile(Paths.get(customDockerFileName));
             keycloakContainer = new KeycloakContainer();
             keycloakContainer.setImage(imageFromDockerfile);
+            keycloakContainer.withContextPath(CONTEXT_PATH);
         }
-
-        if (realmImportFileName != null) {
-            addRealmImportFile(realmImportFileName, keycloakContainer);
-        }
-//        addStartupCliFilesIfPresent(keycloakContainer);
-
-        // we use the standalone configuration file for integration tests
-        keycloakContainer.addEnv("KEYCLOAK_CONFIG_FILE", System.getProperty("keycloakConfigFile", "standalone.xml"));
 
         return keycloakContainer.withProviderClassesFrom("target/classes");
-    }
-
-    public static KeycloakContainer createLocalKeycloakContainer() {
-        return new CustomKeycloak("http://localhost:8080/auth", "admin", "admin");
-    }
-
-    private static void addRealmImportFile(String realmImportFileName, KeycloakContainer keycloakContainer) {
-        keycloakContainer.withEnv("KEYCLOAK_IMPORT", "/tmp/" + realmImportFileName);
-        keycloakContainer.withCopyFileToContainer(MountableFile.forHostPath(Path.of("../imex/" + realmImportFileName)), "/tmp/" + realmImportFileName);
-    }
-
-    private static void addStartupCliFilesIfPresent(KeycloakContainer keycloakContainer) {
-        try {
-            Files.list(Path.of("../cli")).forEach(cliFilePath -> {
-                File cliFile = cliFilePath.toFile();
-                if (!cliFile.getName().endsWith(".cli")) {
-                    return;
-                }
-                String sourcePath = cliFile.getAbsolutePath();
-                String containerPath = "/opt/jboss/startup-scripts/" + cliFile.getName();
-                log.info("Copying {} into container {}", sourcePath, containerPath);
-                keycloakContainer.withCopyFileToContainer(MountableFile.forHostPath(cliFilePath), containerPath);
-            });
-        } catch (IOException e) {
-            log.error("Failed to list init-cli files.", e);
-        }
     }
 
     public static ResteasyWebTarget getResteasyWebTarget(KeycloakContainer keycloak) {
