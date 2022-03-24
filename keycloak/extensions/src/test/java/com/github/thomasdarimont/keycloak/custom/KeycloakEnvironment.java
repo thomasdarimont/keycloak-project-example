@@ -85,8 +85,7 @@ public class KeycloakEnvironment {
     }
 
     public Keycloak getAdminClient() {
-        return Keycloak.getInstance(keycloak.getAuthServerUrl(), KeycloakTestSupport.MASTER_REALM,
-                keycloak.getAdminUsername(), keycloak.getAdminPassword(), KeycloakTestSupport.ADMIN_CLI);
+        return keycloak.getKeycloakAdminClient();
     }
 
     public TokenService getTokenService() {
