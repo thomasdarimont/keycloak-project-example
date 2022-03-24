@@ -70,9 +70,7 @@ services:
       - "127.0.0.1:8790:8790"
       - "127.0.0.1:8787:8787"
     volumes:
-      - ../../../keycloak/themes/apps:/opt/keycloak/themes/apps:z
-      - ../../../keycloak/themes/internal:/opt/keycloak/themes/internal:z
-      - ../../../keycloak/themes/internal-modern:/opt/keycloak/themes/internal-modern:z
+      - ../../../keycloak/themes:/opt/keycloak/themes:z
       - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
       - ../../../keycloak/imex:/opt/keycloak/imex:z
@@ -86,5 +84,5 @@ services:
 #      - ../../../keycloak/extensionsx/target/classes:/opt/keycloak/providers/extensionsx.jar:z
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
-      - ./keycloak-ext/keycloak-home-idp-discovery-16.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery-16.0.0.jar:z
+      - ./keycloak-ext/keycloak-home-idp-discovery-17.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery.jar:z
 #      - ./keycloak-ext/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:/opt/keycloak/providers/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:z
