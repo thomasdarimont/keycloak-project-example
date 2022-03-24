@@ -164,7 +164,6 @@ clients:
     adminUrl: ""
     redirectUris:
       - "/*"
-      - "http://localhost:4000/acme-account/*"
     webOrigins:
       - "+"
     defaultClientScopes:
