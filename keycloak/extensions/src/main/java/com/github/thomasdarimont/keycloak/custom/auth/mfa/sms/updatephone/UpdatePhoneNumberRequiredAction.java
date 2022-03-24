@@ -41,8 +41,8 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     private static final String PHONE_NUMBER_FIELD = "mobile";
 
-    private static final String PHONE_NUMBER_ATTRIBUTE = "phone_number";
-    private static final String PHONE_NUMBER_VERIFIED_ATTRIBUTE = "phone_number_verified";
+    private static final String PHONE_NUMBER_ATTRIBUTE = "phoneNumber";
+    private static final String PHONE_NUMBER_VERIFIED_ATTRIBUTE = "phoneNumberVerified";
 
     private static final String PHONE_NUMBER_AUTH_NOTE = ID + "-number";
     private static final String FORM_ACTION_UPDATE = "update";

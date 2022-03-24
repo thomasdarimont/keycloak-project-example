@@ -480,8 +480,8 @@ users:
     enabled: true
     attributes:
       locale: ["en"]
-      phone_number: ["+49178111222333"]
-      phone_number_verified: ["true"]
+      phoneNumber: ["+49178111222333"]
+      phoneNumberVerified: ["true"]
     credentials:
       - type: password
         userLabel: initial
