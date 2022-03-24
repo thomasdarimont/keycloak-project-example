@@ -1,11 +1,11 @@
-ARG KEYCLOAK_VERSION=17.0.0
+ARG KEYCLOAK_VERSION=17.0.1
 ARG ALPINE_VERSION=3.15.0
 
 #####################################################
 # Base keycloak image with binary keycloak release
 # TODO use version from KEYCLOAK_VERSION once legacy keycloak image is available
 #FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy as keycloak
-FROM quay.io/keycloak/keycloak:17.0.0-legacy as keycloak
+FROM quay.io/keycloak/keycloak:17.0.1-legacy as keycloak
 
 #####################################################
 # Prepare custom JDK with jlink

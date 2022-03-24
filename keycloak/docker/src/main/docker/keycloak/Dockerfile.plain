@@ -1,8 +1,8 @@
-ARG KEYCLOAK_VERSION=17.0.0
+ARG KEYCLOAK_VERSION=17.0.1
 
 # TODO use version from KEYCLOAK_VERSION once legacy keycloak image is available
 #FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy
-FROM quay.io/keycloak/keycloak:17.0.0-legacy
+FROM quay.io/keycloak/keycloak:17.0.1-legacy
 
 USER root
 

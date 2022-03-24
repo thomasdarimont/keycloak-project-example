@@ -1,7 +1,6 @@
-# TODO use keycloak-legacy 17.0.0 docker image
 #FROM quay.io/keycloak/keycloak:16.1.1
 #FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy
-FROM quay.io/keycloak/keycloak:17.0.0-legacy
+FROM quay.io/keycloak/keycloak:17.0.1-legacy
 
 USER root
 
