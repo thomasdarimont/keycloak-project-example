@@ -53,7 +53,7 @@ public class KeycloakTestSupport {
             keycloakContainer = new KeycloakContainer(imageName);
         } else {
             // building custom Keycloak docker image with additional libraries
-            String customDockerFileName = "../docker/src/main/docker/keycloak/Dockerfile.ci.plain";
+            String customDockerFileName = "../docker/src/main/docker/keycloakx/Dockerfile.ci.plain";
             ImageFromDockerfile imageFromDockerfile = new ImageFromDockerfile();
             imageFromDockerfile.withDockerfile(Paths.get(customDockerFileName));
             keycloakContainer = new KeycloakContainer();
@@ -63,12 +63,12 @@ public class KeycloakTestSupport {
         if (realmImportFileName != null) {
             addRealmImportFile(realmImportFileName, keycloakContainer);
         }
-        addStartupCliFilesIfPresent(keycloakContainer);
+//        addStartupCliFilesIfPresent(keycloakContainer);
 
         // we use the standalone configuration file for integration tests
         keycloakContainer.addEnv("KEYCLOAK_CONFIG_FILE", System.getProperty("keycloakConfigFile", "standalone.xml"));
 
-        return keycloakContainer.withExtensionClassesFrom("target/classes");
+        return keycloakContainer.withProviderClassesFrom("target/classes");
     }
 
     public static KeycloakContainer createLocalKeycloakContainer() {

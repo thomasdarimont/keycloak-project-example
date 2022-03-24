@@ -52,9 +52,9 @@
         <freemarker.version>2.3.31</freemarker.version>
 
         <!-- Testing -->
-        <junit-jupiter.version>5.7.2</junit-jupiter.version>
-        <assertj-core.version>3.20.2</assertj-core.version>
-        <testcontainers-keycloak.version>1.8.1</testcontainers-keycloak.version>
+        <junit-jupiter.version>5.8.2</junit-jupiter.version>
+        <assertj-core.version>3.22.0</assertj-core.version>
+        <testcontainers-keycloak.version>2.1.2</testcontainers-keycloak.version>
 
         <!-- Tooling -->
         <auto-service.version>1.0.1</auto-service.version>

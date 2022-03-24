@@ -1,0 +1,4 @@
+ARG KEYCLOAK_VERSION=17.0.1
+FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+
+
