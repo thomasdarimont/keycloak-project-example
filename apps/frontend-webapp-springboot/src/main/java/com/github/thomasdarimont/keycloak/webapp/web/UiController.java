@@ -22,6 +22,7 @@ class UiController {
     private final TokenAccessor tokenAccessor;
 
     @GetMapping("/")
+
     public String showIndex(Model model) {
         return "index";
     }
