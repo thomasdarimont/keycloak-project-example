@@ -1,0 +1,135 @@
+realm: acme-saml
+enabled: true
+displayName: Acme SAML
+displayNameHtml: Acme SAML
+loginWithEmailAllowed: true
+loginTheme: internal
+accountTheme: keycloak
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
+
+components:
+  # TODO externalize cert and keys
+  "org.keycloak.keys.KeyProvider":
+    - name: custom-aes-generated
+      providerId: aes-generated
+      config:
+        kid: ["b4ae2780-ddcc-4199-b579-d2715340cb0b"]
+        secret: ["AK9MESP3eN1lI7Ukk4hHeQ"]
+        priority: ['100']
+    - name: custom-hmac-generated
+      providerId: hmac-generated
+      config:
+        kid: ["1d0e6d18-d947-44ef-b5ab-1cae5b4e2d68"]
+        secret: ["heM9Q45VuQ6V-OqJ4HTmDBgQ53duz_5YgeZKZaJiddbe3FyT3vOi9Tv12iPX3rt6eIzRD1nPQY3T6NOPawBLmQ"]
+        priority: ['100']
+        algorithm: ["HS256"]
+    - name: custom-rsa-generated
+      providerId: rsa-generated
+      config:
+        privateKey: ["MIIEowIBAAKCAQEAw5UaCtl+P3oLnM2GXMuLwpZeipVirZlaUfmbKRPnkVK/ALmbn8/HrdU7PG41YMDIbPxSr2VRrkQPYPXRb97vYAhsQLTDYX3P3VzISWK2yv+5CgjeycImMtyFcx7PnS7Qn+D/vy1+G/UgKjoSE/O6kwFbCX4uLDV+JS/niks9UzWvjnR9xDFpVf+NmzPNmAuu3NtDPve6hQcnpAns3bDPlz6wbeLL07JVCX64jR0iz1EVzntRQ5RHDaU4+AA8SsqdyRXmAQNDXoLTsS+NXPO/VDpITYUhU3gXrmpJFDWJdTa4jSt01M6SO7lY0nKWyanx18kTweI7CNDwCtn+dMCC6QIDAQABAoIBAAGD6XZ9jmKYA7iEiB62bgAFMbjRpPjS2BYMAMV987yWv0eWaIwBrFqerQ2QDgZQoAzmHI7i0lHvEY5vAR8kg0bDcfFDZUMfWimtIxkcdG2YsxqOjIlUIX8h4b/NVI7zcqbWc6zLwa8eRFBHcGXqrL6gU0/8xAdQJ8jKePkDkbdQDvMSHSuIRRFCWHUTwOykXjuB4fzyzwNyjXQbmcSDeYm8LKtULji+fwpjcd34+aM7eqXnAMkzkPvfLNuULcXRP+Pu7DPGIXrw5/P+LmbN7LE+JM8B+hiYn62GDOttTCnKpjU58125p/Pvjec8bpYorhJP7O1iG02u4dTEA9Vpv2ECgYEA5JudCkEzY2HLn02N0ybQZhVODLWxktvDFxj6NXh0wBIu1uVzOpG9GgwRtyS1i+6KrnpKz7eqWHLAT0o3doPKVbxFJ7aUgYUL7IQqbgD1sdV+Cq7n1xVdyGnOaaBXpKhftSKqjEpup7UKN5xrQ+W5nYHcuHzjZLlLc5xkRSkrLjkCgYEA2wR0wvkgwwI85aUk5/dSysvHct8Wh1PF8TPvoyuiouNdCc6X4HPjcL5o+B9AVVr7JroVsHVtDYSA9+uHTag8DHbJ3lVbWA94N4SuNCoKJ6DZtapRnCLEFPXXRO5me4GvTxtEO8S5ES0PwykAu5bKRfhl/xmeUU/OVWidAAsh+jECgYEAhMovail9ZBkGYj52R1SgcOunLpLL1vZ4WA5WKIETsA3fz0vwpvDI2zxvfeaA3gtt2vOGSSnydPYS5vvBQ8JB4ZM+yFax5JoX1wbebo94KBhO4n2+hZ0PoL50+737qtVy4pCEaIFDzX7HtI3TcNkb/HXWdAN3QqavQTRyugmz32ECgYAqnn5eJn6ClB/njDBXV2BsCCWCq/jFUr71Bec++FHIorfLHcGeMs7ydIsWpXYuZerziUiJMwCKnds+4z1MFk3BGyiDNFb3FuOM4ivICNo7Bej3mfIRkQ5ZCdHfHwkgRYcovKSVgN2Ggx9LGeKDnn80CHdIoeKV7hK3ugi7Jm9xMQKBgCcyKs3Odw5u4RpTAChAmdvgnkuXoCtQAsi998NPWyu1Y8aEfaAQJKbWdXDen9/PUu+ZUtwkyn7goAX0TtRgcTrkc6qyXQI/3gXPWpm0o++Mxdb7+l9wLZhosnoeeUtkF+3+wD1WlxKDOvw0UNEAYodBpdyYGfVZiky1ntcBelb/"]
+        keyUse: ["SIG"]
+        certificate: ["MIIClzCCAX8CBgF/0OmrYzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARkZW1vMB4XDTIyMDMyODE0MjIyOVoXDTMyMDMyODE0MjQwOVowDzENMAsGA1UEAwwEZGVtbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMOVGgrZfj96C5zNhlzLi8KWXoqVYq2ZWlH5mykT55FSvwC5m5/Px63VOzxuNWDAyGz8Uq9lUa5ED2D10W/e72AIbEC0w2F9z91cyElitsr/uQoI3snCJjLchXMez50u0J/g/78tfhv1ICo6EhPzupMBWwl+Liw1fiUv54pLPVM1r450fcQxaVX/jZszzZgLrtzbQz73uoUHJ6QJ7N2wz5c+sG3iy9OyVQl+uI0dIs9RFc57UUOURw2lOPgAPErKnckV5gEDQ16C07EvjVzzv1Q6SE2FIVN4F65qSRQ1iXU2uI0rdNTOkju5WNJylsmp8dfJE8HiOwjQ8ArZ/nTAgukCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAcDoujUldX1HiCjPjLrcUaY+LNCSsGWeN7g/lI7z18sxg3VlhsPz2Bg5m4zZCFVcrTPax1PuNqYIxetR9fEP8N+8GHLTnd4KrGvE6rH8xwDDk3GET5QKHnaUDUoxdOND85d65oL20NDIHaNDP+Kw/XIktV30mTKZerkDpxJSC9101RDwVhH3zpr0t4CYTnnR6NTBNkVRfDl19Nia98KpbSJizIw2y0zC8wubJzFnBoWbXv1AXOqTZUR2pyP742YJNA/9NFg4+EDbW/ZJVaajY+UVN8ImCj1T32f78189d3NFoCX81pBkmRv8YfXetZgDcofuKKTkUmFlP55x5S32Vmw=="]
+        priority: ['100']
+    - name: custom-rsa-enc-generated
+      providerId: rsa-enc-generated
+      config:
+        privateKey: ["MIIEowIBAAKCAQEAvMLRCPK7e4w+JKoGvYsSHxh7xRZRqB24QUaFs2CxV1LK37rFKFmKx236LYjl5dCWEEceDgmCO9lLNrbt5pvYsGVcU2Uzvv0r0sikDI/LUogNfIactKZkT+U1HcvOsBpDdCTsNhsR9d0wUXQXpUjPJYKyIyMX/WpiaNPzFd9qUUB6angq1SLlSTG3n3dFCedEvWIDRMY7FM5eHi78YrIpsCfgVQmKjjEonYqIBx6BG/lI/89hm7u++IyzHv32XgQPNpzY0ltsLaALcedLcv9auNkCxwLbGIVzaIf4dDO3VHJsNYHrJAypUBPta4sBYVnwajDjq+eSNFwUFNFxcN0/5wIDAQABAoIBAC6qsXhXXm+YiAKTgJAa0lOav3rF3lFEa7nDoCltVdrDbsGqULT9kjhk4a2hQ0kybO9ATddllWuLeLNhvWY+kG9n19AMXKMyv0Ng9GHgqQFR/peTRinJW1J/Vcb0jLhv/c44lKd5wNJ6qUfx/iiQXBonejgCpJsz0nmdMONu9T951tJZc8jIV+SuldWOBlH5DY4rGO+8wmxCzbuOKkb4mBNy511rVLn5csePZooSWHJPU647MT8+/xO//UYGPnlK1FOyaLNlWpDnebXFXDftl274fgR27AAaGbVGGIv7NDkidLYR/TvG6ifEgxtUJB1vk8n8Id1EwA5eZsVPgVcpW+kCgYEA73MxEWD1WFHIhTM+285mpMdwwLpd3eFyJBG4VzKRsiJUAVapPnNrVB0Jknzyo/yhL6Yv9TUmmj7zyOh7KYIMDjoBfOZym463WYW4WmKmCJPjZBvV9f0ZPkOO9bjMRvz0zQRFB1D50ebtja2nPKzMUG1iNPrv49qMzqJbOBTJGh8CgYEAyc69CWGohP6z9mNn+qHbZ0pYAYCf1d9/fhX6CHcgVPudTPr/8EERvMEffr1fh5IadJIWDu2/fYZxlJGS+r/3YLwJTBvYip9d06TUThDxxQiHSdK7USW5A7lSgT/kKTp2ldqmiDQtoaf54Axlapq5m9K/uN45keismI1LNsgZsTkCgYEAzCfVrTCS3sOUCOWBcZ2QbGvTWa9MevJOBCzLlCT8jfmw0BdYY3O7DdNYJvq7UlACCgNSnmm7yQVli2WUJPbJWpPgUuKU0sai0wQtA3tafrPAy8jj60DpdenaCO2P1fK0sdwzEqLa7TlMT2DA1v2pkeVBN1TAle/v3/oTdkRalhcCgYBdIIVFpgZhUTR0+AyMsVKRSNJx5wxbYubvpW6bp3WJIg/F7XJcSXrI8wn4r6U856RDtQJu4zHh2D/jwoXkJuAeiMd1ksgLuF1RBJhgahtXxIbB/3gni1Pkrwmu0XAVwn/kyWDeK83+8ogx5yaJ2lra2JdW1V4VwhybzWAvKIoKqQKBgFCzeiA47tVF18lx9h9qc86HrrS+OtwrAyNlQlt8sHGHV3ev3Ip361U6B50bv9NTpfgtcBL4Ml57lyO0RljQxV+9TLYSfOJo5iYwVmIP1LhmKWf+4WSvybhCIzCXp9czao5nHXFsvBtyy3+ay76RtAxmVn2lE/3zy45cwEIHErnr"]
+        keyUse: ["ENC"]
+        certificate: ["MIIClzCCAX8CBgF/0OmsGjANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARkZW1vMB4XDTIyMDMyODE0MjIyOVoXDTMyMDMyODE0MjQwOVowDzENMAsGA1UEAwwEZGVtbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALzC0Qjyu3uMPiSqBr2LEh8Ye8UWUagduEFGhbNgsVdSyt+6xShZisdt+i2I5eXQlhBHHg4JgjvZSza27eab2LBlXFNlM779K9LIpAyPy1KIDXyGnLSmZE/lNR3LzrAaQ3Qk7DYbEfXdMFF0F6VIzyWCsiMjF/1qYmjT8xXfalFAemp4KtUi5Ukxt593RQnnRL1iA0TGOxTOXh4u/GKyKbAn4FUJio4xKJ2KiAcegRv5SP/PYZu7vviMsx799l4EDzac2NJbbC2gC3HnS3L/WrjZAscC2xiFc2iH+HQzt1RybDWB6yQMqVAT7WuLAWFZ8Gow46vnkjRcFBTRcXDdP+cCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAWjAlB7qYrXY2XbriG0S+H+PKJsZ3GZFYZAsFGOYvEmL2BT4e53GzQLqDiwW2VUnhGXFwN438+IptYPZXuXiqjidjTyqLpApZzm66er9ZLs5Ii8E1wJn0j/uRpmsQ3arsZ7FAVYaVbt5txyJSh0mDOng351HsCye7EDWhseaZLTQ8YIGZxoPZYe8abceG3lxF8iI2Wnmvhudzhli9ZCRbYeNeVGObNLiBd33gYEYo3UZc+j0/tIoYmVLG5R8CeKK62M5ow8/ul4xc9BmX7QFB/GLCQnhlEMeFAunhtLZBAwmJA9lG0JXp3c4K22cGXyyLG15PBSYWULJcUQ8lxKW+lQ=="]
+        priority: ['100']
+        algorithm: ["RSA-OAEP"]
+
+clients:
+  - clientId: acme_saml_idp_broker
+    name: Acme SAML Broker Client
+    rootUrl: ''
+    adminUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-saml/protocol/saml"
+    surrogateAuthRequired: false
+    enabled: true
+    alwaysDisplayInConsole: false
+    clientAuthenticatorType: client-secret
+    redirectUris:
+      - "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps/broker/idp-acme-saml/endpoint/*"
+    notBefore: 0
+    bearerOnly: false
+    consentRequired: false
+    standardFlowEnabled: true
+    implicitFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    publicClient: false
+    frontchannelLogout: true
+    protocol: saml
+    attributes:
+      saml.assertion.signature: 'true'
+      saml.force.post.binding: 'true'
+      saml.multivalued.roles: 'false'
+      saml.encrypt: 'false'
+      backchannel.logout.revoke.offline.tokens: 'false'
+      saml.server.signature: 'true'
+      saml.server.signature.keyinfo.ext: 'false'
+      exclude.session.state.from.auth.response: 'false'
+# TODO externalize saml certificate
+      saml.signing.certificate: "MIICtzCCAZ8CBgF5PmO+MTANBgkqhkiG9w0BAQsFADAfMR0wGwYDVQQDDBRhY21lX3NhbWxfaWRwX2Jyb2tlcjAeFw0yMTA1MDUyMTE0NTRaFw0zMTA1MDUyMTE2MzRaMB8xHTAbBgNVBAMMFGFjbWVfc2FtbF9pZHBfYnJva2VyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAngWDA4phFQgIpqVvau/7PJoHDMO1YAM95iaTRvSgLBCUohCtEUHpLS5yBd+k4aya55LNZY4Wh6XUWw0wvQkvP9oaBFgseVy+IiEgatiZAcmsGTeHf4acIkcsZIiobaISSbE+SCLhxsRbMGrIJjp1HXagHPm/Kw/GV5ZbPC3zVlVTMIuVPuQq/xCQxTreOj4V9JgExehrrjAFYL2bQ8GywAPXiblR7WWojoEF1L8iDW7jCam/Jpi/o3upNndMbRqLK4XBWGENsP1YaXaon55UsB/CjvZYnKzrNr1wDM/zhWVjOVr4Uk4N6QoY5K54ELAmYAWgSCZzuClzXI6QOPpkxwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQABeL4DpJIymxZ5UWFWwFC5NXLJ0Q8+UdrWPrqazebtsGSrYUwpsO4gObEHuo497UMcXMcDd9cJiPLeo9TyvfNFkC/17riGC5gd8eBIHTAEECnyJZGtuAuWQtRIkoLYJ260zlgC6dBy86m9OSd6UgJRmkXihWcE/dGplWw5FYQ0U3CrE9LXup0d0PEYH+b1RUUtIxjQDZxxVoO2BjivfbbmILbOikthMfjfO3BviIb9U/8MrerLftZ+wssSUxsCr41pakIZn5uTttiwwlUXlFTWQ5vsvDLNLprINgTlzZOXZYQ9Az08PcQR5EMpb0LDoQlTGf9BZJNtMFmssLKeNi9V"
+      backchannel.logout.session.required: 'false'
+      client_credentials.use_refresh_token: 'false'
+      saml.signature.algorithm: RSA_SHA256
+      saml_force_name_id_format: 'false'
+      saml.client.signature: 'false'
+      tls.client.certificate.bound.access.tokens: 'false'
+      saml.authnstatement: 'true'
+      display.on.consent.screen: 'false'
+# TODO externalize saml key
+      saml.signing.private.key: "MIIEpAIBAAKCAQEAngWDA4phFQgIpqVvau/7PJoHDMO1YAM95iaTRvSgLBCUohCtEUHpLS5yBd+k4aya55LNZY4Wh6XUWw0wvQkvP9oaBFgseVy+IiEgatiZAcmsGTeHf4acIkcsZIiobaISSbE+SCLhxsRbMGrIJjp1HXagHPm/Kw/GV5ZbPC3zVlVTMIuVPuQq/xCQxTreOj4V9JgExehrrjAFYL2bQ8GywAPXiblR7WWojoEF1L8iDW7jCam/Jpi/o3upNndMbRqLK4XBWGENsP1YaXaon55UsB/CjvZYnKzrNr1wDM/zhWVjOVr4Uk4N6QoY5K54ELAmYAWgSCZzuClzXI6QOPpkxwIDAQABAoIBABIOrS79ZCSkG2D3rKi6ran6K+4QeyxykmM3a0MDdz4x0tpGL5C2SHAKS6tSKCRFthnaU7BUMUzk7UROWJBxeT3BrZFrhgGEUJHT2UF8aNekdQ8Yolo3RqZAHdmLKDwG9jIHmAdkPQqaq5T3ztFXgsSQJrHI9Eh2cALYQqq40YK+5VF+sYrEwBvT4wZtgsFd+NXjQuaLH2PuQAG9gdAH0jhzN+NRmbC8JEHtb6/i0tKiOBcYuEAcQ+BE6V4EpGDEWlIDoLMI7EGZsQHuvn6Aqs7IpIBNhJiTFl1rGCssDVzjgfFKaa/jTfDS8xUfbusT5vqLTecUQRzenrPeyAgRoBECgYEA01+d1X4OvmIqZ5nW9CjJvs4y9qKvtpv2Xvrqe2/qdhejfmg9XMUwpBAOfaH8Y/5RoJzqq0iyfpaDnt0REJC7+x2LOZ8XOzRH1ow7M9swBYZDuz6Wa0h2uFcPHW+3SDKulm+TyNczltLvKA7v/KyS8Bn1UkjDL/QIlQbCEPLLtb8CgYEAv2JPgzLTV+DA3ybKmF+1sTpsRnHGOqiKzb5GIf8yq0zi6t7pjK5QiRbZBvlH5aC8BFY52k7BcGBiQsnc1kDpg/ms6Mg9TRXaTVZIzqlRYSDsFcaDGvXxzLdc6WwJGPOV/VXrC3DzgHt/Rb6ED6CXPrxlrgGAc2nkpt9waQac4vkCgYEAg77FEZxQdDmbVJd+cxA5LsQ236LnAlqTZP/fxrAq4xA4x0ERfhEqEBgx7/xW47xQBFvJqJjXKC+IOixvxnNvt0Ti0jdms3ASlpcxD1E+zTKyZLLN7nBsDtm0ghRvmIB+cSV6Z2Q6s3cluUIWMtcdfqmvTmorvmfMMZbUvtuWPOECgYEAl26im51LvO0Jr4hyJb8VdPZVVigQQbm6mrFDrQLQhNqBcnaPNdF3yAFcGDiGuxtDqerQO/y08sZQ+afgJWeXXeXg+w/18VipMyhi06MF0WTLaS957YtNmD4+NjRVvnh+5cVmBdeJ1M/jFLx6oiLfibRogBaQHMJdOezydSfWW4ECgYBSN/CBHUKZn16UaOrjZReLGHtAHqA6KsLPQSDv+kUkaiZZr782d3DMDxIRyU+eXFtvDqYWzvRYnoaV/4sL2CLd2XTnMpFdlrDELzsD4xzr6sSHRAcuWD6T0lURfGmRt3/Qo7GZh312WtezrD0fRaz2OZpzA/txDsz0gQojC7JUwQ=="
+      saml_name_id_format: username
+      saml.onetimeuse.condition: 'false'
+      saml_signature_canonicalization_method: "http://www.w3.org/2001/10/xml-exc-c14n#"
+    authenticationFlowBindingOverrides: {}
+    fullScopeAllowed: false
+    nodeReRegistrationTimeout: -1
+    protocolMappers:
+      - name: X500 email
+        protocol: saml
+        protocolMapper: saml-user-property-mapper
+        consentRequired: false
+        config:
+          attribute.nameformat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+          user.attribute: email
+          friendly.name: email
+          attribute.name: urn:oid:1.2.840.113549.1.9.1
+      - name: X500 surname
+        protocol: saml
+        protocolMapper: saml-user-property-mapper
+        consentRequired: false
+        config:
+          attribute.nameformat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+          user.attribute: lastName
+          friendly.name: surname
+          attribute.name: urn:oid:2.5.4.4
+      - name: X500 givenName
+        protocol: saml
+        protocolMapper: saml-user-property-mapper
+        consentRequired: false
+        config:
+          attribute.nameformat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+          user.attribute: firstName
+          friendly.name: givenName
+          attribute.name: urn:oid:2.5.4.42
+    defaultClientScopes: []
+    optionalClientScopes: []
+
+users:
+  - username: acmesaml
+    email: acmesaml@local
+    firstName: Anne
+    lastName: SAML
+    enabled: true
+    attributes:
+      locale: ["de"]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false

@@ -195,12 +195,11 @@ identityProviders:
     linkOnly: false
     firstBrokerLoginFlowAlias: first broker login
     config:
-# FIXME the acme-saml realm certificate changes on every deployment, disabling the certificate validation for now
-#      validateSignature: 'true'
-      hideOnLoginPage: true
+      validateSignature: 'true'
+      hideOnLoginPage: false
       guiOrder: "2000"
-      validateSignature: 'false'
-      signingCertificate: "MIICoTCCAYkCBgF5PnCbNTANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlhY21lLXNhbWwwHhcNMjEwNTA1MjEyODU3WhcNMzEwNTA1MjEzMDM3WjAUMRIwEAYDVQQDDAlhY21lLXNhbWwwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCwYJ+z47Xsll8pptApv8qhbVeCG6pA3/hX45fVPnNlnpXv9AeQNDBTptluoRw3OOsBdZ+jp7j7xfkJIsaGwMbcIM0gMVRFVnWImDXZT+3IeQZbZHQ/Jx0NrfmU7Cj7TR/PvK9o+hNVlyxMH5YgitHbbZwhx0Y0bJ3TuTkiAYORfPmaZ7j7sdl8RIOnnMUmSrx5JOj5Sc08OY2HHsLy0W33w0ix6Elw8sxzMIEL6Zepkw4Z5XsID0dvsbv7mlAcpsXe6aKu7amYDwbjt6pr6sbYi/PbxBlcNaP3YH0si6bTFnpBuRK52mxpv6xzDhycbQLC0H3MYyBRhXsliCNCCRxDAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAF5Nquu6FYl6AiKfVMZlbJfzr+S80uiYXf7pZM4Z6n0U7oMHzd2WH8orlWF1698Bksi83Wtlsl89fXtP5/vUOtaZn4GNEP0BQqXdATgGU9KirJG4ISSdq2xbLYcXSVXEmR5fEFsZQhUkuq5it6pu2oFMiJcEJ2IMzX9KPcnQrK+tuujAr/t8Te7IcAyqMuQGvy/OCd4ErdA+u31vetkeG+kTeFj9fYmJprZTVkSEiVNrJI86ON1xeB8ltcKLH3/UxJBPCX6noppBICEZHcPSUBw5BOATC8BCRd02zebPfJZTrB8G3siL7FwzWEl1NNoxse/VjRJIjhKP3EM005ad4FM="
+      # Note this singing certificate must match the 'custom-rsa-generated' in acme-saml.yaml
+      signingCertificate: "MIIClzCCAX8CBgF/0OmrYzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARkZW1vMB4XDTIyMDMyODE0MjIyOVoXDTMyMDMyODE0MjQwOVowDzENMAsGA1UEAwwEZGVtbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMOVGgrZfj96C5zNhlzLi8KWXoqVYq2ZWlH5mykT55FSvwC5m5/Px63VOzxuNWDAyGz8Uq9lUa5ED2D10W/e72AIbEC0w2F9z91cyElitsr/uQoI3snCJjLchXMez50u0J/g/78tfhv1ICo6EhPzupMBWwl+Liw1fiUv54pLPVM1r450fcQxaVX/jZszzZgLrtzbQz73uoUHJ6QJ7N2wz5c+sG3iy9OyVQl+uI0dIs9RFc57UUOURw2lOPgAPErKnckV5gEDQ16C07EvjVzzv1Q6SE2FIVN4F65qSRQ1iXU2uI0rdNTOkju5WNJylsmp8dfJE8HiOwjQ8ArZ/nTAgukCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAcDoujUldX1HiCjPjLrcUaY+LNCSsGWeN7g/lI7z18sxg3VlhsPz2Bg5m4zZCFVcrTPax1PuNqYIxetR9fEP8N+8GHLTnd4KrGvE6rH8xwDDk3GET5QKHnaUDUoxdOND85d65oL20NDIHaNDP+Kw/XIktV30mTKZerkDpxJSC9101RDwVhH3zpr0t4CYTnnR6NTBNkVRfDl19Nia98KpbSJizIw2y0zC8wubJzFnBoWbXv1AXOqTZUR2pyP742YJNA/9NFg4+EDbW/ZJVaajY+UVN8ImCj1T32f78189d3NFoCX81pBkmRv8YfXetZgDcofuKKTkUmFlP55x5S32Vmw=="
       postBindingLogout: 'true'
       nameIDPolicyFormat: "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
       postBindingResponse: 'true'
