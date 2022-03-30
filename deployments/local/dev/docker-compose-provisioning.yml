@@ -1,15 +1,16 @@
 services:
   acme-keycloak-provisioning:
-    image: quay.io/adorsys/keycloak-config-cli:4.9.0-17.0.0
+    image: quay.io/adorsys/keycloak-config-cli:5.0.0-17.0.1
     env_file:
 # generated via start.java
       - ./../../../generated.env.tmp
     environment:
       KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
       KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: "120s"
-      IMPORT_PATH: "/config"
-      IMPORT_FORCE: "false"
-      IMPORT_VARSUBSTITUTION: "true"
+# see: https://github.com/adorsys/keycloak-config-cli/blob/v5.0.0/CHANGELOG.md
+      IMPORT_FILES_LOCATION: "/config/*" # IMPORT_PATH: "/config"
+      IMPORT_CACHE_ENABLED: "true" # IMPORT_FORCE: "false"
+      IMPORT_VAR_SUBSTITUTION_ENABLED: "true" # IMPORT_VARSUBSTITUTION: "true"
       IMPORT_VALIDATE: "true"
 
 # See https://github.com/adorsys/keycloak-config-cli#log-level

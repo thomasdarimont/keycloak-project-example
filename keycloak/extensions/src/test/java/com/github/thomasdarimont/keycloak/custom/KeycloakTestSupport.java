@@ -104,12 +104,12 @@ public class KeycloakTestSupport {
 
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
-        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:4.9.0-17.0.0");
+        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:5.0.0-17.0.1");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
-        keycloakConfigCli.addEnv("IMPORT_PATH", "/config");
-        keycloakConfigCli.addEnv("IMPORT_FORCE", "false");
-        keycloakConfigCli.addEnv("IMPORT_VARSUBSTITUTION", "true");
+        keycloakConfigCli.addEnv("IMPORT_FILES_LOCATION", "/config/*");
+        keycloakConfigCli.addEnv("IMPORT_CACHE_ENABLED", "true");
+        keycloakConfigCli.addEnv("IMPORT_VAR_SUBSTITUTION_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_USER", keycloakContainer.getAdminUsername());
         keycloakConfigCli.addEnv("KEYCLOAK_PASSWORD", keycloakContainer.getAdminPassword());
         keycloakConfigCli.addEnv("KEYCLOAK_URL", keycloakContainer.getAuthServerUrl());
