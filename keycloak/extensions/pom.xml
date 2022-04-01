@@ -19,6 +19,8 @@
         <smallrye-health.version>3.0.0</smallrye-health.version>
         <microprofile-health-api.version>3.0</microprofile-health-api.version>
         <microprofile-metrics-api.version>3.0</microprofile-metrics-api.version>
+        <resteasy.version>4.7.5.Final</resteasy.version>
+        <httpcomponents.version>4.5.13</httpcomponents.version>
     </properties>
 
     <dependencies>
@@ -43,7 +45,28 @@
             <artifactId>keycloak-services</artifactId>
             <version>${keycloak.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-multipart-provider</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-multipart-provider</artifactId>
+            <version>${resteasy.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpcomponents.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
 
         <dependency>
             <groupId>org.keycloak</groupId>
