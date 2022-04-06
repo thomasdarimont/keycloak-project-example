@@ -8,7 +8,6 @@ import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
@@ -36,9 +35,9 @@ public class TokenUtils {
      */
     public static String generateServiceAccountAccessToken(KeycloakSession session, String clientId, String scope, Consumer<AccessToken> tokenAdjuster) {
 
-        KeycloakContext context = session.getContext();
-        RealmModel realm = context.getRealm();
-        ClientModel client = session.clients().getClientByClientId(realm, clientId);
+        var context = session.getContext();
+        var realm = context.getRealm();
+        var client = session.clients().getClientByClientId(realm, clientId);
 
         if (client == null) {
             throw new IllegalStateException("client not found");
@@ -48,39 +47,46 @@ public class TokenUtils {
             throw new IllegalStateException("service account not enabled");
         }
 
-        UserModel clientUser = session.users().getServiceAccount(client);
-        String clientUsername = clientUser.getUsername();
+        var clientUser = session.users().getServiceAccount(client);
+        var clientUsername = clientUser.getUsername();
 
-        RootAuthenticationSessionModel rootAuthSession = new AuthenticationSessionManager(session).createAuthenticationSession(realm, false);
-        AuthenticationSessionModel authSession = rootAuthSession.createAuthenticationSession(client);
+        // we need to remember the current authSession since createAuthenticationSession changes the current authSession in the context
+        var currentAuthSession = context.getAuthenticationSession();
 
-        authSession.setAuthenticatedUser(clientUser);
-        authSession.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
-        authSession.setClientNote(OIDCLoginProtocol.ISSUER, Urls.realmIssuer(session.getContext().getUri().getBaseUri(), realm.getName()));
-        authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
+        try {
+            var rootAuthSession = new AuthenticationSessionManager(session).createAuthenticationSession(realm, false);
+            var authSession = rootAuthSession.createAuthenticationSession(client);
 
-        ClientConnection clientConnection = context.getConnection();
-        UserSessionModel userSession = session.sessions().createUserSession(authSession.getParentSession().getId(), realm, clientUser, clientUsername, clientConnection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, UserSessionModel.SessionPersistenceState.TRANSIENT);
+            authSession.setAuthenticatedUser(clientUser);
+            authSession.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+            authSession.setClientNote(OIDCLoginProtocol.ISSUER, Urls.realmIssuer(session.getContext().getUri().getBaseUri(), realm.getName()));
+            authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
-        AuthenticationManager.setClientScopesInSession(authSession);
-        ClientSessionContext clientSessionCtx = TokenManager.attachAuthenticationSession(session, userSession, authSession);
+            var clientConnection = context.getConnection();
+            var userSession = session.sessions().createUserSession(authSession.getParentSession().getId(), realm, clientUser, clientUsername, clientConnection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, UserSessionModel.SessionPersistenceState.TRANSIENT);
 
-        // Notes about client details
-        userSession.setNote(ServiceAccountConstants.CLIENT_ID, client.getClientId());
-        userSession.setNote(ServiceAccountConstants.CLIENT_HOST, clientConnection.getRemoteHost());
-        userSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS, clientConnection.getRemoteAddr());
+            AuthenticationManager.setClientScopesInSession(authSession);
+            var clientSessionCtx = TokenManager.attachAuthenticationSession(session, userSession, authSession);
 
-        TokenManager tokenManager = new TokenManager();
-        EventBuilder event = new EventBuilder(realm, session, clientConnection);
-        TokenManager.AccessTokenResponseBuilder responseBuilder = tokenManager.responseBuilder(realm, client, event, session, userSession, clientSessionCtx).generateAccessToken();
+            // Notes about client details
+            userSession.setNote(ServiceAccountConstants.CLIENT_ID, client.getClientId());
+            userSession.setNote(ServiceAccountConstants.CLIENT_HOST, clientConnection.getRemoteHost());
+            userSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS, clientConnection.getRemoteAddr());
 
-        if (tokenAdjuster != null) {
-            tokenAdjuster.accept(responseBuilder.getAccessToken());
+            var tokenManager = new TokenManager();
+            var event = new EventBuilder(realm, session, clientConnection);
+            TokenManager.AccessTokenResponseBuilder responseBuilder = tokenManager.responseBuilder(realm, client, event, session, userSession, clientSessionCtx).generateAccessToken();
+
+            if (tokenAdjuster != null) {
+                tokenAdjuster.accept(responseBuilder.getAccessToken());
+            }
+
+            var accessTokenResponse = responseBuilder.build();
+            return accessTokenResponse.getToken();
+        } finally {
+            // reset current authentication session
+            context.setAuthenticationSession(currentAuthSession);
         }
-
-        AccessTokenResponse res = responseBuilder.build();
-
-        return res.getToken();
     }
 
     public static String generateAccessToken(KeycloakSession session, UserSessionModel userSession, String clientId, String scope, Consumer<AccessToken> tokenAdjuster) {
