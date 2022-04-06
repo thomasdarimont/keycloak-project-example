@@ -1,0 +1,30 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>SPA BFF Demo</title>
+</head>
+<body>
+
+<a href="/bff/" id="login">login</a>
+<a href="#" id="logout" onclick="logoutForm.submit(); return false;">Logout</a>
+
+<form id="logoutForm" th:action="@{/logout}" method="POST">
+    <!--/* CSRF token will be emitted by Spring Security */-->
+</form>
+
+<div id="app">
+    <div id="username"><span sec:authentication="name">Anonymous</span></div>
+    <pre id="userInfo"></pre>
+</div>
+
+
+<script defer th:src="@{${appScript}}">
+
+</script>
+
+</body>
+</html>

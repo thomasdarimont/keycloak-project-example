@@ -18,3 +18,11 @@ services:
     ports:
       - "4000:80"
       - "4443:443"
+
+  redis:
+    image: redis:6.2.6-alpine3.15
+    ports:
+      - '6379:6379'
+    #  --requirepass redispass
+    command: redis-server --save 20 1 --loglevel warning
+

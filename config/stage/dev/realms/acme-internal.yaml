@@ -353,6 +353,31 @@ clients:
     optionalClientScopes:
       - "phone"
 
+  - clientId: acme-bff-springboot
+    protocol: openid-connect
+    name: Acme BFF App Spring Boot
+    description: "Acme BFF Spring Boot Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    secret: "$(env:ACME_APPS_APP_BFF_SPRINGBOOT_SECRET:-secret)"
+    fullScopeAllowed: false
+    rootUrl: "https://apps.acme.test:4693/bff"
+    baseUrl: "/"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
 
 authenticationFlows:
 ## Identity First Browser Login Flow
