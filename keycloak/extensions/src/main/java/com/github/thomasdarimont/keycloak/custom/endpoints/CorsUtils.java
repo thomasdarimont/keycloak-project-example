@@ -23,12 +23,17 @@ public class CorsUtils {
     ) {
 
         var client = resolveClient(session, clientId);
-        var requestOrigin = URI.create(request.getHttpHeaders().getHeaderString("origin")).toString();
+
         var allowedOrigins = WebOriginsUtils.resolveValidWebOrigins(session, client);
 
         var cors = Cors.add(request, responseBuilder);
-        if (allowedOrigins.contains(requestOrigin)) {
-            cors.allowedOrigins(requestOrigin); //
+
+        var originHeaderValue = request.getHttpHeaders().getHeaderString("origin");
+        if (originHeaderValue != null) {
+            var requestOrigin = URI.create(originHeaderValue).toString();
+            if (allowedOrigins.contains(requestOrigin)) {
+                cors.allowedOrigins(requestOrigin); //
+            }
         }
 
         var methods = allowedHttpMethods.toArray(new String[0]);
