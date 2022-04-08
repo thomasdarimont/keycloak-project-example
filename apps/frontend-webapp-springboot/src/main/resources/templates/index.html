@@ -28,14 +28,14 @@
 
                 fetch("/webapp/auth/check-session", {credentials: 'include', redirect: 'follow'})
                     .then(function (response) {
-                    if (!response.ok && response.status == 401) {
-                        window.location.reload();
-                    }
+                        if (!response.ok && response.status == 401) {
+                            window.location.reload();
+                        }
 
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    }
-                });
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        }
+                    });
             }
 
             if (!(typeof document.addEventListener === "undefined" || hidden === undefined)) {

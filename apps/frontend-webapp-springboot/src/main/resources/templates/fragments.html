@@ -4,19 +4,19 @@
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>Account Console</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 
-    <link rel="stylesheet" href="/webapp/webjars/bootstrap/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/webapp/webjars/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"/>
-    <link rel="stylesheet" href="/webapp/webjars/font-awesome/css/all.css">
+    <link href="/webapp/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/webapp/webjars/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet"/>
+    <link href="/webapp/webjars/font-awesome/css/all.css" rel="stylesheet">
 
-    <script src="/webapp/webjars/jquery/jquery.min.js" defer></script>
-    <script src="/webapp/webjars/momentjs/min/moment.min.js" defer></script>
-    <script src="/webapp/webjars/momentjs/locale/de.js" defer></script>
+    <script defer src="/webapp/webjars/jquery/jquery.min.js"></script>
+    <script defer src="/webapp/webjars/momentjs/min/moment.min.js"></script>
+    <script defer src="/webapp/webjars/momentjs/locale/de.js"></script>
 
-    <script src="/webapp/webjars/bootstrap/js/bootstrap.min.js" defer></script>
-    <script src="/webapp/webjars/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js" defer></script>
-    <script src="/webapp/webjars/font-awesome/js/all.js" defer></script>
+    <script defer src="/webapp/webjars/bootstrap/js/bootstrap.min.js"></script>
+    <script defer src="/webapp/webjars/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script defer src="/webapp/webjars/font-awesome/js/all.js"></script>
 </head>
 
 <body>
@@ -29,13 +29,13 @@
         <div class="container-fluid">
             <!-- Toggle button -->
             <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-mdb-toggle="collapse"
-                    data-mdb-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent"
                     aria-expanded="false"
                     aria-label="Toggle navigation"
+                    class="navbar-toggler"
+                    data-mdb-target="#navbarSupportedContent"
+                    data-mdb-toggle="collapse"
+                    type="button"
             >
                 <i class="fas fa-bars"></i>
             </button>
@@ -50,16 +50,20 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/webapp/profile" th:classappend="${current == 'profile' ? 'active' : ''}">Profile</a>
+                        <a class="nav-link" href="/webapp/profile"
+                           th:classappend="${current == 'profile' ? 'active' : ''}">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/webapp/settings" th:classappend="${current == 'settings' ? 'active' : ''}">Settings</a>
+                        <a class="nav-link" href="/webapp/settings"
+                           th:classappend="${current == 'settings' ? 'active' : ''}">Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/webapp/security" th:classappend="${current == 'security' ? 'active' : ''}">Security</a>
+                        <a class="nav-link" href="/webapp/security"
+                           th:classappend="${current == 'security' ? 'active' : ''}">Security</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/webapp/applications" th:classappend="${current == 'applications' ? 'active' : ''}">Applications</a>
+                        <a class="nav-link" href="/webapp/applications"
+                           th:classappend="${current == 'applications' ? 'active' : ''}">Applications</a>
                     </li>
                 </ul>
             </div>
@@ -69,13 +73,13 @@
             <div class="d-flex align-items-center">
                 <!-- Avatar -->
                 <div class="dropdown">
-                    <button id="navbarDropdownMenuAvatar" class="btn btn-secondary dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown"  data-bs-auto-close="true"
-                            aria-expanded="false">
+                    <button aria-expanded="false" class="btn btn-secondary dropdown-toggle" data-bs-auto-close="true"
+                            data-bs-toggle="dropdown" id="navbarDropdownMenuAvatar"
+                            type="button">
                         <i class="fas fa-user"></i>
                         <span sec:authentication="name">Anonymous</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+                    <ul aria-labelledby="navbarDropdownMenuAvatar" class="dropdown-menu dropdown-menu-end">
                         <li>
                             <a class="dropdown-item" href="#" onclick="logoutForm.submit(); return false;">Logout</a>
                         </li>
@@ -87,7 +91,7 @@
         <!-- Container wrapper -->
     </nav>
 
-    <form id="logoutForm" th:action="@{/logout}" method="POST" class="visually-hidden">
+    <form class="visually-hidden" id="logoutForm" method="POST" th:action="@{/logout}">
         <!--/* CSRF token will be emitted by Spring Security */-->
     </form>
     <!-- Navbar -->

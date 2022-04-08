@@ -5,21 +5,34 @@ import com.github.thomasdarimont.keycloak.webapp.domain.ApplicationEntry;
 import com.github.thomasdarimont.keycloak.webapp.domain.CredentialEntry;
 import com.github.thomasdarimont.keycloak.webapp.domain.SettingEntry;
 import com.github.thomasdarimont.keycloak.webapp.domain.UserProfile;
-import com.github.thomasdarimont.keycloak.webapp.support.TokenAccessor;
+import com.github.thomasdarimont.keycloak.webapp.keycloak.client.KeycloakClientException;
+import com.github.thomasdarimont.keycloak.webapp.keycloak.client.acme.AcmeApplication;
+import com.github.thomasdarimont.keycloak.webapp.keycloak.client.acme.AcmeCredential;
+import com.github.thomasdarimont.keycloak.webapp.keycloak.client.acme.AcmeKeycloakClient;
+import com.github.thomasdarimont.keycloak.webapp.support.OAuth2Accessor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 class UiController {
 
-    private final TokenAccessor tokenAccessor;
+    private final AcmeKeycloakClient acmeKeycloakClient;
+
+    private final OAuth2Accessor OAuth2Accessor;
 
     @GetMapping("/")
 
@@ -30,12 +43,12 @@ class UiController {
     @GetMapping("/profile")
     public String showProfile(Model model, Authentication auth) {
 
-        OAuth2AccessToken accessToken = tokenAccessor.getAccessToken(auth);
+        var user = (DefaultOidcUser) auth.getPrincipal();
 
         var profile = new UserProfile();
-        profile.setFirstname("Thomas");
-        profile.setLastname("Darimont");
-        profile.setEmail("thomas.darimont@gmail.com");
+        profile.setFirstname(user.getGivenName());
+        profile.setLastname(user.getFamilyName());
+        profile.setEmail(user.getEmail());
 
         model.addAttribute("profile", profile);
 
@@ -43,19 +56,33 @@ class UiController {
     }
 
     @GetMapping("/settings")
-    public String showSettings(Model model) {
+    public String showSettings(Model model, Authentication auth) {
+        OAuth2AuthorizedClient oAuth2AuthorizedClient = OAuth2Accessor.getAuthorizedClient(auth);
+        if (oAuth2AuthorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:settings";
+        }
 
-        var setting1 = new SettingEntry();
-        setting1.setName("setting1");
-        setting1.setValue("value1");
-        setting1.setType("string");
+        var settingsResponse = acmeKeycloakClient.listSettings(oAuth2AuthorizedClient);
 
-        var setting2 = new SettingEntry();
-        setting2.setName("setting2");
-        setting2.setValue("on");
-        setting2.setType("boolean");
+        var settings = settingsResponse.entrySet().stream().map(entry -> {
+            var setting = new SettingEntry();
+            String key = entry.getKey();
+            String type = "String";
+            switch (key) {
+                case "Setting1":
+                    type = "string";
+                    break;
+                case "Setting2":
+                    type = "boolean";
+                    break;
+            }
 
-        var settings = List.of(setting1, setting2);
+            setting.setName(key);
+            setting.setType(type);
+            setting.setValue(String.valueOf(entry.getValue()));
+            return setting;
+        }).collect(Collectors.toList());
 
         model.addAttribute("settings", settings);
 
@@ -63,19 +90,23 @@ class UiController {
     }
 
     @GetMapping("/security")
-    public String showSecurity(Model model) {
+    public String showSecurity(Model model, Authentication auth) {
+        OAuth2AuthorizedClient oAuth2AuthorizedClient = OAuth2Accessor.getAuthorizedClient(auth);
+        if (oAuth2AuthorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:security";
+        }
 
-        var credential1 = new CredentialEntry();
-        credential1.setId("cred1");
-        credential1.setLabel("value1");
-        credential1.setType("password");
+        var credentialsResponse = acmeKeycloakClient.listCredentials(oAuth2AuthorizedClient);
 
-        var credential2 = new CredentialEntry();
-        credential2.setId("cred2");
-        credential2.setLabel("value2");
-        credential2.setType("totp");
-
-        var credentials = List.of(credential1, credential2);
+        var credentials = credentialsResponse.getCredentialInfos().values().stream().flatMap(Collection::stream).map(stringListEntry ->
+        {
+            CredentialEntry credentialEntry = new CredentialEntry();
+            credentialEntry.setId(stringListEntry.getCredentialId());
+            credentialEntry.setLabel(stringListEntry.getCredentialLabel());
+            credentialEntry.setType(stringListEntry.getCredentialType());
+            return credentialEntry;
+        }).collect(Collectors.toList());
 
         model.addAttribute("credentials", credentials);
 
@@ -83,22 +114,33 @@ class UiController {
     }
 
     @GetMapping("/applications")
-    public String showApplications(Model model) {
+    public String showApplications(Model model, Authentication auth) {
 
-        var appEntry1 = new ApplicationEntry();
-        appEntry1.setClientId("app1");
-        appEntry1.setName("App 1");
-        appEntry1.setUrl("http://localhost/app1");
+        OAuth2AuthorizedClient oAuth2AuthorizedClient = OAuth2Accessor.getAuthorizedClient(auth);
+        if (oAuth2AuthorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:applications";
+        }
 
-        var appEntry2 = new ApplicationEntry();
-        appEntry2.setClientId("app2");
-        appEntry2.setName("App 2");
-        appEntry2.setUrl("http://localhost/app2");
+        var appsResponse = acmeKeycloakClient.listApplications(oAuth2AuthorizedClient);
 
-        var apps = List.of(appEntry1, appEntry2);
+        var apps = appsResponse.getClients().stream().map(acmeApplication -> {
+            var application = new ApplicationEntry();
+            application.setClientId(acmeApplication.getClientId());
+            application.setName(acmeApplication.getClientName());
+            application.setUrl(acmeApplication.getEffectiveUrl());
+            return application;
+        }).collect(Collectors.toList());
 
         model.addAttribute("apps", apps);
 
         return "applications";
     }
+
+    @ExceptionHandler(KeycloakClientException.class)
+    public String clientError(KeycloakClientException exception) {
+        log.error("Client failed with status {} and body {}", exception.getStatusCode(), exception.getErrorBody());
+        return "profile";
+    }
+
 }
