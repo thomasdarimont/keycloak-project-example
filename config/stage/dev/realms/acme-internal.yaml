@@ -119,6 +119,12 @@ clientScopes:
           "id.token.claim": "true"
           "access.token.claim": "true"
 
+clientScopeMappings:
+  account:
+    - client: frontend-webapp-springboot
+      roles:
+        - manage-account
+
 requiredActions:
   - alias: acme-update-phonenumber
     name: 'Acme: Update Mobile Phonenumber'
@@ -359,6 +365,8 @@ clients:
     defaultClientScopes:
       - "email"
       - "profile"
+    # roles required to access custom resources
+      - "roles"
     optionalClientScopes:
       - "phone"
 
