@@ -379,6 +379,27 @@ clients:
     optionalClientScopes:
       - "phone"
 
+  - clientId: acme-service-client-jwt-auth
+    protocol: openid-connect
+    name: Acme Service JWT Auth Client
+    description: "Acme Service JWT Auth Client Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    clientAuthenticatorType: "client-jwt"
+    attributes:
+      "use.refresh.tokens": "false"
+# Note that this certificate must match apps/jwt-client-authentication/client_cert.pem
+      "jwt.credential.certificate": "MIIFLzCCAxegAwIBAgIUDYnNAzTFZ6FNHbRn4evtZFluiuAwDQYJKoZIhvcNAQELBQAwJzElMCMGA1UEAwwcYWNtZS1zZXJ2aWNlLWNsaWVudC1qd3QtYXV0aDAeFw0yMjA0MTAxMTU5MjdaFw0yMzA0MTAxMTU5MjdaMCcxJTAjBgNVBAMMHGFjbWUtc2VydmljZS1jbGllbnQtand0LWF1dGgwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQCu91jwgkO/ZJoeIzclL+x7oBxsgjxGDLdCYs4QKEhitB8FFOobxtA67Yh48Bprd9Qji9IHvdxVLPa+SkgMvF/5MhDKUW/wLBpDL0sgvLT56FV9gl/hqtUvVKVNTQuEBk0QpTJH4uSg5jNIZARVcOnPRvBtQ0vpQ/1FsEJkSLXq7OAUQTgguXltR+/u2hH4wpOIRzpjeN7i/OHkiZS0K5otAVr1kCoMeZXo0qUfzG6FngVQhqZ3haMf3C+MSjLagvFzYK6NlJJDp7WIFvzkCriZlIyrSbO4vpHjmKuo31boIAbwn1EimHWGG1ExcXWLeqLfJt43tQIwzPe6PhnQ+2kw7zb6O6SrJhnaYNTVclAuj3TRtF0bxM9B9kEpHyypxGKwF8UAyqQkMnG1tJzvafruDLHrHpOAnV4bncWjbIP5vsS+mEALIs+CpRujdNut1NrJT7rMkNcXdhOfiLVA5FY91c5WC1uoJPmyFscsj2WmBe5AVQFpOiS0V5dIm1Gc3ctebX7Nqa8rxnEPVQhRWyacadlti+VNHgUUZIbU67vHx64w+Gh3XlxG2fBqf1YHHOOUlFHUAcJoANqyk0lD6eqn8RSpI0xB/VdQNnCmDblx94W0iTCxgEC3vrUsHzC3r37BX6dHo3aF7xaT6wwRCM8/FHj1eH/JBq+1Xt4y1P3aNQIDAQABo1MwUTAdBgNVHQ4EFgQUt+sggUSV+8cCNAvMMlBH1SBRAA0wHwYDVR0jBBgwFoAUt+sggUSV+8cCNAvMMlBH1SBRAA0wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAgEAPsthqWnfJFEjh7BV/Vg8hAgLme/cVDr/O1Ff0WVX+Mmtsu+vZyRGNXL67PXYqar9b+fZr5mGhbiZS4mBk/5N9sGRpDh2Keyy9j/CTaYUpszqur5NfYBvmtbk+u4BCPkMMme+R2RnZ3GnzOoGKlZ2jCfBvm/Jr+Ta05VVGb41LZfb19m8uYnMzLTZd1VSZQ4+vHa6OrPn1zaAPobHWLysLkUH6ngteZjVu2bPcf1UYmYRyMs/a4cIgsC3A5PIFu9DN87o0q8LN3qITt70/3FgKLUuPmvCZSnNZ+oLsUDs3RM5qyJth91UAaJL3LXglkSCzwmSqimel+Ga3e4ltmsUMB2HKc81NXfMmAV3gRYyfwLQSA1HyuMGOBRLbmsXr6Y6C4l3Wfsbv/MLL/BgDev6A6Hkq2Zc0Q4VJUhBsm75GMAy5vA6Pn+TSp8MeWJMAXJwcY/3ESyodfn29m0mGiHwef/ByQcK/8M9fRFIvIsKF/NPziWHiIV3QXB2qDIZF595/De4siUtaSW6H9ywZpVfTBoc/AEHKY4QZ1Pr8xj+YRQar7qmuVsSug6RWgXplZWOn9vx25FPwAXcOv9z/gP7zA8IYMiEUZ0MKFLetQ6ietCNPlvqgFC59+hjsh/MyNTePitxNPN1+MYUb7Xr/Ul+BREnNCVJM/ZCEbIhsVKMiCk="
+      "token.endpoint.auth.signing.alg": "RS256"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
 authenticationFlows:
 ## Identity First Browser Login Flow
   - alias: "Browser Identity First"
