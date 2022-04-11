@@ -59,7 +59,7 @@ services:
       - "--spi-events-listener-email-include-events=UPDATE_PASSWORD"
       - "--spi-events-listener-jboss-logging-success-level=info"
       - "--spi-events-listener-jboss-logging-error-level=warn"
-#      - "--config-file=/opt/keycloak/conf/keycloak.conf"
+#      - "--log-level=info,org.hibernate:debug"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
