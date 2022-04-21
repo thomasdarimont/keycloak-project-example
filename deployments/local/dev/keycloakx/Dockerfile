@@ -1,5 +1,6 @@
 #see https://www.keycloak.org/server/containers
-FROM quay.io/keycloak/keycloak:17.0.1
+ARG KEYCLOAK_VERSION=18.0.0
+FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 
 USER root
 
