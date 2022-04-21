@@ -1,4 +1,4 @@
-FROM postgres:11.12
+FROM postgres:11.15
 
 # 999 uid of postgresql
 COPY --chown=999:0 "./acme.test+1.pem" /var/lib/postgresql/server.crt
