@@ -1,7 +1,6 @@
-#FROM quay.io/keycloak/keycloak:16.1.1
-#FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy
-FROM quay.io/keycloak/keycloak:17.0.1-legacy
-
+# Stay on 17.0.1 due to regression in Keycloak 18.0.0: /authjs/keycloak.js
+ARG KEYCLOAK_VERSION=17.0.1
+FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy
 USER root
 
 # Add java-11-openjdk-devel JDK for debugging

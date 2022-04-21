@@ -48,7 +48,7 @@ services:
       - "--http-enabled=true"
       - "--http-port=8080"
       - "--metrics-enabled=true"
-#      - "--health-enabled=true" # metrics config in Keycloak-X 18.+
+      - "--health-enabled=true"
       - "--cache=local"
       - "--proxy=passthrough"
       - "--https-protocols=TLSv1.3,TLSv1.2"
