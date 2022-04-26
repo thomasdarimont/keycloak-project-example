@@ -32,17 +32,4 @@ class AuthController {
 
         return ResponseEntity.ok().build();
     }
-
-    @Data
-    static class IntrospectionResponse {
-
-        private boolean active;
-
-        private Map<String, Object> data = new HashMap<>();
-
-        @JsonAnySetter
-        public void setDataEntry(String key, Object value) {
-            data.put(key, value);
-        }
-    }
 }

@@ -14,9 +14,7 @@ public class AcmeCredential {
     private String credentialType;
     private String credentialLabel;
     private Long createdAt;
-
     private boolean collection;
     private int count;
-
     private Map<String, Object> metadata;
 }

@@ -7,19 +7,19 @@ import java.util.Map;
 
 public interface AcmeKeycloakClient extends KeycloakClient {
     /* call custom endpoint for settings */
-    Map<String, Object> listSettings(OAuth2AuthorizedClient authorizedClient);
+    Map<String, Object> listSettings();
 
-    void updateSettings(OAuth2AuthorizedClient authorizedClient, Map<String, Object> settings);
+    void updateSettings(Map<String, Object> settings);
 
-    void triggerDeleteAccount(OAuth2AuthorizedClient authorizedClient);
+    void triggerDeleteAccount();
 
-    AcmeCredentialInfosResponse listCredentials(OAuth2AuthorizedClient authorizedClient);
+    AcmeCredentialInfosResponse listCredentials();
 
-    void deleteCredential(OAuth2AuthorizedClient authorizedClient, AcmeCredentialDeleteRequest credentialDeleteRequest);
+    void deleteCredential(AcmeCredentialDeleteRequest credentialDeleteRequest);
 
     default String createEmailChangeRedirectUrl(String redirectAfter) {
         return buildActionExecutionRedirect("acme-update-email", redirectAfter);
     }
 
-    AcmeApplicationInfoResponse listApplications(OAuth2AuthorizedClient authorizedClient);
+    AcmeApplicationInfoResponse listApplications();
 }

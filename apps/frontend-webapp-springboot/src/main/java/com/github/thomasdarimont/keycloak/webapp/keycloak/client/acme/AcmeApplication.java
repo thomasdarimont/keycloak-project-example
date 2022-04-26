@@ -7,5 +7,5 @@ import lombok.Data;
 public class AcmeApplication {
     private String clientId;
     private String clientName;
-    private java.lang.String effectiveUrl;
+    private String effectiveUrl;
 }
