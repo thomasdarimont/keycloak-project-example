@@ -19,14 +19,11 @@ import org.testcontainers.containers.SelinuxContext;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.utility.MountableFile;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
@@ -67,8 +64,8 @@ public class KeycloakTestSupport {
     }
 
     public static ResteasyWebTarget getResteasyWebTarget(KeycloakContainer keycloak) {
-        ResteasyClient client = new ResteasyClientBuilder().build();
-        return client.target(UriBuilder.fromPath(keycloak.getAuthServerUrl()));
+        Client client = ResteasyClientBuilder.newBuilder().build();
+        return (ResteasyWebTarget)client.target(UriBuilder.fromPath(keycloak.getAuthServerUrl()));
     }
 
     public static UserRef createOrUpdateTestUser(RealmResource realm, String username, String password, Consumer<UserRepresentation> adjuster) {

@@ -55,6 +55,7 @@
         <!-- Testing -->
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <assertj-core.version>3.22.0</assertj-core.version>
+        <resteasy.version>4.7.5.Final</resteasy.version>
         <testcontainers-keycloak.version>2.1.2</testcontainers-keycloak.version>
 
         <!-- Tooling -->
