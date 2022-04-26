@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:17.0.0
+FROM quay.io/keycloak/keycloak:17.0.1
 
 USER 0
 
