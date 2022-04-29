@@ -34,7 +34,7 @@ client.global.set("KC_REFRESH_TOKEN", response.body.refresh_token);
 POST {{ISSUER}}/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{TEST_CLIENT_ID}}&client_secret={{TEST_CLIENT_SECRET}}&grant_type=client_credentials
+client_id={{TEST_CLIENT3_ID}}&client_secret={{TEST_CLIENT_SECRET}}&grant_type=client_credentials
 
 > {%
 client.global.set("KC_ACCESS_TOKEN", response.body.access_token);
