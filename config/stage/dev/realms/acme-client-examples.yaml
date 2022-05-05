@@ -65,6 +65,7 @@ clients:
     adminUrl: ""
     redirectUris:
       - "/*"
+      - "https://flowsimulator.pragmaticwebsecurity.com"
     webOrigins:
       - "+"
     defaultClientScopes:
