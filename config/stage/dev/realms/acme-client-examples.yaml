@@ -1,0 +1,204 @@
+realm: acme-client-examples
+enabled: true
+
+clients:
+  - clientId: acme-client-spa-app
+    protocol: openid-connect
+    name: Acme SPA Frontend App
+    description: "JavaScript based Single-Page App as Public Client that uses Authorization Code Grant Flow"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    fullScopeAllowed: false
+    rootUrl: "https://www.keycloak.org/app"
+    baseUrl: "/#url=https://id.acme.test:8443/auth&realm=acme-client-examples&client=acme-client-spa-app"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+      - "https://flowsimulator.pragmaticwebsecurity.com"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+
+  - clientId: acme-client-cli-app
+    protocol: openid-connect
+    name: Acme CLI App
+    description: "Command-line interface app that can obtain tokens with Username + Password and ClientId via grant_type=password"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "use.refresh.tokens": "false"
+
+  - clientId: acme-client-classic-web-app
+    protocol: openid-connect
+    name: Acme Classic Server-side Web Application
+    description: "Classic Server-side Web Application that uses Authorization Code Grant Flow"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    secret: "$(env:ACME_APPS_APP_WEB_SPRINGBOOT_SECRET:-secret)"
+    fullScopeAllowed: false
+    rootUrl: "https://apps.acme.test:4633/webapp"
+    baseUrl: "/"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+
+  - clientId: acme-client-legacy-app
+    protocol: openid-connect
+    name: Acme Legacy App
+    description: "Legacy App that can obtain tokens with Username + Password and ClientId+Secret via grant_type=password"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: true
+    serviceAccountsEnabled: false
+    secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
+  - clientId: acme-client-api-resource-server
+    protocol: openid-connect
+    name: Acme API Resource Server
+    description: "OAuth2 Resource Server that can be called with an AccessToken, can be used to provide Role configuration for an API"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+
+  - clientId: acme-client-api-resource-server2
+    protocol: openid-connect
+    name: Acme API Resource Server 2
+    description: "OAuth2 Resource Server that can be called with an AccessToken, can be used to provide Role configuration for an API"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+
+
+  - clientId: acme-client-service-app
+    protocol: openid-connect
+    name: Acme Service App
+    description: "Acme Service App that can obtain tokens via grant_type=client_credentials"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
+  - clientId: acme-client-mobile-app
+    protocol: openid-connect
+    name: Acme Mobile App
+    description: "Acme Mobile App with Authorization Code Flow"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: false
+    redirectUris:
+      # App URL
+      - "acme://app/callback/*"
+      # Claimed URL
+      - "https://mobile.acme.test/*"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+      - "offline_access"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+
+  - clientId: acme-client-desktop-app
+    protocol: openid-connect
+    name: Acme Desktop App
+    description: "Acme Desktop App with Authorization Code Flow"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/*"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+      - "offline_access"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+
+users:
+  - username: employee
+    email: employee@local
+    firstName: Erik
+    lastName: Employee
+    enabled: true
+    attributes:
+      locale: ["en"]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false
+
+  - username: tester
+    email: tester@local
+    firstName: Theo
+    lastName: Tester
+    enabled: true
+    attributes:
+      locale: ["en"]
+      phoneNumber: ["+49178111222333"]
+      phoneNumberVerified: ["true"]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false
