@@ -44,7 +44,7 @@ public class KeycloakLogoutHandler implements LogoutHandler {
         if (isStandardHttps || isStandardHttp) {
             hostname = request.getServerName();
         }
-        return request.getScheme() + "://" + hostname + request.getContextPath();
+        return request.getScheme() + "://" + hostname + request.getContextPath() + "/";
     }
 
     private String createKeycloakLogoutUrl(String issuerUri, String idTokenValue, String defaultRedirectUri) {

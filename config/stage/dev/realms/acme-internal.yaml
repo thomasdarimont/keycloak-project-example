@@ -344,7 +344,8 @@ clients:
     baseUrl: "/"
     adminUrl: ""
     redirectUris:
-      - "/*"
+      - "/"
+      - "/login/oauth2/code/keycloak"
     webOrigins:
       - "+"
     defaultClientScopes:
