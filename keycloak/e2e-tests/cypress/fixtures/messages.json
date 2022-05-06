@@ -6,8 +6,8 @@
     "errorInvalidPassword": "Ungültiges Passwort."
   },
   "en": {
-    "signOut": "Sign Out",
-    "signIn": "Sign In",
+    "signOut": "Sign out",
+    "signIn": "Sign in",
     "errorInvalidUsernameOrEmail": "Invalid username or email.",
     "errorInvalidPassword": "Invalid password."
   }

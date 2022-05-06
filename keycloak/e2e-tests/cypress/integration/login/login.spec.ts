@@ -18,6 +18,10 @@ context('Login...', () => {
 
         cy.get('#landingSignOutButton').invoke("text").should('eq', msg.signOut)
         cy.get('#landingSignOutButton').click()
+
+        // confirm logout
+        cy.get('#kc-logout').click()
+
         cy.get('#landingSignInButton').invoke("text").should('eq', msg.signIn)
     });
 
