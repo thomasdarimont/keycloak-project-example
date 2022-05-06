@@ -98,13 +98,7 @@
             <version>${keycloak.version}</version>
             <type>zip</type>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-maven-plugin</artifactId>
-            <version>${quarkus.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+     </dependencies>
 
     <dependencyManagement>
         <dependencies>
