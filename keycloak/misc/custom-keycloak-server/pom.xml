@@ -88,7 +88,7 @@
                     <artifactId>quarkus-jdbc-mariadb-deployment</artifactId>
                 </exclusion>
                 <!-- Exclude unused support for: H2; DOES NOT WORK BECAUSE OF BUILD -->
-                <!--exclusion>
+                <exclusion>
                     <groupId>com.h2database</groupId>
                     <artifactId>h2</artifactId>
                 </exclusion>
@@ -99,22 +99,22 @@
                 <exclusion>
                     <groupId>io.quarkus</groupId>
                     <artifactId>quarkus-jdbc-h2-deployment</artifactId>
-                </exclusion-->
+                </exclusion>
             </exclusions>
         </dependency>
 
         <!-- Additional Quarkus Features: Begin -->
 
-<!--        <dependency>-->
-<!--            <groupId>io.quarkus</groupId>-->
-<!--            <artifactId>quarkus-logging-gelf</artifactId>-->
-<!--            <version>${quarkus.version}</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.quarkus</groupId>-->
-<!--            <artifactId>quarkus-logging-gelf-deployment</artifactId>-->
-<!--            <version>${quarkus.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-gelf</artifactId>
+            <version>${quarkus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-logging-gelf-deployment</artifactId>
+            <version>${quarkus.version}</version>
+        </dependency>
 
         <!-- Additional Quarkus Features: End -->
     </dependencies>
