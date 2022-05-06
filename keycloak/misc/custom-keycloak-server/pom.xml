@@ -21,6 +21,26 @@
 
     <dependencies>
 
+<!--        <dependency>-->
+<!--            <groupId>org.keycloak</groupId>-->
+<!--            <artifactId>keycloak-services</artifactId>-->
+<!--            <version>${keycloak.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.keycloak</groupId>-->
+<!--            <artifactId>keycloak-quarkus-server</artifactId>-->
+<!--            <version>${keycloak.version}</version>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
         <dependency>
             <!-- Base Keycloak.X Distribution -->
             <groupId>org.keycloak</groupId>
