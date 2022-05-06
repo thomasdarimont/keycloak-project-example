@@ -102,6 +102,9 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- CVE Patch overrides: Begin -->
+
             <dependency>
                 <groupId>com.thoughtworks.xstream</groupId>
                 <artifactId>xstream</artifactId>
@@ -117,6 +120,20 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.13.2.2</version>
             </dependency>
+            <!-- CVE Patch overrides: End -->
+
+            <!-- Custom Quarkus Features: Begin -->
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-logging-gelf</artifactId>
+                <version>${quarkus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkus</groupId>
+                <artifactId>quarkus-logging-gelf-deployment</artifactId>
+                <version>${quarkus.version}</version>
+            </dependency>
+            <!-- Custom Quarkus Features: End -->
         </dependencies>
     </dependencyManagement>
 
@@ -128,8 +145,8 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>unpack-cli</id>
-                        <phase>validate</phase>
+                        <id>unpack-keycloak-server-distribution</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -143,6 +160,30 @@
                                 </artifactItem>
                             </artifactItems>
                             <excludes>**/lib/**</excludes>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>add-quarkus-extension-logging-gelf</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>io.quarkus</groupId>
+                                    <artifactId>quarkus-logging-gelf</artifactId>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.directory}/keycloak-${keycloak.version}/lib/lib/main</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.quarkus</groupId>
+                                    <artifactId>quarkus-logging-gelf-deployment</artifactId>
+                                    <type>jar</type>
+                                    <outputDirectory>${project.build.directory}/keycloak-${keycloak.version}/lib/lib/main</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
