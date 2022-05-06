@@ -21,24 +21,12 @@
 
     <dependencies>
 
-<!--        <dependency>-->
-<!--            <groupId>org.keycloak</groupId>-->
-<!--            <artifactId>keycloak-services</artifactId>-->
-<!--            <version>${keycloak.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.keycloak</groupId>-->
-<!--            <artifactId>keycloak-quarkus-server</artifactId>-->
-<!--            <version>${keycloak.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
             <version>1.0.1</version>
+            <optional>true</optional>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -54,6 +42,9 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-quarkus-server</artifactId>
             <version>${keycloak.version}</version>
+
+            <!-- Exclude unused dependencies -->
+
             <exclusions>
                 <!-- Exclude unused support for: MySQL -->
                 <exclusion>

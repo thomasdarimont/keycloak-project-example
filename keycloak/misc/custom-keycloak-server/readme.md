@@ -1,6 +1,10 @@
 Custom Keycloak Server
 ----
 
+Simple example for creating a custom Quarkus based Keycloak Distribution.
+
+Unwanted features can be removed via maven dependency excludes.
+
 # Build
 ```
 mvn clean verify -DskipTests

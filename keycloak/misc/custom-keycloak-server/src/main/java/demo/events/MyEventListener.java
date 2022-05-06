@@ -11,14 +11,20 @@ import org.keycloak.models.KeycloakSessionFactory;
 
 @AutoService(EventListenerProviderFactory.class)
 public class MyEventListener implements EventListenerProvider, EventListenerProviderFactory {
+
+    @Override
+    public String getId() {
+        return "myevents";
+    }
+
     @Override
     public void onEvent(Event event) {
-        System.out.println("Hello: " + event);
+        System.out.println("UserEvent: " + event);
     }
 
     @Override
     public void onEvent(AdminEvent event, boolean includeRepresentation) {
-
+        System.out.println("AdminEvent: " + event);
     }
 
     @Override
@@ -28,21 +34,14 @@ public class MyEventListener implements EventListenerProvider, EventListenerProv
 
     @Override
     public void init(Config.Scope config) {
-
     }
 
     @Override
     public void postInit(KeycloakSessionFactory factory) {
-
     }
 
     @Override
     public void close() {
-
     }
 
-    @Override
-    public String getId() {
-        return "myevents";
-    }
 }
