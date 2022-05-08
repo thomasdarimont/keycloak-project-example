@@ -15,7 +15,7 @@ class scanImage {
 
     static final String TRIVY_VERSION_OPT = "--trivy-version";
     static final String TRIVY_VERSION_ENV = "TRIVY_VERSION";
-    static final String TRIVY_VERSION_DEFAULT = "0.19.1";
+    static final String TRIVY_VERSION_DEFAULT = "0.27.1";
 
     static final String VERBOSE_CMD = "--verbose";
 
@@ -61,6 +61,7 @@ class scanImage {
         commandLine.add("-v");
         commandLine.add("/var/run/docker.sock:/var/run/docker.sock:z");
         commandLine.add("aquasec/trivy:" + trivyVersion);
+        commandLine.add("image");
         commandLine.add(imageName);
 
         var pb = new ProcessBuilder(commandLine);
