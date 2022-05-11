@@ -93,7 +93,7 @@ public class UserCredentialsInfoResource {
         AccessToken.Access accountAccess = resourceAccess == null ? null : resourceAccess.get(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
         var canAccessAccount = accountAccess != null
                 && (accountAccess.isUserInRole(AccountRoles.MANAGE_ACCOUNT) || accountAccess.isUserInRole(AccountRoles.VIEW_PROFILE));
-        if (canAccessAccount) {
+        if (!canAccessAccount) {
             return Response.status(FORBIDDEN).build();
         }
 
