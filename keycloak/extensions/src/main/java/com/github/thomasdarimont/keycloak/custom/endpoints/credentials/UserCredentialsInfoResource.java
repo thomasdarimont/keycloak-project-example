@@ -218,7 +218,7 @@ public class UserCredentialsInfoResource {
 
         if (RecoveryAuthnCodesCredentialModel.TYPE.equals(credential.getType())) {
             try {
-                Map<String, Object> credentialData = JsonSerialization.readValue(credential.getCredentialData(), Map.class);
+                Map credentialData = JsonSerialization.readValue(credential.getCredentialData(), Map.class);
                 credentialInfo.getMetadata().put("remainingCodes", credentialData.get("remainingCodes"));
             } catch (IOException e) {
                 throw new RuntimeException(e);

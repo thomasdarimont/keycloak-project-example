@@ -82,7 +82,7 @@ public class CustomAzureADGroupMapper extends AbstractClaimMapper {
 
     @Override
     public String getDisplayType() {
-        return "AAD Groups claim to Group";
+        return "Acme: AAD Groups claim to Group";
     }
 
     @Override

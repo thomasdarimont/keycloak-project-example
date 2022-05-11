@@ -3,7 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClient;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import lombok.extern.jbosslog.JBossLog;
-import org.keycloak.common.util.RandomString;
+import org.keycloak.common.util.SecretGenerator;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakUriInfo;
@@ -13,7 +13,6 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.theme.Theme;
 import org.keycloak.urls.UrlType;
 
-import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.Map;
 
@@ -48,7 +47,7 @@ public class SmsCodeSender {
     }
 
     protected String generateCode(int length) {
-        return new RandomString(length, new SecureRandom(), RandomString.digits).nextString();
+        return SecretGenerator.getInstance().randomString(length, SecretGenerator.DIGITS);
     }
 
     protected String resolveDomain(KeycloakContext context) {
