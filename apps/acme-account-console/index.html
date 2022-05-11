@@ -244,11 +244,20 @@
 
     window.onload = () => {
 
-        window.keycloak = new Keycloak({
+        let keycloak = new Keycloak({
             url: keycloakUrl,
             realm: realm,
             clientId: clientId
         });
+        window.keycloak = keycloak;
+
+        // workaround for changes with oidc logout in Keycloak 18.0.0
+        // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
+        keycloak.createLogoutUrl = function(options) {
+            return keycloak.endpoints.logout()
+                + '?id_token_hint=' + keycloak.idToken
+                + '&post_logout_redirect_uri=' + encodeURIComponent(window.location.href);
+        }
 
         let initConfig = {
             onLoad: 'login-required', // redirects to login if not login
