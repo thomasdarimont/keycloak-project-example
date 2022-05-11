@@ -6,7 +6,7 @@ import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionProvider;
-import org.keycloak.common.util.RandomString;
+import org.keycloak.common.util.SecretGenerator;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailTemplateProvider;
 import org.keycloak.email.freemarker.beans.ProfileBean;
@@ -85,7 +85,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
             return form.createForm("verify-email-form.ftl");
         }
 
-        String email = context.getUser().getEmail();
+//        String email = context.getUser().getEmail();
         form.setAttribute("currentEmail", "");
 
         if (formCustomizer != null) {
@@ -114,7 +114,6 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
         RealmModel realm = context.getRealm();
         UserModel currentUser = context.getUser();
-        UserModel user = currentUser;
         KeycloakSession session = context.getSession();
 
         String newEmail = String.valueOf(formData.getFirst(EMAIL_FIELD)).trim();
@@ -131,7 +130,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
             if (Validation.isBlank(newEmail) || !Validation.isEmailValid(newEmail)) {
                 emailError = "invalidEmailMessage";
                 errorEvent.detail("error", "invalid-email-format");
-            } else if (Objects.equals(newEmail, user.getEmail())) {
+            } else if (Objects.equals(newEmail, currentUser.getEmail())) {
                 emailError = "invalidEmailSameAddressMessage";
                 errorEvent.detail("error", "invalid-email-same-email");
             } else if (session.users().getUserByEmail(realm, newEmail) != null) {
@@ -152,7 +151,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
                 return;
             }
 
-            String code = RandomString.randomCode(VERIFY_CODE_LENGTH).toLowerCase();
+            String code = SecretGenerator.getInstance().randomString(VERIFY_CODE_LENGTH).toLowerCase();
             authSession.setAuthNote(AUTH_NOTE_CODE, code);
 
             LoginFormsProvider form = context.form();
@@ -173,7 +172,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
                 Map<String, Object> attributes = new HashMap<>();
                 attributes.put("code", code);
-                attributes.put("user", new ProfileBean(user) {
+                attributes.put("user", new ProfileBean(currentUser) {
                     @Override
                     public String getEmail() {
                         return newEmail;
@@ -210,9 +209,9 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
                 return;
             }
 
-            user.setEmail(emailFromAuthNote);
-            user.setEmailVerified(true);
-            user.removeRequiredAction(ID);
+            currentUser.setEmail(emailFromAuthNote);
+            currentUser.setEmailVerified(true);
+            currentUser.removeRequiredAction(ID);
 
             event.success();
 
