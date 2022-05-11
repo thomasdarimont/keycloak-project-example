@@ -335,6 +335,7 @@
         let smsInfo = credentialsData.credentialInfos['mfa-sms'];
         let trustedDeviceInfo = credentialsData.credentialInfos['acme-trusted-device'];
         let backupCodeInfo = credentialsData.credentialInfos['backup-code'];
+        let recoveryCodeInfo = credentialsData.credentialInfos['recovery-authn-codes'];
 
         let otpAuthHtml = "";
         if (otpInfo) {
@@ -429,6 +430,16 @@
                  <td><a href="#" onclick="changeMfa('backup-code');return false">Update</a></td>
                  <td>${!!backupCodeInfo ? '<a href="#" onclick="removeMfa(\'backup-code\');return false">Remove</a>' : ''}</td>
             </tr>
+
+            <tr>
+                 <td>${!!recoveryCodeInfo ? "&check;" : ""}</td>
+                 <td>Recovery Code</td>
+                 <td>${!!recoveryCodeInfo ? escapeHtml(recoveryCodeInfo[0].credentialLabel) + `(${recoveryCodeInfo[0].metadata['remainingCodes']})` : ''}</td>
+                 <td>${!!recoveryCodeInfo ? formatDate(recoveryCodeInfo[0].createdAt) : '-'}</td>
+                 <td><a href="#" onclick="changeMfa('recovery-authn-codes');return false">Update</a></td>
+                 <td>${!!recoveryCodeInfo ? '<a href="#" onclick="removeMfa(\'recovery-authn-codes\');return false">Remove</a>' : ''}</td>
+            </tr>
+
             ${otpAuthHtml}
             </tbody>
             </table>
@@ -519,6 +530,7 @@
             "mfa-sms": "acme-update-phonenumber",
             "acme-trusted-device": "acme-manage-trusted-device",
             "backup-code": "acme-generate-backup-codes",
+            "recovery-authn-codes": "CONFIGURE_RECOVERY_AUTHN_CODES",
         }
 
         let action = actions[method];
@@ -534,7 +546,7 @@
 
     async function removeMfa(credentialType, credentialId) {
 
-        if (!(["otp", "mfa-sms", "acme-trusted-device", "backup-code"].includes(credentialType))) {
+        if (!(["otp", "mfa-sms", "acme-trusted-device", "backup-code", "recovery-authn-codes"].includes(credentialType))) {
             return;
         }
 

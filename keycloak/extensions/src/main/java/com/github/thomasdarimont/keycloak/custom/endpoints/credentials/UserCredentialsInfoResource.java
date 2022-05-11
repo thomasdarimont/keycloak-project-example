@@ -21,8 +21,10 @@ import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.models.credential.RecoveryAuthnCodesCredentialModel;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.services.resources.Cors;
+import org.keycloak.util.JsonSerialization;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -32,6 +34,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,18 +48,11 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 public class UserCredentialsInfoResource {
 
-    private static final Set<String> RELEVANT_CREDENTIAL_TYPES = Set.of(
-            PasswordCredentialModel.TYPE,
-            SmsCredentialModel.TYPE,
-            OTPCredentialModel.TYPE,
-            TrustedDeviceCredentialModel.TYPE,
-            BackupCodeCredentialModel.TYPE);
+    private static final Set<String> RELEVANT_CREDENTIAL_TYPES = Set.of(PasswordCredentialModel.TYPE, SmsCredentialModel.TYPE, OTPCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, BackupCodeCredentialModel.TYPE, // TODO Remove support for backup codes
+            RecoveryAuthnCodesCredentialModel.TYPE);
 
-    private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(
-            SmsCredentialModel.TYPE,
-            TrustedDeviceCredentialModel.TYPE,
-            OTPCredentialModel.TYPE,
-            BackupCodeCredentialModel.TYPE);
+    private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(SmsCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, OTPCredentialModel.TYPE, BackupCodeCredentialModel.TYPE, // TODO Remove support for backup codes
+            RecoveryAuthnCodesCredentialModel.TYPE);
 
     private final KeycloakSession session;
     private final AccessToken token;
@@ -91,8 +87,7 @@ public class UserCredentialsInfoResource {
 
         var resourceAccess = token.getResourceAccess();
         AccessToken.Access accountAccess = resourceAccess == null ? null : resourceAccess.get(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
-        var canAccessAccount = accountAccess != null
-                && (accountAccess.isUserInRole(AccountRoles.MANAGE_ACCOUNT) || accountAccess.isUserInRole(AccountRoles.VIEW_PROFILE));
+        var canAccessAccount = accountAccess != null && (accountAccess.isUserInRole(AccountRoles.MANAGE_ACCOUNT) || accountAccess.isUserInRole(AccountRoles.VIEW_PROFILE));
         if (!canAccessAccount) {
             return Response.status(FORBIDDEN).build();
         }
@@ -123,9 +118,8 @@ public class UserCredentialsInfoResource {
 
         var resourceAccess = token.getResourceAccess();
         AccessToken.Access accountAccess = resourceAccess == null ? null : resourceAccess.get(Constants.ACCOUNT_MANAGEMENT_CLIENT_ID);
-        var canAccessAccount = accountAccess != null
-                && (accountAccess.isUserInRole(AccountRoles.MANAGE_ACCOUNT) || accountAccess.isUserInRole(AccountRoles.VIEW_PROFILE));
-        if (canAccessAccount) {
+        var canAccessAccount = accountAccess != null && (accountAccess.isUserInRole(AccountRoles.MANAGE_ACCOUNT) || accountAccess.isUserInRole(AccountRoles.VIEW_PROFILE));
+        if (!canAccessAccount) {
             return Response.status(FORBIDDEN).build();
         }
 
@@ -138,8 +132,7 @@ public class UserCredentialsInfoResource {
         // TODO check token.getAuth_time()
 
         UserCredentialManager ucm = session.userCredentialManager();
-        var credentials = ucm.getStoredCredentialsByTypeStream(realm, user, credentialType)
-                .collect(Collectors.toList());
+        var credentials = ucm.getStoredCredentialsByTypeStream(realm, user, credentialType).collect(Collectors.toList());
         if (credentials.isEmpty()) {
             return withCors(request, Response.status(Response.Status.NOT_FOUND)).build();
         }
@@ -163,9 +156,7 @@ public class UserCredentialsInfoResource {
 
     private boolean removeCredentialForUser(RealmModel realm, UserModel user, CredentialModel credentialModel) {
         boolean removed = session.userCredentialManager().removeStoredCredential(realm, user, credentialModel.getId());
-        if (removed
-                && TrustedDeviceCredentialModel.TYPE.equals(credentialModel.getType())
-                && isCurrentRequestFromGivenTrustedDevice(credentialModel)) {
+        if (removed && TrustedDeviceCredentialModel.TYPE.equals(credentialModel.getType()) && isCurrentRequestFromGivenTrustedDevice(credentialModel)) {
             // remove dangling trusted device cookie
             TrustedDeviceCookie.removeDeviceCookie(session, realm);
 
@@ -222,6 +213,15 @@ public class UserCredentialsInfoResource {
 
             if (isCurrentRequestFromGivenTrustedDevice(credential)) {
                 credentialInfo.getMetadata().put("current", "true");
+            }
+        }
+
+        if (RecoveryAuthnCodesCredentialModel.TYPE.equals(credential.getType())) {
+            try {
+                Map<String, Object> credentialData = JsonSerialization.readValue(credential.getCredentialData(), Map.class);
+                credentialInfo.getMetadata().put("remainingCodes", credentialData.get("remainingCodes"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 

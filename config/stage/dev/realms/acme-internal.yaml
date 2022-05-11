@@ -144,6 +144,13 @@ requiredActions:
     enabled: true
     defaultAction: false
     priority: 1400
+  - alias: CONFIGURE_RECOVERY_AUTHN_CODES
+    name: 'Recovery Authentication Codes'
+    providerId: CONFIGURE_RECOVERY_AUTHN_CODES
+    enabled: true
+    defaultAction: false
+    priority: 1500
+
 
 clients:
   - clientId: app-minispa
@@ -448,6 +455,8 @@ authenticationFlows:
         requirement: ALTERNATIVE
         authenticatorConfig: "acme-sms-auth-default"
       - authenticator: acme-auth-backup-code
+        requirement: ALTERNATIVE
+      - authenticator: auth-recovery-authn-code-form
         requirement: ALTERNATIVE
 
 authenticatorConfig:
