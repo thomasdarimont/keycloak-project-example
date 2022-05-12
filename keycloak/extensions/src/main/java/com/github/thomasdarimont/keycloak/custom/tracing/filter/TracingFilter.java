@@ -58,6 +58,13 @@ public class TracingFilter implements ContainerRequestFilter, ContainerResponseF
 
     private String getRealmNameFromPath(String path) {
         var prefixLength = REALMS_PATH_PREFIX.length();
-        return path.substring(prefixLength, path.indexOf('/', prefixLength));
+
+        var realmPath = path.substring(prefixLength);
+        var nextSlashIdx = realmPath.indexOf('/');
+        if (nextSlashIdx == -1) {
+            return realmPath;
+        }
+
+        return realmPath.substring(0, nextSlashIdx);
     }
 }
