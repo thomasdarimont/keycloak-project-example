@@ -20,7 +20,7 @@ context('Login...', () => {
         cy.get('#landingSignOutButton').click()
 
         // confirm logout
-        cy.get('#kc-logout').click()
+        cy.get('#kc-logout', {timeout:10000}).click()
 
         cy.get('#landingSignInButton').invoke("text").should('eq', msg.signIn)
     });
