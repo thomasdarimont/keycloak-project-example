@@ -59,7 +59,7 @@ jobs:
         working-directory: ./keycloak/e2e-tests
         run: |
           yarn install
-          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:9.6.1 run --env keycloak_host=http://localhost:8080
+          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/browsers:node14.17.6-chrome100-ff98 run --env keycloak_host=http://localhost:8080 --browser chrome
 
       - name: Archive testrun video
         if: ${{ always() }}
