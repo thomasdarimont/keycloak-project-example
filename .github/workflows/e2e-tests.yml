@@ -36,17 +36,12 @@ jobs:
           touch deployments/local/dev/keycloakx/acme.test+1.pem
           java start.java --http --extensions=jar --keycloak=keycloakx --ci=github --detach
 
-      - name: Sleep
-        uses: jakejarvis/wait-action@master
-        with:
-          time: '120s'
-
       - name: Show current containers
         run: |
           docker ps -a
 
       - name: Check keycloak is reachable
-        run: docker run --network container:dev_acme-keycloak_1 --rm appropriate/curl -s --retry 15 --max-time 180 --retry-connrefused http://localhost:8080/
+        run: docker run --network container:dev_acme-keycloak_1 --rm appropriate/curl -s --retry 15 --max-time 180 --retry-connrefused http://localhost:8080/auth/realms/acme-internal
 
       - name: Check docker-compose stack
         if: ${{ always() }}
