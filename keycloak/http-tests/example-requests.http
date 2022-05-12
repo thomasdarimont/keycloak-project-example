@@ -1,4 +1,4 @@
-### Obtain tokens via ROPC Grant Flow
+### Obtain tokens via Resource Owner Password Credentials Grant Flow
 POST {{ISSUER}}/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
