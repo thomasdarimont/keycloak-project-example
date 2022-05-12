@@ -33,6 +33,7 @@ jobs:
           export GROUP
           echo "Running as ${USER}:${GROUP}"
           java bin/envcheck.java
+          touch deployments/local/dev/keycloakx/acme.test+1.pem
           java start.java --http --extensions=jar --keycloak=keycloakx --ci=github --detach
 
       - name: Sleep

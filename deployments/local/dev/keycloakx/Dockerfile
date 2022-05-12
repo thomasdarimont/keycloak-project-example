@@ -14,7 +14,7 @@ RUN microdnf update -y && microdnf install -y java-17-openjdk-devel && microdnf 
 ## Workaround for adding the current certifcate to the cacerts truststore
 # Import certificate into cacerts truststore
 COPY --chown=keycloak:keycloak "./acme.test+1.pem" "/etc/x509/tls.crt.pem"
-RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass changeit
+RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass changeit || echo "Failed to import cert"
 
 #RUN  export AEROGEAR_VERSION=2.5.1 && \
 #     curl https://github.com/aerogear/keycloak-metrics-spi/releases/download/$AEROGEAR_VERSION/keycloak-metrics-spi-$AEROGEAR_VERSION.jar \
