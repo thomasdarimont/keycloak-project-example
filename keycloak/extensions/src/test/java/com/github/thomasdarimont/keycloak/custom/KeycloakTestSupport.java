@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -21,7 +20,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.nio.file.Paths;
@@ -50,6 +48,7 @@ public class KeycloakTestSupport {
         KeycloakContainer keycloakContainer;
         if (imageName != null) {
             keycloakContainer = new KeycloakContainer(imageName);
+            keycloakContainer.addEnv("KC_FEATURES", "preview");
         } else {
             // building custom Keycloak docker image with additional libraries
             String customDockerFileName = "../docker/src/main/docker/keycloakx/Dockerfile.ci.plain";
@@ -65,7 +64,7 @@ public class KeycloakTestSupport {
 
     public static ResteasyWebTarget getResteasyWebTarget(KeycloakContainer keycloak) {
         Client client = ResteasyClientBuilder.newBuilder().build();
-        return (ResteasyWebTarget)client.target(UriBuilder.fromPath(keycloak.getAuthServerUrl()));
+        return (ResteasyWebTarget) client.target(UriBuilder.fromPath(keycloak.getAuthServerUrl()));
     }
 
     public static UserRef createOrUpdateTestUser(RealmResource realm, String username, String password, Consumer<UserRepresentation> adjuster) {
