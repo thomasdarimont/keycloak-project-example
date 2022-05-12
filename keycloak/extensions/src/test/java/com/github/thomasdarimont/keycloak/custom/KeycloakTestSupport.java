@@ -36,11 +36,11 @@ public class KeycloakTestSupport {
     public static final String CONTEXT_PATH = "/auth";
 
     public static KeycloakContainer createKeycloakContainer() {
-        return createKeycloakContainer(null, null);
+        return createKeycloakContainer(null);
     }
 
     public static KeycloakContainer createKeycloakContainer(String realmImportFileName) {
-        return createKeycloakContainer(null, realmImportFileName);
+        return createKeycloakContainer("quay.io/keycloak/keycloak:18.0.0", realmImportFileName);
     }
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {

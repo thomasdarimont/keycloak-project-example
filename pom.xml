@@ -40,7 +40,7 @@
 
         <!-- Docker Image -->
         <docker.image>acme/acme-keycloak</docker.image>
-        <docker.file>keycloak/Dockerfile.plain</docker.file>
+        <docker.file>keycloakx/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
         <keycloak.version>18.0.0</keycloak.version>
