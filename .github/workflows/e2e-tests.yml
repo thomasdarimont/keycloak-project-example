@@ -41,7 +41,7 @@ jobs:
           docker ps -a
 
       - name: Check keycloak is reachable
-        run: docker run --network container:dev_acme-keycloak_1 --rm --entrypoint /bin/sh appropriate/curl wget --quiet --spider --tries=30 --read-timeout=20 --retry-connrefused --timeout=15 http://localhost:8080/auth/realms/acme-internal
+        run: docker run --network container:dev_acme-keycloak_1 --rm --entrypoint /usr/bin/wget appropriate/curl --quiet --spider --tries=30 --read-timeout=20 --retry-connrefused --timeout=15 http://localhost:8080/auth/realms/acme-internal
 
       - name: Check docker-compose stack
         if: ${{ always() }}
