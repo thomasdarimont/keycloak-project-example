@@ -38,8 +38,8 @@ services:
       KC_DB_SCHEMA: dbo
       KC_DB_URL_PROPERTIES: ";encrypt=true;trustServerCertificate=true;applicationName=keycloak"
       # Workaround for Keycloak.X and MSSQL, see: https://groups.google.com/g/keycloak-dev/c/ZGuX0CFWqwo/m/fhhT8qnOBgAJ?utm_medium=email&utm_source=footer&pli=1
-      KC_DB_TX_TYPE: "enabled"
-      KC_DB_DRIVER: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+      KC_TRANSACTION_XA_ENABLED: "false"
+      #KC_DB_DRIVER: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
     volumes:
       # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
       - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
