@@ -22,6 +22,8 @@ import org.keycloak.sessions.RootAuthenticationSessionModel;
 
 import java.util.function.Consumer;
 
+import static org.keycloak.models.UserSessionModel.SessionPersistenceState.TRANSIENT;
+
 public class TokenUtils {
 
     /**
@@ -63,7 +65,10 @@ public class TokenUtils {
             authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
             var clientConnection = context.getConnection();
-            var userSession = session.sessions().createUserSession(authSession.getParentSession().getId(), realm, clientUser, clientUsername, clientConnection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, UserSessionModel.SessionPersistenceState.TRANSIENT);
+            var sessionId = authSession.getParentSession().getId();
+            var remoteAddr = clientConnection.getRemoteAddr();
+            var userSession = session.sessions().createUserSession(sessionId, realm, clientUser, clientUsername, //
+                    remoteAddr, ServiceAccountConstants.CLIENT_AUTH, false, null, null, TRANSIENT);
 
             AuthenticationManager.setClientScopesInSession(authSession);
             var clientSessionCtx = TokenManager.attachAuthenticationSession(session, userSession, authSession);
@@ -71,11 +76,12 @@ public class TokenUtils {
             // Notes about client details
             userSession.setNote(ServiceAccountConstants.CLIENT_ID, client.getClientId());
             userSession.setNote(ServiceAccountConstants.CLIENT_HOST, clientConnection.getRemoteHost());
-            userSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS, clientConnection.getRemoteAddr());
+            userSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS, remoteAddr);
 
             var tokenManager = new TokenManager();
             var event = new EventBuilder(realm, session, clientConnection);
-            TokenManager.AccessTokenResponseBuilder responseBuilder = tokenManager.responseBuilder(realm, client, event, session, userSession, clientSessionCtx).generateAccessToken();
+            var responseBuilder = tokenManager.responseBuilder(realm, client, event, session, userSession, clientSessionCtx);
+            responseBuilder.generateAccessToken();
 
             if (tokenAdjuster != null) {
                 tokenAdjuster.accept(responseBuilder.getAccessToken());
@@ -105,7 +111,7 @@ public class TokenUtils {
         iamAuthSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
         ClientConnection connection = context.getConnection();
-        UserSessionModel iamUserSession = session.sessions().createUserSession(KeycloakModelUtils.generateId(), realm, userSession.getUser(), userSession.getUser().getUsername(), connection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, UserSessionModel.SessionPersistenceState.TRANSIENT);
+        UserSessionModel iamUserSession = session.sessions().createUserSession(KeycloakModelUtils.generateId(), realm, userSession.getUser(), userSession.getUser().getUsername(), connection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, TRANSIENT);
 
         AuthenticationManager.setClientScopesInSession(iamAuthSession);
         ClientSessionContext clientSessionCtx = TokenManager.attachAuthenticationSession(session, iamUserSession, iamAuthSession);
