@@ -102,7 +102,7 @@
                     </#if>
                 </#if>
                 <#if client??>
-                <h1 id="cc-kc-app-name">${advancedMsg(client.name)}</h1>
+                <h1 id="cc-kc-app-name">${advancedMsg(client.name!'')}</h1>
                 </#if>
             </header>
             <div id="cc-kc-content">
