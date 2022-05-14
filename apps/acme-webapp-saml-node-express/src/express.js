@@ -59,6 +59,9 @@ function configureSaml(app, config) {
         function (request, profile, done) {
                 return done(null, {
                 username: profile["nameID"],
+                    firstname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"],
+                    lastname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
+                    email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
                 // e.g. if you added a Group claim
                 group: profile["http://schemas.xmlsoap.org/claims/Group"],
             });

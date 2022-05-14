@@ -456,7 +456,7 @@ clients:
     fullScopeAllowed: false
     nodeReRegistrationTimeout: -1
     protocolMappers:
-      - name: X500 email
+      - name: "acme-saml-email"
         protocol: saml
         protocolMapper: saml-user-property-mapper
         consentRequired: false
@@ -464,8 +464,8 @@ clients:
           attribute.nameformat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
           user.attribute: email
           friendly.name: email
-          attribute.name: urn:oid:1.2.840.113549.1.9.1
-      - name: X500 surname
+          attribute.name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+      - name: "acme-saml-lastname"
         protocol: saml
         protocolMapper: saml-user-property-mapper
         consentRequired: false
@@ -473,8 +473,8 @@ clients:
           attribute.nameformat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
           user.attribute: lastName
           friendly.name: surname
-          attribute.name: urn:oid:2.5.4.4
-      - name: X500 givenName
+          attribute.name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"
+      - name: "acme-saml-firstname"
         protocol: saml
         protocolMapper: saml-user-property-mapper
         consentRequired: false
@@ -482,7 +482,7 @@ clients:
           attribute.nameformat: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
           user.attribute: firstName
           friendly.name: givenName
-          attribute.name: urn:oid:2.5.4.42
+          attribute.name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
     defaultClientScopes: []
     optionalClientScopes: []
 
