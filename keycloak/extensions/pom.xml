@@ -32,6 +32,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Required for custom SAML role mapper -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-saml-core</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Required for Event Listener SPI -->
         <dependency>
             <groupId>org.keycloak</groupId>

@@ -1,0 +1,20 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Acme Webapp SAML Node</a>
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+        </li>
+        <% if (locals.user) { %>
+            <li class="nav-item">
+                <a class="nav-link" href="/app">App</a>
+            </li>
+        <% } %>
+        <li class="nav-item">
+            <% if (locals.user) { %>
+                <a class="nav-link" href="/logout">Logout</a>
+            <% } else { %>
+                <a class="nav-link" href="/login">Login</a>
+            <% } %>
+        </li>
+    </ul>
+</nav>

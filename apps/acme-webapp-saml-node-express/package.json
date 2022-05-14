@@ -1,0 +1,28 @@
+{
+  "name": "acme-webapp-saml-node-express",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "author": "Thomas Darimont",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "ejs": "^3.1.8",
+    "es6-promisify": "^7.0.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.3",
+    "https": "^1.0.0",
+    "passport": "^0.5.2",
+    "passport-saml": "^3.2.1",
+    "spdy": "^4.0.2",
+    "stoppable": "^1.1.0",
+    "winston": "^3.3.3"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
+}
