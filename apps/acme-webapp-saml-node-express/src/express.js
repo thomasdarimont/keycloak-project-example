@@ -57,14 +57,15 @@ function configureSaml(app, config) {
             logoutUrl: config.IDP_ISSUER + "/protocol/saml",
         },
         function (request, profile, done) {
-                return done(null, {
+            let user = {
                 username: profile["nameID"],
-                    firstname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"],
-                    lastname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
-                    email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+                firstname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"],
+                lastname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
+                email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
                 // e.g. if you added a Group claim
                 group: profile["http://schemas.xmlsoap.org/claims/Group"],
-            });
+            };
+            return done(null, user);
         }
     );
     passport.use(samlStrategy);

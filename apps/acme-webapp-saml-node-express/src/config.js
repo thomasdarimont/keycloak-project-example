@@ -16,6 +16,11 @@ let SAML_SP_KEY = process.env.SAML_SP_KEY || fs.readFileSync(TLS_KEY_FILE, "utf-
 // realm certificate used to sign saml requests from Keycloak
 let SAML_IDP_CERT = process.env.SAML_IDP_CERT;
 
+if (!SAML_IDP_CERT) {
+    console.log('Missing SAML_IDP_CERT env variable.');
+    process.exit(1);
+}
+
 export default {
     IDP_ISSUER,
     SP_ISSUER,
