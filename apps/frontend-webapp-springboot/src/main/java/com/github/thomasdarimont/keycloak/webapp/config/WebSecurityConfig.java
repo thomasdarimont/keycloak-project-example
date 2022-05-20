@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.webapp.config;
 
 import com.github.thomasdarimont.keycloak.webapp.support.security.KeycloakLogoutHandler;
-import com.github.thomasdarimont.keycloak.webapp.support.security.oauth2.OAuth2AuthorizationRequestCustomizers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
@@ -39,10 +39,7 @@ class WebSecurityConfig {
                     clientRegistrationRepository, //
                     OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI //
             );
-            // Note: backported the OAuth2AuthorizationRequestCustomizers from Spring Security 5.7,
-            // replace with original version once Spring Boot support Spring Security 5.7.
             oauth2AuthRequestResolver.setAuthorizationRequestCustomizer(OAuth2AuthorizationRequestCustomizers.withPkce());
-
             o2cc.authorizationCodeGrant().authorizationRequestResolver(oauth2AuthRequestResolver);
         });
 
