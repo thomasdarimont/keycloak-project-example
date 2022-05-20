@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @AutoService(ProtocolMapper.class)
@@ -31,6 +32,8 @@ public class AcmeSamlRoleListMapper extends AbstractSAMLProtocolMapper implement
     public static final String SINGLE_ROLE_ATTRIBUTE = "single";
 
     public static final String PREFIX_CLIENT_ROLES = "prefixClientRoles";
+
+    public static final String FILTER_PATTERN = "roleNameFilterPattern";
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
@@ -62,6 +65,14 @@ public class AcmeSamlRoleListMapper extends AbstractSAMLProtocolMapper implement
         property.setType(ProviderConfigProperty.BOOLEAN_TYPE);
         property.setDefaultValue("true");
         property.setHelpText("If true, all roles will be stored under one attribute with multiple attribute values.");
+        configProperties.add(property);
+
+        property = new ProviderConfigProperty();
+        property.setName(FILTER_PATTERN);
+        property.setLabel("Role filter prefix");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setDefaultValue("");
+        property.setHelpText("If set, only roles that match the filter pattern are included.");
         configProperties.add(property);
 
         property = new ProviderConfigProperty();
@@ -108,6 +119,12 @@ public class AcmeSamlRoleListMapper extends AbstractSAMLProtocolMapper implement
 
         var allRoles = RoleUtils.expandCompositeRoles(userSession.getUser().getRoleMappingsStream().collect(Collectors.toSet()));
 
+        String filterPatternString = mappingModel.getConfig().get(FILTER_PATTERN);
+        Pattern filterPattern = null;
+        if (filterPatternString != null && !filterPatternString.isBlank()) {
+            filterPattern = Pattern.compile(filterPatternString);
+        }
+
         for (RoleModel role : allRoles) {
             AttributeType attributeType;
             if (singleAttribute) {
@@ -123,8 +140,14 @@ public class AcmeSamlRoleListMapper extends AbstractSAMLProtocolMapper implement
 
             var roleName = role.getName();
 
+            if (filterPattern != null) {
+                if (!filterPattern.matcher(roleName).matches()) {
+                    continue;
+                }
+            }
+
             if (prefixClientRoles && role.isClientRole()) {
-                roleName = ((ClientModel)role.getContainer()).getClientId() + ":" + roleName;
+                roleName = ((ClientModel) role.getContainer()).getClientId() + ":" + roleName;
             }
 
             attributeType.addAttributeValue(roleName);
