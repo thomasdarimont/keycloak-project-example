@@ -1,0 +1,23 @@
+# Login
+bin/kcadm.sh config credentials \
+  --server http://localhost:8080/auth  \
+  --realm master \
+  --user admin \
+  --password admin
+
+# Create Client
+bin/kcadm.sh create clients \
+  -r master \
+  -s clientId=keycloak-config-cli \
+  -s enabled=true \
+  -s clientAuthenticatorType=client-secret \
+  -s secret=mysecret \
+  -s standardFlowEnabled=false \
+  -s directAccessGrantsEnabled=false \
+  -s serviceAccountsEnabled=true
+
+# Add realm admin role to Service-Account
+bin/kcadm.sh add-roles \
+  -r master \
+  --uusername service-account-keycloak-config-cli \
+  --rolename admin
