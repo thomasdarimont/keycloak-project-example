@@ -17,12 +17,14 @@
         <module>apps/backend-api-quarkus</module>
         <module>apps/backend-api-springboot</module>
         <module>apps/backend-api-springboot-reactive</module>
+        <module>apps/backend-api-springboot3</module>
         <module>apps/backend-api-micronaut</module>
         <module>apps/offline-session-client</module>
         <module>apps/spring-boot-device-flow-client</module>
         <module>apps/frontend-webapp-springboot</module>
+        <module>apps/frontend-webapp-springboot3</module>
         <module>apps/jwt-client-authentication</module>
-<!--        <module>keycloak/patches/keycloak-model-infinispan-patch</module>-->
+        <!--        <module>keycloak/patches/keycloak-model-infinispan-patch</module>-->
 <!--        <module>keycloak/patches/wildfly-clustering-infinispan-extension-patch-25.0.x</module>-->
 <!--        <module>keycloak/patches/wildfly-clustering-infinispan-extension-patch-26.0.x</module>-->
     </modules>

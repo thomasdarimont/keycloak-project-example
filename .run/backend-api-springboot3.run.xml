@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="backend-api-springboot" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+  <configuration default="false" name="backend-api-springboot3" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" />
     <module name="backend-api-springboot3" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.acme.backend.springboot.users.BackendApiSpringboot3App" />
