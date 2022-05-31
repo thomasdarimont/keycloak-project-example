@@ -8,11 +8,11 @@ authors = ["Thomas Darimont <thomas.darimont@gmail.com>"]
 
 [dependencies]
 actix-web = { version = "4.0.1", features = ["openssl"] }
-actix-cors = "0.6.0"
-actix-4-jwt-auth = "0.4.1"
-openssl = "0.10.38"
-serde = { version = "1.0.136", features = ["derive"] }
-serde_json = { version = "1.0.79" }
+actix-cors = "0.6.1"
+actix-4-jwt-auth = "0.4.2"
+openssl = "0.10.40"
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = { version = "1.0.81" }
 chrono = "0.4.19"
 env_logger = "0.9.0"
 
