@@ -59,6 +59,9 @@ services:
       - "--spi-events-listener-email-include-events=UPDATE_PASSWORD"
       - "--spi-events-listener-jboss-logging-success-level=info"
       - "--spi-events-listener-jboss-logging-error-level=warn"
+# Example for static overrides for .well-known/openid-configuration endpoint
+#      - "--spi-well-known-openid-configuration-openid-configuration-override=/opt/keycloak/conf/openid-config.json"
+#      - "--spi-well-known-openid-configuration-include-client-scopes=true"
 # Workaround to allow logouts via old Keycloak Admin-Console
 # see: org.keycloak.protocol.oidc.endpoints.LogoutEndpoint.logout(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
       - "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
@@ -77,6 +80,7 @@ services:
     volumes:
       - ../../../keycloak/themes:/opt/keycloak/themes:z
       - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
+      - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
       - ../../../keycloak/imex:/opt/keycloak/imex:z
       - ./run/keycloakx/data:/opt/keycloak/data:z

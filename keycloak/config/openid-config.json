@@ -1,0 +1,6 @@
+{
+  "device_authorization_endpoint": null,
+  "backchannel_authentication_endpoint": null,
+  "backchannel_authentication_request_signing_alg_values_supported": null,
+  "mtls_endpoint_aliases": null
+}
