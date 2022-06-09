@@ -1,10 +1,13 @@
 package com.github.thomasdarimont.keycloak.custom.oidc.wellknown;
 
+import com.google.auto.service.AutoService;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.protocol.oidc.OIDCWellKnownProvider;
+import org.keycloak.protocol.oidc.OIDCWellKnownProviderFactory;
 import org.keycloak.protocol.oidc.representations.OIDCConfigurationRepresentation;
 import org.keycloak.wellknown.WellKnownProvider;
+import org.keycloak.wellknown.WellKnownProviderFactory;
 
 import java.util.ArrayList;
 
@@ -42,7 +45,7 @@ public class AcmeOidcWellKnownProvider implements WellKnownProvider {
 //        // remove dynamic client registration endpoint
 //        config.setRegistrationEndpoint(null);
 
-        // Add custom claim
+//        // Add custom claim
 //        var claimsSupported = new ArrayList<>(config.getClaimsSupported());
 //        claimsSupported.add("customClaim");
 //        config.setClaimsSupported(claimsSupported);
@@ -53,5 +56,18 @@ public class AcmeOidcWellKnownProvider implements WellKnownProvider {
     @Override
     public void close() {
         // NOOP
+    }
+
+    /**
+     * Custom {@link WellKnownProviderFactory} which reuses the {@link OIDCWellKnownProviderFactory#PROVIDER_ID} to override
+     * the default {@link OIDCWellKnownProviderFactory}.
+     */
+    @AutoService(WellKnownProviderFactory.class)
+    public static class Factory extends OIDCWellKnownProviderFactory {
+
+        @Override
+        public WellKnownProvider create(KeycloakSession session) {
+            return new AcmeOidcWellKnownProvider(session, (OIDCWellKnownProvider) super.create(session));
+        }
     }
 }
