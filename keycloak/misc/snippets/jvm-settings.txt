@@ -1,0 +1,3 @@
+
+# see https://support.datastax.com/s/article/FAQ-How-to-disable-client-initiated-TLS-renegotiation
+-Djdk.tls.rejectClientInitiatedRenegotiation=true -Djdk.tls.rejectClientInitializedRenego=true
