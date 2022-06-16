@@ -1,4 +1,4 @@
-# Stay on 17.0.1 due to regression in Keycloak 18.0.0: /authjs/keycloak.js
+# Stay on 17.0.1 due to regression in Keycloak 18.0.0: admin-console -> index.html /auth[/]js/keycloak.js
 ARG KEYCLOAK_VERSION=17.0.1
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION-legacy
 USER root
