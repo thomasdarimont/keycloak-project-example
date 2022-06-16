@@ -17,10 +17,10 @@ jobs:
         with:
           java-version: 11
 
-      - name: Configure Node.js '14.x'
+      - name: Configure Node.js '18.x'
         uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
+          node-version: '18.x'
 
       - name: Prepare artifacts (e.g. extensions) for docker-compose stack
         run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DskipTests verify --file pom.xml  --settings maven-settings.xml
@@ -59,7 +59,7 @@ jobs:
         working-directory: ./keycloak/e2e-tests
         run: |
           yarn install
-          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:9.6.1 run --env keycloak_host=http://localhost:8080
+          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:10.1.0 run --env keycloak_host=http://localhost:8080
 
       - name: Archive testrun video
         if: ${{ always() }}
