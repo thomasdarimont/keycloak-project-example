@@ -11,12 +11,12 @@ After successful test-run package all extensions and themes as a custom docker i
 This image is meant to be the project base image fulfilling the projects requirements in contrast to the general keycloak image.
 
 ## Use-Cases
-These requirements work in different contextes, roles and use-cases:
+These requirements work in different contexts, roles and use-cases:
 
 a) **Developer** for keycloak themes, extensions and image
 
 1) build and integration-test with test-containers (uses standard keycloak image)
-2) run external keycloak with hotdeploy (theme, extension, ...), run integrationtest, e2e testing
+2) run external keycloak with hot-deploy (theme, extension, ...), run integrationtest, e2e testing
 
 a) **Developer** publishing an image:
 
@@ -70,7 +70,7 @@ mvn clean verify -Pwith-integration-tests
 
 ## Run
 
-We provide a platform agnostic single-file source-code Java launcher [start.java](start.java) to start the Keycloak environment.
+We provide a platform-agnostic single-file source-code Java launcher [start.java](start.java) to start the Keycloak environment.
 
 To speed up development we can mount the [keycloak/extensions](keycloak/extensions) class-folder and [keycloak/themes](keycloak/themes) folder into
 a Keycloak container that is started via docker-compose (see below). This allows for quick turnarounds while working on themes and extensions.
@@ -117,14 +117,23 @@ The example environment can be configured with OpenLDAP via the `--openldap` fla
 java start.java --openldap
 ```
 
-### Enable PostgreSQL
+### Enable Postgresql
 
-The example environment can be configured to use PostgreSQL as a database via the `--database=postgres` flag to override the default `h2` database.
+The example environment can be configured to use Postgresql as a database via the `--database=postgres` flag to override the default `h2` database.
 
-#### Run with PostgreSQL
+#### Run with Postgresql
 ```
 java start.java --database=postgres
 ```
+
+#### Run with Legacy Keycloak
+By default, we use the quarkus based Keycloak distribution to run the example environment.
+To use the legacy wildfly based Keycloak distribution, add the flag `--keycloak=keycloak`. 
+
+```
+java start.java --keycloak=keycloak
+```
+
 
 ### Access metrics
 
