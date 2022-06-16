@@ -6,17 +6,17 @@
     "license": "SEE LICENSE IN LICENSE.md",
     "private": true,
     "scripts": {
-        "cypress:open": "./node_modules/.bin/cypress open",
-        "cypress:test": "./node_modules/.bin/cypress run",
+        "cypress:open": "NODE_OPTIONS=--openssl-legacy-provider ./node_modules/.bin/cypress open",
+        "cypress:test": "NODE_OPTIONS=--openssl-legacy-provider ./node_modules/.bin/cypress run",
         "type-check": "./node_modules/.bin/tsc --project ./cypress/tsconfig.json --noEmit"
     },
     "devDependencies": {
-        "@testing-library/cypress": "^8.0.2",
+        "@testing-library/cypress": "^8.0.3",
         "@types/testing-library__cypress": "^5.0.9",
-        "cypress": "^9.6.1",
-        "cypress-terminal-report": "^3.5.2",
+        "cypress": "^10.1.0",
+        "cypress-terminal-report": "^4.0.1",
         "cypress-xpath": "^1.6.2",
         "dotenv": "^16.0.1",
-        "typescript": "^4.6.4"
+        "typescript": "^4.7.3"
     }
 }
