@@ -5,6 +5,19 @@
 <body class="container">
 <div th:replace="~{fragments::navbar2(current=applications)}"></div>
 <h1>Applications</h1>
-
+<div class="col-lg-8">
+    <div class="card mb-8">
+        <div class="card-body">
+            <div class="row" th:each="app : ${apps}">
+                <div class="col-sm-4">
+                    <a class="mb-0" th:href="${app.url}" th:text="${app.name}"></a>
+                </div>
+                <div class="col-sm-4">
+                    <p class="mb-0" th:text="${app.clientId}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

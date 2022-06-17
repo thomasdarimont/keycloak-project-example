@@ -1,21 +1,15 @@
 package com.github.thomasdarimont.keycloak.webapp.support;
 
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +17,7 @@ public class TokenIntrospector {
 
     private final OAuth2AuthorizedClientService authorizedClientService;
 
-    private final TokenAccessor tokenAccessor;
+    private final OAuth2Accessor oauth2Accessor;
 
     public IntrospectionResult introspectToken(Authentication auth) {
 
@@ -48,7 +42,7 @@ public class TokenIntrospector {
         var requestBody = new LinkedMultiValueMap<String, String>();
         requestBody.add("client_id", authorizedClient.getClientRegistration().getClientId());
         requestBody.add("client_secret", authorizedClient.getClientRegistration().getClientSecret());
-        var accessToken = tokenAccessor.getAccessToken(auth);
+        var accessToken = oauth2Accessor.getAccessToken(auth);
         requestBody.add("token", accessToken.getTokenValue());
         requestBody.add("token_type_hint", "access_token");
 
@@ -63,16 +57,4 @@ public class TokenIntrospector {
         return responseData;
     }
 
-    @Data
-    public static class IntrospectionResult {
-
-        private boolean active;
-
-        private Map<String, Object> data = new HashMap<>();
-
-        @JsonAnySetter
-        public void setDataEntry(String key, Object value) {
-            data.put(key, value);
-        }
-    }
 }

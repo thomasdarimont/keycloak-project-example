@@ -6,5 +6,26 @@
 <div th:replace="~{fragments::navbar2 (current=security)}"></div>
 <h1>Security</h1>
 
+<div class="col-lg-9">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row" th:each="credential : ${credentials}">
+                <div class="col-sm-3">
+                    <p class="mb-0" th:text="${credential.type}"></p>
+                </div>
+                <div class="col-sm-3">
+                    <p class="mb-0" th:text="${credential.label}"></p>
+                </div>
+                <div class="col-sm-3">
+                    <form method="post" th:action="@{credentialDelete}">
+                        <input name="id" th:value="${credential.id}" type="hidden"/>
+                        <input class="btn btn-primary" type="submit" value="Delete"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

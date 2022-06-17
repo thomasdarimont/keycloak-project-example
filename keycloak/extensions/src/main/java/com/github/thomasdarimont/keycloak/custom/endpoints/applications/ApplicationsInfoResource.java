@@ -81,10 +81,10 @@ public class ApplicationsInfoResource {
             return Response.status(FORBIDDEN).build();
         }
 
-        var credentialInfos = getApplicationsForUser(realm, user, clientName);
+        var clientRepresentationList = getApplicationsForUser(realm, user, clientName);
 
         var responseBody = new HashMap<String, Object>();
-        responseBody.put("clients", credentialInfos);
+        responseBody.put("clients", clientRepresentationList);
 
         return withCors(request, Response.ok(responseBody)).build();
     }

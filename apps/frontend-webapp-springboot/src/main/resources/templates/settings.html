@@ -5,6 +5,20 @@
 <body class="container">
 <div th:replace="~{fragments::navbar2 (current=settings)}"></div>
 <h1>Settings</h1>
+<div class="col-lg-8">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row" th:each="setting : ${settings}">
+                <div class="col-sm-3">
+                    <p class="mb-0" th:text="${setting.name}"></p>
+                </div>
+                <div class="col-sm-9">
+                    <p class="text-muted mb-0" th:text="${setting.value}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
