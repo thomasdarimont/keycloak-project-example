@@ -1,16 +1,15 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="OfflineSessionClient (logout)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" />
     <module name="offline-session-client" />
+    <option name="PROGRAM_PARAMETERS" value="--logout" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="demo.OfflineSessionClient" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="demo.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="SPRING_BOOT_MAIN_CLASS" value="demo.OfflineSessionClient" />
-    <option name="PROGRAM_PARAMETERS" value="--logout" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="backend-api-springboot" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" />
-    <module name="backend-api-springboot3" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="com.acme.backend.springboot.users.BackendApiSpringboot3App" />
+    <module name="backend-api-springboot" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.acme.backend.springboot.users.BackendApiSpringbootApp" />
     <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
     <method v="2">
       <option name="Make" enabled="true" />
