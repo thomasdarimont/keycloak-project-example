@@ -22,6 +22,7 @@ spring:
             user-name-attribute: preferred_username
         registration:
           keycloak:
+            client-name: 'Acme Internal'
             client-id: 'frontend-webapp-springboot'
             client-secret: 'secret'
             client-authentication-method: client_secret_post

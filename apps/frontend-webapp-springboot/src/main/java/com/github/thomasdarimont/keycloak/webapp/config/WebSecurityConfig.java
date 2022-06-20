@@ -8,7 +8,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
@@ -23,12 +25,12 @@ class WebSecurityConfig {
     private final KeycloakLogoutHandler keycloakLogoutHandler;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository, AuthorizationRequestRepository authorizationRequestRepository) throws Exception {
 
         http.authorizeRequests(arc -> {
             // declarative route configuration
             // add additional routes
-            arc.antMatchers("/webjars/**", "/resources/**", "/css/**").permitAll();
+            arc.antMatchers("/webjars/**", "/resources/**", "/css/**", "/auth/register").permitAll();
             arc.anyRequest().fullyAuthenticated();
         });
 
@@ -40,7 +42,9 @@ class WebSecurityConfig {
                     OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI //
             );
             oauth2AuthRequestResolver.setAuthorizationRequestCustomizer(OAuth2AuthorizationRequestCustomizers.withPkce());
-            o2cc.authorizationCodeGrant().authorizationRequestResolver(oauth2AuthRequestResolver);
+            o2cc.authorizationCodeGrant() //
+                    .authorizationRequestResolver(oauth2AuthRequestResolver) //
+                    .authorizationRequestRepository(authorizationRequestRepository);
         });
 
         http.oauth2Login(o2lc -> {
@@ -51,6 +55,11 @@ class WebSecurityConfig {
         });
 
         return http.build();
+    }
+
+    @Bean
+    public AuthorizationRequestRepository authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 
     private GrantedAuthoritiesMapper userAuthoritiesMapper() {
