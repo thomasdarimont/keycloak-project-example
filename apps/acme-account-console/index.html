@@ -127,6 +127,7 @@
 
     <div class="message-content">
         <div class="message">Please login</div>
+        <a href="#" onclick="register()">Register</a>
     </div>
 </div>
 
@@ -265,7 +266,7 @@
 
         let initConfig = {
             onLoad: 'login-required', // redirects to login if not login
-            // onLoad: 'check-sso', // shows login button of not logged in
+            // onLoad: 'check-sso', // shows login button and regsiter link if not logged in
             checkLoginIframe: true,
             checkLoginIframeInterval: 1,
             pkceMethod: 'S256',
@@ -293,6 +294,11 @@
     function getTimeSinceLastAuth() {
         let timeSinceAuthInSeconds = Math.floor((Date.now() - (keycloak.tokenParsed.auth_time * 1000)) / 1000);
         return timeSinceAuthInSeconds;
+    }
+
+    function register() {
+        keycloak.register();
+        return false;
     }
 
     function enforceCurrentAuth() {
