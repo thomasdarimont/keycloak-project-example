@@ -13,9 +13,12 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2Authorization
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
 
 @Configuration
@@ -57,8 +60,15 @@ class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * The explicit declaration of {@link AuthorizationRequestRepository} is only necessary, if dynamic user self-registration is required.
+     * See {@link com.github.thomasdarimont.keycloak.webapp.web.AuthController#register(HttpServletRequest, HttpServletResponse)}.
+     * If this is not needed, this bean can be removed.
+     *
+     * @return
+     */
     @Bean
-    public AuthorizationRequestRepository authorizationRequestRepository() {
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 

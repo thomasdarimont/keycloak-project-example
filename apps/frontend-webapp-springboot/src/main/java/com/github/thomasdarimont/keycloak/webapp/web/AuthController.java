@@ -24,7 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-class AuthController {
+public class AuthController {
 
     private final TokenIntrospector tokenIntrospector;
 
