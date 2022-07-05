@@ -100,7 +100,7 @@ public class KeycloakTestSupport {
 
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
-        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:5.2.0-18.0.0");
+        GenericContainer<?> keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:5.2.1-18.0.1");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
         keycloakConfigCli.addEnv("IMPORT_FILES_LOCATION", "/config/*");
