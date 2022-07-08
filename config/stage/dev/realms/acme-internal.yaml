@@ -56,12 +56,32 @@ smtpServer:
   fromDisplayName: "Acme Employee Account"
 
 clientScopes:
+  - name: email
+    description: 'OpenID Connect built-in scope: email'
+    protocol: openid-connect
+    attributes:
+      consent.screen.text: "${emailScopeConsentText}"
+      include.in.token.scope: 'true'
+      display.on.consent.screen: 'true'
+      gui.order: '2000'
+  - name: phone
+    description: 'OpenID Connect built-in scope: phone'
+    protocol: openid-connect
+    attributes:
+      consent.screen.text: "${phoneScopeConsentText}"
+      include.in.token.scope: 'true'
+      display.on.consent.screen: 'true'
+      gui.order: '3000'
   - name: acme.profile
     description: Acme Profile Access
     protocol: openid-connect
   - name: acme.ageinfo
     description: Acme Profile AgeInfo
     protocol: openid-connect
+    attributes:
+      "include.in.token.scope": "true"
+      "display.on.consent.screen": "true"
+      "gui.order": "4000"
     protocolMappers:
       - name: "Acme: Audience Resolve"
         protocol: openid-connect
@@ -83,6 +103,10 @@ clientScopes:
   - name: name
     description: Name Details
     protocol: openid-connect
+    attributes:
+      "include.in.token.scope": "true"
+      "display.on.consent.screen": "true"
+      "gui.order": "1000"
     protocolMappers:
       - name: "Acme: Given Name"
         protocol: openid-connect

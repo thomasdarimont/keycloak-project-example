@@ -13,18 +13,13 @@ public class ScopeBean {
     public static final Comparator<ScopeBean> DEFAULT_ORDER;
 
     static {
-        DEFAULT_ORDER = Comparator.comparing(s -> {
-            String guiOrder = s.getScopeModel().getGuiOrder();
-            if (guiOrder != null) {
-                return guiOrder;
-            }
-            return s.getName();
-        });
+        DEFAULT_ORDER = Comparator.comparing(ScopeBean::getGuiOrder);
     }
 
     private final ClientScopeModel scopeModel;
     private final boolean optional;
     private final boolean granted;
+
     private final List<ScopeFieldBean> scopeFields;
 
     public boolean isOptional() {
@@ -33,6 +28,16 @@ public class ScopeBean {
 
     public boolean isGranted() {
         return granted;
+    }
+
+    public String getGuiOrder() {
+
+        String guiOrder = getScopeModel().getGuiOrder();
+        if (guiOrder != null) {
+            return guiOrder;
+        }
+
+        return getName();
     }
 
     public ClientScopeModel getScopeModel() {

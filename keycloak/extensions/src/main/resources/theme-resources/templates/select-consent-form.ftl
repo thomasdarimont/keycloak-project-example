@@ -33,6 +33,7 @@
                                 </p>
                             </div>
 
+                            <#-- Field details by scope -->
                             <#--
                             <div class="${properties.kcFormGroupClass!}">
                                 <#list scope.fields as scopeField>
@@ -46,7 +47,7 @@
                                             <input id="${scopeField.name}"
                                                    type="${scopeField.type}"
                                                    name="${scopeField.name}"
-                                                   value="${scopeField.value}"
+                                                   value="${(scopeField.value!'')}"
                                                    disabled/>
                                         </div>
                                     </div>

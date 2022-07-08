@@ -44,11 +44,12 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
     private static final OrderedModel.OrderedModelComparator<OAuthGrantBean.ClientScopeEntry> COMPARATOR_INSTANCE = new OrderedModel.OrderedModelComparator<>();
     private static final Map<String, List<ScopeField>> SCOPE_FIELD_MAPPING;
+    public static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
 
     static {
         var map = new HashMap<String, List<ScopeField>>();
 
-        map.put(OAuth2Constants.SCOPE_PHONE, List.of(new ScopeField(IDToken.PHONE_NUMBER, "tel", u -> u.getFirstAttribute(IDToken.PHONE_NUMBER)))); //
+        map.put(OAuth2Constants.SCOPE_PHONE, List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber")))); //
         map.put(OAuth2Constants.SCOPE_EMAIL, List.of(new ScopeField(IDToken.EMAIL, "email", UserModel::getEmail))); //
         // TODO add dedicated client scope of name
         map.put("name", List.of( //
@@ -57,6 +58,26 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         ));
 
         SCOPE_FIELD_MAPPING = Collections.unmodifiableMap(map);
+    }
+
+    @Override
+    public String getId() {
+        return "acme-dynamic-consent";
+    }
+
+    @Override
+    public String getDisplayText() {
+        return "Acme: Dynamic Consent selection";
+    }
+
+    @Override
+    public RequiredActionProvider create(KeycloakSession session) {
+        return this;
+    }
+
+    @Override
+    public RequiredActionProvider createDisplay(KeycloakSession session, String displayType) {
+        return create(session);
     }
 
     @Override
@@ -71,96 +92,24 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var authSession = context.getAuthenticationSession();
         var user = context.getUser();
 
-        if ("checked".equals(authSession.getClientNote(getId()))) {
+        // For Keycloak versions up to 18.0.2 evaluateTriggers is called multiple times,
+        // since we need to perform this check only once per auth session, we use a marker
+        // to remember whether the check already took place.
+        if (AUTH_SESSION_CONSENT_CHECK_MARKER.equals(authSession.getClientNote(getId()))) {
             return;
         }
 
         var missingConsents = getScopeInfo(context.getSession(), authSession, user);
 
-        var prompt = context.getUriInfo().getQueryParameters().getFirst("prompt");
+        var prompt = context.getUriInfo().getQueryParameters().getFirst(OAuth2Constants.PROMPT);
         var explicitConsentRequested = OIDCLoginProtocol.PROMPT_VALUE_CONSENT.equals(prompt);
 
         if (!missingConsents.getMissingRequired().isEmpty() || explicitConsentRequested) {
-            user.addRequiredAction(getId());
-            authSession.setClientNote(getId(), "checked");
+            authSession.addRequiredAction(getId());
+            authSession.setClientNote(getId(), AUTH_SESSION_CONSENT_CHECK_MARKER);
         } else {
-            user.removeRequiredAction(getId());
+            authSession.removeRequiredAction(getId());
         }
-    }
-
-    private ScopeInfo getScopeInfo(KeycloakSession session, AuthenticationSessionModel authSession, UserModel user) {
-        var client = authSession.getClient();
-        var requestedScopes = computeRequestedScopes(authSession, client);
-        var consentByClient = session.users().getConsentByClient(authSession.getRealm(), user.getId(), client.getId());
-        var missingRequired = new HashSet<>(requestedScopes.getRequired().values());
-        var missingOptional = new HashSet<>(requestedScopes.getOptional().values());
-
-        var grantedRequired = Collections.<ClientScopeModel>emptySet();
-        var grantedOptional = Collections.<ClientScopeModel>emptySet();
-
-        if (consentByClient != null) {
-
-            grantedRequired = new HashSet<>(requestedScopes.getRequired().values());
-            grantedOptional = new HashSet<>(requestedScopes.getOptional().values());
-
-            grantedRequired.retainAll(consentByClient.getGrantedClientScopes());
-            grantedOptional.retainAll(consentByClient.getGrantedClientScopes());
-            missingRequired.removeAll(consentByClient.getGrantedClientScopes());
-            missingOptional.removeAll(consentByClient.getGrantedClientScopes());
-        }
-
-        return ScopeInfo.builder() //
-                .grantedRequired(grantedRequired) //
-                .grantedOptional(grantedOptional) //
-                .missingRequired(missingRequired) //
-                .missingOptional(missingOptional) //
-                .build();
-    }
-
-    @Data
-    @Builder
-    static class ScopeInfo {
-        private final Set<ClientScopeModel> grantedRequired;
-        private final Set<ClientScopeModel> grantedOptional;
-
-        private final Set<ClientScopeModel> missingRequired;
-        private final Set<ClientScopeModel> missingOptional;
-    }
-
-    private RequestedScopes computeRequestedScopes(AuthenticationSessionModel authSession, ClientModel client) {
-        var defaultClientScopes = client.getClientScopes(true);
-        var optionalClientScopes = client.getClientScopes(false);
-
-        var requestedRequired = new HashMap<String, ClientScopeModel>();
-        var requestedOptional = new HashMap<String, ClientScopeModel>();
-        for (var scopeId : authSession.getClientScopes()) {
-            var foundInDefaultScope = false;
-            for (var scope : defaultClientScopes.values()) {
-                if (scope.getId().equals(scopeId)) {
-                    requestedRequired.put(scope.getName(), scope);
-                    foundInDefaultScope = true;
-                    break;
-                }
-            }
-            if (!foundInDefaultScope) {
-                for (var scope : optionalClientScopes.values()) {
-                    if (scope.getId().equals(scopeId)) {
-                        requestedOptional.put(scope.getName(), scope);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return new RequestedScopes(requestedRequired, requestedOptional);
-    }
-
-    @Data
-    static class RequestedScopes {
-
-        private final Map<String, ClientScopeModel> required;
-        private final Map<String, ClientScopeModel> optional;
-
     }
 
     @Override
@@ -174,7 +123,8 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         var form = context.form();
         var user = context.getUser();
-        form.setAttribute("username", user.getUsername());
+
+        form.setAttribute(UserModel.USERNAME, user.getUsername());
 
         var authSession = context.getAuthenticationSession();
 
@@ -206,9 +156,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         // use form from src/main/resources/theme-resources/templates/
         return form.createForm("select-consent-form.ftl");
-    }
-
-    static class ScopeBeanOrdering {
     }
 
     @Override
@@ -272,18 +219,8 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         }
 
         // TODO ensure that required scopes are always consented
-        user.removeRequiredAction(getId());
+        authSession.removeRequiredAction(getId());
         context.success();
-    }
-
-    @Override
-    public RequiredActionProvider create(KeycloakSession session) {
-        return this;
-    }
-
-    @Override
-    public RequiredActionProvider createDisplay(KeycloakSession session, String displayType) {
-        return create(session);
     }
 
     @Override
@@ -301,13 +238,78 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         // NOOP
     }
 
-    @Override
-    public String getId() {
-        return "acme-dynamic-consent";
+    private ScopeInfo getScopeInfo(KeycloakSession session, AuthenticationSessionModel authSession, UserModel user) {
+        var client = authSession.getClient();
+        var requestedScopes = computeRequestedScopes(authSession, client);
+        var consentByClient = session.users().getConsentByClient(authSession.getRealm(), user.getId(), client.getId());
+        var missingRequired = new HashSet<>(requestedScopes.getRequired().values());
+        var missingOptional = new HashSet<>(requestedScopes.getOptional().values());
+
+        var grantedRequired = Collections.<ClientScopeModel>emptySet();
+        var grantedOptional = Collections.<ClientScopeModel>emptySet();
+
+        if (consentByClient != null) {
+
+            grantedRequired = new HashSet<>(requestedScopes.getRequired().values());
+            grantedOptional = new HashSet<>(requestedScopes.getOptional().values());
+
+            grantedRequired.retainAll(consentByClient.getGrantedClientScopes());
+            grantedOptional.retainAll(consentByClient.getGrantedClientScopes());
+            missingRequired.removeAll(consentByClient.getGrantedClientScopes());
+            missingOptional.removeAll(consentByClient.getGrantedClientScopes());
+        }
+
+        return ScopeInfo.builder() //
+                .grantedRequired(grantedRequired) //
+                .grantedOptional(grantedOptional) //
+                .missingRequired(missingRequired) //
+                .missingOptional(missingOptional) //
+                .build();
     }
 
-    @Override
-    public String getDisplayText() {
-        return "Acme: Dynamic Consent selection";
+    private RequestedScopes computeRequestedScopes(AuthenticationSessionModel authSession, ClientModel client) {
+        var defaultClientScopes = client.getClientScopes(true);
+        var optionalClientScopes = client.getClientScopes(false);
+
+        var requestedRequired = new HashMap<String, ClientScopeModel>();
+        var requestedOptional = new HashMap<String, ClientScopeModel>();
+        for (var scopeId : authSession.getClientScopes()) {
+            var foundInDefaultScope = false;
+            for (var scope : defaultClientScopes.values()) {
+                if (scope.getId().equals(scopeId)) {
+                    requestedRequired.put(scope.getName(), scope);
+                    foundInDefaultScope = true;
+                    break;
+                }
+            }
+            if (!foundInDefaultScope) {
+                for (var scope : optionalClientScopes.values()) {
+                    if (scope.getId().equals(scopeId)) {
+                        requestedOptional.put(scope.getName(), scope);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return new RequestedScopes(requestedRequired, requestedOptional);
+    }
+
+    @Data
+    @Builder
+    static class ScopeInfo {
+        private final Set<ClientScopeModel> grantedRequired;
+        private final Set<ClientScopeModel> grantedOptional;
+
+        private final Set<ClientScopeModel> missingRequired;
+        private final Set<ClientScopeModel> missingOptional;
+    }
+
+    @Data
+    static class RequestedScopes {
+
+        private final Map<String, ClientScopeModel> required;
+        private final Map<String, ClientScopeModel> optional;
+
     }
 }
