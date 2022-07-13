@@ -386,6 +386,33 @@ clients:
     optionalClientScopes:
       - "phone"
 
+  - clientId: consent-webapp-springboot
+    protocol: openid-connect
+    name: Acme Consent App Spring Boot
+    description: "Web Consent Spring Boot Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    secret: "$(env:ACME_APPS_APP_CONSENT_SPRINGBOOT_SECRET:-secret)"
+    fullScopeAllowed: false
+    rootUrl: "https://apps.acme.test:4631/webapp"
+    baseUrl: "/"
+    adminUrl: ""
+    redirectUris:
+      - "/"
+      - "/login/oauth2/code/keycloak"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+
   - clientId: acme-bff-springboot
     protocol: openid-connect
     name: Acme BFF App Spring Boot

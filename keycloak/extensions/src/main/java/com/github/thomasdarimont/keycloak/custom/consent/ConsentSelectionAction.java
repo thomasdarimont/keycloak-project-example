@@ -10,6 +10,7 @@ import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
@@ -23,9 +24,12 @@ import org.keycloak.models.UserConsentModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.representations.IDToken;
+import org.keycloak.services.util.ResolveRelative;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -99,12 +103,17 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             return;
         }
 
+        if ("consent-webapp-springboot".equals(authSession.getClient().getClientId())) {
+            return;
+        }
+
         var missingConsents = getScopeInfo(context.getSession(), authSession, user);
 
         var prompt = context.getUriInfo().getQueryParameters().getFirst(OAuth2Constants.PROMPT);
         var explicitConsentRequested = OIDCLoginProtocol.PROMPT_VALUE_CONSENT.equals(prompt);
 
-        if (!missingConsents.getMissingRequired().isEmpty() || explicitConsentRequested) {
+        if ( // !missingConsents.getMissingRequired().isEmpty() ||
+                explicitConsentRequested) {
             authSession.addRequiredAction(getId());
             authSession.setClientNote(getId(), AUTH_SESSION_CONSENT_CHECK_MARKER);
         } else {
@@ -116,7 +125,35 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     public void requiredActionChallenge(RequiredActionContext context) {
 
         // Show form
-        context.challenge(createForm(context, null));
+        // context.challenge(createForm(context, null));
+
+        // check for callback -> consent_cb=1
+        // if callback, then context.success() and return
+        if ("1".equals(context.getHttpRequest().getUri().getQueryParameters().getFirst("consent_cb"))) {
+            context.success();
+            return;
+        }
+
+        ClientModel client = context.getSession().getContext().getRealm().getClientByClientId("consent-webapp-springboot");
+
+        URI consentAppTargetUri;
+        if (client.getRootUrl() != null && (client.getBaseUrl() == null || client.getBaseUrl().isEmpty())) {
+            consentAppTargetUri = KeycloakUriBuilder.fromUri(client.getRootUrl()).build();
+        } else {
+            consentAppTargetUri = KeycloakUriBuilder.fromUri(ResolveRelative.resolveRelativeUri(context.getSession(), client.getRootUrl(), client.getBaseUrl())).build();
+        }
+
+        URI appUri = URI.create(context.getAuthenticationSession().getClientNotes().get("redirect_uri"));
+
+        UriBuilder ub = UriBuilder.fromUri(consentAppTargetUri)
+                .queryParam("redirect_uri", appUri)
+                .queryParam(" client_id", context.getSession().getContext().getClient().getClientId())
+                .queryParam("scope", context.getAuthenticationSession().getClientNotes().get("scope"))
+                ;
+        URI uri = ub.build();
+        context.challenge(Response.temporaryRedirect(uri).build());
+        // otherwise, get current url
+        // redirect to consent client base url
     }
 
     protected Response createForm(RequiredActionContext context, Consumer<LoginFormsProvider> formCustomizer) {
