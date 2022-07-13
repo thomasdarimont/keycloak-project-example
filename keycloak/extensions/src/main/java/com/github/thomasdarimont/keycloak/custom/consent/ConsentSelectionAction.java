@@ -93,6 +93,16 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
 
+        // Decide which use-case is required:
+        // Onboard a client with user decisions regarding consent and maybe missing profile attribute collection
+        // 1) Client is used for the first time OR
+        // 2) Client has changed required scopes OR
+        // 3) Client enforced consent screen
+        // Decision local data only
+        // Assumption: Scope to Profile Attribute mapping is fix (E.g. scope name to attribute first-, lastname cannot have a salutation added later
+        //         OR: Remove all consent for name and let the process begin again
+        //         OR: A remote call per login/auth-flow
+
         var authSession = context.getAuthenticationSession();
         var user = context.getUser();
 
@@ -132,12 +142,28 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
+        // Show form for user sees scopes (required, optional)
+        // AND/OR associated profile attributes
+        // AND/OR give user the chance to update/add profile attributes
 
+        // Implementation
+        // 1) Local (background sync)
+        // 2) Local with remote call
+        // 2) Redirect browser
+
+<<<<<<< HEAD
         // Show form
         // context.challenge(createForm(context, null));
 
         // check for callback -> consent_cb=1
         // if callback, then context.success() and return
+=======
+        context.challenge(createForm(context, null));
+
+        // check for callback -> consent_cb=1
+        // if callback, then context.success() and return
+        /*
+>>>>>>> d160ba5 (WIP for external consent management)
         if ("1".equals(context.getHttpRequest().getUri().getQueryParameters().getFirst("consent_cb"))) {
             context.success();
             return;
@@ -161,6 +187,12 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
                 ;
         URI uri = ub.build();
         context.challenge(Response.temporaryRedirect(uri).build());
+<<<<<<< HEAD
+=======
+
+         */
+
+>>>>>>> d160ba5 (WIP for external consent management)
         // otherwise, get current url
         // redirect to consent client base url
     }
@@ -206,7 +238,14 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
     @Override
     public void processAction(RequiredActionContext context) {
-        // handle consent selection from user
+        // Persist user consent for client (required, optional)
+        // AND/OR handle changes done for profile attributes incl. validation and persistence
+
+        // Implementation
+        // 1) Local (background sync)
+        // 2) Remote call
+        // 3) Redirect has happend before
+
         var formParameters = context.getHttpRequest().getFormParameters();
 
         var authSession = context.getAuthenticationSession();
@@ -344,9 +383,9 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     @Data
     @Builder
     static class ScopeInfo {
-
         private final Set<ClientScopeModel> grantedRequired;
         private final Set<ClientScopeModel> grantedOptional;
+
         private final Set<ClientScopeModel> missingRequired;
         private final Set<ClientScopeModel> missingOptional;
     }
@@ -356,5 +395,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         private final Map<String, ClientScopeModel> required;
         private final Map<String, ClientScopeModel> optional;
+
     }
 }

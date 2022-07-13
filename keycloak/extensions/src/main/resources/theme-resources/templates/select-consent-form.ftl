@@ -34,7 +34,7 @@
                             </div>
 
                             <#-- Field details by scope -->
-                            <#--
+
                             <div class="${properties.kcFormGroupClass!}">
                                 <#list scope.fields as scopeField>
                                     <div class="${properties.kcInputWrapperClass!}">
@@ -53,7 +53,6 @@
                                     </div>
                                 </#list>
                             </div>
-                            -->
                             <#-- -->
 
                             <div></div>
