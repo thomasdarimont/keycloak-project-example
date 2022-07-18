@@ -8,6 +8,7 @@ import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailTemplateProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserLoginFailureModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
 
@@ -81,6 +82,18 @@ public class AccountActivity {
             }
         } catch (EmailException e) {
             log.errorf(e, "Failed to send email for trusted device change: %s.", change);
+        }
+    }
+
+    public static void onAccountLockedOut(KeycloakSession session, RealmModel realm, UserModel user, UserLoginFailureModel userLoginFailure) {
+        var realmDisplayName = getRealmDisplayName(realm);
+        try {
+            AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                attributes.put("userLoginFailure", userLoginFailure);
+                emailTemplateProvider.send("acmeAccountBlockedSubject", List.of(realmDisplayName), "acme-account-blocked.ftl", attributes);
+            });
+        } catch (EmailException e) {
+            log.errorf(e, "Failed to send email for user account block. userId=%s", userLoginFailure.getUserId());
         }
     }
 
