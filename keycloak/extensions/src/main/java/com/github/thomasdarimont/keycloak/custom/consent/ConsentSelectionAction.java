@@ -14,12 +14,10 @@ import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.forms.login.freemarker.model.OAuthGrantBean;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.ClientScopeModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.models.OrderedModel;
 import org.keycloak.models.UserConsentModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
@@ -46,9 +44,11 @@ import static java.util.stream.Collectors.toList;
 @AutoService(RequiredActionFactory.class)
 public class ConsentSelectionAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
 
-    private static final OrderedModel.OrderedModelComparator<OAuthGrantBean.ClientScopeEntry> COMPARATOR_INSTANCE = new OrderedModel.OrderedModelComparator<>();
+    private static final boolean REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE = false;
+
+    private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
+
     private static final Map<String, List<ScopeField>> SCOPE_FIELD_MAPPING;
-    public static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
 
     static {
         var map = new HashMap<String, List<ScopeField>>();
@@ -112,10 +112,19 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var prompt = context.getUriInfo().getQueryParameters().getFirst(OAuth2Constants.PROMPT);
         var explicitConsentRequested = OIDCLoginProtocol.PROMPT_VALUE_CONSENT.equals(prompt);
 
+<<<<<<< HEAD
         if ( // !missingConsents.getMissingRequired().isEmpty() ||
                 explicitConsentRequested) {
+=======
+        var consentMissingForRequiredScopes = !missingConsents.getMissingRequired().isEmpty();
+        if (consentMissingForRequiredScopes || explicitConsentRequested) {
+>>>>>>> afda0af (keycloak: refactor dynamic consent handling)
             authSession.addRequiredAction(getId());
             authSession.setClientNote(getId(), AUTH_SESSION_CONSENT_CHECK_MARKER);
+
+            if (consentMissingForRequiredScopes && REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE) {
+                authSession.addRequiredAction(UserModel.RequiredAction.UPDATE_PROFILE);
+            }
         } else {
             authSession.removeRequiredAction(getId());
         }
@@ -335,9 +344,9 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     @Data
     @Builder
     static class ScopeInfo {
+
         private final Set<ClientScopeModel> grantedRequired;
         private final Set<ClientScopeModel> grantedOptional;
-
         private final Set<ClientScopeModel> missingRequired;
         private final Set<ClientScopeModel> missingOptional;
     }
@@ -347,6 +356,5 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         private final Map<String, ClientScopeModel> required;
         private final Map<String, ClientScopeModel> optional;
-
     }
 }
