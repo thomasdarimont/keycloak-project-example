@@ -9,13 +9,16 @@ function qsa(selector) {
 }
 
 function callApi(url, requestOptions, onError) {
+    let csrfToken = qs("meta[name=_csrf]").content;
+    let csrfTokenHeader = qs("meta[name=_csrf_header]").content;
     let requestData = {
         timeout: 2000,
         method: "GET",
         credentials: "include",
         headers: {
             "Accept": "application/json",
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            [`${csrfTokenHeader}`]: csrfToken
         }
         , ...requestOptions
     }
