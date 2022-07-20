@@ -51,11 +51,14 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         map.put(OAuth2Constants.SCOPE_PHONE, List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber")))); //
         map.put(OAuth2Constants.SCOPE_EMAIL, List.of(new ScopeField(IDToken.EMAIL, "email", UserModel::getEmail))); //
-        // TODO add dedicated client scope of name
+
+        // Dedicated client scope: name
         map.put("name", List.of( //
                 new ScopeField(IDToken.GIVEN_NAME, "text", UserModel::getFirstName), //
                 new ScopeField(IDToken.FAMILY_NAME, "text", UserModel::getLastName) //
         ));
+        // Dedicated client scope: name
+        map.put("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName))); //
 
         SCOPE_FIELD_MAPPING = Collections.unmodifiableMap(map);
     }
@@ -105,7 +108,9 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var explicitConsentRequested = OIDCLoginProtocol.PROMPT_VALUE_CONSENT.equals(prompt);
 
         var consentMissingForRequiredScopes = !missingConsents.getMissingRequired().isEmpty();
-        if (consentMissingForRequiredScopes || explicitConsentRequested) {
+        var consentMissingForOptionalScopes = !missingConsents.getMissingOptional().isEmpty();
+        var consentSelectionRequired = explicitConsentRequested || consentMissingForRequiredScopes || consentMissingForOptionalScopes;
+        if (consentSelectionRequired) {
             authSession.addRequiredAction(getId());
             authSession.setClientNote(getId(), AUTH_SESSION_CONSENT_CHECK_MARKER);
 
@@ -179,8 +184,30 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         event.client(client).user(user).event(EventType.GRANT_CONSENT);
 
         if (formParameters.getFirst("cancel") != null) {
+            // User choose NOT to update consented scopes
+
             event.error(Errors.CONSENT_DENIED);
             // return to the application without consent update
+            UserConsentModel consentModel = session.users().getConsentByClient(realm, user.getId(), client.getId());
+            if (consentModel == null) {
+                // No consents given: Deny access to application
+                context.failure();
+                return;
+            }
+
+            var currentGrantedScopes = consentModel.getGrantedClientScopes();
+            if (currentGrantedScopes.isEmpty()) {
+                // No consents given: Deny access to application
+                context.failure();
+                return;
+            }
+
+            var currentGrantedScopesIds = currentGrantedScopes.stream().map(ClientScopeModel::getId).collect(Collectors.toSet());
+            var currentGrantedScopeNames = currentGrantedScopes.stream().map(ClientScopeModel::getName).collect(Collectors.joining(" "));
+            context.getAuthenticationSession().setClientScopes(currentGrantedScopesIds);
+            context.getAuthenticationSession().setClientNote(OAuth2Constants.SCOPE, "openid " + currentGrantedScopeNames);
+
+            // Allow access to application (with original consented scopes)
             context.success();
             return;
         }
