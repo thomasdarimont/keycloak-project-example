@@ -65,9 +65,9 @@
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                           name="accept" id="kc-login" type="submit" value="${msg("doYes")}"/>
+                           name="accept" id="kc-login" type="submit" value="${msg("doContinue")}"/>
                     <input class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}"
-                           name="cancel" id="kc-cancel" type="submit" value="${msg("doNo")}"/>
+                           name="cancel" id="kc-cancel" type="submit" value="${msg("doCancel")}"/>
 
                 </div>
             </div>
