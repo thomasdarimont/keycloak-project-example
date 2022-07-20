@@ -25,6 +25,9 @@
             <button id="loginBtn" onclick="keycloak.login()">Login</button>
             <button id="registerBtn" onclick="keycloak.register()">Register</button>
             <button id="updateConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Update consent</button>
+            <button id="operation1Btn" onclick="performOperation('op1','name')">Op 1 (name)</button>
+            <button id="operation2Btn" onclick="performOperation('op2','phone')">Op 2 (phone)</button>
+            <button id="operation3Btn" onclick="performOperation('op3','phone name')">Op 2 (phone+name)</button>
             <button id="logoutBtn" onclick="keycloak.logout()" class="hidden">Logout</button>
         </li>
     </ul>
@@ -82,9 +85,14 @@
         // workaround for changes with oidc logout in Keycloak 18.0.0
         // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
         keycloak.createLogoutUrl = function(options) {
+
+            let currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set("scope", keycloak.tokenParsed.scope);
+            let redirectUriWithCurrentScope = currentUrl.toString();
+
             return keycloak.endpoints.logout()
                 + '?id_token_hint=' + keycloak.idToken
-                + '&post_logout_redirect_uri=' + encodeURIComponent(window.location.href);
+                + '&post_logout_redirect_uri=' + encodeURIComponent(redirectUriWithCurrentScope);
         }
 
 
@@ -115,6 +123,9 @@
         $("#loginBtn").classList.remove("hidden");
         $("#registerBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.add("hidden");
+        $("#operation1Btn").classList.add("hidden");
+        $("#operation2Btn").classList.add("hidden");
+        $("#operation3Btn").classList.add("hidden");
         $("#logoutBtn").classList.add("hidden");
     }
 
@@ -124,6 +135,9 @@
         $("#registerBtn").classList.add("hidden");
         $("#logoutBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.remove("hidden");
+        $("#operation1Btn").classList.remove("hidden");
+        $("#operation2Btn").classList.remove("hidden");
+        $("#operation3Btn").classList.remove("hidden");
 
         $("#greeting").classList.toggle("hidden");
 
@@ -136,6 +150,39 @@
         $("#issuer").innerText = keycloak.tokenParsed.iss;
         $("#scopeRequested").innerText = scope;
         $("#scopeGranted").innerText = keycloak.tokenParsed.scope;
+    }
+
+    function performOperation(operationName, requiredScope) {
+
+        if (checkRequiredScopePresent(requiredScope)) {
+            alert("Perform operation " + operationName);
+        }
+    }
+
+    function checkRequiredScopePresent(requiredScope) {
+
+        let requiredScopeNames = requiredScope.split(" ");
+
+        let grantedScope = keycloak.tokenParsed.scope;
+        let grantedScopeNames = (grantedScope || "openid").split(" ")
+
+        let containsAllRequiredScopes =requiredScopeNames.every(it => grantedScopeNames.includes(it))
+        if (containsAllRequiredScopes) {
+            return true;
+        }
+
+        // need to request additional required scope
+        let requestedScope = grantedScope + " " + requiredScope;
+
+        // update current redirect URL
+        let currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("scope", requestedScope);
+        let redirectUriWithNewScope = currentUrl.toString();
+
+        // perform new authorization code flow
+        keycloak.login({scope: requestedScope, redirectUri: redirectUriWithNewScope});
+
+        return false;
     }
 
 </script>
