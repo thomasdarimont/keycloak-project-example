@@ -51,6 +51,7 @@
 
                                         <div class="${properties.kcLabelWrapperClass!}">
                                             <label for="${scopeField.name}">${msg(scopeField.name)}</label>
+                                            <#if scopeField.required>*</#if>
                                         </div>
 
                                         <div class="${properties.kcInputWrapperClass!}">
@@ -58,7 +59,8 @@
                                                    type="${scopeField.type}"
                                                    name="${scopeField.name}"
                                                    value="${(scopeField.value!'')}"
-                                                   disabled/>
+<#--                                                   disabled-->
+                                            />
                                         </div>
                                     </div>
                                 </#list>

@@ -20,10 +20,11 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.UserConsentModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
-import org.keycloak.representations.IDToken;
 import org.keycloak.sessions.AuthenticationSessionModel;
+import org.keycloak.util.JsonSerialization;
 
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,24 +54,34 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var clientToScopeFieldsMapping = new LinkedHashMap<String, List<ScopeFieldsMapping>>();
         clientToScopeFieldsMapping.put(DEFAULT_CLIENT, List.of(
 
-                new ScopeFieldsMapping("email", List.of(new ScopeField("email", "email", UserModel::getEmail))),
-                new ScopeFieldsMapping("phone", List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber")))),
-                new ScopeFieldsMapping("birthdate", List.of(new ScopeField("birthdate", "text", u -> u.getFirstAttribute("birthdate")))),
-                new ScopeFieldsMapping("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName))),
+                new ScopeFieldsMapping("email", List.of(new ScopeField("email", "email", UserModel::getEmail, true))),
+                new ScopeFieldsMapping("phone", List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber"),true))),
+                new ScopeFieldsMapping("birthdate", List.of(new ScopeField("birthdate", "text", u -> u.getFirstAttribute("birthdate"),true))),
+                new ScopeFieldsMapping("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName,true))),
 
                 new ScopeFieldsMapping("name", List.of( //
-                        new ScopeField("salutation", "text", u -> u.getFirstAttribute("salutation")), //
-                        new ScopeField("firstName", "text", UserModel::getFirstName), //
-                        new ScopeField("lastName", "text", UserModel::getLastName) //
+                        new ScopeField("salutation", "text", u -> u.getFirstAttribute("salutation"),false), //
+                        new ScopeField("title", "text", u -> u.getFirstAttribute("title"),false), //
+                        new ScopeField("firstName", "text", UserModel::getFirstName,true), //
+                        new ScopeField("lastName", "text", UserModel::getLastName,true) //
                 )),
 
                 new ScopeFieldsMapping("address", List.of( //
-                        new ScopeField("address.street", "text", u -> u.getFirstAttribute("address.street")), //
-                        new ScopeField("address.careOf", "text", u -> u.getFirstAttribute("address.careOf")), //
-                        new ScopeField("address.postalCode", "text", u -> u.getFirstAttribute("address.postalCode")), //
-                        new ScopeField("address.city", "text", u -> u.getFirstAttribute("address.city")), //
-                        new ScopeField("address.region", "text", u -> u.getFirstAttribute("address.region")), //
-                        new ScopeField("address.country", "text", u -> u.getFirstAttribute("address.country")) //
+                        new ScopeField("address.street", "text", u -> "Have it your way 42",true), //
+                        new ScopeField("address.careOf", "text", u -> "",false), //
+                        new ScopeField("address.postalCode", "text", u -> "12345",true), //
+                        new ScopeField("address.city", "text", u -> "Saarbrücken",true), //
+                        new ScopeField("address.region", "text", u -> "Saarland",false), //
+                        new ScopeField("address.country", "text", u -> "DE",true) //
+                )),
+
+                new ScopeFieldsMapping("address:billing", List.of( //
+                    new ScopeField("address:billing.street", "text", u -> u.getFirstAttribute("address.street"),true), //
+                    new ScopeField("address:billing.careOf", "text", u -> u.getFirstAttribute("address.careOf"),false), //
+                    new ScopeField("address:billing.postalCode", "text", u -> u.getFirstAttribute("address.postalCode"),true), //
+                    new ScopeField("address:billing.city", "text", u -> u.getFirstAttribute("address.city"),true), //
+                    new ScopeField("address:billing.region", "text", u -> u.getFirstAttribute("address.region"),false), //
+                    new ScopeField("address:billing.country", "text", u -> u.getFirstAttribute("address.country"),true) //
                 ))
         ));
 
@@ -194,6 +205,12 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         }
 
         scopes.sort(ScopeBean.DEFAULT_ORDER);
+
+        try {
+            System.out.printf("Scope Profile Field Mapping: %s%n", JsonSerialization.writeValueAsString(scopes));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         form.setAttribute("scopes", scopes);
 

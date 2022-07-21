@@ -672,6 +672,8 @@ users:
     enabled: true
     attributes:
       locale: ["en"]
+      title: ""
+      salutation: "mr"
       phoneNumber: ["+49178111222333"]
       phoneNumberVerified: ["true"]
     credentials:

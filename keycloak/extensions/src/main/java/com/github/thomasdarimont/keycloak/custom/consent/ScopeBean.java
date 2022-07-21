@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.consent;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.models.ClientScopeModel;
 
@@ -16,10 +17,14 @@ public class ScopeBean {
         DEFAULT_ORDER = Comparator.comparing(ScopeBean::getGuiOrder);
     }
 
+    @JsonIgnore
     private final ClientScopeModel scopeModel;
+    @JsonIgnore
     private final boolean optional;
+    @JsonIgnore
     private final boolean granted;
 
+    @JsonIgnore
     private final List<ScopeFieldBean> scopeFields;
 
     public boolean isOptional() {

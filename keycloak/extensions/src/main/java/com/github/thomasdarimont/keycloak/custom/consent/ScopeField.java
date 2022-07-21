@@ -13,4 +13,6 @@ public class ScopeField {
     private final String type;
 
     private final Function<UserModel, String> valueAccessor;
+
+    private final boolean required;
 }
