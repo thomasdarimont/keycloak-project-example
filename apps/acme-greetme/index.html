@@ -25,9 +25,11 @@
             <button id="loginBtn" onclick="keycloak.login()">Login</button>
             <button id="registerBtn" onclick="keycloak.register()">Register</button>
             <button id="updateConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Update consent</button>
-            <button id="operation1Btn" onclick="performOperation('op1','name')">Op 1 (name)</button>
-            <button id="operation2Btn" onclick="performOperation('op2','phone')">Op 2 (phone)</button>
-            <button id="operation3Btn" onclick="performOperation('op3','phone name')">Op 2 (phone+name)</button>
+            <button id="operation1Btn" onclick="performOperation('op1','name')" class="operation">Op 1 (name)</button>
+            <button id="operation2Btn" onclick="performOperation('op2','phone')"  class="operation">Op 2 (phone)</button>
+            <button id="operation3Btn" onclick="performOperation('op3','phone name')"  class="operation">Op 3 (phone+name)</button>
+            <button id="operation4Btn" onclick="performOperation('op4','acme.api')" class="operation">Op 4 (acme.api)</button>
+            <button id="operation5Btn" onclick="performOperation('op5','address')"  class="operation">Op 5 (address)</button>
             <button id="logoutBtn" onclick="keycloak.logout()" class="hidden">Logout</button>
         </li>
     </ul>
@@ -115,7 +117,6 @@
 
         keycloak.init(initConfig).success(onLoginSuccess);
 
-
         keycloak.onAuthLogout = showWelcome;
     };
 
@@ -123,9 +124,7 @@
         $("#loginBtn").classList.remove("hidden");
         $("#registerBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.add("hidden");
-        $("#operation1Btn").classList.add("hidden");
-        $("#operation2Btn").classList.add("hidden");
-        $("#operation3Btn").classList.add("hidden");
+        $(".operation").classList.add("hidden");
         $("#logoutBtn").classList.add("hidden");
     }
 
@@ -135,9 +134,7 @@
         $("#registerBtn").classList.add("hidden");
         $("#logoutBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.remove("hidden");
-        $("#operation1Btn").classList.remove("hidden");
-        $("#operation2Btn").classList.remove("hidden");
-        $("#operation3Btn").classList.remove("hidden");
+        $(".operation").classList.remove("hidden");
 
         $("#greeting").classList.toggle("hidden");
 

@@ -44,9 +44,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
     private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
 
-    private static final Map<String, List<ScopeField>> SCOPE_FIELD_MAPPING;
-
-    static {
+    private Map<String, List<ScopeField>> getScopeFieldMapping() {
         var map = new HashMap<String, List<ScopeField>>();
 
         map.put(OAuth2Constants.SCOPE_PHONE, List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber")))); //
@@ -60,7 +58,15 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         // Dedicated client scope: name
         map.put("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName))); //
 
-        SCOPE_FIELD_MAPPING = Collections.unmodifiableMap(map);
+        // Dedicated client scope: address
+        map.put("address", List.of( //
+                new ScopeField("address.country", "text", u -> u.getFirstAttribute("address.country")), //
+                new ScopeField("address.city", "text", u -> u.getFirstAttribute("address.city")), //
+                new ScopeField("address.street", "text", u -> u.getFirstAttribute("address.street")), //
+                new ScopeField("address.zip", "text", u -> u.getFirstAttribute("address.zip")) //
+        ));
+
+        return Collections.unmodifiableMap(map);
     }
 
     @Override
@@ -145,11 +151,12 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var grantedOptional = scopeInfo.getGrantedOptional();
         var missingRequired = scopeInfo.getMissingRequired();
         var missingOptional = scopeInfo.getMissingOptional();
-
+        var scopeFieldMapping = getScopeFieldMapping();
         var scopes = new ArrayList<ScopeBean>();
         for (var currentScopes : List.of(grantedRequired, missingRequired, grantedOptional, missingOptional)) {
             for (var scope : currentScopes) {
-                var fields = SCOPE_FIELD_MAPPING.getOrDefault(scope.getName(), List.of()).stream().map(fun).collect(toList());
+
+                var fields = scopeFieldMapping.getOrDefault(scope.getName(), List.of()).stream().map(fun).collect(toList());
                 var optional = currentScopes == grantedOptional || currentScopes == missingOptional;
                 var granted = currentScopes == grantedRequired || currentScopes == grantedOptional;
                 scopes.add(new ScopeBean(scope, optional, granted, fields));
