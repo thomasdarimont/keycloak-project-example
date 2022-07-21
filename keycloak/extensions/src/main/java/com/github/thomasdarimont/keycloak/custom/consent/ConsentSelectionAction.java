@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,28 +45,55 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     private static final boolean REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE = false;
 
     private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
+    public static final String DEFAULT_CLIENT = "default";
 
-    private Map<String, List<ScopeField>> getScopeFieldMapping() {
+    private Map<String, List<ScopeField>> getScopeFieldMapping(String clientId) {
+
+        // Holds the client fields mapping, LinkedHashMap to retain insertion order
+        var clientToScopeFieldsMapping = new LinkedHashMap<String, List<ScopeFieldsMapping>>();
+        clientToScopeFieldsMapping.put(DEFAULT_CLIENT, List.of(
+
+                new ScopeFieldsMapping("email", List.of(new ScopeField("email", "email", UserModel::getEmail))),
+                new ScopeFieldsMapping("phone", List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber")))),
+                new ScopeFieldsMapping("birthdate", List.of(new ScopeField("birthdate", "text", u -> u.getFirstAttribute("birthdate")))),
+                new ScopeFieldsMapping("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName))),
+
+                new ScopeFieldsMapping("name", List.of( //
+                        new ScopeField("salutation", "text", u -> u.getFirstAttribute("salutation")), //
+                        new ScopeField("firstName", "text", UserModel::getFirstName), //
+                        new ScopeField("lastName", "text", UserModel::getLastName) //
+                )),
+
+                new ScopeFieldsMapping("address", List.of( //
+                        new ScopeField("address.street", "text", u -> u.getFirstAttribute("address.street")), //
+                        new ScopeField("address.careOf", "text", u -> u.getFirstAttribute("address.careOf")), //
+                        new ScopeField("address.postalCode", "text", u -> u.getFirstAttribute("address.postalCode")), //
+                        new ScopeField("address.city", "text", u -> u.getFirstAttribute("address.city")), //
+                        new ScopeField("address.region", "text", u -> u.getFirstAttribute("address.region")), //
+                        new ScopeField("address.country", "text", u -> u.getFirstAttribute("address.country")) //
+                ))
+        ));
+
+        var defaultScopeFieldsMappings = clientToScopeFieldsMapping.get("default");
+
         var map = new HashMap<String, List<ScopeField>>();
 
-        map.put(OAuth2Constants.SCOPE_PHONE, List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber")))); //
-        map.put(OAuth2Constants.SCOPE_EMAIL, List.of(new ScopeField(IDToken.EMAIL, "email", UserModel::getEmail))); //
+        // add default scope field mapping
+        for (var scopeFieldsMapping : defaultScopeFieldsMappings) {
+            var fields = map.computeIfAbsent(scopeFieldsMapping.getScope(), ignored -> new ArrayList<>());
+            fields.addAll(scopeFieldsMapping.getFields());
+        }
 
-        // Dedicated client scope: name
-        map.put("name", List.of( //
-                new ScopeField(IDToken.GIVEN_NAME, "text", UserModel::getFirstName), //
-                new ScopeField(IDToken.FAMILY_NAME, "text", UserModel::getLastName) //
-        ));
-        // Dedicated client scope: name
-        map.put("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName))); //
-
-        // Dedicated client scope: address
-        map.put("address", List.of( //
-                new ScopeField("address.country", "text", u -> u.getFirstAttribute("address.country")), //
-                new ScopeField("address.city", "text", u -> u.getFirstAttribute("address.city")), //
-                new ScopeField("address.street", "text", u -> u.getFirstAttribute("address.street")), //
-                new ScopeField("address.zip", "text", u -> u.getFirstAttribute("address.zip")) //
-        ));
+        // override default scope field mapping if necessary
+        if (clientToScopeFieldsMapping.containsKey(clientId)) {
+            var clientScopeFieldsMappings = clientToScopeFieldsMapping.get(clientId);
+            // remove default scope fields for overridden scopes
+            clientToScopeFieldsMapping.keySet().forEach(map::remove);
+            for (var scopeFieldsMapping : clientScopeFieldsMappings) {
+                var fields = map.computeIfAbsent(scopeFieldsMapping.getScope(), ignored -> new ArrayList<>());
+                fields.addAll(scopeFieldsMapping.getFields());
+            }
+        }
 
         return Collections.unmodifiableMap(map);
     }
@@ -152,7 +180,8 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var grantedOptional = scopeInfo.getGrantedOptional();
         var missingRequired = scopeInfo.getMissingRequired();
         var missingOptional = scopeInfo.getMissingOptional();
-        var scopeFieldMapping = getScopeFieldMapping();
+        var clientId = authSession.getClient().getClientId();
+        var scopeFieldMapping = getScopeFieldMapping(clientId);
         var scopes = new ArrayList<ScopeBean>();
         for (var currentScopes : List.of(grantedRequired, missingRequired, grantedOptional, missingOptional)) {
             for (var scope : currentScopes) {
@@ -168,10 +197,10 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         form.setAttribute("scopes", scopes);
 
-        form.setAttribute("grantedScopes", scopeInfo.getGrantedScopeNames());
+        form.setAttribute("grantedScopeNames", scopeInfo.getGrantedScopeNames());
 
-        form.setAttribute("grantedScopeNames", String.join(" ", scopeInfo.getGrantedScopeNames()));
-        form.setAttribute("requestedScopeNames", String.join(" ", scopeInfo.getRequestedScopeNames()));
+        form.setAttribute("grantedScope", String.join(" ", scopeInfo.getGrantedScopeNames()));
+        form.setAttribute("requestedScope", String.join(" ", scopeInfo.getRequestedScopeNames()));
 
         if (formCustomizer != null) {
             formCustomizer.accept(form);
@@ -369,5 +398,13 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         private final Map<String, ClientScopeModel> required;
         private final Map<String, ClientScopeModel> optional;
+    }
+
+    @Data
+    static class ScopeFieldsMapping {
+
+        private final String scope;
+
+        private final List<ScopeField> fields;
     }
 }

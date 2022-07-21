@@ -221,7 +221,7 @@ clients:
     #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "$(env:APPS_FRONTEND_URL_GREETME)"
-    baseUrl: "/?realm=acme-internal"
+    baseUrl: "/?realm=acme-internal&scope=openid"
     adminUrl: ""
     redirectUris:
       - "/*"
@@ -252,7 +252,7 @@ clients:
     #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "$(env:APPS_FRONTEND_URL_GREETME)"
-    baseUrl: "/?realm=acme-internal&client_id=app-consent-demo"
+    baseUrl: "/?realm=acme-internal&client_id=app-consent-demo&scope=openid"
     adminUrl: ""
     redirectUris:
       - "/*"

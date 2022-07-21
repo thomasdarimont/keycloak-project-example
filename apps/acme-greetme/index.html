@@ -39,11 +39,13 @@
     <h1>ClientId: <span id="clientInfo"></span></h1>
     <div id="greeting" class="hidden">
         <h2>Email: <span id="email"></span></h2>
+        <h2>Email Verified: <span id="emailVerified"></span></h2>
         <h2>Username: <span id="username"></span></h2>
         <h2>Name: <span id="displayName"></span></h2>
         <h2>Firstname: <span id="firstname"></span></h2>
         <h2>Lastname: <span id="lastname"></span></h2>
         <h2>Phone: <span id="phone"></span></h2>
+        <h2>Phone Verified: <span id="phoneVerified"></span></h2>
         <h2>Requested Scope: <span id="scopeRequested"></span></h2>
         <h2>Granted Scope: <span id="scopeGranted"></span></h2>
         <h2>Issuer: <span id="issuer"></span></h2>
@@ -146,7 +148,9 @@
         $("#firstname").innerText = keycloak.tokenParsed.given_name;
         $("#lastname").innerText = keycloak.tokenParsed.family_name;
         $("#email").innerText = keycloak.tokenParsed.email;
+        $("#emailVerified").innerText = keycloak.tokenParsed.email_verified;
         $("#phone").innerText = keycloak.tokenParsed.phone_number;
+        $("#phoneVerified").innerText = keycloak.tokenParsed.phone_number_verified;
         $("#issuer").innerText = keycloak.tokenParsed.iss;
         $("#scopeRequested").innerText = scope;
         $("#scopeGranted").innerText = keycloak.tokenParsed.scope;

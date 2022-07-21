@@ -6,35 +6,36 @@
         ${msg('acmeConsentSelectionTitle')}
     <#elseif section = "form">
 
+        <p>
+        <div>DEBUG
+            <div>Granted Scope: ${grantedScope}</div>
+            <div>Requested Scope: ${requestedScope}</div>
+        </div>
+        </p>
+
         <p>${msg('acmeConsentSelection')}</p>
         <form id="acme-dynamic-scope-selection-form" class="${properties.kcFormClass!}" action="${url.loginAction}"
               method="post">
 
             <div class="${properties.kcFormGroupClass!}">
-
-                <div>
-                    <div>Granted Scopes: ${grantedScopeNames}</div>
-                    <div>Requested Scopes: ${requestedScopeNames}</div>
-                </div>
-
                 <div id="scopes">
                     <#list scopes as scope>
                         <div>
-                            <div class="${properties.kcInputWrapperClass!} ${grantedScopes?seq_contains(scope.name)?string("hidden", "")}">
+                            <div class="${properties.kcInputWrapperClass!} ${grantedScopeNames?seq_contains(scope.name)?string("hidden", "")}">
                                 <#if !scope.optional>
                                     <input type="hidden" name="scopeSelection" value="${scope.name}"/>
                                 </#if>
 
                                 <label for="${scope.name}-item">${msg(scope.name)}</label>
-<#--                                <span><#if scope.optional>(optional)</#if></span>-->
+                                <#--                                <span><#if scope.optional>(optional)</#if></span>-->
                                 <input id="${scope.name}-item"
                                        type="checkbox"
                                        name="scopeSelection"
                                        value="${scope.name}"
                                        <#if !scope.optional>disabled</#if>
                                         <#if scope.granted || scope.optional>checked</#if>
-<#--                                        <#if !scope.optional>class="hidden"</#if>-->
-                                        class="hidden"
+                                        <#--                                        <#if !scope.optional>class="hidden"</#if>-->
+                                       class="hidden"
                                 />
                                 <p>
                                     ${msg(scope.description)}
@@ -42,7 +43,8 @@
                             </div>
 
                             <#-- Field details by scope -->
-                            <#--
+                            <#-- -->
+                            <#if !grantedScopeNames?seq_contains(scope.name) >
                             <div class="${properties.kcFormGroupClass!}">
                                 <#list scope.fields as scopeField>
                                     <div class="${properties.kcInputWrapperClass!}">
@@ -61,7 +63,7 @@
                                     </div>
                                 </#list>
                             </div>
--->
+                            </#if>
 
                             <#-- -->
 
