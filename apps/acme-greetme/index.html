@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
 
-    <title>Acme Greet Me</title>
+    <title>App: ClientId</title>
 
     <style>
         ul.menu > li {
@@ -62,6 +62,7 @@
 
     let realm = searchParams.get("realm") || 'acme-internal';
     let clientId = searchParams.get("client_id") || 'app-greetme';
+    window.document.title = "App: " + clientId;
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     // let scope = searchParams.get("scope") || 'openid email profile phone';
