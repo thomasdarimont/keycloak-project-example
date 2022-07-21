@@ -54,34 +54,34 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var clientToScopeFieldsMapping = new LinkedHashMap<String, List<ScopeFieldsMapping>>();
         clientToScopeFieldsMapping.put(DEFAULT_CLIENT, List.of(
 
-                new ScopeFieldsMapping("email", List.of(new ScopeField("email", "email", UserModel::getEmail, true))),
-                new ScopeFieldsMapping("phone", List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber"),true))),
-                new ScopeFieldsMapping("birthdate", List.of(new ScopeField("birthdate", "text", u -> u.getFirstAttribute("birthdate"),true))),
-                new ScopeFieldsMapping("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName,true))),
+                new ScopeFieldsMapping("email", List.of(new ScopeField("email", "email", UserModel::getEmail, true, true))),
+                new ScopeFieldsMapping("phone", List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber"),true, false))),
+                new ScopeFieldsMapping("birthdate", List.of(new ScopeField("birthdate", "text", u -> u.getFirstAttribute("birthdate"),true, false))),
+                new ScopeFieldsMapping("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName,true, false))),
 
                 new ScopeFieldsMapping("name", List.of( //
-                        new ScopeField("salutation", "text", u -> u.getFirstAttribute("salutation"),false), //
-                        new ScopeField("title", "text", u -> u.getFirstAttribute("title"),false), //
-                        new ScopeField("firstName", "text", UserModel::getFirstName,true), //
-                        new ScopeField("lastName", "text", UserModel::getLastName,true) //
+                        new ScopeField("salutation", "text", u -> u.getFirstAttribute("salutation"),false, false), //
+                        new ScopeField("title", "text", u -> u.getFirstAttribute("title"),false, false), //
+                        new ScopeField("firstName", "text", UserModel::getFirstName,true, false), //
+                        new ScopeField("lastName", "text", UserModel::getLastName,true, false) //
                 )),
 
                 new ScopeFieldsMapping("address", List.of( //
-                        new ScopeField("address.street", "text", u -> "Have it your way 42",true), //
-                        new ScopeField("address.careOf", "text", u -> "",false), //
-                        new ScopeField("address.postalCode", "text", u -> "12345",true), //
-                        new ScopeField("address.city", "text", u -> "Saarbrücken",true), //
-                        new ScopeField("address.region", "text", u -> "Saarland",false), //
-                        new ScopeField("address.country", "text", u -> "DE",true) //
+                        new ScopeField("address.street", "text", u -> "Have it your way 42",true, false), //
+                        new ScopeField("address.careOf", "text", u -> "",false, false), //
+                        new ScopeField("address.postalCode", "text", u -> "12345",true, false), //
+                        new ScopeField("address.city", "text", u -> "Saarbrücken",true, false), //
+                        new ScopeField("address.region", "text", u -> "Saarland",false, false), //
+                        new ScopeField("address.country", "text", u -> "DE",true, false) //
                 )),
 
                 new ScopeFieldsMapping("address:billing", List.of( //
-                    new ScopeField("address:billing.street", "text", u -> u.getFirstAttribute("address.street"),true), //
-                    new ScopeField("address:billing.careOf", "text", u -> u.getFirstAttribute("address.careOf"),false), //
-                    new ScopeField("address:billing.postalCode", "text", u -> u.getFirstAttribute("address.postalCode"),true), //
-                    new ScopeField("address:billing.city", "text", u -> u.getFirstAttribute("address.city"),true), //
-                    new ScopeField("address:billing.region", "text", u -> u.getFirstAttribute("address.region"),false), //
-                    new ScopeField("address:billing.country", "text", u -> u.getFirstAttribute("address.country"),true) //
+                    new ScopeField("address:billing.street", "text", u -> u.getFirstAttribute("address.street"),true, false), //
+                    new ScopeField("address:billing.careOf", "text", u -> u.getFirstAttribute("address.careOf"),false, false), //
+                    new ScopeField("address:billing.postalCode", "text", u -> u.getFirstAttribute("address.postalCode"),true, false), //
+                    new ScopeField("address:billing.city", "text", u -> u.getFirstAttribute("address.city"),true, false), //
+                    new ScopeField("address:billing.region", "text", u -> u.getFirstAttribute("address.region"),false, false), //
+                    new ScopeField("address:billing.country", "text", u -> u.getFirstAttribute("address.country"),true, false) //
                 ))
         ));
 

@@ -59,7 +59,8 @@
                                                    type="${scopeField.type}"
                                                    name="${scopeField.name}"
                                                    value="${(scopeField.value!'')}"
-<#--                                                   disabled-->
+                                                   <#if scopeField.readonly>disabled</#if>
+<#--                                                   -->
                                             />
                                         </div>
                                     </div>

@@ -28,4 +28,8 @@ public class ScopeFieldBean {
     public boolean isRequired() {
         return scopeField.isRequired();
     }
+
+    public boolean isReadonly() {
+        return scopeField.isReadonly();
+    }
 }
