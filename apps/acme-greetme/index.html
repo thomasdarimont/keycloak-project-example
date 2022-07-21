@@ -124,7 +124,7 @@
         $("#loginBtn").classList.remove("hidden");
         $("#registerBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.add("hidden");
-        $(".operation").classList.add("hidden");
+        [...document.querySelectorAll(".operation")].forEach(op => op.classList.add("hidden"));
         $("#logoutBtn").classList.add("hidden");
     }
 
@@ -134,8 +134,7 @@
         $("#registerBtn").classList.add("hidden");
         $("#logoutBtn").classList.remove("hidden");
         $("#updateConsentBtn").classList.remove("hidden");
-        $(".operation").classList.remove("hidden");
-
+        [...document.querySelectorAll(".operation")].forEach(op => op.classList.remove("hidden"));
         $("#greeting").classList.toggle("hidden");
 
         $("#username").innerText = keycloak.tokenParsed.preferred_username;
