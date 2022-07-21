@@ -11,23 +11,31 @@
               method="post">
 
             <div class="${properties.kcFormGroupClass!}">
+
+                <div>
+                    <div>Granted Scopes: ${grantedScopeNames}</div>
+                    <div>Requested Scopes: ${requestedScopeNames}</div>
+                </div>
+
                 <div id="scopes">
                     <#list scopes as scope>
                         <div>
-                            <div class="${properties.kcInputWrapperClass!}">
-                                <input id="${scope.name}-item"
-                                       type="checkbox"
-                                       name="scopeSelection"
-                                       value="${scope.name}"
-                                       <#if !scope.optional>disabled</#if>
-                                        <#if scope.granted || !scope.optional>checked</#if>
-                                />
+                            <div class="${properties.kcInputWrapperClass!} ${grantedScopes?seq_contains(scope.name)?string("hidden", "")}">
                                 <#if !scope.optional>
                                     <input type="hidden" name="scopeSelection" value="${scope.name}"/>
                                 </#if>
 
                                 <label for="${scope.name}-item">${msg(scope.name)}</label>
-                                <span><#if scope.optional>(optional)</#if></span>
+<#--                                <span><#if scope.optional>(optional)</#if></span>-->
+                                <input id="${scope.name}-item"
+                                       type="checkbox"
+                                       name="scopeSelection"
+                                       value="${scope.name}"
+                                       <#if !scope.optional>disabled</#if>
+                                        <#if scope.granted || scope.optional>checked</#if>
+<#--                                        <#if !scope.optional>class="hidden"</#if>-->
+                                        class="hidden"
+                                />
                                 <p>
                                     ${msg(scope.description)}
                                 </p>
@@ -53,7 +61,7 @@
                                     </div>
                                 </#list>
                             </div>
-                            -->
+-->
 
                             <#-- -->
 

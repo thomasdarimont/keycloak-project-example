@@ -66,6 +66,9 @@
     // ?scope=openid+email+custom.profile+custom.ageinfo
     // let scope = searchParams.get("scope") || 'openid email profile phone';
     let scope = searchParams.get("scope") || 'openid email name phone';
+    if (scope === "openid") {
+        scope = "";
+    }
 
     document.getElementById("clientInfo").textContent = clientId;
 

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -166,6 +167,11 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         scopes.sort(ScopeBean.DEFAULT_ORDER);
 
         form.setAttribute("scopes", scopes);
+
+        form.setAttribute("grantedScopes", scopeInfo.getGrantedScopeNames());
+
+        form.setAttribute("grantedScopeNames", String.join(" ", scopeInfo.getGrantedScopeNames()));
+        form.setAttribute("requestedScopeNames", String.join(" ", scopeInfo.getRequestedScopeNames()));
 
         if (formCustomizer != null) {
             formCustomizer.accept(form);
@@ -342,6 +348,20 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         private final Set<ClientScopeModel> grantedOptional;
         private final Set<ClientScopeModel> missingRequired;
         private final Set<ClientScopeModel> missingOptional;
+
+        private Set<String> getGrantedScopeNames() {
+            var result = new LinkedHashSet<String>();
+            grantedRequired.stream().map(ClientScopeModel::getName).forEach(result::add);
+            grantedOptional.stream().map(ClientScopeModel::getName).forEach(result::add);
+            return result;
+        }
+
+        private Set<String> getRequestedScopeNames() {
+            var result = new LinkedHashSet<String>();
+            missingRequired.stream().map(ClientScopeModel::getName).forEach(result::add);
+            missingOptional.stream().map(ClientScopeModel::getName).forEach(result::add);
+            return result;
+        }
     }
 
     @Data
