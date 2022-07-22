@@ -160,6 +160,7 @@
 
         if (!isScopePresent(requiredScope)) {
             redirectForConsent(requiredScope);
+            return;
         }
 
         alert("Perform operation " + operationName);
@@ -185,8 +186,6 @@
 
         // perform new authorization code flow
         keycloak.login({scope: requestedScope, redirectUri: redirectUriWithNewScope});
-
-        return false;
     }
 
 </script>
