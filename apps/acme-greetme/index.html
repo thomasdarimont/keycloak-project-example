@@ -24,7 +24,7 @@
         <li>
             <button id="loginBtn" onclick="keycloak.login()">Login</button>
             <button id="registerBtn" onclick="keycloak.register()">Register</button>
-            <button id="updateConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Update consent</button>
+            <button id="manageConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Manage consent</button>
             <button id="operation1Btn" onclick="performOperation('op1','name')" class="operation">Op 1 (name)</button>
             <button id="operation2Btn" onclick="performOperation('op2','phone')"  class="operation">Op 2 (phone)</button>
             <button id="operation3Btn" onclick="performOperation('op3','phone name')"  class="operation">Op 3 (phone+name)</button>
@@ -158,25 +158,25 @@
 
     function performOperation(operationName, requiredScope) {
 
-        if (checkRequiredScopePresent(requiredScope)) {
-            alert("Perform operation " + operationName);
+        if (!isScopePresent(requiredScope)) {
+            redirectForConsent(requiredScope);
         }
+
+        alert("Perform operation " + operationName);
     }
 
-    function checkRequiredScopePresent(requiredScope) {
+    function isScopePresent(requiredScope) {
 
+        let grantedScopeNames = (keycloak.tokenParsed.scope || "openid").split(" ")
         let requiredScopeNames = requiredScope.split(" ");
 
-        let grantedScope = keycloak.tokenParsed.scope;
-        let grantedScopeNames = (grantedScope || "openid").split(" ")
+        return requiredScopeNames.every(it => grantedScopeNames.includes(it));
+    }
 
-        let containsAllRequiredScopes =requiredScopeNames.every(it => grantedScopeNames.includes(it))
-        if (containsAllRequiredScopes) {
-            return true;
-        }
+    function redirectForConsent(requiredScope) {
 
         // need to request additional required scope
-        let requestedScope = grantedScope + " " + requiredScope;
+        let requestedScope = keycloak.tokenParsed.scope + " " + requiredScope;
 
         // update current redirect URL
         let currentUrl = new URL(window.location.href);
