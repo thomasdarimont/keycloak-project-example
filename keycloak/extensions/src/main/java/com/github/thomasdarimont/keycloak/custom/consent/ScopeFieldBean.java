@@ -8,28 +8,31 @@ import org.keycloak.models.UserModel;
 public class ScopeFieldBean {
 
     @JsonIgnore
-    private final ScopeField scopeField;
+    private final ProfileAttribute attribute;
 
     @JsonIgnore
     private final UserModel user;
 
     public String getName() {
-        return scopeField.getName();
+        return attribute.getName();
     }
 
     public String getType() {
-        return scopeField.getType();
+        return attribute.getType();
     }
 
     public String getValue() {
-        return scopeField.getValueAccessor().apply(user);
+        if (attribute instanceof KeycloakProfileAttribute) {
+            return ((KeycloakProfileAttribute)attribute).getValue(user);
+        }
+        return attribute.getValue();
     }
 
     public boolean isRequired() {
-        return scopeField.isRequired();
+        return attribute.isRequired();
     }
 
     public boolean isReadonly() {
-        return scopeField.isReadonly();
+        return attribute.isReadonly();
     }
 }

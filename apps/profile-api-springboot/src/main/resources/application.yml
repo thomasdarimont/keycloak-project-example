@@ -1,0 +1,27 @@
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      # deals with single and multi-valued JWT claims
+      accept-single-value-as-array: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${acme.jwt.issuerUri}
+          jwk-set-uri: ${acme.jwt.issuerUri}/protocol/openid-connect/certs
+# Use mock-service jwks-endpoint to obtain public key for testing
+#          jwk-set-uri: http://localhost:9999/jwks
+
+acme:
+  jwt:
+    issuerUri: https://id.acme.test:8443/auth/realms/acme-internal
+
+server:
+  port: 4653
+#  ssl:
+#    enabled: true
+#    key-store: ../../config/stage/dev/tls/acme.test+1.p12
+#    key-store-password: changeit
+#    key-store-type: PKCS12

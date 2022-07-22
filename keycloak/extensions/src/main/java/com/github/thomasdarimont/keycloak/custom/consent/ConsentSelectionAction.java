@@ -48,46 +48,37 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
     public static final String DEFAULT_CLIENT = "default";
 
-    private Map<String, List<ScopeField>> getScopeFieldMapping(String clientId) {
+    private Map<String, List<ProfileAttribute>> getScopeFieldMapping(String clientId) {
 
         // Holds the client fields mapping, LinkedHashMap to retain insertion order
         var clientToScopeFieldsMapping = new LinkedHashMap<String, List<ScopeFieldsMapping>>();
         clientToScopeFieldsMapping.put(DEFAULT_CLIENT, List.of(
 
-                new ScopeFieldsMapping("email", List.of(new ScopeField("email", "email", UserModel::getEmail, true, true))),
-                new ScopeFieldsMapping("phone", List.of(new ScopeField("phoneNumber", "tel", u -> u.getFirstAttribute("phoneNumber"),true, false))),
-                new ScopeFieldsMapping("birthdate", List.of(new ScopeField("birthdate", "text", u -> u.getFirstAttribute("birthdate"),true, false))),
-                new ScopeFieldsMapping("firstname", List.of(new ScopeField("firstName", "text", UserModel::getFirstName,true, false))),
+                new ScopeFieldsMapping("email", List.of(new KeycloakProfileAttribute("email", "email", true, true, UserModel::getEmail))),
+                new ScopeFieldsMapping("phone", List.of(new KeycloakProfileAttribute("phoneNumber", "tel", true, false, u -> u.getFirstAttribute("phoneNumber")))),
+                new ScopeFieldsMapping("birthdate", List.of(new KeycloakProfileAttribute("birthdate", "text", true, false, u -> u.getFirstAttribute("birthdate")))),
+                new ScopeFieldsMapping("firstname", List.of(new KeycloakProfileAttribute("firstName", "text", true, false, UserModel::getFirstName))),
 
                 new ScopeFieldsMapping("name", List.of( //
-                        new ScopeField("salutation", "text", u -> u.getFirstAttribute("salutation"),false, false), //
-                        new ScopeField("title", "text", u -> u.getFirstAttribute("title"),false, false), //
-                        new ScopeField("firstName", "text", UserModel::getFirstName,true, false), //
-                        new ScopeField("lastName", "text", UserModel::getLastName,true, false) //
+                        new KeycloakProfileAttribute("salutation", "text", false, false, u -> u.getFirstAttribute("salutation")), //
+                        new KeycloakProfileAttribute("title", "text", false, false, u -> u.getFirstAttribute("title")), //
+                        new KeycloakProfileAttribute("firstName", "text", true, false, UserModel::getFirstName), //
+                        new KeycloakProfileAttribute("lastName", "text", true, false, UserModel::getLastName) //
                 )),
 
                 new ScopeFieldsMapping("address", List.of( //
-                        new ScopeField("address.street", "text", u -> "Have it your way 42",true, false), //
-                        new ScopeField("address.careOf", "text", u -> "",false, false), //
-                        new ScopeField("address.postalCode", "text", u -> "12345",true, false), //
-                        new ScopeField("address.city", "text", u -> "Saarbrücken",true, false), //
-                        new ScopeField("address.region", "text", u -> "Saarland",false, false), //
-                        new ScopeField("address.country", "text", u -> "DE",true, false) //
-                )),
-
-                new ScopeFieldsMapping("address:billing", List.of( //
-                    new ScopeField("address:billing.street", "text", u -> u.getFirstAttribute("address.street"),true, false), //
-                    new ScopeField("address:billing.careOf", "text", u -> u.getFirstAttribute("address.careOf"),false, false), //
-                    new ScopeField("address:billing.postalCode", "text", u -> u.getFirstAttribute("address.postalCode"),true, false), //
-                    new ScopeField("address:billing.city", "text", u -> u.getFirstAttribute("address.city"),true, false), //
-                    new ScopeField("address:billing.region", "text", u -> u.getFirstAttribute("address.region"),false, false), //
-                    new ScopeField("address:billing.country", "text", u -> u.getFirstAttribute("address.country"),true, false) //
+                        new KeycloakProfileAttribute("address.street", "text", true, false, u -> "Have it your way 42"), //
+                        new KeycloakProfileAttribute("address.careOf", "text", false, false, u -> ""), //
+                        new KeycloakProfileAttribute("address.postalCode", "text", true, false, u -> "12345"), //
+                        new KeycloakProfileAttribute("address.city", "text", true, false, u -> "Saarbrücken"), //
+                        new KeycloakProfileAttribute("address.region", "text", false, false, u -> "Saarland"), //
+                        new KeycloakProfileAttribute("address.country", "text", true, false, u -> "DE") //
                 ))
         ));
 
         var defaultScopeFieldsMappings = clientToScopeFieldsMapping.get("default");
 
-        var map = new HashMap<String, List<ScopeField>>();
+        var map = new HashMap<String, List<ProfileAttribute>>();
 
         // add default scope field mapping
         for (var scopeFieldsMapping : defaultScopeFieldsMappings) {
@@ -148,6 +139,10 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             return;
         }
 
+        if (!isDynamicConsentManagementEnabled(authSession.getClient())) {
+            return;
+        }
+
         var missingConsents = getScopeInfo(context.getSession(), authSession, user);
 
         var prompt = context.getUriInfo().getQueryParameters().getFirst(OAuth2Constants.PROMPT);
@@ -168,6 +163,10 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         }
     }
 
+    private boolean isDynamicConsentManagementEnabled(ClientModel client) {
+        return Set.of("app-greetme", "app-consent-demo").contains(client.getClientId());
+    }
+
     @Override
     public void requiredActionChallenge(RequiredActionContext context) {
 
@@ -183,16 +182,23 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         form.setAttribute(UserModel.USERNAME, user.getUsername());
 
         var authSession = context.getAuthenticationSession();
+        var session = context.getSession();
 
-        Function<ScopeField, ScopeFieldBean> fun = f -> new ScopeFieldBean(f, user);
+        Function<ProfileAttribute, ScopeFieldBean> fun = f -> new ScopeFieldBean(f, user);
 
-        var scopeInfo = getScopeInfo(context.getSession(), authSession, user);
+        var scopeInfo = getScopeInfo(session, authSession, user);
         var grantedRequired = scopeInfo.getGrantedRequired();
         var grantedOptional = scopeInfo.getGrantedOptional();
         var missingRequired = scopeInfo.getMissingRequired();
         var missingOptional = scopeInfo.getMissingOptional();
         var clientId = authSession.getClient().getClientId();
-        var scopeFieldMapping = getScopeFieldMapping(clientId);
+
+        // var scopeFieldMapping = getScopeFieldMapping(clientId);
+        var requestedScopeNames = scopeInfo.getRequestedScopeNames();
+        var userId = user.getId();
+        var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, clientId, requestedScopeNames, userId) //
+                .getMapping();
+
         var scopes = new ArrayList<ScopeBean>();
         for (var currentScopes : List.of(grantedRequired, missingRequired, grantedOptional, missingOptional)) {
             for (var scope : currentScopes) {
@@ -217,7 +223,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         form.setAttribute("grantedScopeNames", scopeInfo.getGrantedScopeNames());
 
         form.setAttribute("grantedScope", String.join(" ", scopeInfo.getGrantedScopeNames()));
-        form.setAttribute("requestedScope", String.join(" ", scopeInfo.getRequestedScopeNames()));
+        form.setAttribute("requestedScope", String.join(" ", requestedScopeNames));
 
         if (formCustomizer != null) {
             formCustomizer.accept(form);
@@ -422,6 +428,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         private final String scope;
 
-        private final List<ScopeField> fields;
+        private final List<ProfileAttribute> fields;
     }
 }
