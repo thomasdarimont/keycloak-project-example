@@ -7,8 +7,14 @@ public class UserProfileRepository {
 
     public UserProfile getProfileByUserId(String userId) {
 
-        UserProfile profile = new UserProfile();
-        profile.setFirstName("Theo");
+        var tester = getTesterProfile();
+
+        return tester;
+    }
+
+    private UserProfile getTesterProfile() {
+        var profile = new UserProfile();
+        profile.setFirstName("Theodore");
         profile.setLastName("Tester");
         profile.setTitle("Dr.");
         profile.setSalutation("Herr");
@@ -20,7 +26,6 @@ public class UserProfileRepository {
         profile.setAddressPostalCode("12345");
         profile.setAddressRegion("");
         profile.setAddressCountry("DE");
-
         return profile;
     }
 }

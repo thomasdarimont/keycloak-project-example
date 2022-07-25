@@ -9,10 +9,11 @@ import java.util.function.Function;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class ProfileAttribute {
 
     private String name;
+
+    private String claimName;
 
     private String type;
 
@@ -21,4 +22,13 @@ public class ProfileAttribute {
     private boolean required;
 
     private boolean readonly;
+
+    public ProfileAttribute(String name, String claimName, String type, String value, boolean required, boolean readonly) {
+        this.name = name;
+        this.claimName = claimName;
+        this.type = type;
+        this.value = value;
+        this.required = required;
+        this.readonly = readonly;
+    }
 }

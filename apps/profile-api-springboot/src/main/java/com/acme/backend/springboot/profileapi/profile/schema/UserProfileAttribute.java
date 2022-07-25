@@ -1,15 +1,19 @@
 package com.acme.backend.springboot.profileapi.profile.schema;
 
+import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-@Data
+
+@Getter
+@ToString
 @AllArgsConstructor
-@Builder(builderMethodName = "newAttribute")
 public class UserProfileAttribute {
 
     // TODO discuss:
@@ -17,19 +21,30 @@ public class UserProfileAttribute {
 
     // validation: clientSide, serverSide
 
-    private final String name;
+    private String name;
 
-    private final String claimName;
+    private String claimName;
 
-    private final String type;
+    private String type;
 
-    private final String defaultValue;
+    private String defaultValue;
 
-    private final Set<String> allowedValues;
+    private Set<String> allowedValues;
 
-    private final boolean required;
+    private boolean required;
 
-    private final boolean readonly;
+    private boolean readonly;
+
+    /**
+     * Holds a function that defines the attribute value extraction logic.
+     */
+    private Function<UserProfile, String> accessor;
+
+    private BiConsumer<UserProfile, String> mutator;
+
+    public static Builder newAttribute() {
+        return new Builder();
+    }
 
     public String toClaimName() {
         if (this.claimName != null) {
@@ -43,7 +58,7 @@ public class UserProfileAttribute {
      *
      * @return
      */
-    public UserProfileAttribute.UserProfileAttributeBuilder customize() {
+    public Builder customize() {
         return newAttribute() //
                 .name(name) //
                 .claimName(claimName) //
@@ -51,6 +66,71 @@ public class UserProfileAttribute {
                 .defaultValue(defaultValue) //
                 .allowedValues(new LinkedHashSet<>(allowedValues)) //
                 .readonly(readonly) //
-                .required(required);
+                .required(required) //
+                .accessor(accessor) //
+                .mutator(mutator);
+    }
+
+    @ToString
+    public static class Builder {
+        private String name;
+        private String claimName;
+        private String type;
+        private String defaultValue;
+        private Set<String> allowedValues;
+        private boolean required;
+        private boolean readonly;
+        private Function<UserProfile, String> accessor;
+
+        private BiConsumer<UserProfile, String> mutator;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder claimName(String claimName) {
+            this.claimName = claimName;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder defaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
+        public Builder allowedValues(Set<String> allowedValues) {
+            this.allowedValues = allowedValues;
+            return this;
+        }
+
+        public Builder required(boolean required) {
+            this.required = required;
+            return this;
+        }
+
+        public Builder readonly(boolean readonly) {
+            this.readonly = readonly;
+            return this;
+        }
+
+        public Builder accessor(Function<UserProfile, String> accessor) {
+            this.accessor = accessor;
+            return this;
+        }
+
+        public Builder mutator(BiConsumer<UserProfile, String> mutator) {
+            this.mutator = mutator;
+            return this;
+        }
+
+        public UserProfileAttribute build() {
+            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readonly, accessor, mutator);
+        }
     }
 }

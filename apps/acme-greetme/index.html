@@ -61,6 +61,7 @@
     let searchParams = new URLSearchParams(window.location.search);
     let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://id.acme.test:8080" : "https://id.acme.test:8443");
     let keycloakUrl = keycloakBaseUrl + (searchParams.get("path") || "/auth");
+    let userInfoUrl = searchParams.get("userinfo_url");
 
     let realm = searchParams.get("realm") || 'acme-internal';
     let clientId = searchParams.get("client_id") || 'app-greetme';
@@ -134,7 +135,7 @@
         $("#logoutBtn").classList.add("hidden");
     }
 
-    function showGreeting() {
+    async function showGreeting() {
 
         $("#loginBtn").classList.add("hidden");
         $("#registerBtn").classList.add("hidden");
@@ -143,14 +144,45 @@
         [...document.querySelectorAll(".operation")].forEach(op => op.classList.remove("hidden"));
         $("#greeting").classList.toggle("hidden");
 
-        $("#username").innerText = keycloak.tokenParsed.preferred_username;
-        $("#displayName").innerText = keycloak.tokenParsed.name;
-        $("#firstname").innerText = keycloak.tokenParsed.given_name;
-        $("#lastname").innerText = keycloak.tokenParsed.family_name;
-        $("#email").innerText = keycloak.tokenParsed.email;
-        $("#emailVerified").innerText = keycloak.tokenParsed.email_verified;
-        $("#phone").innerText = keycloak.tokenParsed.phone_number;
-        $("#phoneVerified").innerText = keycloak.tokenParsed.phone_number_verified;
+        let userProfile = {
+            preferred_username: keycloak.tokenParsed.preferred_username,
+            name: keycloak.tokenParsed.name,
+            given_name: keycloak.tokenParsed.given_name,
+            family_name: keycloak.tokenParsed.family_name,
+            email: keycloak.tokenParsed.email,
+            email_verified: keycloak.tokenParsed.email_verified,
+            phone_number: keycloak.tokenParsed.phone_number,
+            phone_number_verified: keycloak.tokenParsed.phone_number_verified,
+        }
+
+        if (userInfoUrl) {
+            let userInfoResponse = await fetch(userInfoUrl, {
+                timeout: 2000,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + keycloak.token,
+                    "Accept": "application/json"
+                }
+            });
+
+            let userInfo = await userInfoResponse.json();
+            userProfile["name"] = userInfo["name"]
+            userProfile["given_name"] = userInfo["given_name"]
+            userProfile["family_name"] = userInfo["family_name"]
+            userProfile["email"] = userInfo["email"]
+            userProfile["phone_number"] = userInfo["phone_number"]
+
+            console.log(userInfo)
+        }
+
+        $("#username").innerText = userProfile.preferred_username;
+        $("#displayName").innerText = userProfile.name;
+        $("#firstname").innerText = userProfile.given_name;
+        $("#lastname").innerText = userProfile.family_name;
+        $("#email").innerText = userProfile.email;
+        $("#emailVerified").innerText = userProfile.email_verified;
+        $("#phone").innerText = userProfile.phone_number;
+        $("#phoneVerified").innerText = userProfile.phone_number_verified;
         $("#issuer").innerText = keycloak.tokenParsed.iss;
         $("#scopeRequested").innerText = scope;
         $("#scopeGranted").innerText = keycloak.tokenParsed.scope;

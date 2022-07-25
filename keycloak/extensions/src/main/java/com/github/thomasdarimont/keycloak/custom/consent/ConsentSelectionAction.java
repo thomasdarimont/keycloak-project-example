@@ -54,25 +54,25 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var clientToScopeFieldsMapping = new LinkedHashMap<String, List<ScopeFieldsMapping>>();
         clientToScopeFieldsMapping.put(DEFAULT_CLIENT, List.of(
 
-                new ScopeFieldsMapping("email", List.of(new KeycloakProfileAttribute("email", "email", true, true, UserModel::getEmail))),
-                new ScopeFieldsMapping("phone", List.of(new KeycloakProfileAttribute("phoneNumber", "tel", true, false, u -> u.getFirstAttribute("phoneNumber")))),
-                new ScopeFieldsMapping("birthdate", List.of(new KeycloakProfileAttribute("birthdate", "text", true, false, u -> u.getFirstAttribute("birthdate")))),
-                new ScopeFieldsMapping("firstname", List.of(new KeycloakProfileAttribute("firstName", "text", true, false, UserModel::getFirstName))),
+                new ScopeFieldsMapping("email", List.of(new KeycloakProfileAttribute("email", "email", "email", true, true, UserModel::getEmail))),
+                new ScopeFieldsMapping("phone", List.of(new KeycloakProfileAttribute("phoneNumber", "phone_number", "tel", true, false, u -> u.getFirstAttribute("phoneNumber")))),
+                new ScopeFieldsMapping("birthdate", List.of(new KeycloakProfileAttribute("birthdate", "birthdate", "text", true, false, u -> u.getFirstAttribute("birthdate")))),
+                new ScopeFieldsMapping("firstname", List.of(new KeycloakProfileAttribute("firstName", "given_name", "text", true, false, UserModel::getFirstName))),
 
                 new ScopeFieldsMapping("name", List.of( //
-                        new KeycloakProfileAttribute("salutation", "text", false, false, u -> u.getFirstAttribute("salutation")), //
-                        new KeycloakProfileAttribute("title", "text", false, false, u -> u.getFirstAttribute("title")), //
-                        new KeycloakProfileAttribute("firstName", "text", true, false, UserModel::getFirstName), //
-                        new KeycloakProfileAttribute("lastName", "text", true, false, UserModel::getLastName) //
+                        new KeycloakProfileAttribute("salutation", "salutation", "text", false, false, u -> u.getFirstAttribute("salutation")), //
+                        new KeycloakProfileAttribute("title", "title", "text", false, false, u -> u.getFirstAttribute("title")), //
+                        new KeycloakProfileAttribute("firstName", "given_name", "text", true, false, UserModel::getFirstName), //
+                        new KeycloakProfileAttribute("lastName", "family_name", "text", true, false, UserModel::getLastName) //
                 )),
 
                 new ScopeFieldsMapping("address", List.of( //
-                        new KeycloakProfileAttribute("address.street", "text", true, false, u -> "Have it your way 42"), //
-                        new KeycloakProfileAttribute("address.careOf", "text", false, false, u -> ""), //
-                        new KeycloakProfileAttribute("address.postalCode", "text", true, false, u -> "12345"), //
-                        new KeycloakProfileAttribute("address.city", "text", true, false, u -> "Saarbrücken"), //
-                        new KeycloakProfileAttribute("address.region", "text", false, false, u -> "Saarland"), //
-                        new KeycloakProfileAttribute("address.country", "text", true, false, u -> "DE") //
+                        new KeycloakProfileAttribute("address.street", "address.street", "text", true, false, u -> "Have it your way 42"), //
+                        new KeycloakProfileAttribute("address.careOf", "address.careOf", "text", false, false, u -> ""), //
+                        new KeycloakProfileAttribute("address.postalCode", "address.postalCode", "text", true, false, u -> "12345"), //
+                        new KeycloakProfileAttribute("address.city", "address.city", "text", true, false, u -> "Saarbrücken"), //
+                        new KeycloakProfileAttribute("address.region", "address.region", "text", false, false, u -> "Saarland"), //
+                        new KeycloakProfileAttribute("address.country", "address.country", "text", true, false, u -> "DE") //
                 ))
         ));
 

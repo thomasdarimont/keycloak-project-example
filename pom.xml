@@ -25,9 +25,6 @@
         <module>apps/frontend-webapp-springboot3</module>
         <module>apps/jwt-client-authentication</module>
         <module>apps/profile-api-springboot</module>
-        <!--        <module>keycloak/patches/keycloak-model-infinispan-patch</module>-->
-<!--        <module>keycloak/patches/wildfly-clustering-infinispan-extension-patch-25.0.x</module>-->
-<!--        <module>keycloak/patches/wildfly-clustering-infinispan-extension-patch-26.0.x</module>-->
     </modules>
 
     <organization>

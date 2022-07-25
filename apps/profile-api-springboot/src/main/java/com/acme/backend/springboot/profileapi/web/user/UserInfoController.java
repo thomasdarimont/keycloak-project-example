@@ -1,6 +1,7 @@
 package com.acme.backend.springboot.profileapi.web.user;
 
 import com.acme.backend.springboot.profileapi.profile.ConsentAwareUserProfileService;
+import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
 import com.acme.backend.springboot.profileapi.profile.model.UserProfileRepository;
 import com.acme.backend.springboot.profileapi.support.oauth2.TokenAccessor;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
+import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileSchema.PersonAttributes;
+import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileSchema.Scope;
 
 
 /**
@@ -42,17 +46,44 @@ class UserInfoController {
         var userId = accessToken.getSubject();
         var scopes = Set.of(accessToken.<String>getClaim("scope").split(" "));
 
+        var profile = userProfileRepository.getProfileByUserId(userId);
+
         var userInfo = new LinkedHashMap<String, Object>();
         userInfo.put("sub", userId);
 
-        // TODO add additional claims for internal attributes (email_verified, phone_number_verified, etc.)
+        addProfileAttributesToUserInfo(clientId, profile, scopes, userInfo);
 
-        addProfileAttributesToUserInfo(clientId, userId, scopes, userInfo);
+        if (scopes.contains(Scope.NAME)) {
+            var displayName = getDisplayName(userInfo);
+            if (!displayName.isEmpty()) {
+                userInfo.put("name", displayName);
+            }
+        }
 
-        // Example userinfo response from Keycloak
-        /*
+        if (scopes.contains(Scope.EMAIL)) {
+            userInfo.put("email_verified", profile.isEmailVerified());
+        }
 
-PROFILE USERINFO SETTINGS SECURITY APPS LOGOUT
+        if (scopes.contains(Scope.PHONE)) {
+            userInfo.put("phone_number_verified", profile.isPhoneNumberVerified());
+        }
+
+        return userInfo;
+    }
+
+    private String getDisplayName(LinkedHashMap<String, Object> userInfo) {
+        return (userInfo.getOrDefault(PersonAttributes.FIRSTNAME.getClaimName(), "") + " " + userInfo.getOrDefault(PersonAttributes.LASTNAME.getClaimName(), "")).trim();
+    }
+
+    private void addProfileAttributesToUserInfo(String clientId, UserProfile profile, Set<String> scopes, LinkedHashMap<String, Object> userInfo) {
+        var profileAttributes = profileService.getProfileAttributes(clientId, scopes, profile);
+        for (var entry : profileAttributes.entrySet()) {
+            entry.getValue().forEach(attr -> userInfo.put(attr.getClaimName(), attr.getValue()));
+        }
+    }
+
+// Example userinfo response from Keycloak
+/*
 {
     "sub": "befb2e1f-6a1f-42ee-89c6-7a983aee4368",
     "resource_access": {
@@ -79,16 +110,6 @@ PROFILE USERINFO SETTINGS SECURITY APPS LOGOUT
     "family_name": "Tester",
     "email": "tester@local"
 }
-         */
-
-        return userInfo;
-    }
-
-    private void addProfileAttributesToUserInfo(String clientId, String userId, Set<String> scopes, LinkedHashMap<String, Object> userInfo) {
-        var profileAttributes = profileService.getProfileAttributes(clientId, scopes, userId);
-        for (var entry : profileAttributes.entrySet()) {
-            entry.getValue().forEach(attr -> userInfo.put(attr.getClaimName(), attr.getValue()));
-        }
-    }
+*/
 }
 

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,11 +30,11 @@ class ConsentFormController {
 
     // get the metadata of the consent-form and if the form should be shown at all
     @GetMapping("/{userId}") // ?clientId=daba&scope=email+name
-    public Object getProfileAttributesForConsentForm(@PathVariable("userId") String userId, ConsentFormDataRequest consentDataRequest) {
+    public Object getProfileAttributesForConsentForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest) {
 
         log.info("### Get Profile attributes for consent form: {}", httpRequest.getRequestURI());
-        var scopes = Set.of(consentDataRequest.getScope().split("(\\s|\\+)"));
-        var clientId = consentDataRequest.getClientId();
+        var scopes = Set.of(dataRequest.getScope().split("(\\s|\\+)"));
+        var clientId = dataRequest.getClientId();
 
         var attributes = profileService.getProfileAttributes(clientId, scopes, userId);
 
@@ -42,7 +43,7 @@ class ConsentFormController {
 
     // receive the update from the consent-form
     @PostMapping("/{userId}")
-    public Object updateForm(@PathVariable("userId") String userId) {
+    public Object updateForm(@PathVariable("userId") String userId, @RequestBody ConsentFormUpdateRequest updateRequest) {
 
         // check if profile update is allowed
         // read profile attributes to update from request

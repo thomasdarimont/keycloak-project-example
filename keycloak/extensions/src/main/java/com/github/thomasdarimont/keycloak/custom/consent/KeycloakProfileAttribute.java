@@ -8,8 +8,8 @@ public class KeycloakProfileAttribute extends ProfileAttribute {
 
     private final Function<UserModel, String> valueAccessor;
 
-    public KeycloakProfileAttribute(String name, String type, boolean required, boolean readonly, Function<UserModel, String> valueAccessor) {
-        super(name, type, null, required, readonly);
+    public KeycloakProfileAttribute(String name, String claimName, String type, boolean required, boolean readonly, Function<UserModel, String> valueAccessor) {
+        super(name, claimName, type, null, required, readonly);
         this.valueAccessor = valueAccessor;
     }
 

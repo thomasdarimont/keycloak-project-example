@@ -20,8 +20,8 @@ public class ProfileClient {
         var accessToken = TokenUtils.generateServiceAccountAccessToken(session, "app-demo-service", "", null);
 
         // TODO externalize URL
-        var url = String.format("http://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
-                userId, clientId, String.join(" ", scopeNames));
+        var url = String.format("https://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
+                userId, clientId, String.join("+", scopeNames));
 
         var http = SimpleHttp.doGet(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000);
 
