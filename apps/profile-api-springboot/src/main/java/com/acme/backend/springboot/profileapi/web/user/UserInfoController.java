@@ -87,7 +87,7 @@ PROFILE USERINFO SETTINGS SECURITY APPS LOGOUT
     private void addProfileAttributesToUserInfo(String clientId, String userId, Set<String> scopes, LinkedHashMap<String, Object> userInfo) {
         var profileAttributes = profileService.getProfileAttributes(clientId, scopes, userId);
         for (var entry : profileAttributes.entrySet()) {
-            entry.getValue().forEach(attr -> userInfo.put(attr.getName(), attr.getValue()));
+            entry.getValue().forEach(attr -> userInfo.put(attr.getClaimName(), attr.getValue()));
         }
     }
 }

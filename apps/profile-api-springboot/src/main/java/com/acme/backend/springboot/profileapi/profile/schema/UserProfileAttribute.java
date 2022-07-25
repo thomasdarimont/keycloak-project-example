@@ -3,12 +3,11 @@ package com.acme.backend.springboot.profileapi.profile.schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder(builderMethodName = "newAttribute")
 public class UserProfileAttribute {
@@ -18,15 +17,40 @@ public class UserProfileAttribute {
 
     // validation: clientSide, serverSide
 
-    private String name;
+    private final String name;
 
-    private String type;
+    private final String claimName;
 
-    private String defaultValue;
+    private final String type;
 
-    private Set<String> allowedValues;
+    private final String defaultValue;
 
-    private boolean required;
+    private final Set<String> allowedValues;
 
-    private boolean readonly;
+    private final boolean required;
+
+    private final boolean readonly;
+
+    public String toClaimName() {
+        if (this.claimName != null) {
+            return claimName;
+        }
+        return this.name;
+    }
+
+    /**
+     * Returns a UserProfileAttributeBuilder that is configured with the copied values of this {@link UserProfileAttribute}.
+     *
+     * @return
+     */
+    public UserProfileAttribute.UserProfileAttributeBuilder customize() {
+        return newAttribute() //
+                .name(name) //
+                .claimName(claimName) //
+                .type(type) //
+                .defaultValue(defaultValue) //
+                .allowedValues(new LinkedHashSet<>(allowedValues)) //
+                .readonly(readonly) //
+                .required(required);
+    }
 }
