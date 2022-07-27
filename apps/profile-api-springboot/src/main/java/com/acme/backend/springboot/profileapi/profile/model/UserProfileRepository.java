@@ -2,14 +2,22 @@ package com.acme.backend.springboot.profileapi.profile.model;
 
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
+
 @Repository
 public class UserProfileRepository {
 
+    Map<String, UserProfile> profiles = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        profiles.put("",getTesterProfile());
+    }
+
     public UserProfile getProfileByUserId(String userId) {
-
-        var tester = getTesterProfile();
-
-        return tester;
+        return profiles.get("");
     }
 
     private UserProfile getTesterProfile() {

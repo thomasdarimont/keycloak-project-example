@@ -36,7 +36,7 @@ class ConsentFormController {
         var scopes = Set.of(dataRequest.getScope().split("(\\s|\\+)"));
         var clientId = dataRequest.getClientId();
 
-        var attributes = profileService.getProfileAttributes(clientId, scopes, userId);
+        var attributes = profileService.getProfileAttributes(userId, clientId, scopes);
 
         return new ConsentFormDataResponse(attributes);
     }
@@ -44,6 +44,13 @@ class ConsentFormController {
     // receive the update from the consent-form
     @PostMapping("/{userId}")
     public Object updateForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest, @RequestBody Map<String, String> profileUpdate) {
+
+        log.info("### Update Profile attributes from consent form: {}", httpRequest.getRequestURI());
+
+        var scopes = Set.of(dataRequest.getScope().split("(\\s|\\+)"));
+        var clientId = dataRequest.getClientId();
+
+        profileService.updateProfileAttributes(userId, clientId, scopes, profileUpdate);
 
         // check if profile update is allowed
         // read profile attributes to update from request

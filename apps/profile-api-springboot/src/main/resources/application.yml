@@ -20,6 +20,7 @@ acme:
 
 server:
   port: 4653
+  host: 0.0.0.0
   ssl:
     enabled: true
     key-store: ../../config/stage/dev/tls/acme.test+1.p12

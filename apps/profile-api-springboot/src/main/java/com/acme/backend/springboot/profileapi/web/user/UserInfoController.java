@@ -20,6 +20,8 @@ import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileS
 
 /**
  * Custom UserInfo endpoint is intended as a replacement for Keycloak's Userinfo endpoint.
+ *
+ * Use with app-greetme: &userinfo_url=https://apps.acme.test:4653/api/users/me
  */
 @Slf4j
 @RestController
@@ -76,7 +78,7 @@ class UserInfoController {
     }
 
     private void addProfileAttributesToUserInfo(String clientId, UserProfile profile, Set<String> scopes, LinkedHashMap<String, Object> userInfo) {
-        var profileAttributes = profileService.getProfileAttributes(clientId, scopes, profile);
+        var profileAttributes = profileService.getProfileAttributes(profile, clientId, scopes);
         for (var entry : profileAttributes.entrySet()) {
             entry.getValue().forEach(attr -> userInfo.put(attr.getClaimName(), attr.getValue()));
         }

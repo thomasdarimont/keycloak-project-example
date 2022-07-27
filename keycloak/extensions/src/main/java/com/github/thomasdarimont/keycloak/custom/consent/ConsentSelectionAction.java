@@ -241,7 +241,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     @Override
     public void processAction(RequiredActionContext context) {
         // handle consent selection from user
-        var formParameters = context.getHttpRequest().getFormParameters();
+        var formParameters = context.getHttpRequest().getDecodedFormParameters();
 
         var authSession = context.getAuthenticationSession();
         var session = context.getSession();
