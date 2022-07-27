@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -47,6 +48,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
     private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
     public static final String DEFAULT_CLIENT = "default";
+    public static final String CONSENTED_FIELD_LIST = "CONSENTED_FIELD_LIST";
 
     private Map<String, List<ProfileAttribute>> getScopeFieldMapping(String clientId) {
 
@@ -199,11 +201,13 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, clientId, requestedScopeNames, userId) //
                 .getMapping();
 
+        var fieldNameList = new ArrayList<String>();
         var scopes = new ArrayList<ScopeBean>();
         for (var currentScopes : List.of(grantedRequired, missingRequired, grantedOptional, missingOptional)) {
             for (var scope : currentScopes) {
 
                 var fields = scopeFieldMapping.getOrDefault(scope.getName(), List.of()).stream().map(fun).collect(toList());
+                fields.stream().map(ScopeFieldBean::getName).forEach(fieldNameList::add);
                 var optional = currentScopes == grantedOptional || currentScopes == missingOptional;
                 var granted = currentScopes == grantedRequired || currentScopes == grantedOptional;
                 scopes.add(new ScopeBean(scope, optional, granted, fields));
@@ -211,6 +215,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         }
 
         scopes.sort(ScopeBean.DEFAULT_ORDER);
+        authSession.setAuthNote(CONSENTED_FIELD_LIST, String.join(",",fieldNameList));
 
         try {
             System.out.printf("Scope Profile Field Mapping: %s%n", JsonSerialization.writeValueAsString(scopes));
@@ -248,12 +253,13 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         event.client(client).user(user).event(EventType.GRANT_CONSENT);
 
+        var userId = user.getId();
         if (formParameters.getFirst("cancel") != null) {
             // User choose NOT to update consented scopes
 
             event.error(Errors.CONSENT_DENIED);
             // return to the application without consent update
-            UserConsentModel consentModel = session.users().getConsentByClient(realm, user.getId(), client.getId());
+            UserConsentModel consentModel = session.users().getConsentByClient(realm, userId, client.getId());
             if (consentModel == null) {
                 // No consents given: Deny access to application
                 context.failure();
@@ -268,9 +274,10 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             }
 
             var currentGrantedScopesIds = currentGrantedScopes.stream().map(ClientScopeModel::getId).collect(Collectors.toSet());
-            var currentGrantedScopeNames = currentGrantedScopes.stream().map(ClientScopeModel::getName).collect(Collectors.joining(" "));
+            var currentGrantedScopeNames = currentGrantedScopes.stream().map(ClientScopeModel::getName).collect(Collectors.toSet());
+            var currentGrantedScopeNamesAsScope = String.join(",", currentGrantedScopeNames);
             context.getAuthenticationSession().setClientScopes(currentGrantedScopesIds);
-            context.getAuthenticationSession().setClientNote(OAuth2Constants.SCOPE, "openid " + currentGrantedScopeNames);
+            context.getAuthenticationSession().setClientNote(OAuth2Constants.SCOPE, "openid " + currentGrantedScopeNamesAsScope);
 
             // Allow access to application (with original consented scopes)
             context.success();
@@ -295,25 +302,39 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
         if (!scopesToAskForConsent.isEmpty()) {
             // TODO find a way to merge the existing consent with the new consent instead of replacing the existing consent
-            var consentByClient = users.getConsentByClient(realm, user.getId(), client.getId());
+            var consentByClient = users.getConsentByClient(realm, userId, client.getId());
             if (consentByClient != null) {
-                users.revokeConsentForClient(realm, user.getId(), client.getId());
+                users.revokeConsentForClient(realm, userId, client.getId());
             }
             consentByClient = new UserConsentModel(client);
 
             scopesToAskForConsent.forEach(consentByClient::addGrantedClientScope);
 
-            users.addConsent(realm, user.getId(), consentByClient);
+            users.addConsent(realm, userId, consentByClient);
 
             var grantedScopeNames = consentByClient.getGrantedClientScopes().stream().map(ClientScopeModel::getName).collect(Collectors.toList());
             grantedScopeNames.add(0, OAuth2Constants.SCOPE_OPENID);
             var scope = String.join(" ", grantedScopeNames);
+
+            var consentedFieldList = List.of(authSession.getAuthNote(CONSENTED_FIELD_LIST).split(","));
+
+            var profileUpdate = new HashMap<String, String>();
+            for (var fieldName : consentedFieldList) {
+                profileUpdate.put(fieldName, formParameters.getFirst(fieldName));
+            }
+
+            var clientId = client.getClientId();
+            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, clientId, new LinkedHashSet<>(grantedScopeNames), userId, profileUpdate);
+            // check profile result
+            // if errors.isEmpty() -> proceed to context.success()
+            // else show / populate form again with validation errors -> proceed with context.challenge(..)
 
             // TODO find a better way to propagate the selected scopes
             authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
             event.detail(OAuth2Constants.SCOPE, scope).success();
         }
+
 
         // TODO ensure that required scopes are always consented
         authSession.removeRequiredAction(getId());

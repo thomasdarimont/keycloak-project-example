@@ -43,7 +43,7 @@ class ConsentFormController {
 
     // receive the update from the consent-form
     @PostMapping("/{userId}")
-    public Object updateForm(@PathVariable("userId") String userId, @RequestBody ConsentFormUpdateRequest updateRequest) {
+    public Object updateForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest, @RequestBody Map<String, String> profileUpdate) {
 
         // check if profile update is allowed
         // read profile attributes to update from request

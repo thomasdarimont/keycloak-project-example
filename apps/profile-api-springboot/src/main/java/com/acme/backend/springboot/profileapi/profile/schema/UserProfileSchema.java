@@ -57,8 +57,8 @@ public class UserProfileSchema {
                 .name("firstname") //
                 .claimName("given_name") //
                 .type("text") //
-                .readonly(true) //
-                .required(false) //
+                .readonly(false) //
+                .required(true) //
                 .accessor(UserProfile::getFirstName) //
                 .mutator(UserProfile::setFirstName) //
                 .build();
@@ -82,7 +82,7 @@ public class UserProfileSchema {
         UserProfileAttribute PHONE_NUMBER = newAttribute() //
                 .name("phoneNumber") //
                 .claimName("phone_number").type("tel") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getPhoneNumber) //
                 .mutator(UserProfile::setPhoneNumber) //
@@ -90,7 +90,7 @@ public class UserProfileSchema {
         UserProfileAttribute BIRTHDATE = newAttribute() //
                 .name("birthdate") //
                 .type("text") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getBirthdate) //
                 .mutator(UserProfile::setBirthdate) //
@@ -103,7 +103,7 @@ public class UserProfileSchema {
                 .name("address.street") //
                 .claimName("address_street") //
                 .type("text") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getAddressStreet) //
                 .mutator(UserProfile::setAddressStreet) //
@@ -112,7 +112,7 @@ public class UserProfileSchema {
                 .name("address.careOf") //
                 .claimName("address_care_of") //
                 .type("text") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getAddressCareOf) //
                 .mutator(UserProfile::setAddressCareOf) //
@@ -121,7 +121,7 @@ public class UserProfileSchema {
                 .name("address.postalCode") //
                 .claimName("address_postal_code") //
                 .type("text") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getAddressPostalCode) //
                 .mutator(UserProfile::setAddressPostalCode) //
@@ -130,7 +130,7 @@ public class UserProfileSchema {
                 .name("address.region") //
                 .claimName("address_region") //
                 .type("text") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getAddressRegion) //
                 .mutator(UserProfile::setAddressRegion) //
@@ -139,7 +139,7 @@ public class UserProfileSchema {
                 .name("address.country") //
                 .claimName("address_country") //
                 .type("text") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(false) //
                 .accessor(UserProfile::getAddressCountry) //
                 .mutator(UserProfile::setAddressCountry) //

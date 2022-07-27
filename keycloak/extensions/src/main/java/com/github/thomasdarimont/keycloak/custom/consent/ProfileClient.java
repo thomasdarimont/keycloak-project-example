@@ -7,6 +7,7 @@ import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.models.KeycloakSession;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,9 +57,37 @@ public class ProfileClient {
         return result;
     }
 
+    public static ConsentFormUpdateProfileResult updateProfileAttributesFromConsentForm(
+            KeycloakSession session, String clientId, Set<String> scopeNames, String userId, Map<String, String> profileUpdate) {
+
+        // TODO create confidential client with service-accounts enabled
+        var accessToken = TokenUtils.generateServiceAccountAccessToken(session, "app-demo-service", "", null);
+
+        // TODO externalize URL
+        var url = String.format("https://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
+                userId, clientId, String.join("+", scopeNames));
+
+        var http = SimpleHttp.doPost(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000) //
+                .json(profileUpdate);
+
+        try {
+            var response = http.asResponse();
+            var body = toResponse(response, ConsentFormUpdateProfileResult.class);
+            return body;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Data
     public static class ConsentFormProfileDataResponse {
 
         private Map<String, List<ProfileAttribute>> mapping;
+    }
+
+    @Data
+    public static class ConsentFormUpdateProfileResult {
+
+        private Map<String, Object> errors;
     }
 }

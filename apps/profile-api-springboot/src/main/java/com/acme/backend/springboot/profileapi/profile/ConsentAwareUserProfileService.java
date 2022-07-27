@@ -56,6 +56,8 @@ public class ConsentAwareUserProfileService {
 
     private PopulatedUserProfileAttribute populate(UserProfileAttribute attribute, UserProfile profile) {
 
+        // TODO: discuss do we need support for computing attribute values depending on the clientId / scope?
+
         var value = Optional //
                 .ofNullable(attribute.getAccessor()) //
                 .map(extractor -> extractor.apply(profile)) //

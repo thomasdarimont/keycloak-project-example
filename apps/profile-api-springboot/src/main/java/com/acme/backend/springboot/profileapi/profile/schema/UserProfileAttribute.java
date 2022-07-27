@@ -59,16 +59,21 @@ public class UserProfileAttribute {
      * @return
      */
     public Builder customize() {
-        return newAttribute() //
+        var builder = newAttribute() //
                 .name(name) //
                 .claimName(claimName) //
                 .type(type) //
                 .defaultValue(defaultValue) //
-                .allowedValues(new LinkedHashSet<>(allowedValues)) //
                 .readonly(readonly) //
                 .required(required) //
                 .accessor(accessor) //
                 .mutator(mutator);
+
+        if (allowedValues != null) {
+            builder.allowedValues(new LinkedHashSet<>(allowedValues));
+        }
+
+        return builder;
     }
 
     @ToString

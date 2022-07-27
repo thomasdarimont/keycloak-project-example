@@ -15,7 +15,7 @@ import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileS
 @Component
 public class UserProfileSchemaRepository {
 
-    public static final String DEFAULT_ATTRIBUTES_KEY = "default";
+    public static final String DEFAULT_MAPPING_CONTEXT_KEY = "default";
 
     public UserProfileSchema getProfileSchema(String clientId) {
 
@@ -24,7 +24,7 @@ public class UserProfileSchemaRepository {
         var map = new HashMap<String, List<UserProfileAttribute>>();
 
         // add default scope field mapping
-        copyScopeAttributeMappings(clientToUserProfileAttributes.get(DEFAULT_ATTRIBUTES_KEY), map);
+        copyScopeAttributeMappings(clientToUserProfileAttributes.get(DEFAULT_MAPPING_CONTEXT_KEY), map);
 
         // override default scope attribute mapping if necessary
         if (clientToUserProfileAttributes.containsKey(clientId)) {
@@ -37,7 +37,7 @@ public class UserProfileSchemaRepository {
     private Map<String, List<ScopedUserProfileAttributes>> getUserProfileAttributeMapping() {
         var map = new HashMap<String, List<ScopedUserProfileAttributes>>();
 
-        map.put(DEFAULT_ATTRIBUTES_KEY, List.of(
+        map.put(DEFAULT_MAPPING_CONTEXT_KEY, List.of(
                 new ScopedUserProfileAttributes(Scope.EMAIL, PersonAttributes.EMAIL), //
                 new ScopedUserProfileAttributes(Scope.PHONE, PersonAttributes.PHONE_NUMBER), //
                 new ScopedUserProfileAttributes(Scope.BIRTHDATE, PersonAttributes.BIRTHDATE), //
@@ -59,6 +59,12 @@ public class UserProfileSchemaRepository {
                 )));
 
         // TODO add client specific mappings here
+        map.put("myClient", List.of(
+                new ScopedUserProfileAttributes(Scope.NAME, //
+                        PersonAttributes.FIRSTNAME, //
+                        PersonAttributes.LASTNAME.customize().required(false).build() //
+                )
+        ));
 
         return map;
     }
