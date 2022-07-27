@@ -5,6 +5,8 @@ import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
 import com.acme.backend.springboot.profileapi.profile.model.UserProfileRepository;
 import com.acme.backend.springboot.profileapi.profile.schema.UserProfileAttribute;
 import com.acme.backend.springboot.profileapi.profile.schema.UserProfileSchemaRepository;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationError;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationErrors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +72,9 @@ public class ConsentAwareUserProfileService {
     }
 
 
-    public void updateProfileAttributes(String userId, String clientId, Set<String> scopes, Map<String, String> profileUpdate) {
+    public void updateProfileAttributes(String userId, String clientId, Set<String> scopes, //
+                                        Map<String, String> profileUpdate, //
+                                        UserProfileAttributeValidationErrors validationErrors) {
         var profile = userProfileRepository.getProfileByUserId(userId);
 
         userConsentRepository.updateConsent(userId, clientId, scopes);
@@ -91,14 +95,15 @@ public class ConsentAwareUserProfileService {
                     continue;
                 }
 
-                var newAttributeValue = profileUpdate.get(attribute.getName());
-
-                attribute.getMutator().accept(profile, newAttributeValue);
+                var newValue = profileUpdate.get(attribute.getName());
+                if (attribute.isValid(profile, newValue, validationErrors)) {
+                    attribute.update(profile, newValue);
+                }
             }
         }
 
         // update internal attributes
-        if (profileUpdate.containsKey("email_verified")){
+        if (profileUpdate.containsKey("email_verified")) {
             profile.setEmailVerified(Boolean.parseBoolean(profileUpdate.get("email_verified")));
         }
 

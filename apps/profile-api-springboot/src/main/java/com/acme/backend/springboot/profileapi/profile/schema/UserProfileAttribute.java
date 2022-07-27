@@ -1,11 +1,16 @@
 package com.acme.backend.springboot.profileapi.profile.schema;
 
 import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidation;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationError;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationErrors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.ObjectUtils;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -42,6 +47,8 @@ public class UserProfileAttribute {
 
     private BiConsumer<UserProfile, String> mutator;
 
+    private UserProfileAttributeValidation validation;
+
     public static Builder newAttribute() {
         return new Builder();
     }
@@ -51,6 +58,19 @@ public class UserProfileAttribute {
             return claimName;
         }
         return this.name;
+    }
+
+    public boolean isValid(UserProfile profile, String newValue, UserProfileAttributeValidationErrors errors) {
+
+        if (validation != null) {
+            return validation.test(profile, this, newValue, errors);
+        }
+
+        return !required || !ObjectUtils.isEmpty(newValue);
+    }
+
+    public void update(UserProfile profile, String newValue) {
+        mutator.accept(profile, newValue);
     }
 
     /**
@@ -67,7 +87,9 @@ public class UserProfileAttribute {
                 .readonly(readonly) //
                 .required(required) //
                 .accessor(accessor) //
-                .mutator(mutator);
+                .mutator(mutator) //
+                .validation(validation) //
+                ;
 
         if (allowedValues != null) {
             builder.allowedValues(new LinkedHashSet<>(allowedValues));
@@ -88,6 +110,8 @@ public class UserProfileAttribute {
         private Function<UserProfile, String> accessor;
 
         private BiConsumer<UserProfile, String> mutator;
+
+        private UserProfileAttributeValidation validation;
 
         public Builder name(String name) {
             this.name = name;
@@ -134,8 +158,13 @@ public class UserProfileAttribute {
             return this;
         }
 
+        public Builder validation(UserProfileAttributeValidation validation) {
+            this.validation = validation;
+            return this;
+        }
+
         public UserProfileAttribute build() {
-            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readonly, accessor, mutator);
+            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readonly, accessor, mutator, validation);
         }
     }
 }

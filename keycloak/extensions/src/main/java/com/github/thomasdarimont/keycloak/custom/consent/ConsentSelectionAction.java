@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -215,7 +214,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         }
 
         scopes.sort(ScopeBean.DEFAULT_ORDER);
-        authSession.setAuthNote(CONSENTED_FIELD_LIST, String.join(",",fieldNameList));
+        authSession.setAuthNote(CONSENTED_FIELD_LIST, String.join(",", fieldNameList));
 
         try {
             System.out.printf("Scope Profile Field Mapping: %s%n", JsonSerialization.writeValueAsString(scopes));
@@ -303,6 +302,29 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         if (!scopesToAskForConsent.isEmpty()) {
             // TODO find a way to merge the existing consent with the new consent instead of replacing the existing consent
             var consentByClient = users.getConsentByClient(realm, userId, client.getId());
+
+
+            var consentedFieldList = List.of(authSession.getAuthNote(CONSENTED_FIELD_LIST).split(","));
+
+            var profileUpdate = new HashMap<String, String>();
+            for (var fieldName : consentedFieldList) {
+                profileUpdate.put(fieldName, formParameters.getFirst(fieldName));
+            }
+
+            var askedScopeNames = scopesToAskForConsent.stream().map(ClientScopeModel::getName).collect(Collectors.toSet());
+            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, client,
+                    new LinkedHashSet<>(askedScopeNames), user, profileUpdate);
+            // check profile result
+            if (profileUpdateResult.getErrors() != null && !profileUpdateResult.getErrors().isEmpty()) {
+
+                context.challenge(createForm(context, form -> {
+                    System.out.println("customize form with validation errors");
+                }));
+                return;
+            }
+            // if errors.isEmpty() -> proceed to context.success()
+            // else show / populate form again with validation errors -> proceed with context.challenge(..)
+
             if (consentByClient != null) {
                 users.revokeConsentForClient(realm, userId, client.getId());
             }
@@ -316,18 +338,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             grantedScopeNames.add(0, OAuth2Constants.SCOPE_OPENID);
             var scope = String.join(" ", grantedScopeNames);
 
-            var consentedFieldList = List.of(authSession.getAuthNote(CONSENTED_FIELD_LIST).split(","));
-
-            var profileUpdate = new HashMap<String, String>();
-            for (var fieldName : consentedFieldList) {
-                profileUpdate.put(fieldName, formParameters.getFirst(fieldName));
-            }
-
-            var clientId = client.getClientId();
-            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, client, new LinkedHashSet<>(grantedScopeNames), user, profileUpdate);
-            // check profile result
-            // if errors.isEmpty() -> proceed to context.success()
-            // else show / populate form again with validation errors -> proceed with context.challenge(..)
 
             // TODO find a better way to propagate the selected scopes
             authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);

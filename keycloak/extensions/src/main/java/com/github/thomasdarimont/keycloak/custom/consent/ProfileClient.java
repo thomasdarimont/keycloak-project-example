@@ -94,6 +94,14 @@ public class ProfileClient {
     @Data
     public static class ConsentFormUpdateProfileResult {
 
-        private Map<String, Object> errors;
+        private List<ProfileAttributeError> errors;
+    }
+
+    @Data
+    public static class ProfileAttributeError {
+
+        private String type;
+
+        private String attributeName;
     }
 }

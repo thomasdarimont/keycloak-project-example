@@ -1,14 +1,17 @@
 package com.acme.backend.springboot.profileapi.profile.schema;
 
 import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidations;
 import lombok.Data;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileAttribute.newAttribute;
+import static com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidations.NOT_EMPTY;
 
 @Data
 public class UserProfileSchema {
@@ -44,6 +47,7 @@ public class UserProfileSchema {
                 .required(false) //
                 .accessor(UserProfile::getSalutation) //
                 .mutator(UserProfile::setSalutation) //
+                .validation(NOT_EMPTY)
                 .build();
         UserProfileAttribute TITLE = newAttribute() //
                 .name("title") //
@@ -143,6 +147,7 @@ public class UserProfileSchema {
                 .required(false) //
                 .accessor(UserProfile::getAddressCountry) //
                 .mutator(UserProfile::setAddressCountry) //
+                .allowedValues(new LinkedHashSet<>(List.of("DE","FR","ES","EN")))
                 .build();
     }
 }

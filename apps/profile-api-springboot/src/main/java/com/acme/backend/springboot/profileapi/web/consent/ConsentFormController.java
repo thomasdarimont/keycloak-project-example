@@ -1,6 +1,8 @@
 package com.acme.backend.springboot.profileapi.web.consent;
 
 import com.acme.backend.springboot.profileapi.profile.ConsentAwareUserProfileService;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationError;
+import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationErrors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,14 +46,16 @@ class ConsentFormController {
 
     // receive the update from the consent-form
     @PostMapping("/{userId}")
-    public Object updateForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest, @RequestBody Map<String, String> profileUpdate) {
+    public ConsentFormUpdateResponse updateForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest, @RequestBody Map<String, String> profileUpdate) {
 
         log.info("### Update Profile attributes from consent form: {}", httpRequest.getRequestURI());
 
         var scopes = Set.of(dataRequest.getScope().split("(\\s|\\+)"));
         var clientId = dataRequest.getClientId();
 
-        profileService.updateProfileAttributes(userId, clientId, scopes, profileUpdate);
+
+        var validationErrors = new UserProfileAttributeValidationErrors();
+        profileService.updateProfileAttributes(userId, clientId, scopes, profileUpdate, validationErrors);
 
         // check if profile update is allowed
         // read profile attributes to update from request
@@ -61,7 +66,7 @@ class ConsentFormController {
 
         // return success response
         // after this requests for userinfo should reflect the new userprofile values (eventually?)
-        return Map.of();
+        return new ConsentFormUpdateResponse(validationErrors.getErrors());
     }
 
     //Delete?
