@@ -17,7 +17,11 @@ public class UserProfileRepository {
     }
 
     public UserProfile getProfileByUserId(String userId) {
-        return profiles.get("");
+        return profiles.computeIfAbsent(userId, id -> {
+            var profile = new UserProfile();
+            profile.setId(userId);
+            return profile;
+        });
     }
 
     private UserProfile getTesterProfile() {

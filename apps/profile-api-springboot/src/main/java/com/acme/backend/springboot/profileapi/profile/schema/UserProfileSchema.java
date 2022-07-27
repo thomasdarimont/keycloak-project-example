@@ -74,7 +74,7 @@ public class UserProfileSchema {
         UserProfileAttribute EMAIL = newAttribute() //
                 .name("email") //
                 .type("email") //
-                .readonly(true) //
+                .readonly(false) //
                 .required(true) //
                 .accessor(UserProfile::getEmail) //
                 .mutator(UserProfile::setEmail) //
