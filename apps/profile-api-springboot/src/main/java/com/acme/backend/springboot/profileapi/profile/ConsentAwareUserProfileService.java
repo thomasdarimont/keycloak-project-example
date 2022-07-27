@@ -97,5 +97,10 @@ public class ConsentAwareUserProfileService {
             }
         }
 
+        // update internal attributes
+        if (profileUpdate.containsKey("email_verified")){
+            profile.setEmailVerified(Boolean.parseBoolean(profileUpdate.get("email_verified")));
+        }
+
     }
 }

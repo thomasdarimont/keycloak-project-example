@@ -3,6 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.consent;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.keycloak.models.UserModel;
+import org.keycloak.utils.StringUtil;
 
 @Data
 public class ScopeFieldBean {
@@ -23,9 +24,13 @@ public class ScopeFieldBean {
 
     public String getValue() {
         if (attribute instanceof KeycloakProfileAttribute) {
-            return ((KeycloakProfileAttribute)attribute).getValue(user);
+            return ((KeycloakProfileAttribute) attribute).getValue(user);
         }
-        return attribute.getValue();
+        String value = attribute.getValue();
+        if (StringUtil.isBlank(value) && "email".equals(getName())) {
+            value = user.getEmail();
+        }
+        return value;
     }
 
     public boolean isRequired() {

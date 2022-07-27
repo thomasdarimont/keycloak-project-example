@@ -193,12 +193,12 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var grantedOptional = scopeInfo.getGrantedOptional();
         var missingRequired = scopeInfo.getMissingRequired();
         var missingOptional = scopeInfo.getMissingOptional();
-        var clientId = authSession.getClient().getClientId();
+        var client = authSession.getClient();
 
         // var scopeFieldMapping = getScopeFieldMapping(clientId);
         var requestedScopeNames = scopeInfo.getRequestedScopeNames();
         var userId = user.getId();
-        var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, clientId, requestedScopeNames, userId) //
+        var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, client, requestedScopeNames, user) //
                 .getMapping();
 
         var fieldNameList = new ArrayList<String>();
@@ -324,7 +324,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             }
 
             var clientId = client.getClientId();
-            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, clientId, new LinkedHashSet<>(grantedScopeNames), userId, profileUpdate);
+            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, client, new LinkedHashSet<>(grantedScopeNames), user, profileUpdate);
             // check profile result
             // if errors.isEmpty() -> proceed to context.success()
             // else show / populate form again with validation errors -> proceed with context.challenge(..)

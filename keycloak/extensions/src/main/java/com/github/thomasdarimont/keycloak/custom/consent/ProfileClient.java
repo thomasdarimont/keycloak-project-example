@@ -4,7 +4,9 @@ import com.github.thomasdarimont.keycloak.custom.support.TokenUtils;
 import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.UserModel;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,14 +17,14 @@ import java.util.Set;
 @JBossLog
 public class ProfileClient {
 
-    public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, String clientId, Set<String> scopeNames, String userId) {
+    public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, ClientModel client, Set<String> scopeNames, UserModel user) {
 
         // TODO create confidential client with service-accounts enabled
         var accessToken = TokenUtils.generateServiceAccountAccessToken(session, "app-demo-service", "", null);
 
         // TODO externalize URL
         var url = String.format("https://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
-                userId, clientId, String.join("+", scopeNames));
+                user.getId(), client.getClientId(), String.join("+", scopeNames));
 
         var http = SimpleHttp.doGet(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000);
 
@@ -58,14 +60,18 @@ public class ProfileClient {
     }
 
     public static ConsentFormUpdateProfileResult updateProfileAttributesFromConsentForm(
-            KeycloakSession session, String clientId, Set<String> scopeNames, String userId, Map<String, String> profileUpdate) {
+            KeycloakSession session, ClientModel client, Set<String> scopeNames, UserModel user, Map<String, String> profileUpdate) {
 
         // TODO create confidential client with service-accounts enabled
         var accessToken = TokenUtils.generateServiceAccountAccessToken(session, "app-demo-service", "", null);
 
         // TODO externalize URL
         var url = String.format("https://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
-                userId, clientId, String.join("+", scopeNames));
+                user.getId(), client.getClientId(), String.join("+", scopeNames));
+
+        if (profileUpdate.containsKey("email") && profileUpdate.get("email") != null) {
+            profileUpdate.put("email_verified", String.valueOf(user.isEmailVerified()));
+        }
 
         var http = SimpleHttp.doPost(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000) //
                 .json(profileUpdate);
