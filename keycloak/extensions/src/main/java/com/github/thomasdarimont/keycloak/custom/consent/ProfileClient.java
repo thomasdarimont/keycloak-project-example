@@ -1,15 +1,18 @@
 package com.github.thomasdarimont.keycloak.custom.consent;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import com.github.thomasdarimont.keycloak.custom.support.TokenUtils;
 import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,24 +20,67 @@ import java.util.Set;
 @JBossLog
 public class ProfileClient {
 
-    public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, ClientModel client, Set<String> scopeNames, UserModel user) {
+    public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, Set<String> scopeNames, UserModel user) {
 
-        // TODO create confidential client with service-accounts enabled
-        var accessToken = TokenUtils.generateServiceAccountAccessToken(session, "app-demo-service", "", null);
+        var accessToken = getServiceAccountAccessToken(session, realm);
 
-        // TODO externalize URL
-        var url = String.format("https://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
-                user.getId(), client.getClientId(), String.join("+", scopeNames));
+        var url = UriBuilder.fromUri(getProfileApiBaseUrl(realm)) //
+                .path("/consentForm/{userId}") //
+                .queryParam("clientId", client.getClientId()) //
+                .queryParam("scope", String.join("+", scopeNames)) //
+                .buildFromMap(Map.of("userId", user.getId())) //
+                .toString();
 
         var http = SimpleHttp.doGet(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000);
 
         try {
             var response = http.asResponse();
-            var body = toResponse(response, ConsentFormProfileDataResponse.class);
-            return body;
+
+            // TODO handle response error
+
+            return toResponse(response, ConsentFormProfileDataResponse.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static ConsentFormUpdateProfileResult updateProfileAttributesFromConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, Set<String> scopeNames, UserModel user, Map<String, String> profileUpdate) {
+
+        var accessToken = getServiceAccountAccessToken(session, realm);
+
+        var url = UriBuilder.fromUri(getProfileApiBaseUrl(realm)) //
+                .path("/consentForm/{userId}") //
+                .queryParam("clientId", client.getClientId()) //
+                .queryParam("scope", String.join("+", scopeNames)) //
+                .buildFromMap(Map.of("userId", user.getId())) //
+                .toString();
+
+        // special handling for email address verified state, since is managed by Keycloak
+        if (profileUpdate.containsKey("email") && profileUpdate.get("email") != null) {
+            profileUpdate.put("email_verified", String.valueOf(user.isEmailVerified()));
+        }
+
+        var http = SimpleHttp.doPost(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000) //
+                .json(profileUpdate);
+
+        try {
+            var response = http.asResponse();
+
+            // TODO handle response error
+
+            return toResponse(response, ConsentFormUpdateProfileResult.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String getProfileApiBaseUrl(RealmModel realm) {
+        return new RealmConfig(realm).getString("custom.external.profile.api.base_url", "https://apps.acme.test:4653/api");
+    }
+
+    private static String getServiceAccountAccessToken(KeycloakSession session, RealmModel realm) {
+        var serviceAccountClientId = new RealmConfig(realm).getString("custom.external.profile.api.service_account.client_id", "app-demo-service");
+        return TokenUtils.generateServiceAccountAccessToken(session, serviceAccountClientId, "", null);
     }
 
     private static <T> T toResponse(SimpleHttp.Response response, Class<T> type) {
@@ -59,32 +105,6 @@ public class ProfileClient {
         return result;
     }
 
-    public static ConsentFormUpdateProfileResult updateProfileAttributesFromConsentForm(
-            KeycloakSession session, ClientModel client, Set<String> scopeNames, UserModel user, Map<String, String> profileUpdate) {
-
-        // TODO create confidential client with service-accounts enabled
-        var accessToken = TokenUtils.generateServiceAccountAccessToken(session, "app-demo-service", "", null);
-
-        // TODO externalize URL
-        var url = String.format("https://apps.acme.test:4653/api/consentForm/%s?clientId=%s&scope=%s", //
-                user.getId(), client.getClientId(), String.join("+", scopeNames));
-
-        if (profileUpdate.containsKey("email") && profileUpdate.get("email") != null) {
-            profileUpdate.put("email_verified", String.valueOf(user.isEmailVerified()));
-        }
-
-        var http = SimpleHttp.doPost(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000) //
-                .json(profileUpdate);
-
-        try {
-            var response = http.asResponse();
-            var body = toResponse(response, ConsentFormUpdateProfileResult.class);
-            return body;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Data
     public static class ConsentFormProfileDataResponse {
 
@@ -95,6 +115,11 @@ public class ProfileClient {
     public static class ConsentFormUpdateProfileResult {
 
         private List<ProfileAttributeError> errors;
+
+        @JsonIgnore
+        public boolean hasErrors() {
+            return errors != null && !errors.isEmpty();
+        }
     }
 
     @Data
@@ -103,5 +128,7 @@ public class ProfileClient {
         private String type;
 
         private String attributeName;
+
+        private String message;
     }
 }
