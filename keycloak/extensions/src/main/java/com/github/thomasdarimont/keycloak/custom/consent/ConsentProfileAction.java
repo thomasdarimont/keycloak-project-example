@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,65 +41,12 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 @AutoService(RequiredActionFactory.class)
-public class ConsentSelectionAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
+public class ConsentProfileAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
 
     private static final boolean REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE = false;
 
     private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
-    public static final String DEFAULT_CLIENT = "default";
     public static final String CONSENTED_FIELD_LIST = "CONSENTED_FIELD_LIST";
-
-    private Map<String, List<ProfileAttribute>> getScopeFieldMapping(String clientId) {
-
-        // Holds the client fields mapping, LinkedHashMap to retain insertion order
-        var clientToScopeFieldsMapping = new LinkedHashMap<String, List<ScopeFieldsMapping>>();
-        clientToScopeFieldsMapping.put(DEFAULT_CLIENT, List.of(
-
-                new ScopeFieldsMapping("email", List.of(new KeycloakProfileAttribute("email", "email", "email", true, true, UserModel::getEmail))),
-                new ScopeFieldsMapping("phone", List.of(new KeycloakProfileAttribute("phoneNumber", "phone_number", "tel", true, false, u -> u.getFirstAttribute("phoneNumber")))),
-                new ScopeFieldsMapping("birthdate", List.of(new KeycloakProfileAttribute("birthdate", "birthdate", "text", true, false, u -> u.getFirstAttribute("birthdate")))),
-                new ScopeFieldsMapping("firstname", List.of(new KeycloakProfileAttribute("firstName", "given_name", "text", true, false, UserModel::getFirstName))),
-
-                new ScopeFieldsMapping("name", List.of( //
-                        new KeycloakProfileAttribute("salutation", "salutation", "text", false, false, u -> u.getFirstAttribute("salutation")), //
-                        new KeycloakProfileAttribute("title", "title", "text", false, false, u -> u.getFirstAttribute("title")), //
-                        new KeycloakProfileAttribute("firstName", "given_name", "text", true, false, UserModel::getFirstName), //
-                        new KeycloakProfileAttribute("lastName", "family_name", "text", true, false, UserModel::getLastName) //
-                )),
-
-                new ScopeFieldsMapping("address", List.of( //
-                        new KeycloakProfileAttribute("address.street", "address.street", "text", true, false, u -> "Have it your way 42"), //
-                        new KeycloakProfileAttribute("address.careOf", "address.careOf", "text", false, false, u -> ""), //
-                        new KeycloakProfileAttribute("address.postalCode", "address.postalCode", "text", true, false, u -> "12345"), //
-                        new KeycloakProfileAttribute("address.city", "address.city", "text", true, false, u -> "Saarbrücken"), //
-                        new KeycloakProfileAttribute("address.region", "address.region", "text", false, false, u -> "Saarland"), //
-                        new KeycloakProfileAttribute("address.country", "address.country", "text", true, false, u -> "DE") //
-                ))
-        ));
-
-        var defaultScopeFieldsMappings = clientToScopeFieldsMapping.get("default");
-
-        var map = new HashMap<String, List<ProfileAttribute>>();
-
-        // add default scope field mapping
-        for (var scopeFieldsMapping : defaultScopeFieldsMappings) {
-            var fields = map.computeIfAbsent(scopeFieldsMapping.getScope(), ignored -> new ArrayList<>());
-            fields.addAll(scopeFieldsMapping.getFields());
-        }
-
-        // override default scope field mapping if necessary
-        if (clientToScopeFieldsMapping.containsKey(clientId)) {
-            var clientScopeFieldsMappings = clientToScopeFieldsMapping.get(clientId);
-            // remove default scope fields for overridden scopes
-            clientToScopeFieldsMapping.keySet().forEach(map::remove);
-            for (var scopeFieldsMapping : clientScopeFieldsMappings) {
-                var fields = map.computeIfAbsent(scopeFieldsMapping.getScope(), ignored -> new ArrayList<>());
-                fields.addAll(scopeFieldsMapping.getFields());
-            }
-        }
-
-        return Collections.unmodifiableMap(map);
-    }
 
     @Override
     public String getId() {
@@ -109,7 +55,7 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
 
     @Override
     public String getDisplayText() {
-        return "Acme: Dynamic Consent selection";
+        return "Acme: Dynamic Consent";
     }
 
     @Override
@@ -196,7 +142,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var client = authSession.getClient();
         var realm = context.getRealm();
 
-        // var scopeFieldMapping = getScopeFieldMapping(clientId);
         var requestedScopeNames = scopeInfo.getRequestedScopeNames();
         var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, realm, client, requestedScopeNames, user) //
                 .getMapping();
@@ -311,18 +256,13 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             }
 
             var askedScopeNames = scopesToAskForConsent.stream().map(ClientScopeModel::getName).collect(Collectors.toSet());
-            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, realm, client,
-                    new LinkedHashSet<>(askedScopeNames), user, profileUpdate);
-            // check profile result
-            // if errors.isEmpty() -> proceed to context.success()
-            // else show / populate form again with validation errors -> proceed with context.challenge(..)
+            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, realm, client, new LinkedHashSet<>(askedScopeNames), user, profileUpdate);
 
+            // check profile update result
             if (profileUpdateResult.hasErrors()) {
 
                 context.challenge(createForm(context, form -> {
-                    System.out.println("customize form with validation errors");
-                    // form.setAttribute("")
-
+                    // show / populate form again with validation errors -> proceed with context.challenge(..)
                     List<FormMessage> fieldErrors = profileUpdateResult.getErrors().stream() //
                             .map(attributeError -> new FormMessage(attributeError.getAttributeName(), attributeError.getMessage())).collect(toList());
                     form.setErrors(fieldErrors);
@@ -343,13 +283,11 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             grantedScopeNames.add(0, OAuth2Constants.SCOPE_OPENID);
             var scope = String.join(" ", grantedScopeNames);
 
-
             // TODO find a better way to propagate the selected scopes
             authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
 
             event.detail(OAuth2Constants.SCOPE, scope).success();
         }
-
 
         // TODO ensure that required scopes are always consented
         authSession.removeRequiredAction(getId());
@@ -459,11 +397,4 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         private final Map<String, ClientScopeModel> optional;
     }
 
-    @Data
-    static class ScopeFieldsMapping {
-
-        private final String scope;
-
-        private final List<ProfileAttribute> fields;
-    }
 }

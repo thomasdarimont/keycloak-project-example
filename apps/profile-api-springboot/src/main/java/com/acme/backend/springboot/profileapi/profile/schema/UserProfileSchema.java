@@ -1,7 +1,6 @@
 package com.acme.backend.springboot.profileapi.profile.schema;
 
 import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
-import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidations;
 import lombok.Data;
 
 import java.util.LinkedHashMap;
@@ -12,6 +11,8 @@ import java.util.Set;
 
 import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileAttribute.newAttribute;
 import static com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidations.NOT_EMPTY;
+import static java.util.Map.entry;
+import static java.util.Map.ofEntries;
 
 @Data
 public class UserProfileSchema {
@@ -47,13 +48,16 @@ public class UserProfileSchema {
                 .required(false) //
                 .accessor(UserProfile::getSalutation) //
                 .mutator(UserProfile::setSalutation) //
-                .validation(NOT_EMPTY)
+                .allowedValues(new LinkedHashSet<>(List.of("mr", "ms", "divers", ""))) //
+                .annotations(ofEntries(entry("inputType", "select"))) //
                 .build();
         UserProfileAttribute TITLE = newAttribute() //
                 .name("title") //
                 .type("text") //
                 .readonly(false) //
                 .required(false) //
+                .allowedValues(new LinkedHashSet<>(List.of("Dr.", "Prof. Dr.", ""))) //
+                .annotations(ofEntries(entry("inputType", "select"))) //
                 .accessor(UserProfile::getTitle) //
                 .mutator(UserProfile::setTitle) //
                 .build();
@@ -65,6 +69,7 @@ public class UserProfileSchema {
                 .required(true) //
                 .accessor(UserProfile::getFirstName) //
                 .mutator(UserProfile::setFirstName) //
+                .validation(NOT_EMPTY)
                 .build();
         UserProfileAttribute LASTNAME = newAttribute() //
                 .name("lastName") //
@@ -74,6 +79,7 @@ public class UserProfileSchema {
                 .required(true) //
                 .accessor(UserProfile::getLastName) //
                 .mutator(UserProfile::setLastName) //
+                .validation(NOT_EMPTY)
                 .build();
         UserProfileAttribute EMAIL = newAttribute() //
                 .name("email") //
@@ -147,7 +153,7 @@ public class UserProfileSchema {
                 .required(false) //
                 .accessor(UserProfile::getAddressCountry) //
                 .mutator(UserProfile::setAddressCountry) //
-                .allowedValues(new LinkedHashSet<>(List.of("DE","FR","ES","EN")))
+                .allowedValues(new LinkedHashSet<>(List.of("DE", "FR", "ES", "EN")))
                 .build();
     }
 }

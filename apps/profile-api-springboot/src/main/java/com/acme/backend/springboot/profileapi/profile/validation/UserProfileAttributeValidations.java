@@ -9,7 +9,7 @@ public interface UserProfileAttributeValidations {
         boolean valid = !ObjectUtils.isEmpty(newValue);
 
         if (!valid) {
-            errors.addError("NOT_EMPTY", attribute);
+            errors.addError("NOT_EMPTY", attribute, "error-empty");
         }
 
         return valid;

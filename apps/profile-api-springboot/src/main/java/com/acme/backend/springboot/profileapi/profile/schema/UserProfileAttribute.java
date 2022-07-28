@@ -2,15 +2,15 @@ package com.acme.backend.springboot.profileapi.profile.schema;
 
 import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
 import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidation;
-import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationError;
 import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationErrors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -40,13 +40,21 @@ public class UserProfileAttribute {
 
     private boolean readonly;
 
+    private Map<String, String> annotations;
+
     /**
      * Holds a function that defines the attribute value extraction logic.
      */
     private Function<UserProfile, String> accessor;
 
+    /**
+     * Holds a function that defines the attribute value mutation logic.
+     */
     private BiConsumer<UserProfile, String> mutator;
 
+    /**
+     * Holds a function that defines the attribute value validation logic.
+     */
     private UserProfileAttributeValidation validation;
 
     public static Builder newAttribute() {
@@ -64,6 +72,11 @@ public class UserProfileAttribute {
 
         if (validation != null) {
             return validation.test(profile, this, newValue, errors);
+        }
+
+        if (!CollectionUtils.isEmpty(allowedValues) && !allowedValues.contains(newValue)) {
+            errors.addError("NOT_ALLOWED", this, "error-invalid-value");
+            return false;
         }
 
         return !required || !ObjectUtils.isEmpty(newValue);
@@ -86,6 +99,7 @@ public class UserProfileAttribute {
                 .defaultValue(defaultValue) //
                 .readonly(readonly) //
                 .required(required) //
+                .annotations(annotations) //
                 .accessor(accessor) //
                 .mutator(mutator) //
                 .validation(validation) //
@@ -105,6 +119,7 @@ public class UserProfileAttribute {
         private String type;
         private String defaultValue;
         private Set<String> allowedValues;
+        private Map<String, String> annotations = Map.of();
         private boolean required;
         private boolean readonly;
         private Function<UserProfile, String> accessor;
@@ -148,6 +163,11 @@ public class UserProfileAttribute {
             return this;
         }
 
+        public Builder annotations(Map<String, String> annotations) {
+            this.annotations = annotations;
+            return this;
+        }
+
         public Builder accessor(Function<UserProfile, String> accessor) {
             this.accessor = accessor;
             return this;
@@ -164,7 +184,7 @@ public class UserProfileAttribute {
         }
 
         public UserProfileAttribute build() {
-            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readonly, accessor, mutator, validation);
+            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readonly, annotations, accessor, mutator, validation);
         }
     }
 }

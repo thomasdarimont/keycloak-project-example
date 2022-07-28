@@ -27,14 +27,14 @@
                                 </#if>
 
                                 <label for="${scope.name}-item">${msg(scope.name)}</label>
-                                <#--                                <span><#if scope.optional>(optional)</#if></span>-->
+                                <#--   <span><#if scope.optional>(optional)</#if></span>-->
                                 <input id="${scope.name}-item"
                                        type="checkbox"
                                        name="scopeSelection"
                                        value="${scope.name}"
                                        <#if !scope.optional>disabled</#if>
                                         <#if scope.granted || scope.optional>checked</#if>
-                                        <#--                                        <#if !scope.optional>class="hidden"</#if>-->
+                                        <#--  <#if !scope.optional>class="hidden"</#if>-->
                                        class="hidden"
                                 />
                                 <p>
@@ -55,6 +55,16 @@
                                         </div>
 
                                         <div class="${properties.kcInputWrapperClass!}">
+
+                                        <#if scopeField.annotations['inputType']?? && scopeField.annotations['inputType'] == 'select'>
+                                            <select name="${scopeField.name}" id="${scopeField.name}">
+                                                <#list scopeField.allowedValues as allowedValue>
+                                                <option value="${allowedValue}">${msg(allowedValue)}</option>
+                                                </#list>
+                                            </select>
+
+                                        <#else>
+
                                             <input id="${scopeField.name}"
                                                    type="${scopeField.type}"
                                                    name="${scopeField.name}"
@@ -62,6 +72,8 @@
                                                    <#if scopeField.readonly>disabled</#if>
 <#--                                                   -->
                                             />
+                                        </#if>
+
                                             <#if messagesPerField.existsError(scopeField.name)>
                                             <span id="input-error-${scopeField.name?replace(".","-")}" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
                                                 ${kcSanitize(messagesPerField.get(scopeField.name))?no_esc}

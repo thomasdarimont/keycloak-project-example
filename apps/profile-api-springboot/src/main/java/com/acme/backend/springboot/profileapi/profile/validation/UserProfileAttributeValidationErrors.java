@@ -11,7 +11,7 @@ public class UserProfileAttributeValidationErrors {
 
     private final List<UserProfileAttributeValidationError> errors = new ArrayList<>();
 
-    public void addError(String type, UserProfileAttribute attribute) {
-        errors.add(new UserProfileAttributeValidationError(type, attribute.getName(), "error-empty"));
+    public void addError(String type, UserProfileAttribute attribute, String message) {
+        errors.add(new UserProfileAttributeValidationError(type, attribute.getName(), message));
     }
 }

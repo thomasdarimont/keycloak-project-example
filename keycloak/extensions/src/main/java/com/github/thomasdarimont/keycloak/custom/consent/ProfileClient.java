@@ -20,40 +20,31 @@ import java.util.Set;
 @JBossLog
 public class ProfileClient {
 
-    public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, Set<String> scopeNames, UserModel user) {
+    public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, //
+                                                                                    Set<String> scopeNames, UserModel user) {
 
+        var url = getConsentFormUrl(realm, client, scopeNames, user);
         var accessToken = getServiceAccountAccessToken(session, realm);
-
-        var url = UriBuilder.fromUri(getProfileApiBaseUrl(realm)) //
-                .path("/consentForm/{userId}") //
-                .queryParam("clientId", client.getClientId()) //
-                .queryParam("scope", String.join("+", scopeNames)) //
-                .buildFromMap(Map.of("userId", user.getId())) //
-                .toString();
-
         var http = SimpleHttp.doGet(url, session).auth(accessToken).socketTimeOutMillis(60 * 1000);
 
         try {
             var response = http.asResponse();
 
-            // TODO handle response error
-
+            if (response.getStatus() >= 400 && response.getStatus() <= 599) {
+                log.warnf("external profile fetch failed. realm=%s userId=%s status=%s", //
+                        realm.getName(), user.getId(), response.getStatus());
+            }
             return toResponse(response, ConsentFormProfileDataResponse.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static ConsentFormUpdateProfileResult updateProfileAttributesFromConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, Set<String> scopeNames, UserModel user, Map<String, String> profileUpdate) {
+    public static ConsentFormUpdateProfileResult updateProfileAttributesFromConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, //
+                                                                                        Set<String> scopeNames, UserModel user, Map<String, String> profileUpdate) {
 
+        var url = getConsentFormUrl(realm, client, scopeNames, user);
         var accessToken = getServiceAccountAccessToken(session, realm);
-
-        var url = UriBuilder.fromUri(getProfileApiBaseUrl(realm)) //
-                .path("/consentForm/{userId}") //
-                .queryParam("clientId", client.getClientId()) //
-                .queryParam("scope", String.join("+", scopeNames)) //
-                .buildFromMap(Map.of("userId", user.getId())) //
-                .toString();
 
         // special handling for email address verified state, since is managed by Keycloak
         if (profileUpdate.containsKey("email") && profileUpdate.get("email") != null) {
@@ -65,22 +56,34 @@ public class ProfileClient {
 
         try {
             var response = http.asResponse();
-
-            // TODO handle response error
-
+            if (response.getStatus() >= 400 && response.getStatus() <= 599) {
+                log.warnf("external profile update failed. realm=%s userId=%s status=%s", //
+                        realm.getName(), user.getId(), response.getStatus());
+            }
             return toResponse(response, ConsentFormUpdateProfileResult.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static String getProfileApiBaseUrl(RealmModel realm) {
-        return new RealmConfig(realm).getString("custom.external.profile.api.base_url", "https://apps.acme.test:4653/api");
+    private static String getServiceAccountAccessToken(KeycloakSession session, RealmModel realm) {
+        var serviceAccountClientId = new RealmConfig(realm) //
+                .getString("custom.external.profile.api.service_account.client_id", "app-demo-service");
+        return TokenUtils.generateServiceAccountAccessToken(session, serviceAccountClientId, "", null);
     }
 
-    private static String getServiceAccountAccessToken(KeycloakSession session, RealmModel realm) {
-        var serviceAccountClientId = new RealmConfig(realm).getString("custom.external.profile.api.service_account.client_id", "app-demo-service");
-        return TokenUtils.generateServiceAccountAccessToken(session, serviceAccountClientId, "", null);
+    private static String getProfileApiBaseUrl(RealmModel realm) {
+        return new RealmConfig(realm) //
+                .getString("custom.external.profile.api.base_url", "https://apps.acme.test:4653/api");
+    }
+
+    private static String getConsentFormUrl(RealmModel realm, ClientModel client, Set<String> scopeNames, UserModel user) {
+        return UriBuilder.fromUri(getProfileApiBaseUrl(realm)) //
+                .path("/consentForm/{userId}") //
+                .queryParam("clientId", client.getClientId()) //
+                .queryParam("scope", String.join("+", scopeNames)) //
+                .buildFromMap(Map.of("userId", user.getId())) //
+                .toString();
     }
 
     private static <T> T toResponse(SimpleHttp.Response response, Class<T> type) {

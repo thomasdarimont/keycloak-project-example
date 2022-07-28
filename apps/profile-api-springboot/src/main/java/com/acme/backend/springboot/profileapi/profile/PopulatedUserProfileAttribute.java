@@ -3,6 +3,9 @@ package com.acme.backend.springboot.profileapi.profile;
 import com.acme.backend.springboot.profileapi.profile.schema.UserProfileAttribute;
 import lombok.Data;
 
+import java.util.Map;
+import java.util.Set;
+
 @Data
 public class PopulatedUserProfileAttribute {
 
@@ -18,6 +21,10 @@ public class PopulatedUserProfileAttribute {
 
     private String value;
 
+    private Set<String> allowedValues;
+
+    private Map<String, String> annotations;
+
     public PopulatedUserProfileAttribute(UserProfileAttribute source, String value) {
         this.name = source.getName();
         this.claimName = source.toClaimName();
@@ -25,6 +32,8 @@ public class PopulatedUserProfileAttribute {
         this.readonly = source.isRequired();
         this.readonly = source.isReadonly();
         this.value = value;
+        this.allowedValues = source.getAllowedValues();
+        this.annotations = source.getAnnotations();
     }
 
 }
