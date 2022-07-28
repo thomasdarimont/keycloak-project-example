@@ -46,6 +46,10 @@ class WebSecurityConfig {
         });
         http.cors(this::configureCors);
         http.authorizeRequests(arc -> {
+            // see https://localhost:4653/swagger-ui/index.html
+            arc.mvcMatchers("/swagger-ui/**").permitAll();
+            arc.mvcMatchers("/v3/api-docs/swagger-config").permitAll();
+            arc.mvcMatchers("/v3/api-docs").permitAll();
             // declarative route configuration
             // .mvcMatchers("/api").hasAuthority("ROLE_ACCESS")
             arc.mvcMatchers("/api/**").access("@accessController.checkAccess()");
