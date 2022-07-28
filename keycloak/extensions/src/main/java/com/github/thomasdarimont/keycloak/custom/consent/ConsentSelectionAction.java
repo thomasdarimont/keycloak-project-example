@@ -19,6 +19,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.UserConsentModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.utils.FormMessage;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
@@ -193,11 +194,11 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         var missingRequired = scopeInfo.getMissingRequired();
         var missingOptional = scopeInfo.getMissingOptional();
         var client = authSession.getClient();
+        var realm = context.getRealm();
 
         // var scopeFieldMapping = getScopeFieldMapping(clientId);
         var requestedScopeNames = scopeInfo.getRequestedScopeNames();
-        var userId = user.getId();
-        var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, client, requestedScopeNames, user) //
+        var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, realm, client, requestedScopeNames, user) //
                 .getMapping();
 
         var fieldNameList = new ArrayList<String>();
@@ -302,8 +303,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
         if (!scopesToAskForConsent.isEmpty()) {
             // TODO find a way to merge the existing consent with the new consent instead of replacing the existing consent
             var consentByClient = users.getConsentByClient(realm, userId, client.getId());
-
-
             var consentedFieldList = List.of(authSession.getAuthNote(CONSENTED_FIELD_LIST).split(","));
 
             var profileUpdate = new HashMap<String, String>();
@@ -312,18 +311,24 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
             }
 
             var askedScopeNames = scopesToAskForConsent.stream().map(ClientScopeModel::getName).collect(Collectors.toSet());
-            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, client,
+            var profileUpdateResult = ProfileClient.updateProfileAttributesFromConsentForm(session, realm, client,
                     new LinkedHashSet<>(askedScopeNames), user, profileUpdate);
             // check profile result
-            if (profileUpdateResult.getErrors() != null && !profileUpdateResult.getErrors().isEmpty()) {
+            // if errors.isEmpty() -> proceed to context.success()
+            // else show / populate form again with validation errors -> proceed with context.challenge(..)
+
+            if (profileUpdateResult.hasErrors()) {
 
                 context.challenge(createForm(context, form -> {
                     System.out.println("customize form with validation errors");
+                    // form.setAttribute("")
+
+                    List<FormMessage> fieldErrors = profileUpdateResult.getErrors().stream() //
+                            .map(attributeError -> new FormMessage(attributeError.getAttributeName(), attributeError.getMessage())).collect(toList());
+                    form.setErrors(fieldErrors);
                 }));
                 return;
             }
-            // if errors.isEmpty() -> proceed to context.success()
-            // else show / populate form again with validation errors -> proceed with context.challenge(..)
 
             if (consentByClient != null) {
                 users.revokeConsentForClient(realm, userId, client.getId());

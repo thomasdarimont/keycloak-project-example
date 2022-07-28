@@ -8,4 +8,6 @@ public class UserProfileAttributeValidationError {
     private final String type;
 
     private final String attributeName;
+
+    private final String message;
 }

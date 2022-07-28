@@ -22,7 +22,7 @@ import java.util.function.Function;
 public class UserProfileAttribute {
 
     // TODO discuss:
-    // i18n: label, description
+    // i18n: label, description, placeholder
 
     // validation: clientSide, serverSide
 

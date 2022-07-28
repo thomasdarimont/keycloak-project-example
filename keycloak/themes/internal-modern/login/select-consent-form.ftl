@@ -6,12 +6,12 @@
         ${msg('acmeConsentSelectionTitle')}
     <#elseif section = "form">
 
-        <p>
-        <div>DEBUG
-            <div>Granted Scope: ${grantedScope}</div>
-            <div>Requested Scope: ${requestedScope}</div>
-        </div>
-        </p>
+<#--        <p>-->
+<#--        <div>DEBUG-->
+<#--            <div>Granted Scope: ${grantedScope}</div>-->
+<#--            <div>Requested Scope: ${requestedScope}</div>-->
+<#--        </div>-->
+<#--        </p>-->
 
         <p>${msg('acmeConsentSelection')}</p>
         <form id="acme-dynamic-scope-selection-form" class="${properties.kcFormClass!}" action="${url.loginAction}"
@@ -62,6 +62,11 @@
                                                    <#if scopeField.readonly>disabled</#if>
 <#--                                                   -->
                                             />
+                                            <#if messagesPerField.existsError(scopeField.name)>
+                                            <span id="input-error-${scopeField.name?replace(".","-")}" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
+                                                ${kcSanitize(messagesPerField.get(scopeField.name))?no_esc}
+                                            </span>
+                                            </#if>
                                         </div>
                                     </div>
                                 </#list>
