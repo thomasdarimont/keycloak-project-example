@@ -39,7 +39,7 @@ function callApi(url, requestOptions, onError) {
     }
 
     if (spa.userInfo) {
-        qs("#userInfo").innerText = JSON.stringify(spa.userInfo.claims, null, "  ");
+        qs("#userInfo").innerText = JSON.stringify(spa.userInfo, null, "  ");
         qs("#login").remove()
     } else {
         qs("#logout").remove()
