@@ -135,6 +135,28 @@
         $("#logoutBtn").classList.add("hidden");
     }
 
+    async function updateUserProfileFromUserInfoEndpoint(userProfile) {
+
+        let userInfoResponse = await fetch(userInfoUrl, {
+            timeout: 2000,
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + keycloak.token,
+                "Accept": "application/json"
+            }
+        });
+
+        let userInfo = await userInfoResponse.json();
+        userProfile["name"] = userInfo["name"]
+        userProfile["given_name"] = userInfo["given_name"]
+        userProfile["family_name"] = userInfo["family_name"]
+        userProfile["email"] = userInfo["email"]
+        userProfile["email_verified"] = userInfo["email_verified"]
+        userProfile["phone_number"] = userInfo["phone_number"]
+        userProfile["phone_number_verified"] = userInfo["phone_number_verified"]
+        console.log(userInfo)
+    }
+
     async function showGreeting() {
 
         $("#loginBtn").classList.add("hidden");
@@ -144,36 +166,10 @@
         [...document.querySelectorAll(".operation")].forEach(op => op.classList.remove("hidden"));
         $("#greeting").classList.toggle("hidden");
 
-        let userProfile = {
-            preferred_username: keycloak.tokenParsed.preferred_username,
-            name: keycloak.tokenParsed.name,
-            given_name: keycloak.tokenParsed.given_name,
-            family_name: keycloak.tokenParsed.family_name,
-            email: keycloak.tokenParsed.email,
-            email_verified: keycloak.tokenParsed.email_verified,
-            phone_number: keycloak.tokenParsed.phone_number,
-            phone_number_verified: keycloak.tokenParsed.phone_number_verified,
-        }
+        let userProfile = getUserProfileFromKeycloakToken();
 
         if (userInfoUrl) {
-            let userInfoResponse = await fetch(userInfoUrl, {
-                timeout: 2000,
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + keycloak.token,
-                    "Accept": "application/json"
-                }
-            });
-
-            let userInfo = await userInfoResponse.json();
-            userProfile["name"] = userInfo["name"]
-            userProfile["given_name"] = userInfo["given_name"]
-            userProfile["family_name"] = userInfo["family_name"]
-            userProfile["email"] = userInfo["email"]
-            userProfile["email_verified"] = userInfo["email_verified"]
-            userProfile["phone_number"] = userInfo["phone_number"]
-            userProfile["phone_number_verified"] = userInfo["phone_number_verified"]
-            console.log(userInfo)
+            await updateUserProfileFromUserInfoEndpoint(userProfile, userInfoUrl);
         }
 
         $("#username").innerText = userProfile.preferred_username;
@@ -187,6 +183,19 @@
         $("#issuer").innerText = keycloak.tokenParsed.iss;
         $("#scopeRequested").innerText = scope;
         $("#scopeGranted").innerText = keycloak.tokenParsed.scope;
+    }
+
+    function getUserProfileFromKeycloakToken() {
+        return {
+            preferred_username: keycloak.tokenParsed.preferred_username,
+            name: keycloak.tokenParsed.name,
+            given_name: keycloak.tokenParsed.given_name,
+            family_name: keycloak.tokenParsed.family_name,
+            email: keycloak.tokenParsed.email,
+            email_verified: keycloak.tokenParsed.email_verified,
+            phone_number: keycloak.tokenParsed.phone_number,
+            phone_number_verified: keycloak.tokenParsed.phone_number_verified,
+        };
     }
 
     function performOperation(operationName, requiredScope) {
