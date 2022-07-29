@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
 
-    <title>Acme Greet Me</title>
+    <title>App: ClientId</title>
 
     <style>
         ul.menu > li {
@@ -24,7 +24,7 @@
         <li>
             <button id="loginBtn" onclick="keycloak.login()">Login</button>
             <button id="registerBtn" onclick="keycloak.register()">Register</button>
-            <button id="updateConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Update consent</button>
+            <button id="manageConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Manage consent</button>
             <button id="operation1Btn" onclick="performOperation('op1','name')" class="operation">Op 1 (name)</button>
             <button id="operation2Btn" onclick="performOperation('op2','phone')"  class="operation">Op 2 (phone)</button>
             <button id="operation3Btn" onclick="performOperation('op3','phone name')"  class="operation">Op 3 (phone+name)</button>
@@ -39,11 +39,13 @@
     <h1>ClientId: <span id="clientInfo"></span></h1>
     <div id="greeting" class="hidden">
         <h2>Email: <span id="email"></span></h2>
+        <h2>Email Verified: <span id="emailVerified"></span></h2>
         <h2>Username: <span id="username"></span></h2>
         <h2>Name: <span id="displayName"></span></h2>
         <h2>Firstname: <span id="firstname"></span></h2>
         <h2>Lastname: <span id="lastname"></span></h2>
         <h2>Phone: <span id="phone"></span></h2>
+        <h2>Phone Verified: <span id="phoneVerified"></span></h2>
         <h2>Requested Scope: <span id="scopeRequested"></span></h2>
         <h2>Granted Scope: <span id="scopeGranted"></span></h2>
         <h2>Issuer: <span id="issuer"></span></h2>
@@ -59,13 +61,18 @@
     let searchParams = new URLSearchParams(window.location.search);
     let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://id.acme.test:8080" : "https://id.acme.test:8443");
     let keycloakUrl = keycloakBaseUrl + (searchParams.get("path") || "/auth");
+    let userInfoUrl = searchParams.get("userinfo_url");
 
     let realm = searchParams.get("realm") || 'acme-internal';
     let clientId = searchParams.get("client_id") || 'app-greetme';
+    window.document.title = "App: " + clientId;
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     // let scope = searchParams.get("scope") || 'openid email profile phone';
     let scope = searchParams.get("scope") || 'openid email name phone';
+    if (scope === "openid") {
+        scope = "";
+    }
 
     document.getElementById("clientInfo").textContent = clientId;
 
@@ -123,52 +130,96 @@
     function showWelcome() {
         $("#loginBtn").classList.remove("hidden");
         $("#registerBtn").classList.remove("hidden");
-        $("#updateConsentBtn").classList.add("hidden");
+        $("#manageConsentBtn").classList.add("hidden");
         [...document.querySelectorAll(".operation")].forEach(op => op.classList.add("hidden"));
         $("#logoutBtn").classList.add("hidden");
     }
 
-    function showGreeting() {
+    async function updateUserProfileFromUserInfoEndpoint(userProfile) {
+
+        let userInfoResponse = await fetch(userInfoUrl, {
+            timeout: 2000,
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + keycloak.token,
+                "Accept": "application/json"
+            }
+        });
+
+        let userInfo = await userInfoResponse.json();
+        userProfile["name"] = userInfo["name"]
+        userProfile["given_name"] = userInfo["given_name"]
+        userProfile["family_name"] = userInfo["family_name"]
+        userProfile["email"] = userInfo["email"]
+        userProfile["email_verified"] = userInfo["email_verified"]
+        userProfile["phone_number"] = userInfo["phone_number"]
+        userProfile["phone_number_verified"] = userInfo["phone_number_verified"]
+        console.log(userInfo)
+    }
+
+    async function showGreeting() {
 
         $("#loginBtn").classList.add("hidden");
         $("#registerBtn").classList.add("hidden");
         $("#logoutBtn").classList.remove("hidden");
-        $("#updateConsentBtn").classList.remove("hidden");
+        $("#manageConsentBtn").classList.remove("hidden");
         [...document.querySelectorAll(".operation")].forEach(op => op.classList.remove("hidden"));
         $("#greeting").classList.toggle("hidden");
 
-        $("#username").innerText = keycloak.tokenParsed.preferred_username;
-        $("#displayName").innerText = keycloak.tokenParsed.name;
-        $("#firstname").innerText = keycloak.tokenParsed.given_name;
-        $("#lastname").innerText = keycloak.tokenParsed.family_name;
-        $("#email").innerText = keycloak.tokenParsed.email;
-        $("#phone").innerText = keycloak.tokenParsed.phone_number;
+        let userProfile = getUserProfileFromKeycloakToken();
+
+        if (userInfoUrl) {
+            await updateUserProfileFromUserInfoEndpoint(userProfile, userInfoUrl);
+        }
+
+        $("#username").innerText = userProfile.preferred_username;
+        $("#displayName").innerText = userProfile.name;
+        $("#firstname").innerText = userProfile.given_name;
+        $("#lastname").innerText = userProfile.family_name;
+        $("#email").innerText = userProfile.email;
+        $("#emailVerified").innerText = userProfile.email_verified;
+        $("#phone").innerText = userProfile.phone_number;
+        $("#phoneVerified").innerText = userProfile.phone_number_verified;
         $("#issuer").innerText = keycloak.tokenParsed.iss;
         $("#scopeRequested").innerText = scope;
         $("#scopeGranted").innerText = keycloak.tokenParsed.scope;
     }
 
-    function performOperation(operationName, requiredScope) {
-
-        if (checkRequiredScopePresent(requiredScope)) {
-            alert("Perform operation " + operationName);
-        }
+    function getUserProfileFromKeycloakToken() {
+        return {
+            preferred_username: keycloak.tokenParsed.preferred_username,
+            name: keycloak.tokenParsed.name,
+            given_name: keycloak.tokenParsed.given_name,
+            family_name: keycloak.tokenParsed.family_name,
+            email: keycloak.tokenParsed.email,
+            email_verified: keycloak.tokenParsed.email_verified,
+            phone_number: keycloak.tokenParsed.phone_number,
+            phone_number_verified: keycloak.tokenParsed.phone_number_verified,
+        };
     }
 
-    function checkRequiredScopePresent(requiredScope) {
+    function performOperation(operationName, requiredScope) {
 
-        let requiredScopeNames = requiredScope.split(" ");
-
-        let grantedScope = keycloak.tokenParsed.scope;
-        let grantedScopeNames = (grantedScope || "openid").split(" ")
-
-        let containsAllRequiredScopes =requiredScopeNames.every(it => grantedScopeNames.includes(it))
-        if (containsAllRequiredScopes) {
-            return true;
+        if (!isScopePresent(requiredScope)) {
+            redirectForConsent(requiredScope);
+            return;
         }
 
+        alert("Perform operation " + operationName);
+    }
+
+    function isScopePresent(requiredScope) {
+
+        let grantedScopeNames = (keycloak.tokenParsed.scope || "openid").split(" ")
+        let requiredScopeNames = requiredScope.split(" ");
+
+        return requiredScopeNames.every(it => grantedScopeNames.includes(it));
+    }
+
+    function redirectForConsent(requiredScope) {
+
         // need to request additional required scope
-        let requestedScope = grantedScope + " " + requiredScope;
+        let requestedScope = keycloak.tokenParsed.scope + " " + requiredScope;
 
         // update current redirect URL
         let currentUrl = new URL(window.location.href);
@@ -177,8 +228,6 @@
 
         // perform new authorization code flow
         keycloak.login({scope: requestedScope, redirectUri: redirectUriWithNewScope});
-
-        return false;
     }
 
 </script>
