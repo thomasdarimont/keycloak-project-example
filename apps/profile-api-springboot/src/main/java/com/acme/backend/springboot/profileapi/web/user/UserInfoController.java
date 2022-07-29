@@ -4,8 +4,14 @@ import com.acme.backend.springboot.profileapi.profile.ConsentAwareUserProfileSer
 import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
 import com.acme.backend.springboot.profileapi.profile.model.UserProfileRepository;
 import com.acme.backend.springboot.profileapi.support.oauth2.TokenAccessor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +26,7 @@ import static com.acme.backend.springboot.profileapi.profile.schema.UserProfileS
 
 /**
  * Custom UserInfo endpoint is intended as a replacement for Keycloak's Userinfo endpoint.
- *
+ * <p>
  * Use with app-greetme: &userinfo_url=https://apps.acme.test:4653/api/users/me
  */
 @Slf4j
@@ -38,7 +44,15 @@ class UserInfoController {
     private final ConsentAwareUserProfileService profileService;
 
     @GetMapping
-    public Object renderProfileDataAsUserInfoResponse() {
+    @Operation(summary = "Get UserInfo representation of UserProfile")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "UserInfo found", content = { //
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserInfo.class)) //
+            }), //
+            @ApiResponse(responseCode = "400", description = "Invalid Request", content = @Content), //
+            @ApiResponse(responseCode = "404", description = "UserProfile not found", content = @Content) //
+    })
+    public ResponseEntity<UserInfo> getUserInfoForCurrentUser() {
 
         log.info("### Accessing {}", httpRequest.getRequestURI());
 
@@ -49,8 +63,11 @@ class UserInfoController {
         var scopes = Set.of(accessToken.<String>getClaim("scope").split(" "));
 
         var profile = userProfileRepository.getProfileByUserId(userId);
+        if (profile == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-        var userInfo = new LinkedHashMap<String, Object>();
+        var userInfo = new UserInfo();
         userInfo.put("sub", userId);
 
         addProfileAttributesToUserInfo(clientId, profile, scopes, userInfo);
@@ -70,7 +87,7 @@ class UserInfoController {
             userInfo.put("phone_number_verified", profile.isPhoneNumberVerified());
         }
 
-        return userInfo;
+        return ResponseEntity.ok(userInfo);
     }
 
     private String getDisplayName(LinkedHashMap<String, Object> userInfo) {

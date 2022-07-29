@@ -2,6 +2,11 @@ package com.acme.backend.springboot.profileapi.web.consent;
 
 import com.acme.backend.springboot.profileapi.profile.ConsentAwareUserProfileService;
 import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationErrors;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +37,14 @@ class ConsentFormController {
     private final ConsentAwareUserProfileService profileService;
 
     // get the metadata of the consent-form and if the form should be shown at all
+    @Operation(summary = "Get profile data for consent")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "ConsentFormDataResponse found", content = { //
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ConsentFormDataResponse.class)) //
+            }), //
+            @ApiResponse(responseCode = "400", description = "Invalid Request", content = @Content), //
+            @ApiResponse(responseCode = "404", description = "UserProfile not found", content = @Content) //
+    })
     @GetMapping("/{userId}") // ?clientId=daba&scope=email+name
     public ResponseEntity<ConsentFormDataResponse> getProfileAttributesForConsentForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest) {
 
@@ -39,12 +52,28 @@ class ConsentFormController {
         var scopes = Set.of(dataRequest.getScope().split("(\\s|\\+)"));
         var clientId = dataRequest.getClientId();
 
-        var attributes = profileService.getProfileAttributes(userId, clientId, scopes);
+        var profile = profileService.getUserProfile(userId);
+        if (profile == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var attributes = profileService.getProfileAttributes(profile, clientId, scopes);
 
         return ResponseEntity.ok().body(new ConsentFormDataResponse(attributes));
     }
 
     // receive the update from the consent-form
+    @Operation(summary = "Get update profile data from consent")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "Profile data updated for consent", content = { //
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ConsentFormUpdateResponse.class)) //
+            }), //
+            @ApiResponse(responseCode = "400", description = "Invalid Request", content = { //
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ConsentFormUpdateResponse.class)) //
+            }), //
+            @ApiResponse(responseCode = "404", description = "UserProfile not found", content = @Content) //
+    })
+
     @PostMapping("/{userId}")
     public ResponseEntity<ConsentFormUpdateResponse> updateForm(@PathVariable("userId") String userId, ConsentFormDataRequest dataRequest, @RequestBody Map<String, String> profileUpdate) {
 
@@ -53,8 +82,13 @@ class ConsentFormController {
         var scopes = Set.of(dataRequest.getScope().split("(\\s|\\+)"));
         var clientId = dataRequest.getClientId();
 
+        var profile = profileService.getUserProfile(userId);
+        if (profile == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         var validationErrors = new UserProfileAttributeValidationErrors();
-        profileService.updateProfileAttributes(userId, clientId, scopes, profileUpdate, validationErrors);
+        profileService.updateProfileAttributes(profile, clientId, scopes, profileUpdate, validationErrors);
 
         var errors = validationErrors.getErrors();
         if (!CollectionUtils.isEmpty(errors)) {

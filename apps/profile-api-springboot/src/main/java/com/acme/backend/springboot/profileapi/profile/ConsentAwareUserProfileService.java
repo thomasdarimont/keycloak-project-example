@@ -48,8 +48,8 @@ public class ConsentAwareUserProfileService {
         return result;
     }
 
-    public Map<String, List<PopulatedUserProfileAttribute>> getProfileAttributes(String userId, String clientId, Set<String> scopes) {
-        return getProfileAttributes(userProfileRepository.getProfileByUserId(userId), clientId, scopes);
+    public UserProfile getUserProfile(String userId) {
+        return userProfileRepository.getProfileByUserId(userId);
     }
 
     private Map<String, List<UserProfileAttribute>> getProfileSchemaAttributes(String clientId, Set<String> scopes) {
@@ -71,12 +71,11 @@ public class ConsentAwareUserProfileService {
     }
 
 
-    public void updateProfileAttributes(String userId, String clientId, Set<String> scopes, //
+    public void updateProfileAttributes(UserProfile profile, String clientId, Set<String> scopes, //
                                         Map<String, String> profileUpdate, //
                                         UserProfileAttributeValidationErrors validationErrors) {
-        var profile = userProfileRepository.getProfileByUserId(userId);
 
-        userConsentRepository.updateConsent(userId, clientId, scopes);
+        userConsentRepository.updateConsent(profile.getId(), clientId, scopes);
 
         var profileSchema = userProfileSchemaRepository.getProfileSchema(clientId);
 
