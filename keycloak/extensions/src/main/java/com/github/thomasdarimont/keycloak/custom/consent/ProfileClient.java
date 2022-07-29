@@ -20,6 +20,9 @@ import java.util.Set;
 @JBossLog
 public class ProfileClient {
 
+    private static final String DEFAULT_SERVICE_ACCOUNT_CLIENT_ID = "app-demo-service";
+    private static final String DEFAULT_PROFILE_API_URL = "https://apps.acme.test:4653/api";
+
     public static ConsentFormProfileDataResponse getProfileAttributesForConsentForm(KeycloakSession session, RealmModel realm, ClientModel client, //
                                                                                     Set<String> scopeNames, UserModel user) {
 
@@ -68,13 +71,13 @@ public class ProfileClient {
 
     private static String getServiceAccountAccessToken(KeycloakSession session, RealmModel realm) {
         var serviceAccountClientId = new RealmConfig(realm) //
-                .getString("custom.external.profile.api.service_account.client_id", "app-demo-service");
+                .getString("custom.external.profile.api.service_account.client_id", DEFAULT_SERVICE_ACCOUNT_CLIENT_ID);
         return TokenUtils.generateServiceAccountAccessToken(session, serviceAccountClientId, "", null);
     }
 
     private static String getProfileApiBaseUrl(RealmModel realm) {
         return new RealmConfig(realm) //
-                .getString("custom.external.profile.api.base_url", "https://apps.acme.test:4653/api");
+                .getString("custom.external.profile.api.base_url", DEFAULT_PROFILE_API_URL);
     }
 
     private static String getConsentFormUrl(RealmModel realm, ClientModel client, Set<String> scopeNames, UserModel user) {

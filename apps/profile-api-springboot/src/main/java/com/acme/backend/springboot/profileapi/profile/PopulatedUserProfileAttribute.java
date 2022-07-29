@@ -17,7 +17,7 @@ public class PopulatedUserProfileAttribute {
 
     private boolean required;
 
-    private boolean readonly;
+    private boolean readOnly;
 
     private String value;
 
@@ -29,8 +29,8 @@ public class PopulatedUserProfileAttribute {
         this.name = source.getName();
         this.claimName = source.toClaimName();
         this.type = source.getType();
-        this.readonly = source.isRequired();
-        this.readonly = source.isReadonly();
+        this.readOnly = source.isRequired();
+        this.readOnly = source.isReadOnly();
         this.value = value;
         this.allowedValues = source.getAllowedValues();
         this.annotations = source.getAnnotations();

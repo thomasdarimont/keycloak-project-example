@@ -69,7 +69,7 @@
                                                    type="${scopeField.type}"
                                                    name="${scopeField.name}"
                                                    value="${(scopeField.value!'')}"
-                                                   <#if scopeField.readonly>disabled</#if>
+                                                   <#if scopeField.readOnly>disabled</#if>
 <#--                                                   -->
                                             />
                                         </#if>

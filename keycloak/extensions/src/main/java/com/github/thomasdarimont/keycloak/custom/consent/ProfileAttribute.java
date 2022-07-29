@@ -22,7 +22,7 @@ public class ProfileAttribute {
 
     private boolean required;
 
-    private boolean readonly;
+    private boolean readOnly;
 
     private Map<String, String> annotations;
 }

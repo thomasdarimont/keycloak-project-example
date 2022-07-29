@@ -24,6 +24,7 @@ import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.util.JsonSerialization;
 
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 @AutoService(RequiredActionFactory.class)
-public class ConsentProfileAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
+public class ExternalProfileConsentAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
 
     private static final boolean REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE = false;
 
@@ -50,12 +51,15 @@ public class ConsentProfileAction implements RequiredActionProvider, RequiredAct
 
     @Override
     public String getId() {
+
+        // IMPORTANT: before changing this id, remove / disable the required action from the realm,
+        // otherwise Keycloak will complain about the missing required action!
         return "acme-dynamic-consent";
     }
 
     @Override
     public String getDisplayText() {
-        return "Acme: Dynamic Consent";
+        return "Acme: Dynamic External Profile Consent";
     }
 
     @Override
@@ -266,6 +270,7 @@ public class ConsentProfileAction implements RequiredActionProvider, RequiredAct
                     List<FormMessage> fieldErrors = profileUpdateResult.getErrors().stream() //
                             .map(attributeError -> new FormMessage(attributeError.getAttributeName(), attributeError.getMessage())).collect(toList());
                     form.setErrors(fieldErrors);
+                    form.setFormData(new MultivaluedHashMap<>(profileUpdate));
                 }));
                 return;
             }

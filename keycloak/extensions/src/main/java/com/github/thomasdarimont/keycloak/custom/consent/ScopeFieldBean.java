@@ -36,6 +36,8 @@ public class ScopeFieldBean {
     public String getValue() {
 
         String value = attribute.getValue();
+
+        // special case for email managed by Keycloak
         if (StringUtil.isBlank(value) && "email".equals(getName())) {
             value = user.getEmail();
         }
@@ -47,7 +49,7 @@ public class ScopeFieldBean {
         return attribute.isRequired();
     }
 
-    public boolean isReadonly() {
-        return attribute.isReadonly();
+    public boolean isReadOnly() {
+        return attribute.isReadOnly();
     }
 }

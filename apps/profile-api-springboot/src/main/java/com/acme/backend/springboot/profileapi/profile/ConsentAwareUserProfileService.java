@@ -5,7 +5,6 @@ import com.acme.backend.springboot.profileapi.profile.model.UserProfile;
 import com.acme.backend.springboot.profileapi.profile.model.UserProfileRepository;
 import com.acme.backend.springboot.profileapi.profile.schema.UserProfileAttribute;
 import com.acme.backend.springboot.profileapi.profile.schema.UserProfileSchemaRepository;
-import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationError;
 import com.acme.backend.springboot.profileapi.profile.validation.UserProfileAttributeValidationErrors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -87,7 +86,7 @@ public class ConsentAwareUserProfileService {
 
             for (var attribute : attributes) {
 
-                if (attribute.isReadonly()) {
+                if (attribute.isReadOnly()) {
                     continue;
                 }
 

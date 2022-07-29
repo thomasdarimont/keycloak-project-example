@@ -21,10 +21,14 @@ import java.util.function.Function;
 @AllArgsConstructor
 public class UserProfileAttribute {
 
-    // TODO discuss:
-    // i18n: label, description, placeholder
+    // TODO discuss: add support for dynamic field rendering via user-profile-commons.ftl in Keycloak
+    // i18n: displayName, description, placeholder
+    // grouping: group, groupDisplayHeader, groupDisplayDescription
+    // autocomplete
 
-    // validation: clientSide, serverSide
+    // validators: validators.options??
+    //validators.options.options??
+    //validators[attribute.annotations.inputOptionsFromValidation].options??
 
     private String name;
 
@@ -38,8 +42,31 @@ public class UserProfileAttribute {
 
     private boolean required;
 
-    private boolean readonly;
+    private boolean readOnly;
 
+    /**
+     * <pre>
+     * inputHelperTextBefore
+     * inputHelperTextAfter
+     * inputType?? (html5- ...)
+     * inputTypePlaceholder??
+     * inputTypePattern??
+     * inputTypeSize??
+     * inputTypeMaxlength??
+     * inputTypeMinlength??
+     * inputTypeMax??
+     * inputTypeMin??
+     * inputTypeStep??
+     * inputTypeCols??
+     * inputTypeRows??
+     * inputTypeMaxlength??
+     * inputTypeSize??
+     * inputOptionsFromValidation??
+     * inputOptionLabels??
+     * inputOptionLabels[option]!option
+     * inputOptionLabelsI18nPrefix??
+     * </pre>
+     */
     private Map<String, String> annotations;
 
     /**
@@ -97,7 +124,7 @@ public class UserProfileAttribute {
                 .claimName(claimName) //
                 .type(type) //
                 .defaultValue(defaultValue) //
-                .readonly(readonly) //
+                .readOnly(readOnly) //
                 .required(required) //
                 .annotations(annotations) //
                 .accessor(accessor) //
@@ -121,7 +148,7 @@ public class UserProfileAttribute {
         private Set<String> allowedValues;
         private Map<String, String> annotations = Map.of();
         private boolean required;
-        private boolean readonly;
+        private boolean readOnly;
         private Function<UserProfile, String> accessor;
 
         private BiConsumer<UserProfile, String> mutator;
@@ -158,8 +185,8 @@ public class UserProfileAttribute {
             return this;
         }
 
-        public Builder readonly(boolean readonly) {
-            this.readonly = readonly;
+        public Builder readOnly(boolean readOnly) {
+            this.readOnly = readOnly;
             return this;
         }
 
@@ -184,7 +211,7 @@ public class UserProfileAttribute {
         }
 
         public UserProfileAttribute build() {
-            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readonly, annotations, accessor, mutator, validation);
+            return new UserProfileAttribute(name, claimName, type, defaultValue, allowedValues, required, readOnly, annotations, accessor, mutator, validation);
         }
     }
 }
