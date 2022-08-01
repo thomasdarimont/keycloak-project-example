@@ -221,7 +221,7 @@ clients:
     #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "$(env:APPS_FRONTEND_URL_GREETME)"
-    baseUrl: "/?realm=acme-internal"
+    baseUrl: "/?realm=acme-internal&scope=openid"
     adminUrl: ""
     redirectUris:
       - "/*"
@@ -233,6 +233,39 @@ clients:
     optionalClientScopes:
       - "phone"
       - "name"
+      - "acme.api"
+      - "address"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+
+  - clientId: app-consent-demo
+    protocol: openid-connect
+    name: Acme Consent Demo
+    description: "App Consent Demo Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: false
+    rootUrl: "$(env:APPS_FRONTEND_URL_GREETME)"
+    baseUrl: "/?realm=acme-internal&client_id=app-consent-demo&scope=openid"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+      - "http://localhost:4000/acme-greetme/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+    optionalClientScopes:
+      - "phone"
+      - "name"
+      - "acme.api"
+      - "address"
     attributes:
       "pkce.code.challenge.method": "S256"
 
@@ -623,6 +656,8 @@ users:
     enabled: true
     attributes:
       locale: ["de"]
+      title: [""]
+      salutation: ["mr"]
     credentials:
       - type: password
         userLabel: initial
@@ -640,6 +675,8 @@ users:
       locale: ["en"]
       phoneNumber: ["+49178111222333"]
       phoneNumberVerified: ["true"]
+      title: [""]
+      salutation: ["mr"]
     credentials:
       - type: password
         userLabel: initial
@@ -655,6 +692,8 @@ users:
     enabled: true
     attributes:
       locale: ["de"]
+      title: [""]
+      salutation: ["mr"]
     credentials:
       - type: password
         userLabel: initial
