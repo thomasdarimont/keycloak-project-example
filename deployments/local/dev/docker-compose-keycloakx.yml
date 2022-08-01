@@ -59,6 +59,8 @@ services:
       - "--spi-events-listener-email-include-events=UPDATE_PASSWORD"
       - "--spi-events-listener-jboss-logging-success-level=info"
       - "--spi-events-listener-jboss-logging-error-level=warn"
+      - "--spi-truststore-file-file=/opt/keycloak/conf/truststore.p12"
+      - "--spi-truststore-file-password=changeit"
 # Example for static overrides for .well-known/openid-configuration endpoint
 #      - "--spi-well-known-openid-configuration-openid-configuration-override=/opt/keycloak/conf/openid-config.json"
 #      - "--spi-well-known-openid-configuration-include-client-scopes=true"

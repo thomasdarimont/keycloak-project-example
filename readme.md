@@ -93,8 +93,11 @@ The example environment can be configured with https via the `--https` flag.
 Generate a certificate and Key for the example domain `acme.test` with [mkcert](https://github.com/FiloSottile/mkcert).
 ```
 java bin/createTlsCerts.java
+# AND 
+java bin/createTlsCerts.java --pkcs12 --keep
 ```
-This will generate a TLS certificate and key file in `.pem` format in `config/stage/dev/tls`.
+This will generate a TLS certificates and key file in `.pem` format in `config/stage/dev/tls`.
+The later command will create a certificate in `.p12` PKCS12 format, which will be used as a custom truststore by Keycloak.  
 
 Register map the following host names in your hosts file configuration, e.g. `/etc/hosts` on linux / OSX or `c:\Windows\System32\Drivers\etc\hosts` on Windows:
 ```
