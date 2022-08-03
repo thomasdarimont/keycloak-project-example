@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.keycloak.Config;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.authentication.DisplayTypeRequiredActionFactory;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
@@ -38,7 +37,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 @AutoService(RequiredActionFactory.class)
-public class ConsentSelectionAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
+public class ConsentSelectionAction implements RequiredActionProvider, RequiredActionFactory {
 
     private static final boolean REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE = false;
 
@@ -82,11 +81,6 @@ public class ConsentSelectionAction implements RequiredActionProvider, RequiredA
     @Override
     public RequiredActionProvider create(KeycloakSession session) {
         return this;
-    }
-
-    @Override
-    public RequiredActionProvider createDisplay(KeycloakSession session, String displayType) {
-        return create(session);
     }
 
     @Override

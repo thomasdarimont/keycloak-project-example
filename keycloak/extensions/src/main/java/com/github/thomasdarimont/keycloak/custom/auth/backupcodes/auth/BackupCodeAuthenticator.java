@@ -3,24 +3,33 @@ package com.github.thomasdarimont.keycloak.custom.auth.backupcodes.auth;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.action.GenerateBackupCodeAction;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
+import com.google.auto.service.AutoService;
+import org.keycloak.Config;
 import org.keycloak.authentication.AbstractFormAuthenticator;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
+import org.keycloak.authentication.Authenticator;
+import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.utils.FormMessage;
+import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.services.messages.Messages;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
@@ -70,7 +79,7 @@ public class BackupCodeAuthenticator extends AbstractFormAuthenticator {
             return false;
         }
 
-        return session.userCredentialManager().isConfiguredFor(realm, user, BackupCodeCredentialModel.TYPE);
+        return user.credentialManager().isConfiguredFor(BackupCodeCredentialModel.TYPE);
     }
 
     protected boolean isSecondFactorRequired(KeycloakSession session, RealmModel realm, UserModel user) {
@@ -78,8 +87,8 @@ public class BackupCodeAuthenticator extends AbstractFormAuthenticator {
     }
 
     protected boolean isSecondFactorConfigured(KeycloakSession session, RealmModel realm, UserModel user) {
-        UserCredentialManager ucm = session.userCredentialManager();
-        return ucm.isConfiguredFor(realm, user, OTPCredentialModel.TYPE) || ucm.isConfiguredFor(realm, user, SmsCredentialModel.TYPE);
+        var cm = user.credentialManager();
+        return cm.isConfiguredFor(OTPCredentialModel.TYPE) || cm.isConfiguredFor(SmsCredentialModel.TYPE);
     }
 
     @Override
@@ -102,23 +111,21 @@ public class BackupCodeAuthenticator extends AbstractFormAuthenticator {
         }
 
         UserCredentialModel backupCode = new UserCredentialModel(null, BackupCodeCredentialModel.TYPE, backupCodeInput, false);
-        KeycloakSession session = context.getSession();
-        RealmModel realm = context.getRealm();
 
-        boolean backupCodeValid = session.userCredentialManager().isValid(realm, user, backupCode);
+        boolean backupCodeValid = user.credentialManager().isValid(backupCode);
         if (!backupCodeValid) {
             return badBackupCodeHandler(context, user, false);
         }
 
-        checkForRemainingBackupCodes(context, session, realm, user);
+        checkForRemainingBackupCodes(context, user);
 
         return true;
     }
 
-    protected void checkForRemainingBackupCodes(AuthenticationFlowContext context, KeycloakSession session, RealmModel realm, UserModel user) {
+    protected void checkForRemainingBackupCodes(AuthenticationFlowContext context, UserModel user) {
 
         // check if there are remaining backup-codes left, otherwise add required action to user
-        boolean remainingBackupCodesPresent = session.userCredentialManager().isConfiguredFor(realm, user, BackupCodeCredentialModel.TYPE);
+        boolean remainingBackupCodesPresent = user.credentialManager().isConfiguredFor(BackupCodeCredentialModel.TYPE);
         if (remainingBackupCodesPresent) {
             return;
         }
@@ -203,4 +210,87 @@ public class BackupCodeAuthenticator extends AbstractFormAuthenticator {
         return FIELD_USERNAME;
     }
 
+    @AutoService(AuthenticatorFactory.class)
+    public static class Factory implements AuthenticatorFactory {
+
+        private static final BackupCodeAuthenticator INSTANCE = new BackupCodeAuthenticator();
+
+        private static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
+
+        static {
+            List<ProviderConfigProperty> list = ProviderConfigurationBuilder
+                    .create()
+// TODO figure out how to access provider configuration in isConfiguredFor
+//                .property().name("secondFactorRequired")
+//                .type(ProviderConfigProperty.STRING_TYPE)
+//                .label("Required Second Factor Credential Type")
+//                .defaultValue(OTPCredentialModel.TYPE)
+//                .helpText("If the credential model type is configured for the user the authenticator is offered." +
+//                        "If the value is empty the authenticator is always offered.")
+//                .add()
+                    .build();
+
+            CONFIG_PROPERTIES = Collections.unmodifiableList(list);
+        }
+
+        @Override
+        public String getId() {
+            return BackupCodeAuthenticator.ID;
+        }
+
+        @Override
+        public String getDisplayType() {
+            return "Acme: Backup Code Authenticator";
+        }
+
+        @Override
+        public String getHelpText() {
+            return "Backup Codes for 2FA Recovery";
+        }
+
+        @Override
+        public boolean isConfigurable() {
+            return false;
+        }
+
+        @Override
+        public AuthenticationExecutionModel.Requirement[] getRequirementChoices() {
+            return REQUIREMENT_CHOICES;
+        }
+
+        @Override
+        public boolean isUserSetupAllowed() {
+            return false;
+        }
+
+        @Override
+        public String getReferenceCategory() {
+            return BackupCodeCredentialModel.TYPE;
+        }
+
+        @Override
+        public List<ProviderConfigProperty> getConfigProperties() {
+            return CONFIG_PROPERTIES;
+        }
+
+        @Override
+        public Authenticator create(KeycloakSession session) {
+            return INSTANCE;
+        }
+
+        @Override
+        public void init(Config.Scope config) {
+            // NOOP
+        }
+
+        @Override
+        public void postInit(KeycloakSessionFactory factory) {
+            // NOOP
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+        }
+    }
 }

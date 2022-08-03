@@ -3,25 +3,27 @@ package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone;
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
-import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticatorFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialProvider;
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
+import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
-import org.keycloak.credential.CredentialModel;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
 import org.keycloak.services.resources.LoginActionsService;
@@ -147,7 +149,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
             boolean useWebOtp = true;
             boolean result = createSmsSender(context)
-                    .sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), SmsAuthenticatorFactory.VERIFY_CODE_LENGTH, SmsAuthenticatorFactory.CODE_TTL, useWebOtp, authSession);
+                    .sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), SmsAuthenticator.VERIFY_CODE_LENGTH, SmsAuthenticator.CODE_TTL, useWebOtp, authSession);
             if (!result) {
                 log.warnf("Failed to send sms message. realm=%s user=%s", realm.getName(), user.getId());
             }
@@ -192,16 +194,17 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     protected void updateSmsMfaCredential(RealmModel realm, UserModel user, KeycloakSession session, String phoneNumber) {
 
-        UserCredentialManager ucm = session.userCredentialManager();
-        ucm.getStoredCredentialsByTypeStream(realm, user, SmsCredentialModel.TYPE).forEach(
-                cm -> ucm.removeStoredCredential(realm, user, cm.getId())
+        var credentialManager = user.credentialManager();
+        credentialManager.getStoredCredentialsByTypeStream(SmsCredentialModel.TYPE).forEach(
+                cm -> credentialManager.removeStoredCredentialById(cm.getId())
         );
 
         SmsCredentialModel model = new SmsCredentialModel();
         // TODO add support for referencing the phoneNumber from the user profile.
         model.setPhoneNumber(phoneNumber);
 
-        var credential = ucm.createCredentialThroughProvider(realm, user, model);
+        var credentialProvider = session.getProvider(SmsCredentialProvider.class, SmsCredentialProvider.ID);
+        var credential = credentialProvider.createCredential(realm, user, model);
         if (credential != null) {
             AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD);
         }
@@ -217,5 +220,46 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
     @Override
     public void close() {
         // NOOP
+    }
+
+    @AutoService(RequiredActionFactory.class)
+    public static class Factory implements RequiredActionFactory {
+
+        private static final RequiredActionProvider INSTANCE = new UpdatePhoneNumberRequiredAction();
+
+        @Override
+        public RequiredActionProvider create(KeycloakSession session) {
+            return INSTANCE;
+        }
+
+        @Override
+        public void init(Config.Scope config) {
+            // NOOP
+        }
+
+        @Override
+        public void postInit(KeycloakSessionFactory factory) {
+            // NOOP
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+        }
+
+        @Override
+        public String getId() {
+            return UpdatePhoneNumberRequiredAction.ID;
+        }
+
+        @Override
+        public String getDisplayText() {
+            return "Acme: Update Mobile Phonenumber";
+        }
+
+        @Override
+        public boolean isOneTimeAction() {
+            return true;
+        }
     }
 }

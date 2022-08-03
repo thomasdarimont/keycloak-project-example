@@ -2,8 +2,6 @@ package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials
 
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import org.keycloak.credential.CredentialModel;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 public class TrustedDeviceCredentialModel extends CredentialModel {
@@ -38,7 +36,7 @@ public class TrustedDeviceCredentialModel extends CredentialModel {
         return deviceId;
     }
 
-    public static TrustedDeviceCredentialModel lookupTrustedDevice(KeycloakSession session, RealmModel realm, UserModel user, TrustedDeviceToken trustedDeviceToken) {
+    public static TrustedDeviceCredentialModel lookupTrustedDevice(UserModel user, TrustedDeviceToken trustedDeviceToken) {
 
         if (user == null) {
             return null;
@@ -48,7 +46,7 @@ public class TrustedDeviceCredentialModel extends CredentialModel {
             return null;
         }
 
-        var credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
+        var credentialModel = user.credentialManager().getStoredCredentialsByTypeStream(TrustedDeviceCredentialModel.TYPE)
                 .filter(cm -> cm.getSecretData().equals(trustedDeviceToken.getDeviceId()))
                 .findAny().orElse(null);
 

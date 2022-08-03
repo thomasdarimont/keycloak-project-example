@@ -3,6 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.common.util.Resteasy;
@@ -11,16 +12,18 @@ import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
+import org.keycloak.credential.CredentialProviderFactory;
 import org.keycloak.credential.CredentialTypeMetadata;
 import org.keycloak.credential.CredentialTypeMetadataContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 
 @JBossLog
 public class TrustedDeviceCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
+
+    public static final String ID = "custom-trusted-device";
 
     private final KeycloakSession session;
 
@@ -38,15 +41,15 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
 
         CredentialModel trustedDeviceCredentialModel = createTrustedDeviceCredentialModel((TrustedDeviceCredentialModel) credentialModel);
 
-        UserCredentialManager ucm = session.userCredentialManager();
-        CredentialModel trustedDeviceModel = ucm.createCredential(realm, user, trustedDeviceCredentialModel);
+        var cm = user.credentialManager();
+        var storedCredential = cm.createStoredCredential(trustedDeviceCredentialModel);
 
         // The execution order of the credential backed authenticators is controlled by the order of the stored credentials
         // not only by the order of the authenticator. There fore, we need to move the new device-credential right after the password credential.
-        ucm.getStoredCredentialsByTypeStream(realm, user, PasswordCredentialModel.TYPE)
+        cm.getStoredCredentialsByTypeStream(PasswordCredentialModel.TYPE)
                 .findFirst()
                 .ifPresent(passwordModel ->
-                        ucm.moveCredentialTo(realm, user, trustedDeviceModel.getId(), passwordModel.getId()));
+                        cm.moveStoredCredentialTo(storedCredential.getId(), passwordModel.getId()));
 
 
         return trustedDeviceCredentialModel;
@@ -68,14 +71,14 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
     @Override
     public boolean deleteCredential(RealmModel realm, UserModel user, String credentialId) {
 
-        UserCredentialManager ucm = session.userCredentialManager();
-        CredentialModel credentialModel = ucm.getStoredCredentialById(realm, user, credentialId);
+        var cm = user.credentialManager();
+        var credentialModel = cm.getStoredCredentialById(credentialId);
 
         boolean deleted = deleteMatchingDeviceCookieIfPresent(realm, credentialModel);
         if (deleted) {
             log.infof("Removed trusted device cookie for user. realm=%s userId=%s", realm.getName(), user.getId());
         }
-        return ucm.removeStoredCredential(realm, user, credentialId);
+        return cm.removeStoredCredentialById(credentialId);
     }
 
     /**
@@ -87,7 +90,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
      */
     private boolean deleteMatchingDeviceCookieIfPresent(RealmModel realm, CredentialModel credentialModel) {
 
-        HttpRequest httpRequest = Resteasy.getContextData(HttpRequest.class);
+        var httpRequest = Resteasy.getContextData(HttpRequest.class);
 
         if (httpRequest == null) {
             return false;
@@ -116,7 +119,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
     @Override
     public CredentialTypeMetadata getCredentialTypeMetadata(CredentialTypeMetadataContext metadataContext) {
 
-        CredentialTypeMetadata.CredentialTypeMetadataBuilder builder = CredentialTypeMetadata.builder();
+        var builder = CredentialTypeMetadata.builder();
         builder.type(getType());
         builder.category(CredentialTypeMetadata.Category.TWO_FACTOR);
         // TODO make backup code removal configurable
@@ -141,7 +144,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-        return session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().orElse(null) != null;
+        return user.credentialManager().getStoredCredentialsByTypeStream(credentialType).findAny().orElse(null) != null;
     }
 
     @Override
@@ -151,14 +154,27 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
             return false;
         }
 
-        TrustedDeviceCredentialInput tdci = (TrustedDeviceCredentialInput) credentialInput;
-        String deviceId = tdci.getChallengeResponse();
+        var tdci = (TrustedDeviceCredentialInput) credentialInput;
+        var deviceId = tdci.getChallengeResponse();
 
-        CredentialModel credentialModel = session.userCredentialManager().getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
+        var credentialModel = user.credentialManager().getStoredCredentialsByTypeStream(TrustedDeviceCredentialModel.TYPE)
                 .filter(cm -> cm.getSecretData().equals(deviceId))
                 .findAny().orElse(null);
 
         return credentialModel != null;
+    }
 
+    @AutoService(CredentialProviderFactory.class)
+    public static class Factory implements CredentialProviderFactory<TrustedDeviceCredentialProvider> {
+
+        @Override
+        public CredentialProvider<CredentialModel> create(KeycloakSession session) {
+            return new TrustedDeviceCredentialProvider(session);
+        }
+
+        @Override
+        public String getId() {
+            return TrustedDeviceCredentialProvider.ID;
+        }
     }
 }

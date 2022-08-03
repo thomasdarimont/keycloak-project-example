@@ -1,10 +1,16 @@
 package com.github.thomasdarimont.keycloak.custom.themes.login;
 
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
+import org.keycloak.Config;
+import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.forms.login.LoginFormsProviderFactory;
 import org.keycloak.forms.login.freemarker.FreeMarkerLoginFormsProvider;
+import org.keycloak.forms.login.freemarker.FreeMarkerLoginFormsProviderFactory;
 import org.keycloak.forms.login.freemarker.model.AuthenticationContextBean;
 import org.keycloak.forms.login.freemarker.model.ClientBean;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.theme.FreeMarkerUtil;
 import org.keycloak.theme.Theme;
 
@@ -37,5 +43,31 @@ public class AcmeFreeMarkerLoginFormsProvider extends FreeMarkerLoginFormsProvid
         }
 
         return super.processTemplate(theme, templateName, locale);
+    }
+
+    @AutoService(LoginFormsProviderFactory.class)
+    public static class Factory extends FreeMarkerLoginFormsProviderFactory {
+
+        private FreeMarkerUtil freeMarker;
+
+        @Override
+        public LoginFormsProvider create(KeycloakSession session) {
+            return new AcmeFreeMarkerLoginFormsProvider(session, freeMarker);
+        }
+
+        @Override
+        public void init(Config.Scope config) {
+            freeMarker = new FreeMarkerUtil();
+        }
+
+        @Override
+        public void postInit(KeycloakSessionFactory factory) {
+            // NOOP
+        }
+
+        @Override
+        public void close() {
+            freeMarker = null;
+        }
     }
 }

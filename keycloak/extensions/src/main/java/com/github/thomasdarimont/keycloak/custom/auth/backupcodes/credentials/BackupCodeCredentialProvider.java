@@ -3,18 +3,20 @@ package com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.BackupCode;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.BackupCodeConfig;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.action.GenerateBackupCodeAction;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
+import org.keycloak.credential.CredentialProviderFactory;
 import org.keycloak.credential.CredentialTypeMetadata;
 import org.keycloak.credential.CredentialTypeMetadata.CredentialTypeMetadataBuilder;
 import org.keycloak.credential.CredentialTypeMetadataContext;
 import org.keycloak.credential.hash.PasswordHashProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
+import org.keycloak.models.SubjectCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 
 @JBossLog
 public class BackupCodeCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
+
+    public static final String ID = "custom-backup-code";
 
     private final KeycloakSession session;
 
@@ -37,8 +41,7 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-        UserCredentialManager userCredentialManager = session.userCredentialManager();
-        return userCredentialManager.getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().isPresent();
+        return user.credentialManager().getStoredCredentialsByTypeStream(credentialType).findAny().isPresent();
     }
 
     @Override
@@ -50,15 +53,15 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
         PasswordHashProvider passwordHashProvider = session.getProvider(PasswordHashProvider.class,
                 backupCodeConfig.getHashingProviderId());
 
-        UserCredentialManager ucm = session.userCredentialManager();
-        List<CredentialModel> backupCodes = ucm.getStoredCredentialsByTypeStream(realm, user, getType())
+        var cm = user.credentialManager();
+        List<CredentialModel> backupCodes = cm.getStoredCredentialsByTypeStream(getType())
                 .collect(Collectors.toList());
 
         for (CredentialModel backupCode : backupCodes) {
             // check if the given backup code matches
             if (passwordHashProvider.verify(codeInput, PasswordCredentialModel.createFromCredentialModel(backupCode))) {
                 // we found matching backup code
-                handleUsedBackupCode(realm, user, ucm, backupCode);
+                handleUsedBackupCode(cm, backupCode);
                 return true;
             }
         }
@@ -67,9 +70,9 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
         return false;
     }
 
-    protected void handleUsedBackupCode(RealmModel realm, UserModel user, UserCredentialManager ucm, CredentialModel backupCode) {
+    protected void handleUsedBackupCode(SubjectCredentialManager cm, CredentialModel backupCode) {
         // delete backup code entry
-        ucm.removeStoredCredential(realm, user, backupCode.getId());
+        cm.removeStoredCredentialById(backupCode.getId());
     }
 
     @Override
@@ -100,7 +103,7 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
         PasswordCredentialModel encodedBackupCode = encodeBackupCode(backupCode, backupCodeConfig, passwordHashProvider);
         CredentialModel backupCodeModel = createBackupCodeCredentialModel(backupCode, encodedBackupCode);
 
-        session.userCredentialManager().createCredential(realm, user, backupCodeModel);
+        user.credentialManager().createStoredCredential(backupCodeModel);
 
         return backupCodeModel;
     }
@@ -132,8 +135,7 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
 
     @Override
     public boolean deleteCredential(RealmModel realm, UserModel user, String credentialId) {
-        UserCredentialManager userCredentialManager = session.userCredentialManager();
-        return userCredentialManager.removeStoredCredential(realm, user, credentialId);
+        return user.credentialManager().removeStoredCredentialById(credentialId);
     }
 
     @Override
@@ -162,5 +164,19 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
         builder.iconCssClass("kcAuthenticatorBackupCodeClass");
 
         return builder.build(session);
+    }
+
+    @AutoService(CredentialProviderFactory.class)
+    public static class Factory implements CredentialProviderFactory<BackupCodeCredentialProvider> {
+
+        @Override
+        public CredentialProvider<CredentialModel> create(KeycloakSession session) {
+            return new BackupCodeCredentialProvider(session);
+        }
+
+        @Override
+        public String getId() {
+            return BackupCodeCredentialProvider.ID;
+        }
     }
 }

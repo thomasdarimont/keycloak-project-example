@@ -2,7 +2,6 @@ package com.github.thomasdarimont.keycloak.custom.endpoints.credentials;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
-import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
@@ -17,7 +16,6 @@ import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
@@ -48,10 +46,10 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 public class UserCredentialsInfoResource {
 
-    private static final Set<String> RELEVANT_CREDENTIAL_TYPES = Set.of(PasswordCredentialModel.TYPE, SmsCredentialModel.TYPE, OTPCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, BackupCodeCredentialModel.TYPE, // TODO Remove support for backup codes
+    private static final Set<String> RELEVANT_CREDENTIAL_TYPES = Set.of(PasswordCredentialModel.TYPE, SmsCredentialModel.TYPE, OTPCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE,
             RecoveryAuthnCodesCredentialModel.TYPE);
 
-    private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(SmsCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, OTPCredentialModel.TYPE, BackupCodeCredentialModel.TYPE, // TODO Remove support for backup codes
+    private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(SmsCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, OTPCredentialModel.TYPE,
             RecoveryAuthnCodesCredentialModel.TYPE);
 
     private final KeycloakSession session;
@@ -131,8 +129,8 @@ public class UserCredentialsInfoResource {
         String credentialId = removeCredentialRequest.getCredentialId();
         // TODO check token.getAuth_time()
 
-        UserCredentialManager ucm = session.userCredentialManager();
-        var credentials = ucm.getStoredCredentialsByTypeStream(realm, user, credentialType).collect(Collectors.toList());
+        var credentialManager = user.credentialManager();
+        var credentials = credentialManager.getStoredCredentialsByTypeStream(credentialType).collect(Collectors.toList());
         if (credentials.isEmpty()) {
             return withCors(request, Response.status(Response.Status.NOT_FOUND)).build();
         }
@@ -155,7 +153,7 @@ public class UserCredentialsInfoResource {
     }
 
     private boolean removeCredentialForUser(RealmModel realm, UserModel user, CredentialModel credentialModel) {
-        boolean removed = session.userCredentialManager().removeStoredCredential(realm, user, credentialModel.getId());
+        boolean removed = user.credentialManager().removeStoredCredentialById(credentialModel.getId());
         if (removed && TrustedDeviceCredentialModel.TYPE.equals(credentialModel.getType()) && isCurrentRequestFromGivenTrustedDevice(credentialModel)) {
             // remove dangling trusted device cookie
             TrustedDeviceCookie.removeDeviceCookie(session, realm);
@@ -167,8 +165,8 @@ public class UserCredentialsInfoResource {
 
     private Map<String, List<CredentialInfo>> loadCredentialInfosForUser(RealmModel realm, UserModel user) {
 
-        var ucm = session.userCredentialManager();
-        var credentials = ucm.getStoredCredentialsStream(realm, user).collect(Collectors.toList());
+        var credentialManager = user.credentialManager();
+        var credentials = credentialManager.getStoredCredentialsStream().collect(Collectors.toList());
 
         var credentialData = new HashMap<String, List<CredentialInfo>>();
         for (var credential : credentials) {
@@ -239,7 +237,7 @@ public class UserCredentialsInfoResource {
     }
 
     private boolean shouldAggregate(String credentialType) {
-        return BackupCodeCredentialModel.TYPE.equals(credentialType);
+        return false;
     }
 
     private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {

@@ -6,12 +6,15 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDevic
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceName;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
-import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProviderFactory;
+import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProvider;
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
+import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialProvider;
@@ -19,8 +22,8 @@ import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.sessions.AuthenticationSessionModel;
@@ -106,9 +109,9 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         if (formParams.containsKey("dont-trust-device")) {
             log.info("Remove trusted device registration");
 
-            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceCredentialModel.lookupTrustedDevice(session, realm, user, receivedTrustedDeviceToken);
+            TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceCredentialModel.lookupTrustedDevice(user, receivedTrustedDeviceToken);
             if (trustedDeviceModel != null) {
-                boolean deleted = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProviderFactory.ID)
+                boolean deleted = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProvider.ID)
                         .deleteCredential(realm, user, trustedDeviceModel.getId());
                 if (deleted) {
 
@@ -145,7 +148,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
     private void registerNewTrustedDevice(KeycloakSession session, RealmModel realm, UserModel user, String deviceName, TrustedDeviceToken receivedTrustedDeviceToken) {
 
-        TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceCredentialModel.lookupTrustedDevice(session, realm, user, receivedTrustedDeviceToken);
+        TrustedDeviceCredentialModel currentTrustedDevice = TrustedDeviceCredentialModel.lookupTrustedDevice(user, receivedTrustedDeviceToken);
 
         if (currentTrustedDevice == null) {
             log.info("Register new trusted device");
@@ -159,11 +162,12 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         TrustedDeviceToken newTrustedDeviceToken = createDeviceToken(deviceId, numberOfDaysToTrustDevice);
 
         if (currentTrustedDevice == null) {
-            TrustedDeviceCredentialModel tdcm = new TrustedDeviceCredentialModel(null, deviceName, newTrustedDeviceToken.getDeviceId());
-            session.userCredentialManager().createCredentialThroughProvider(realm, user, tdcm);
+            var tdcm = new TrustedDeviceCredentialModel(null, deviceName, newTrustedDeviceToken.getDeviceId());
+            var cp = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProvider.ID);
+            cp.createCredential(realm, user, tdcm);
         } else {
             // update label name for existing device
-            session.userCredentialManager().updateCredentialLabel(realm, user, currentTrustedDevice.getId(), deviceName);
+            user.credentialManager().updateCredentialLabel(currentTrustedDevice.getId(), deviceName);
         }
 
         String deviceTokenString = session.tokens().encode(newTrustedDeviceToken);
@@ -174,14 +178,11 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
     private void removeTrustedDevices(RequiredActionContext context) {
 
-        KeycloakSession session = context.getSession();
-        UserCredentialManager ucm = session.userCredentialManager();
+        var user = context.getUser();
+        var scm = user.credentialManager();
 
-        RealmModel realm = context.getRealm();
-        UserModel user = context.getUser();
-
-        ucm.getStoredCredentialsByTypeStream(realm, user, TrustedDeviceCredentialModel.TYPE)
-                .forEach(cm -> ucm.removeStoredCredential(realm, user, cm.getId()));
+        scm.getStoredCredentialsByTypeStream(TrustedDeviceCredentialModel.TYPE)
+                .forEach(cm -> scm.removeStoredCredentialById(cm.getId()));
     }
 
     protected TrustedDeviceToken createDeviceToken(String deviceId, int numberOfDaysToTrustDevice) {
@@ -206,5 +207,46 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
     @Override
     public void close() {
         // NOOP
+    }
+
+    @AutoService(RequiredActionFactory.class)
+    public static class Factory implements RequiredActionFactory {
+
+        public static final ManageTrustedDeviceAction INSTANCE = new ManageTrustedDeviceAction();
+
+        @Override
+        public RequiredActionProvider create(KeycloakSession session) {
+            return INSTANCE;
+        }
+
+        @Override
+        public void init(Config.Scope config) {
+            // NOOP
+        }
+
+        @Override
+        public void postInit(KeycloakSessionFactory factory) {
+            // NOOP
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+        }
+
+        @Override
+        public String getId() {
+            return ManageTrustedDeviceAction.ID;
+        }
+
+        @Override
+        public String getDisplayText() {
+            return "Acme: Manage Trusted Device";
+        }
+
+        @Override
+        public boolean isOneTimeAction() {
+            return true;
+        }
     }
 }

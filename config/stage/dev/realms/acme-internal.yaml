@@ -156,12 +156,6 @@ requiredActions:
     enabled: true
     defaultAction: false
     priority: 1200
-  - alias: acme-generate-backup-codes
-    name: 'Acme: Generate Backup Codes'
-    providerId: acme-generate-backup-codes
-    enabled: true
-    defaultAction: false
-    priority: 1300
   - alias: acme-update-email
     name: 'Acme: Update Email'
     providerId: acme-update-email
@@ -588,8 +582,6 @@ authenticationFlows:
       - authenticator: acme-sms-authenticator
         requirement: ALTERNATIVE
         authenticatorConfig: "acme-sms-auth-default"
-      - authenticator: acme-auth-backup-code
-        requirement: ALTERNATIVE
       - authenticator: auth-recovery-authn-code-form
         requirement: ALTERNATIVE
 

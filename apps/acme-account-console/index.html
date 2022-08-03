@@ -339,7 +339,6 @@
         let otpInfo = credentialsData.credentialInfos['otp'];
         let smsInfo = credentialsData.credentialInfos['mfa-sms'];
         let trustedDeviceInfo = credentialsData.credentialInfos['acme-trusted-device'];
-        let backupCodeInfo = credentialsData.credentialInfos['backup-code'];
         let recoveryCodeInfo = credentialsData.credentialInfos['recovery-authn-codes'];
 
         let otpAuthHtml = "";
@@ -427,15 +426,6 @@
                 <td>${!!smsInfo ? '<a href="#" onclick="removeMfa(\'mfa-sms\');return false">Remove</a>' : ''}</td>
             </tr>
             ${trustedDeviceAuthHtml}
-            <tr>
-                 <td>${!!backupCodeInfo ? "&check;" : ""}</td>
-                 <td>Backup Code</td>
-                 <td>${!!backupCodeInfo ? escapeHtml(backupCodeInfo[0].credentialLabel) : ''}</td>
-                 <td>${!!backupCodeInfo ? formatDate(backupCodeInfo[0].createdAt) : '-'}</td>
-                 <td><a href="#" onclick="changeMfa('backup-code');return false">Update</a></td>
-                 <td>${!!backupCodeInfo ? '<a href="#" onclick="removeMfa(\'backup-code\');return false">Remove</a>' : ''}</td>
-            </tr>
-
             <tr>
                  <td>${!!recoveryCodeInfo ? "&check;" : ""}</td>
                  <td>Recovery Code</td>
@@ -534,7 +524,6 @@
             "otp": "CONFIGURE_TOTP",
             "mfa-sms": "acme-update-phonenumber",
             "acme-trusted-device": "acme-manage-trusted-device",
-            "backup-code": "acme-generate-backup-codes",
             "recovery-authn-codes": "CONFIGURE_RECOVERY_AUTHN_CODES",
         }
 
@@ -551,7 +540,7 @@
 
     async function removeMfa(credentialType, credentialId) {
 
-        if (!(["otp", "mfa-sms", "acme-trusted-device", "backup-code", "recovery-authn-codes"].includes(credentialType))) {
+        if (!(["otp", "mfa-sms", "acme-trusted-device", "recovery-authn-codes"].includes(credentialType))) {
             return;
         }
 

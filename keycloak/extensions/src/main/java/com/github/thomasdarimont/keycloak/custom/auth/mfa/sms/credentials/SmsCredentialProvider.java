@@ -2,22 +2,25 @@ package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials;
 
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.PhoneNumberUtils;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone.UpdatePhoneNumberRequiredAction;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
+import org.keycloak.credential.CredentialProviderFactory;
 import org.keycloak.credential.CredentialTypeMetadata;
 import org.keycloak.credential.CredentialTypeMetadataContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.representations.IDToken;
 
 @JBossLog
 public class SmsCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
+
+    public static final String ID = "acme-mfa-sms";
 
     private final KeycloakSession session;
 
@@ -32,8 +35,7 @@ public class SmsCredentialProvider implements CredentialProvider<CredentialModel
 
     @Override
     public boolean isConfiguredFor(RealmModel realm, UserModel user, String credentialType) {
-        UserCredentialManager userCredentialManager = session.userCredentialManager();
-        return userCredentialManager.getStoredCredentialsByTypeStream(realm, user, credentialType).findAny().isPresent();
+        return user.credentialManager().getStoredCredentialsByTypeStream(credentialType).findAny().isPresent();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class SmsCredentialProvider implements CredentialProvider<CredentialModel
         model.setUserLabel("SMS @ " + PhoneNumberUtils.abbreviatePhoneNumber(phoneNumber));
         model.writeCredentialData();
 
-        session.userCredentialManager().createCredential(realm, user, model);
+        user.credentialManager().createStoredCredential(model);
 
         return model;
     }
@@ -77,9 +79,7 @@ public class SmsCredentialProvider implements CredentialProvider<CredentialModel
 
     @Override
     public boolean deleteCredential(RealmModel realm, UserModel user, String credentialId) {
-
-        UserCredentialManager userCredentialManager = session.userCredentialManager();
-        return userCredentialManager.removeStoredCredential(realm, user, credentialId);
+        return user.credentialManager().removeStoredCredentialById(credentialId);
     }
 
     @Override
@@ -107,4 +107,19 @@ public class SmsCredentialProvider implements CredentialProvider<CredentialModel
         builder.iconCssClass("kcAuthenticatorMfaSmsClass");
         return builder.build(session);
     }
+
+    @AutoService(CredentialProviderFactory.class)
+    public static class Factory implements CredentialProviderFactory<SmsCredentialProvider> {
+
+        @Override
+        public CredentialProvider<CredentialModel> create(KeycloakSession session) {
+            return new SmsCredentialProvider(session);
+        }
+
+        @Override
+        public String getId() {
+            return SmsCredentialProvider.ID;
+        }
+    }
+
 }

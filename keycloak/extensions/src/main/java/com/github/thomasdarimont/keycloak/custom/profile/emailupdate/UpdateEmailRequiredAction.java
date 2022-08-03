@@ -1,10 +1,13 @@
 package com.github.thomasdarimont.keycloak.custom.profile.emailupdate;
 
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
+import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.common.util.SecretGenerator;
 import org.keycloak.email.EmailException;
@@ -17,6 +20,7 @@ import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
@@ -234,4 +238,47 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
     public void close() {
         // NOOP
     }
+
+
+    @AutoService(RequiredActionFactory.class)
+    public static class Factory implements RequiredActionFactory {
+
+        private static final UpdateEmailRequiredAction INSTANCE = new UpdateEmailRequiredAction();
+
+        @Override
+        public RequiredActionProvider create(KeycloakSession session) {
+            return INSTANCE;
+        }
+
+        @Override
+        public void init(Config.Scope config) {
+            // NOOP
+        }
+
+        @Override
+        public void postInit(KeycloakSessionFactory factory) {
+            // NOOP
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+        }
+
+        @Override
+        public String getId() {
+            return UpdateEmailRequiredAction.ID;
+        }
+
+        @Override
+        public String getDisplayText() {
+            return "Acme: Update Email";
+        }
+
+        @Override
+        public boolean isOneTimeAction() {
+            return true;
+        }
+    }
+
 }

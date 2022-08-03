@@ -4,10 +4,14 @@ import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.BackupCode;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.BackupCodeConfig;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.BackupCodeGenerator;
 import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialModel;
+import com.github.thomasdarimont.keycloak.custom.auth.backupcodes.credentials.BackupCodeCredentialProvider;
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
+import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
+import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
+import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
@@ -16,8 +20,8 @@ import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.forms.login.freemarker.model.RealmBean;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.UserCredentialManager;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.sessions.AuthenticationSessionModel;
@@ -70,9 +74,7 @@ public class GenerateBackupCodeAction implements RequiredActionProvider {
     }
 
     protected boolean backupCodesConfiguredForUser(RequiredActionContext context, UserModel user) {
-
-        UserCredentialManager ucm = context.getSession().userCredentialManager();
-        return ucm.getStoredCredentialsByTypeStream(context.getRealm(), user, getBackupCodeType())
+        return user.credentialManager().getStoredCredentialsByTypeStream(getBackupCodeType())
                 .findAny().isPresent();
     }
 
@@ -86,12 +88,13 @@ public class GenerateBackupCodeAction implements RequiredActionProvider {
 
         List<BackupCode> backupCodes = new ArrayList<>();
         long now = Time.currentTimeMillis();
-        UserCredentialManager userCredentialManager = session.userCredentialManager();
+        var credentialProvider = session.getProvider(BackupCodeCredentialProvider.class, BackupCodeCredentialProvider.ID);
         for (int i = 1, count = backupCodeConfig.getBackupCodeCount(); i <= count; i++) {
             BackupCode backupCode = generateBackupCode(backupCodeConfig, now, i);
             try {
                 // create and store new backup-code credential model
-                userCredentialManager.createCredentialThroughProvider(realm, user, new BackupCodeCredentialModel(backupCode));
+
+                credentialProvider.createCredential(realm, user, new BackupCodeCredentialModel(backupCode));
                 backupCodes.add(backupCode);
             } catch (Exception ex) {
                 log.warnf(ex, "Cloud not create backup code for user. realm=%s user=%s", realm.getId(), user.getId());
@@ -144,12 +147,12 @@ public class GenerateBackupCodeAction implements RequiredActionProvider {
 
     protected void removeExistingBackupCodesIfPresent(RealmModel realm, UserModel user, KeycloakSession session) {
 
-        UserCredentialManager userCredentialManager = session.userCredentialManager();
+        var credentialManager = user.credentialManager();
         log.debugf("Removing existing backup codes. realm=%s user=%s", realm.getId(), user.getId());
-        List<CredentialModel> credentials = userCredentialManager.getStoredCredentialsByTypeStream(realm, user, getBackupCodeType())
+        List<CredentialModel> credentials = credentialManager.getStoredCredentialsByTypeStream(getBackupCodeType())
                 .collect(Collectors.toList());
         for (CredentialModel credential : credentials) {
-            userCredentialManager.removeStoredCredential(realm, user, credential.getId());
+            credentialManager.removeStoredCredentialById(credential.getId());
         }
         log.debugf("Removed existing backup codes. realm=%s user=%s", realm.getId(), user.getId());
     }
@@ -177,4 +180,46 @@ public class GenerateBackupCodeAction implements RequiredActionProvider {
     public void close() {
         // NOOP
     }
+
+    @AutoService(RequiredActionFactory.class)
+    public static class Factory implements RequiredActionFactory {
+
+        public static final GenerateBackupCodeAction INSTANCE = new GenerateBackupCodeAction();
+
+        @Override
+        public RequiredActionProvider create(KeycloakSession session) {
+            return INSTANCE;
+        }
+
+        @Override
+        public void init(Config.Scope config) {
+            // NOOP
+        }
+
+        @Override
+        public void postInit(KeycloakSessionFactory factory) {
+            // NOOP
+        }
+
+        @Override
+        public void close() {
+            // NOOP
+        }
+
+        @Override
+        public String getId() {
+            return GenerateBackupCodeAction.ID;
+        }
+
+        @Override
+        public String getDisplayText() {
+            return "Acme: Generate Backup Codes";
+        }
+
+        @Override
+        public boolean isOneTimeAction() {
+            return true;
+        }
+    }
+
 }

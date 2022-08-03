@@ -15,10 +15,10 @@
 
     <properties>
         <cdi-api.version>2.0.2</cdi-api.version>
-        <smallrye-metrics.version>3.0.1</smallrye-metrics.version>
-        <smallrye-health.version>3.0.0</smallrye-health.version>
-        <microprofile-health-api.version>3.0</microprofile-health-api.version>
-        <microprofile-metrics-api.version>3.0</microprofile-metrics-api.version>
+        <smallrye-metrics.version>3.0.5</smallrye-metrics.version>
+        <smallrye-health.version>3.1.2</smallrye-health.version>
+        <microprofile-health-api.version>3.1</microprofile-health-api.version>
+        <microprofile-metrics-api.version>3.0.1</microprofile-metrics-api.version>
         <resteasy.version>4.7.5.Final</resteasy.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
     </properties>
