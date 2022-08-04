@@ -35,6 +35,7 @@ import java.util.Map;
 import static org.keycloak.authentication.authenticators.util.AuthenticatorUtils.getDisabledByBruteForceEventError;
 import static org.keycloak.services.validation.Validation.FIELD_USERNAME;
 
+@Deprecated
 public class BackupCodeAuthenticator extends AbstractFormAuthenticator {
 
     public static final String ID = "acme-auth-backup-code";

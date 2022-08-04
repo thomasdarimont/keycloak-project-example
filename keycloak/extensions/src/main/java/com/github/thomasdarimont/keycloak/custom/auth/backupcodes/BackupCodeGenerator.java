@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.backupcodes;
 
 import org.keycloak.common.util.SecretGenerator;
 
+@Deprecated
 public class BackupCodeGenerator {
 
     // TODO consider using a method like Base32 to reduce potential for typos when a code is entered manually

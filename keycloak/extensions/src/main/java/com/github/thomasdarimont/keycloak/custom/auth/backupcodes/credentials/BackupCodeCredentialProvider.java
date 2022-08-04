@@ -23,6 +23,7 @@ import org.keycloak.models.credential.PasswordCredentialModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Deprecated
 @JBossLog
 public class BackupCodeCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
 

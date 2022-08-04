@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.auth.backupcodes;
 
+@Deprecated
 public class BackupCode {
 
     private final String id;

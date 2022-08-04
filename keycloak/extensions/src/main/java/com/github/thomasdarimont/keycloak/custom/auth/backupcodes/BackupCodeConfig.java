@@ -4,6 +4,7 @@ import lombok.Data;
 import org.keycloak.credential.hash.Pbkdf2Sha256PasswordHashProviderFactory;
 import org.keycloak.models.RealmModel;
 
+@Deprecated
 @Data
 public class BackupCodeConfig {
 
