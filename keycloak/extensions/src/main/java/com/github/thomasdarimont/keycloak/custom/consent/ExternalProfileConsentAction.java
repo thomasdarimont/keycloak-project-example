@@ -3,6 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.consent;
 import com.google.auto.service.AutoService;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.authentication.DisplayTypeRequiredActionFactory;
@@ -41,13 +42,14 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
+@JBossLog
 @AutoService(RequiredActionFactory.class)
 public class ExternalProfileConsentAction implements RequiredActionProvider, RequiredActionFactory, DisplayTypeRequiredActionFactory {
 
     private static final boolean REQUIRE_UPDATE_PROFILE_AFTER_CONSENT_UPDATE = false;
 
     private static final String AUTH_SESSION_CONSENT_CHECK_MARKER = "checked";
-    public static final String CONSENTED_FIELD_LIST = "CONSENTED_FIELD_LIST";
+    public static final String CONSENTED_ATTRIBUTES_LIST = "CONSENTED_ATTRIBUTES_LIST";
 
     @Override
     public String getId() {
@@ -116,6 +118,7 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
     }
 
     private boolean isDynamicConsentManagementEnabled(ClientModel client) {
+        // TODO add logic here to determine if client is elegible for dynamic consent management
         return Set.of("app-greetme", "app-consent-demo").contains(client.getClientId());
     }
 
@@ -123,10 +126,10 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
     public void requiredActionChallenge(RequiredActionContext context) {
 
         // Show form
-        context.challenge(createForm(context, null));
+        context.challenge(createForm(context, Collections.emptyMap(), null));
     }
 
-    protected Response createForm(RequiredActionContext context, Consumer<LoginFormsProvider> formCustomizer) {
+    protected Response createForm(RequiredActionContext context, Map<String, String> profileUpdate, Consumer<LoginFormsProvider> formCustomizer) {
 
         var form = context.form();
         var user = context.getUser();
@@ -136,7 +139,16 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
         var authSession = context.getAuthenticationSession();
         var session = context.getSession();
 
-        Function<ProfileAttribute, ScopeFieldBean> fun = f -> new ScopeFieldBean(f, user);
+        Function<ProfileAttribute, ScopeAttributeBean> convertAttributeToAttributeBean = attribute -> {
+
+            // override the value sent from the server with the current user input
+            String value = profileUpdate.get(attribute.getName());
+            if (value != null && !value.isBlank()) {
+                attribute.setValue(value);
+            }
+
+            return new ScopeAttributeBean(attribute, user);
+        };
 
         var scopeInfo = getScopeInfo(session, authSession, user);
         var grantedRequired = scopeInfo.getGrantedRequired();
@@ -147,27 +159,27 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
         var realm = context.getRealm();
 
         var requestedScopeNames = scopeInfo.getRequestedScopeNames();
-        var scopeFieldMapping = ProfileClient.getProfileAttributesForConsentForm(session, realm, client, requestedScopeNames, user) //
+        var scopeAttributeMapping = ProfileClient.getProfileAttributesForConsentForm(session, realm, client, requestedScopeNames, user) //
                 .getMapping();
 
-        var fieldNameList = new ArrayList<String>();
+        var attributeNameList = new ArrayList<String>();
         var scopes = new ArrayList<ScopeBean>();
         for (var currentScopes : List.of(grantedRequired, missingRequired, grantedOptional, missingOptional)) {
             for (var scope : currentScopes) {
 
-                var fields = scopeFieldMapping.getOrDefault(scope.getName(), List.of()).stream().map(fun).collect(toList());
-                fields.stream().map(ScopeFieldBean::getName).forEach(fieldNameList::add);
+                var attributeBeans = scopeAttributeMapping.getOrDefault(scope.getName(), List.of()).stream().map(convertAttributeToAttributeBean).collect(toList());
+                attributeBeans.stream().map(ScopeAttributeBean::getName).forEach(attributeNameList::add);
                 var optional = currentScopes == grantedOptional || currentScopes == missingOptional;
                 var granted = currentScopes == grantedRequired || currentScopes == grantedOptional;
-                scopes.add(new ScopeBean(scope, optional, granted, fields));
+                scopes.add(new ScopeBean(scope, optional, granted, attributeBeans));
             }
         }
 
         scopes.sort(ScopeBean.DEFAULT_ORDER);
-        authSession.setAuthNote(CONSENTED_FIELD_LIST, String.join(",", fieldNameList));
+        authSession.setAuthNote(CONSENTED_ATTRIBUTES_LIST, String.join(",", attributeNameList));
 
         try {
-            System.out.printf("Scope Profile Field Mapping: %s%n", JsonSerialization.writeValueAsString(scopes));
+            log.debugf("Scope Profile Attribute Mapping: %s%n", JsonSerialization.writeValueAsString(scopes));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -208,7 +220,7 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
 
             event.error(Errors.CONSENT_DENIED);
             // return to the application without consent update
-            UserConsentModel consentModel = session.users().getConsentByClient(realm, userId, client.getId());
+            var consentModel = session.users().getConsentByClient(realm, userId, client.getId());
             if (consentModel == null) {
                 // No consents given: Deny access to application
                 context.failure();
@@ -252,11 +264,11 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
         if (!scopesToAskForConsent.isEmpty()) {
             // TODO find a way to merge the existing consent with the new consent instead of replacing the existing consent
             var consentByClient = users.getConsentByClient(realm, userId, client.getId());
-            var consentedFieldList = List.of(authSession.getAuthNote(CONSENTED_FIELD_LIST).split(","));
+            var consentedAttributesList = List.of(authSession.getAuthNote(CONSENTED_ATTRIBUTES_LIST).split(","));
 
             var profileUpdate = new HashMap<String, String>();
-            for (var fieldName : consentedFieldList) {
-                profileUpdate.put(fieldName, formParameters.getFirst(fieldName));
+            for (var attributeName : consentedAttributesList) {
+                profileUpdate.put(attributeName, formParameters.getFirst(attributeName));
             }
 
             var askedScopeNames = scopesToAskForConsent.stream().map(ClientScopeModel::getName).collect(Collectors.toSet());
@@ -265,12 +277,11 @@ public class ExternalProfileConsentAction implements RequiredActionProvider, Req
             // check profile update result
             if (profileUpdateResult.hasErrors()) {
 
-                context.challenge(createForm(context, form -> {
+                context.challenge(createForm(context, profileUpdate, form -> {
                     // show / populate form again with validation errors -> proceed with context.challenge(..)
-                    List<FormMessage> fieldErrors = profileUpdateResult.getErrors().stream() //
+                    List<FormMessage> attributeErrors = profileUpdateResult.getErrors().stream() //
                             .map(attributeError -> new FormMessage(attributeError.getAttributeName(), attributeError.getMessage())).collect(toList());
-                    form.setErrors(fieldErrors);
-                    form.setFormData(new MultivaluedHashMap<>(profileUpdate));
+                    form.setErrors(attributeErrors);
                 }));
                 return;
             }

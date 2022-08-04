@@ -14,4 +14,8 @@ public class UserProfileAttributeValidationErrors {
     public void addError(String type, UserProfileAttribute attribute, String message) {
         errors.add(new UserProfileAttributeValidationError(type, attribute.getName(), message));
     }
+
+    public boolean isEmpty() {
+        return errors.isEmpty();
+    }
 }

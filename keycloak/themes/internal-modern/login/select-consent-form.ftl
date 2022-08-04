@@ -42,41 +42,42 @@
                                 </p>
                             </div>
 
-                            <#-- Field details by scope -->
+                            <#-- Attribute details by scope -->
                             <#-- -->
                             <#if !grantedScopeNames?seq_contains(scope.name) >
                             <div class="${properties.kcFormGroupClass!}">
-                                <#list scope.fields as scopeField>
+                                <#list scope.attributes as scopeAttribute>
                                     <div class="${properties.kcInputWrapperClass!}">
 
                                         <div class="${properties.kcLabelWrapperClass!}">
-                                            <label for="${scopeField.name}">${msg(scopeField.name)}</label>
-                                            <#if scopeField.required>*</#if>
+                                            <label for="${scopeAttribute.name}">${msg(scopeAttribute.name)}</label>
+                                            <#if scopeAttribute.required>*</#if>
                                         </div>
 
                                         <div class="${properties.kcInputWrapperClass!}">
 
-                                        <#if scopeField.annotations['inputType']?? && scopeField.annotations['inputType'] == 'select'>
-                                            <select name="${scopeField.name}" id="${scopeField.name}">
-                                                <#list scopeField.allowedValues as allowedValue>
-                                                <option value="${allowedValue}">${msg(allowedValue)}</option>
+                                        <#if scopeAttribute.annotations['inputType']?? && scopeAttribute.annotations['inputType'] == 'select'>
+                                            <select name="${scopeAttribute.name}" id="${scopeAttribute.name}">
+                                                <#list scopeAttribute.allowedValues as allowedValue>
+                                                <option value="${allowedValue}" <#if allowedValue == (scopeAttribute.value!'')>selected</#if>>${msg(allowedValue)}</option>
                                                 </#list>
                                             </select>
 
                                         <#else>
 
-                                            <input id="${scopeField.name}"
-                                                   type="${scopeField.type}"
-                                                   name="${scopeField.name}"
-                                                   value="${(scopeField.value!'')}"
-                                                   <#if scopeField.readOnly>disabled</#if>
+                                            <input id="${scopeAttribute.name}"
+                                                   type="${scopeAttribute.type}"
+                                                   name="${scopeAttribute.name}"
+                                                   value="${(scopeAttribute.value!'')}"
+                                                   autocomplete="off"
+                                                   <#if scopeAttribute.readOnly>disabled</#if>
 <#--                                                   -->
                                             />
                                         </#if>
 
-                                            <#if messagesPerField.existsError(scopeField.name)>
-                                            <span id="input-error-${scopeField.name?replace(".","-")}" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
-                                                ${kcSanitize(messagesPerField.get(scopeField.name))?no_esc}
+                                            <#if messagesPerField.existsError(scopeAttribute.name)>
+                                            <span id="input-error-${scopeAttribute.name?replace(".","-")}" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
+                                                ${kcSanitize(messagesPerField.get(scopeAttribute.name))?no_esc}
                                             </span>
                                             </#if>
                                         </div>

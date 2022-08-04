@@ -25,7 +25,7 @@ public class ScopeBean {
     private final boolean granted;
 
     @JsonIgnore
-    private final List<ScopeFieldBean> scopeFields;
+    private final List<ScopeAttributeBean> attributes;
 
     public boolean isOptional() {
         return optional;
@@ -57,8 +57,8 @@ public class ScopeBean {
         return scopeModel.getDescription();
     }
 
-    public List<ScopeFieldBean> getFields() {
-        return Collections.unmodifiableList(scopeFields);
+    public List<ScopeAttributeBean> getAttributes() {
+        return Collections.unmodifiableList(attributes);
     }
 
     @Override

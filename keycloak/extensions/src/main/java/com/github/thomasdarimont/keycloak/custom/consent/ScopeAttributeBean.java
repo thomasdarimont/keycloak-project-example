@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
-public class ScopeFieldBean {
+public class ScopeAttributeBean {
 
     @JsonIgnore
     private final ProfileAttribute attribute;

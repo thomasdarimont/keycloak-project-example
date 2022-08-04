@@ -79,6 +79,8 @@ public class ConsentAwareUserProfileService {
 
         var profileSchema = userProfileSchemaRepository.getProfileSchema(clientId);
 
+        Map<String, Runnable> attributeUpdates = new HashMap<>();
+
         for (var entry : profileSchema.getScopeAttributeMapping(scopes).entrySet()) {
             var scope = entry.getKey();
             var attributes = entry.getValue();
@@ -94,16 +96,27 @@ public class ConsentAwareUserProfileService {
                 }
 
                 var newValue = profileUpdate.get(attribute.getName());
-                if (attribute.isValid(profile, newValue, validationErrors)) {
-                    attribute.update(profile, newValue);
+                if (!attribute.isValid(profile, newValue, validationErrors)) {
+                    continue;
                 }
+
+                // collect attribute updates
+                attributeUpdates.put(scope + ":" + attribute.getName(), () -> {
+                    attribute.update(profile, newValue);
+                });
             }
         }
+
+        if (!validationErrors.isEmpty()) {
+            return;
+        }
+
+        // apply attribute updates
+        attributeUpdates.values().forEach(Runnable::run);
 
         // update internal attributes
         if (profileUpdate.containsKey("email_verified")) {
             profile.setEmailVerified(Boolean.parseBoolean(profileUpdate.get("email_verified")));
         }
-
     }
 }
