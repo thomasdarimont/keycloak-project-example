@@ -13,6 +13,7 @@ RUN microdnf update -y && microdnf install -y java-17-openjdk-devel && microdnf 
 
 ## Workaround for adding the current certifcate to the cacerts truststore
 # Import certificate into cacerts truststore
+RUN echo 1659621300842
 COPY --chown=keycloak:keycloak "./acme.test+1.pem" "/etc/x509/tls.crt.pem"
 RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass changeit || echo "Failed to import cert"
 
