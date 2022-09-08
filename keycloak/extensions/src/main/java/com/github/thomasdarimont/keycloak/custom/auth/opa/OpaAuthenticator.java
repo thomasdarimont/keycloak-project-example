@@ -9,6 +9,7 @@ import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticationExecutionModel;
+import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
@@ -20,6 +21,7 @@ import org.keycloak.services.messages.Messages;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @JBossLog
 public class OpaAuthenticator implements Authenticator {
@@ -39,7 +41,9 @@ public class OpaAuthenticator implements Authenticator {
         var user = context.getUser();
         var authSession = context.getAuthenticationSession();
 
-        var access = opaClient.checkAccess(session, context.getAuthenticatorConfig(), realm, user, authSession.getClient(), OpaClient.OPA_ACTION_LOGIN);
+        var authenticatorConfig = context.getAuthenticatorConfig();
+        var config = authenticatorConfig != null ? authenticatorConfig.getConfig() : null;
+        var access = opaClient.checkAccess(session, config, realm, user, authSession.getClient(), OpaClient.OPA_ACTION_LOGIN);
 
         if (!access.isAllowed()) {
             var loginForm = session.getProvider(LoginFormsProvider.class);

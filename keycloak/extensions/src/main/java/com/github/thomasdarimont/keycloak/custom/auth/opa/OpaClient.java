@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.broker.provider.util.SimpleHttp;
-import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
@@ -54,7 +53,7 @@ public class OpaClient {
 
     public static final String OPA_AUTHZ_URL = "authzUrl";
 
-    public AccessResponse checkAccess(KeycloakSession session, AuthenticatorConfigModel config, RealmModel realm, UserModel user, ClientModel client, String action) {
+    public AccessResponse checkAccess(KeycloakSession session, Map<String, String> config, RealmModel realm, UserModel user, ClientModel client, String action) {
 
         var username = user.getUsername();
         var realmRoles = getBoolean(config, OPA_USE_REALM_ROLES, true) ? fetchRealmRoles(user) : null;
@@ -89,13 +88,8 @@ public class OpaClient {
         return accessResponse;
     }
 
-    private <T> Map<String, Object> extractAttributes(T source, AuthenticatorConfigModel configModel, String attributesKey, BiFunction<T, String, Object> valueExtractor, Function<T, Map<String, Object>> defaultValuesExtractor) {
+    private <T> Map<String, Object> extractAttributes(T source, Map<String, String> config, String attributesKey, BiFunction<T, String, Object> valueExtractor, Function<T, Map<String, Object>> defaultValuesExtractor) {
 
-        if (configModel == null && defaultValuesExtractor != null) {
-            return defaultValuesExtractor.apply(source);
-        }
-
-        var config = configModel.getConfig();
         if (config == null) {
             return defaultValuesExtractor.apply(source);
         }
@@ -114,9 +108,9 @@ public class OpaClient {
         return attributes;
     }
 
-    private Map<String, Object> extractUserAttributes(UserModel user, AuthenticatorConfigModel configModel) {
+    private Map<String, Object> extractUserAttributes(UserModel user, Map<String, String> config) {
 
-        var userAttributes = extractAttributes(user, configModel, OPA_USER_ATTRIBUTES, (u, attr) -> {
+        var userAttributes = extractAttributes(user, config, OPA_USER_ATTRIBUTES, (u, attr) -> {
             Object value;
             switch (attr) {
                 case "id":
@@ -149,14 +143,14 @@ public class OpaClient {
         return userAttributes;
     }
 
-    private Map<String, Object> extractClientAttributes(ClientModel client, AuthenticatorConfigModel configModel) {
+    private Map<String, Object> extractClientAttributes(ClientModel client, Map<String, String> config) {
         var clientConfig = new ClientConfig(client);
-        return extractAttributes(client, configModel, OPA_CLIENT_ATTRIBUTES, (c, attr) -> clientConfig.getValue(attr), c -> null);
+        return extractAttributes(client, config, OPA_CLIENT_ATTRIBUTES, (c, attr) -> clientConfig.getValue(attr), c -> null);
     }
 
-    private Map<String, Object> extractRealmAttributes(RealmModel realm, AuthenticatorConfigModel configModel) {
+    private Map<String, Object> extractRealmAttributes(RealmModel realm, Map<String, String> config) {
         var realmConfig = new RealmConfig(realm);
-        return extractAttributes(realm, configModel, OPA_REALM_ATTRIBUTES, (r, attr) -> realmConfig.getValue(attr), r -> null);
+        return extractAttributes(realm, config, OPA_REALM_ATTRIBUTES, (r, attr) -> realmConfig.getValue(attr), r -> null);
     }
 
     private static List<String> fetchGroupNames(UserModel user) {
@@ -182,13 +176,8 @@ public class OpaClient {
         return role.getName();
     }
 
-    private boolean getBoolean(AuthenticatorConfigModel configModel, String key, boolean defaultValue) {
+    private boolean getBoolean(Map<String, String> config, String key, boolean defaultValue) {
 
-        if (configModel == null) {
-            return defaultValue;
-        }
-
-        var config = configModel.getConfig();
         if (config == null) {
             return defaultValue;
         }
@@ -216,18 +205,13 @@ public class OpaClient {
         }
     }
 
-    private String getAuthzUrl(AuthenticatorConfigModel config) {
+    private String getAuthzUrl(Map<String, String> config) {
 
         if (config == null) {
             return DEFAULT_OPA_AUTHZ_URL;
         }
 
-        var configMap = config.getConfig();
-        if (configMap == null) {
-            return DEFAULT_OPA_AUTHZ_URL;
-        }
-
-        return configMap.getOrDefault(OPA_AUTHZ_URL, DEFAULT_OPA_AUTHZ_URL);
+        return config.getOrDefault(OPA_AUTHZ_URL, DEFAULT_OPA_AUTHZ_URL);
     }
 
     @Data
