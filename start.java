@@ -45,6 +45,7 @@ class start {
     static final String HTTPS_OPT = "--https";
     static final String PROVISION_OPT = "--provision";
     static final String OPENLDAP_OPT = "--openldap";
+    static final String OPA_OPT = "--opa";
     static final String KEYCLOAK_OPT = "--keycloak=keycloak";
     static final String POSTGRES_OPT = "--database=postgres";
     static final String MSSQL_OPT = "--database=mssql";
@@ -67,6 +68,7 @@ class start {
         var useProvision = !argList.contains(PROVISION_OPT + "=false");
         var useOpenLdap = argList.contains(OPENLDAP_OPT) || argList.contains(OPENLDAP_OPT + "=true");
         var usePostgres = argList.contains(POSTGRES_OPT);
+        var useOpa = argList.contains(OPA_OPT);
         var useMssql = argList.contains(MSSQL_OPT);
         var useMysql = argList.contains(MYSQL_OPT);
         var useDatabase = usePostgres || useMysql || useMssql;
@@ -148,6 +150,11 @@ class start {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-openldap.yml");
             envFiles.add("deployments/local/dev/keycloak-openldap.env");
+        }
+
+        if (useOpa) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-opa.yml");
         }
 
         if (EXTENSIONS_OPT_CLASSES.equals(extension)) {

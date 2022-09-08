@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Keycloak Scripts" type="Remote">
-    <module name="keycloak-project-template" />
+  <configuration default="false" name="Keycloak Remote" type="Remote">
+    <module name="extensions" />
     <option name="USE_SOCKET_TRANSPORT" value="true" />
     <option name="SERVER_MODE" value="false" />
     <option name="SHMEM_ADDRESS" />
