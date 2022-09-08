@@ -39,7 +39,7 @@ public class OpaAuthenticator implements Authenticator {
         var user = context.getUser();
         var authSession = context.getAuthenticationSession();
 
-        var access = opaClient.checkAccess(session, context.getAuthenticatorConfig(), realm, user, authSession.getClient());
+        var access = opaClient.checkAccess(session, context.getAuthenticatorConfig(), realm, user, authSession.getClient(), OpaClient.OPA_ACTION_LOGIN);
 
         if (!access.isAllowed()) {
             var loginForm = session.getProvider(LoginFormsProvider.class);

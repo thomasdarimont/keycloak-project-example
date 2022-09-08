@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
 @JBossLog
 public class OpaClient {
 
-    static final String DEFAULT_OPA_AUTHZ_URL = "http://acme-opa:8181/v1/data/iam/keycloak/allow";
+    public static final String OPA_ACTION_LOGIN = "login";
+
+    public static final String DEFAULT_OPA_AUTHZ_URL = "http://acme-opa:8181/v1/data/iam/keycloak/allow";
 
     public static final String OPA_USE_REALM_ROLES = "useRealmRoles";
 
@@ -49,10 +51,10 @@ public class OpaClient {
     public static final String OPA_CLIENT_ATTRIBUTES = "clientAttributes";
 
     public static final String OPA_USE_GROUPS = "useGroups";
-    
+
     public static final String OPA_AUTHZ_URL = "authzUrl";
 
-    public AccessResponse checkAccess(KeycloakSession session, AuthenticatorConfigModel config, RealmModel realm, UserModel user, ClientModel client) {
+    public AccessResponse checkAccess(KeycloakSession session, AuthenticatorConfigModel config, RealmModel realm, UserModel user, ClientModel client, String action) {
 
         var username = user.getUsername();
         var realmRoles = getBoolean(config, OPA_USE_REALM_ROLES, true) ? fetchRealmRoles(user) : null;
@@ -65,7 +67,7 @@ public class OpaClient {
         var realmAttributes = getBoolean(config, OPA_USE_REALM_ATTRIBUTES, false) ? extractRealmAttributes(realm, config) : null;
         var clientAttributes = getBoolean(config, OPA_USE_CLIENT_ATTRIBUTES, false) ? extractClientAttributes(client, config) : null;
         var resource = new Resource(realm.getName(), realmAttributes, client.getClientId(), clientAttributes);
-        var accessRequest = new AccessRequest(subject, resource);
+        var accessRequest = new AccessRequest(subject, resource, action);
 
         try {
             log.infof("Sending OPA authorization request. realm=%s user=%s client=%s\n%s", //
@@ -233,6 +235,7 @@ public class OpaClient {
 
         private final Subject subject;
         private final Resource resource;
+        private final String action;
     }
 
     @Data
