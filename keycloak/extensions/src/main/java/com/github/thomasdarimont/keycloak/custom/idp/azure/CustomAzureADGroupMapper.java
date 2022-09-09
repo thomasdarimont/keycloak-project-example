@@ -108,9 +108,16 @@ public class CustomAzureADGroupMapper extends AbstractClaimMapper {
         JsonWebToken aadIdToken = (JsonWebToken) context.getContextData().get(OIDCIdentityProvider.VALIDATED_ID_TOKEN);
         if (aadIdToken == null) {
             log.errorf("Could not find validated AAD IDToken");
+            return;
+        }
+
+        if (aadIdToken.getOtherClaims() == null) {
+            log.errorf("Could not find additional claims in AAD IDToken");
+            return;
         }
 
         // extract group ids from AAD ID-Token
+        @SuppressWarnings("unchecked")
         List<String> assignedGroupIds = (List<String>) aadIdToken.getOtherClaims().get("groups");
 
         if (assignedGroupIds == null || assignedGroupIds.isEmpty()) {
