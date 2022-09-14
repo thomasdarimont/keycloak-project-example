@@ -24,7 +24,8 @@ public class UsersController
     public object Me() {
 
         _logger.LogInformation("### Accessing {}", _accessor.HttpContext?.Request.Path.Value);
-        var username = _accessor.HttpContext?.User.FindFirst("preferred_username")?.Value;
+        // var username = _accessor.HttpContext?.User.FindFirst("preferred_username")?.Value;
+        var username = _accessor.HttpContext?.User?.Identity?.Name;
 
         var data = new Dictionary<string,object>
         {
