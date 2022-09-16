@@ -1,25 +1,36 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-// Add services to the container.
+namespace backend_api_dotnet;
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var loggerFactory = LoggerFactory
+            .Create(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddConsole();
+            });
+            var builder = CreateHostBuilder(args, loggerFactory);
+            loggerFactory.CreateLogger<Program>().LogInformation("Hello!");
 
-var app = builder.Build();
+            builder.Build().Run();
+        }
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+        public static IHostBuilder CreateHostBuilder(string[] args, ILoggerFactory loggerFactory) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => 
+                    webBuilder.UseStartup(context => new Startup(context.Configuration, loggerFactory))
+                );
+    }
