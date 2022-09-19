@@ -1,5 +1,7 @@
 package iam.keycloak
 
+import future.keywords.in
+
 default allow = {
     "allow": false,
     "message": "access-denied"
@@ -9,7 +11,7 @@ default allow = {
 allow = result {
 
     input.resource.realm == "acme-internal"
-    input.subject.realmRoles[_] == "acme-user"
+    "acme-user" in input.subject.roles
 
     result = _allow(true, "acme-user can access")
 }
