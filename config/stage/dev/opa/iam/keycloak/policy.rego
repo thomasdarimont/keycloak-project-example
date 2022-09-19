@@ -11,7 +11,7 @@ default allow = {
 allow = result {
 
     input.resource.realm == "acme-internal"
-    "acme-user" in input.subject.roles
+    "acme-user" in input.subject.realmRoles
 
     result = _allow(true, "acme-user can access")
 }

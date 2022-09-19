@@ -1,11 +1,11 @@
 services:
   acme-opa:
-    build:
-      context: "."
-      dockerfile: "./opa/Dockerfile"
+    image: openpolicyagent/opa:0.44.0-rootless
     command:
       - run
       - --server
+      - --set
+      - "decision_logs.console=true"
     ports:
       - "18181:8181"
       - "18182:8182"

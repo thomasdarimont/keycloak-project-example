@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.auth.opa;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
@@ -246,10 +247,15 @@ public class OpaClient {
 
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     static class AccessResponse {
 
         private Map<String, Object> result;
+
+        private Map<String, Object> additionalData = new HashMap<>();
+
+        public AccessResponse(Map<String, Object> result) {
+            this.result = result;
+        }
 
         @JsonIgnore
         public boolean isAllowed() {
@@ -265,6 +271,11 @@ public class OpaClient {
                 return null;
             }
             return (String) hint;
+        }
+
+        @JsonAnySetter
+        public void handleUnknownProperty(String key, Object value) {
+            this.additionalData.put(key, value);
         }
     }
 

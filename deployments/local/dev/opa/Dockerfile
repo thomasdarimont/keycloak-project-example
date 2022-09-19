@@ -1,1 +1,0 @@
-FROM openpolicyagent/opa:0.44.0-envoy-static

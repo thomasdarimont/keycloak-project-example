@@ -9,7 +9,7 @@ Example Auth-Flow
 Example Authenticator Config
 ![img.png](auth-config.png)
 
-OPA URL: `http://localhost:18181/v1/policies/iam/keycloak/allow`
+OPA URL: `http://localhost:8181/v1/policies/iam/keycloak/allow`
 Attributes: `acme.greeting`
 
 # Deploy policies
