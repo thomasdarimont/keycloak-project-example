@@ -82,6 +82,7 @@ services:
     volumes:
       - ../../../keycloak/themes:/opt/keycloak/themes:z
       - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
+      - ../../../keycloak/config/quarkus.properties:/opt/keycloak/conf/quarkus.properties:z
       - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
       - ../../../keycloak/imex:/opt/keycloak/imex:z
