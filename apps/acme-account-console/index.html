@@ -505,6 +505,9 @@
     }
 
     function formatDate(timestamp) {
+        if (!timestamp) {
+            return "--";
+        }
         return new Intl.DateTimeFormat('de-DE', {dateStyle: 'medium', timeStyle: 'short'}).format(new Date(timestamp))
     }
 

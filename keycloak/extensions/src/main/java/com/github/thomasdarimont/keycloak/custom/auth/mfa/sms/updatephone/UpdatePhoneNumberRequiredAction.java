@@ -2,11 +2,11 @@ package com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.updatephone;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.PhoneNumberUtils;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
-import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialProvider;
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
@@ -16,6 +16,7 @@ import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.common.util.Time;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
@@ -127,9 +128,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
         String phoneNumber = formData.getFirst(PHONE_NUMBER_FIELD);
 
-        EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PROFILE_ERROR)
-                .client(authSession.getClient())
-                .user(authSession.getAuthenticatedUser());
+        EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PROFILE_ERROR).client(authSession.getClient()).user(authSession.getAuthenticatedUser());
 
 
         if (formData.getFirst(FORM_ACTION_UPDATE) != null) {
@@ -148,8 +147,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
             form.setAttribute("currentMobile", phoneNumber);
 
             boolean useWebOtp = true;
-            boolean result = createSmsSender(context)
-                    .sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), SmsAuthenticator.VERIFY_CODE_LENGTH, SmsAuthenticator.CODE_TTL, useWebOtp, authSession);
+            boolean result = createSmsSender(context).sendVerificationCode(session, realm, user, phoneNumber, Map.of("client", SmsClientFactory.MOCK_SMS_CLIENT), SmsAuthenticator.VERIFY_CODE_LENGTH, SmsAuthenticator.CODE_TTL, useWebOtp, authSession);
             if (!result) {
                 log.warnf("Failed to send sms message. realm=%s user=%s", realm.getName(), user.getId());
             }
@@ -195,16 +193,16 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
     protected void updateSmsMfaCredential(RealmModel realm, UserModel user, KeycloakSession session, String phoneNumber) {
 
         var credentialManager = user.credentialManager();
-        credentialManager.getStoredCredentialsByTypeStream(SmsCredentialModel.TYPE).forEach(
-                cm -> credentialManager.removeStoredCredentialById(cm.getId())
-        );
+        credentialManager.getStoredCredentialsByTypeStream(SmsCredentialModel.TYPE).forEach(cm -> credentialManager.removeStoredCredentialById(cm.getId()));
 
         SmsCredentialModel model = new SmsCredentialModel();
-        // TODO add support for referencing the phoneNumber from the user profile.
         model.setPhoneNumber(phoneNumber);
+        model.setType(SmsCredentialModel.TYPE);
+        model.setCreatedDate(Time.currentTimeMillis());
+        model.setUserLabel("SMS @ " + PhoneNumberUtils.abbreviatePhoneNumber(phoneNumber));
+        model.writeCredentialData();
 
-        var credentialProvider = session.getProvider(SmsCredentialProvider.class, SmsCredentialProvider.ID);
-        var credential = credentialProvider.createCredential(realm, user, model);
+        var credential = user.credentialManager().createStoredCredential(model);
         if (credential != null) {
             AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD);
         }
