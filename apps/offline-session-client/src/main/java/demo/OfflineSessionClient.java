@@ -60,8 +60,8 @@ public class OfflineSessionClient {
                     OAuthInfo.builder()
                             .issuer("https://id.acme.test:8443/auth/realms/acme-internal")
                             .clientId("app-mobile")
-                            .scope("profile offline_access")
-                            .grantType("password")
+                            .scope("profile offline_access") // offline_access instructs keycloak to create an offline_session in the KC database
+                            .grantType("password") // for the sake of the demo
                             .username("tester")
                             .password("test")
                             .build();
