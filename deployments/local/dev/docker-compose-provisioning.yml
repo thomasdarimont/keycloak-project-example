@@ -1,6 +1,7 @@
 services:
   acme-keycloak-provisioning:
-    image: quay.io/adorsys/keycloak-config-cli:5.3.1-19.0.1
+    #image: quay.io/adorsys/keycloak-config-cli:5.3.1-19.0.1
+    image: thomasdarimont/keycloak-config-cli:5.4.0-20.0.0-SNAPSHOT
     env_file:
 # generated via start.java
       - ./../../../generated.env.tmp
@@ -14,7 +15,8 @@ services:
       IMPORT_VALIDATE: "true"
 
 # See https://github.com/adorsys/keycloak-config-cli#log-level
-#      LOGGING_LEVEL_KEYCLOAKCONFIGCLI: "debug"
+      #LOGGING_LEVEL_KEYCLOAKCONFIGCLI: "debug"
+      LOGGING_LEVEL_ROOT: "DEBUG"
 
     volumes:
       - ../../../config/stage/dev/realms:/config:z

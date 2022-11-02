@@ -32,7 +32,7 @@ public class CustomHealthChecks {
 
     private static final HealthCheckResponseBuilder KEYCLOAK_SERVER_HEALTH_CHECK = //
             HealthCheckResponse.named("keycloak:server") //
-                    .withData("version", Version.VERSION_KEYCLOAK) //
+                    .withData("version", Version.VERSION) //
                     .withData("startupTimestamp", ManagementFactory.getRuntimeMXBean().getStartTime());
 
     private static final int DB_CONN_VALID_TIMEOUT_MILLIS = 1000;

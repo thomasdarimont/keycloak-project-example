@@ -11,7 +11,6 @@ import org.keycloak.forms.login.freemarker.model.AuthenticationContextBean;
 import org.keycloak.forms.login.freemarker.model.ClientBean;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.theme.FreeMarkerUtil;
 import org.keycloak.theme.Theme;
 
 import javax.ws.rs.core.Response;
@@ -23,8 +22,8 @@ import java.util.Locale;
 @JBossLog
 public class AcmeFreeMarkerLoginFormsProvider extends FreeMarkerLoginFormsProvider {
 
-    public AcmeFreeMarkerLoginFormsProvider(KeycloakSession session, FreeMarkerUtil freeMarker) {
-        super(session, freeMarker);
+    public AcmeFreeMarkerLoginFormsProvider(KeycloakSession session) {
+        super(session);
     }
 
     @Override
@@ -48,16 +47,14 @@ public class AcmeFreeMarkerLoginFormsProvider extends FreeMarkerLoginFormsProvid
     @AutoService(LoginFormsProviderFactory.class)
     public static class Factory extends FreeMarkerLoginFormsProviderFactory {
 
-        private FreeMarkerUtil freeMarker;
-
         @Override
         public LoginFormsProvider create(KeycloakSession session) {
-            return new AcmeFreeMarkerLoginFormsProvider(session, freeMarker);
+            return new AcmeFreeMarkerLoginFormsProvider(session);
         }
 
         @Override
         public void init(Config.Scope config) {
-            freeMarker = new FreeMarkerUtil();
+            // NOOP
         }
 
         @Override
@@ -67,7 +64,7 @@ public class AcmeFreeMarkerLoginFormsProvider extends FreeMarkerLoginFormsProvid
 
         @Override
         public void close() {
-            freeMarker = null;
+            // NOOP
         }
     }
 }
