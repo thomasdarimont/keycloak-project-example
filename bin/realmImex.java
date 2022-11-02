@@ -55,7 +55,8 @@ class realmImex {
         var migrationAction = Optional.ofNullable(System.getenv(MIGRATION_ACTION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(MIGRATION_ACTION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(MIGRATION_ACTION_DEFAULT));
 
         var commandLine = new ArrayList<String>();
-        commandLine.add("docker-compose");
+        commandLine.add("docker");
+        commandLine.add("compose");
         commandLine.add("--env-file");
         commandLine.add("keycloak.env");
         commandLine.add("--file");

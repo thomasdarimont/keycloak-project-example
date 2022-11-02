@@ -115,7 +115,8 @@ class start {
         var requiresBuild = true;
 
         var commandLine = new ArrayList<String>();
-        commandLine.add("docker-compose");
+        commandLine.add("docker");
+        commandLine.add("compose");
         envFiles.add("keycloak.env");
         envFiles.add("deployments/local/dev/keycloak-common.env");
 

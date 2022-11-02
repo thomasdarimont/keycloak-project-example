@@ -36,7 +36,8 @@ class cli {
         }
 
         var commandLine = new ArrayList<String>();
-        commandLine.add("docker-compose");
+        commandLine.add("docker");
+        commandLine.add("compose");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("--file");

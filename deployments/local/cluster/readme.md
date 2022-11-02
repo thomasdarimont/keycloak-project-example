@@ -9,7 +9,7 @@ Copy the `acme.test*.pem` files from the `config/stage/dev/tls` into the [haprox
 
 ## Run 
 ```
-docker-compose --env-file ../../../keycloak.env --file haproxy/docker-compose-haproxy.yml up --remove-orphans
+docker compose --env-file ../../../keycloak.env --file haproxy/docker-compose-haproxy.yml up --remove-orphans
 ```
 
 haproxy status URL: https://id.acme.test:1443/haproxy?status
@@ -25,7 +25,7 @@ Make sure that every Keycloak instance in the cluster must use the exactly same 
 The JGroups authentication uses the `AUTH` module with a pre-shared key. 
 
 ```
-docker-compose --env-file ../../../keycloak.env --file haproxy-encrypted-ispn/docker-compose-enc-haproxy.yml up --remove-orphans
+docker compose --env-file ../../../keycloak.env --file haproxy-encrypted-ispn/docker-compose-enc-haproxy.yml up --remove-orphans
 ```
 
 ## Run with Infinispan cache content stored in jdbc-store
@@ -33,7 +33,7 @@ docker-compose --env-file ../../../keycloak.env --file haproxy-encrypted-ispn/do
 This example shows how to store data from the user session cache in a database that survives restarts.
 
 ```
-docker-compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose-haproxy-jdbc-store.yml up --remove-orphans
+docker compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose-haproxy-jdbc-store.yml up --remove-orphans
 ```
 
 ## Run with dedicated Infinispan Cluster with Remote store
@@ -46,7 +46,7 @@ allow to configure a `connect-timeout` on the remote-store.
 
 To start the environment with a dedicated infinispan cluster, just run:
 ```
-docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml up
+docker compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml up
 ```
 
 ## Run with dedicated Infinispan Cluster with Hotrod store
@@ -58,14 +58,14 @@ distributed and replicated caches in Keycloak will be stored in an external infi
 
 To start the environment with a dedicated infinispan cluster, just run:
 ```
-docker-compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml up
+docker compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml up
 ```
 
 # Cluster with nginx Load-Balancer
 
 ## Run
 ```
-docker-compose --env-file ../../../keycloak.env --file nginx/docker-compose-nginx.yml up --remove-orphans
+docker compose --env-file ../../../keycloak.env --file nginx/docker-compose-nginx.yml up --remove-orphans
 ```
 
 Nginx Keycloak URL: https://id.acme.test:2443/auth
@@ -74,7 +74,7 @@ Nginx Keycloak URL: https://id.acme.test:2443/auth
 
 ## Run
 ```
-docker-compose --env-file ../../../keycloak.env --file apache/docker-compose-apache.yml up --remove-orphans
+docker compose --env-file ../../../keycloak.env --file apache/docker-compose-apache.yml up --remove-orphans
 ```
 
 Apache Keycloak URL: https://id.acme.test:3443/auth
@@ -83,7 +83,7 @@ Apache Keycloak URL: https://id.acme.test:3443/auth
 
 ## Run
 ```
-docker-compose --env-file ../../../keycloak.env --file caddy/docker-compose-caddy.yml up --remove-orphans
+docker compose --env-file ../../../keycloak.env --file caddy/docker-compose-caddy.yml up --remove-orphans
 ```
 
 Caddy Keycloak URL: https://id.acme.test:5443/auth

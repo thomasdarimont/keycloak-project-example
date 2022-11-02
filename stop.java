@@ -28,7 +28,8 @@ class start {
         System.out.println("### Stopping Keycloak Environment");
 
         var commandLine = new ArrayList<String>();
-        commandLine.add("docker-compose");
+        commandLine.add("docker");
+        commandLine.add("compose");
         commandLine.add("--env-file");
         commandLine.add("keycloak.env");
         commandLine.add("--file");
@@ -59,7 +60,7 @@ class start {
             var process = pb.start();
             System.exit(process.waitFor());
         } catch (Exception ex) {
-            System.err.println("Could not run docker-compose down.");
+            System.err.println("Could not run docker compose down.");
             ex.printStackTrace();
             System.exit(1);
         }

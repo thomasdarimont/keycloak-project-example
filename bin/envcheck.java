@@ -20,13 +20,13 @@ class envcheck {
             System.out.println("Please install maven.");
         }
 
-        /* Check required tools: docker-compose */
-        var pbDockerComposer = new ProcessBuilder(List.of("docker-compose", "-v"));
+        /* Check required tools: docker compose */
+        var pbDockerComposer = new ProcessBuilder(List.of("docker", "compose", "-v"));
         pbDockerComposer.inheritIO();
         var processDockerComposer = pbDockerComposer.start();
         returnCode += processDockerComposer.waitFor();
         if (returnCode > 0) {
-            System.out.println("Please install docker-compose.");
+            System.out.println("Please install docker compose.");
         }
 
         /*Check directories exist */
