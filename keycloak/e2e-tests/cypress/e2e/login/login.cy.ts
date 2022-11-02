@@ -6,12 +6,13 @@ import {loginUser, visitClient} from '../../utils/keycloakUtils'
 
 let browserLang = (navigator.language || 'en-EN').split("-")[0];
 let msg = (i18nMsg as any)[browserLang];
+let accountClientId = 'account-console';
 
 context('Login...', () => {
 
     it('with known Username and Password, then Logout should pass', () => {
 
-        visitClient('account')
+        visitClient(accountClientId)
         cy.get('#landingSignInButton').click()
 
         loginUser(users.tester)
@@ -24,7 +25,7 @@ context('Login...', () => {
 
     it('with unknown Username should fail', () => {
 
-        visitClient('account')
+        visitClient(accountClientId)
 
         cy.get('#landingSignInButton').click()
 
@@ -36,7 +37,7 @@ context('Login...', () => {
 
     it('with known Username but invalid Password should fail', () => {
 
-        visitClient('account')
+        visitClient(accountClientId)
 
         cy.get('#landingSignInButton').click()
 
