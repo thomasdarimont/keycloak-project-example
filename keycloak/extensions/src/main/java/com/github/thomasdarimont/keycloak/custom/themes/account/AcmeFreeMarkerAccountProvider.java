@@ -13,7 +13,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.Urls;
-import org.keycloak.theme.FreeMarkerUtil;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -23,8 +22,8 @@ import java.util.List;
 
 public class AcmeFreeMarkerAccountProvider extends FreeMarkerAccountProvider {
 
-    public AcmeFreeMarkerAccountProvider(KeycloakSession session, FreeMarkerUtil freeMarker) {
-        super(session, freeMarker);
+    public AcmeFreeMarkerAccountProvider(KeycloakSession session) {
+        super(session);
     }
 
     @Override
@@ -73,16 +72,14 @@ public class AcmeFreeMarkerAccountProvider extends FreeMarkerAccountProvider {
     @AutoService(AccountProviderFactory.class)
     public static class Factory implements AccountProviderFactory {
 
-        private FreeMarkerUtil freeMarker;
-
         @Override
         public AccountProvider create(KeycloakSession session) {
-            return new AcmeFreeMarkerAccountProvider(session, freeMarker);
+            return new AcmeFreeMarkerAccountProvider(session);
         }
 
         @Override
         public void init(Config.Scope config) {
-            freeMarker = new FreeMarkerUtil();
+            // NOOP
         }
 
         @Override
@@ -92,7 +89,7 @@ public class AcmeFreeMarkerAccountProvider extends FreeMarkerAccountProvider {
 
         @Override
         public void close() {
-            freeMarker = null;
+            // NOOP
         }
 
         @Override
