@@ -10,7 +10,8 @@ class applyKeycloakConfigCli {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var commandLine = new ArrayList<String>();
-        commandLine.add("docker-compose");
+        commandLine.add("docker");
+        commandLine.add("compose");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-provisioning.yml");
         commandLine.add("restart");
