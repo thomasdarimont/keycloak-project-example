@@ -149,6 +149,8 @@ clients:
     optionalClientScopes:
       - "phone"
       - "name"
+    attributes:
+      "post.logout.redirect.uris": "+"
 
 identityProviders:
   - alias: "idp-acme-internal"
