@@ -195,7 +195,7 @@ identityProviders:
     addReadTokenRoleOnCreate: false
     authenticateByDefault: false
     linkOnly: false
-    firstBrokerLoginFlowAlias: first broker login
+    firstBrokerLoginFlowAlias: "first broker login"
     config:
       validateSignature: 'true'
       hideOnLoginPage: false
