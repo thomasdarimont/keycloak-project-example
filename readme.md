@@ -172,9 +172,9 @@ The metrics data can be used to create monitoring dashboards with tools like gra
 
 Scrape targets configured:
 
-|System|Target  |Additional Labels
-|------|--------|------
-|keycloak |http://acme-keycloak:9990/metrics | env
+|System| Target                                 |Additional Labels
+|------|----------------------------------------|------
+|keycloak | http://acme-keycloak:8080/auth/metrics | env
 
 #### Run with Prometheus
 ```
