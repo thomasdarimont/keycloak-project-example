@@ -46,7 +46,6 @@ class start {
     static final String PROVISION_OPT = "--provision";
     static final String OPENLDAP_OPT = "--openldap";
     static final String OPA_OPT = "--opa";
-    static final String KEYCLOAK_OPT = "--keycloak=keycloak";
     static final String POSTGRES_OPT = "--database=postgres";
     static final String MSSQL_OPT = "--database=mssql";
     static final String MYSQL_OPT = "--database=mysql";
@@ -62,7 +61,7 @@ class start {
 
         var argList = Arrays.asList(args);
 
-        var useKeycloakx = !argList.contains(KEYCLOAK_OPT); // --keycloak=keycloakx is implied by default
+        var useKeycloakx = true;
         var useHttp = !argList.contains(HTTP_OPT + "=false"); // --http is implied by default
         var useHttps = argList.contains(HTTPS_OPT) || argList.contains(HTTPS_OPT + "=true");
         var useProvision = !argList.contains(PROVISION_OPT + "=false");
@@ -93,11 +92,6 @@ class start {
             System.exit(-1);
         }
 
-        // Keycloak
-        createFolderIfMissing("deployments/local/dev/run/keycloak/logs");
-        createFolderIfMissing("deployments/local/dev/run/keycloak/data");
-        createFolderIfMissing("deployments/local/dev/run/keycloak/perf");
-
         // Keycloak-X
         createFolderIfMissing("deployments/local/dev/run/keycloakx/logs");
         createFolderIfMissing("deployments/local/dev/run/keycloakx/data");
@@ -125,8 +119,6 @@ class start {
         commandLine.add("--file");
         if (useKeycloakx) {
             commandLine.add("deployments/local/dev/docker-compose-keycloakx.yml");
-        } else {
-            commandLine.add("deployments/local/dev/docker-compose-keycloak.yml");
         }
 
         if ("github".equals(ci)) {

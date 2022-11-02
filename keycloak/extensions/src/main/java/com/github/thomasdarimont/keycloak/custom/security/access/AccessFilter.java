@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloakx.custom.security;
+package com.github.thomasdarimont.keycloak.custom.security.access;
 
 import io.netty.handler.ipfilter.IpFilterRuleType;
 import io.netty.handler.ipfilter.IpSubnetFilterRule;

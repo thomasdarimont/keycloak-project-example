@@ -10,7 +10,7 @@ services:
       - "1025:1025"
 
   acme-account-console:
-    image: httpd:2.4.51-bullseye
+    image: httpd:2.4.54-bullseye
     volumes:
       - ../../../apps/acme-account-console:/usr/local/apache2/htdocs/acme-account:z
       - ../../../apps/acme-greetme:/usr/local/apache2/htdocs/acme-greetme:z
@@ -20,7 +20,7 @@ services:
       - "4443:443"
 
   redis:
-    image: redis:6.2.6-alpine3.15
+    image: redis:6.2.7-bullseye
     ports:
       - '6379:6379'
     #  --requirepass redispass
