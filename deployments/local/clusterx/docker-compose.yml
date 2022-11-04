@@ -48,7 +48,6 @@ services:
     command:
       - "--verbose"
       - "start"
-      - "--auto-build"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
       - "--http-enabled=true"

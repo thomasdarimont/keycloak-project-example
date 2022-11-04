@@ -36,7 +36,7 @@
     -->
     <SYM_ENCRYPT provider="SunJCE"
                  sym_algorithm="AES"
-                 keystore_name="${env.JGROUPS_KEYSTORE_PATH:/opt/jboss/keycloak/conf/jgroups.p12}"
+                 keystore_name="${env.JGROUPS_KEYSTORE_PATH:/opt/keycloak/conf/jgroups.p12}"
                  keystore_type="PKCS12"
                  alias="${env.JGROUPS_KEYSTORE_ALIAS:jgroups}"
                  store_password="${env.JGROUPS_KEYSTORE_PASSWORD:changeme3}"/>
