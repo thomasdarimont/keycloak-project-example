@@ -51,6 +51,7 @@ services:
       - "--health-enabled=true"
       - "--cache=local"
       - "--proxy=passthrough"
+#      - "--log-console-output=json"
       - "--https-protocols=TLSv1.3,TLSv1.2"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
