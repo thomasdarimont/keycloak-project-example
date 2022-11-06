@@ -168,6 +168,12 @@ requiredActions:
     enabled: true
     defaultAction: false
     priority: 1500
+  - alias: acme-context-selection-action
+    name: 'Acme: User Context Selection'
+    providerId: acme-context-selection-action
+    enabled: false
+    defaultAction: false
+    priority: 1600
 
 
 clients:

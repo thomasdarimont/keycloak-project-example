@@ -142,6 +142,7 @@
         <button name="securityBtn" onclick="showSecurity()" class="security">Security</button>
         <button name="appsBtn" onclick="showApps()" class="apps">Apps</button>
         <button name="reauthBtn" onclick="enforceCurrentAuth()" class="reauth">ReAuth</button>
+        <button name="switchContextBtn" onclick="switchContext()" class="switchContext">Switch Context</button>
         <button name="accountBtn" onclick="keycloak.accountManagement()" class="account">Account</button>
         <button name="logoutBtn" onclick="keycloak.logout()" class="logout">Logout</button>
     </div>
@@ -227,8 +228,8 @@
 
     };
 
-    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount"];
-    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount"];
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext"];
+    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
         return !contextClassesToHideDefault.includes(value);
     });
@@ -315,6 +316,12 @@
         keycloak.login({
             loginHint: keycloak.tokenParsed.preferred_username,
             maxAge: 12
+        });
+    }
+
+    function switchContext() {
+        keycloak.login({
+            action: "acme-context-selection-action"
         });
     }
 
