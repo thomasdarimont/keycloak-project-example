@@ -12,13 +12,21 @@
         </p>
 
         <script defer>
-            // periodically reloads the current page to check if the email was already verified on a different device
-
-            // TODO instead of simple reloading the page we could use the current url in an async fetch request and handle the redirect manually.
+            // periodically checks if the email was already verified on a different device
+            // we use the current url in an async fetch request and handle the redirect manually
             function scheduleReload() {
                 setTimeout(() => {
-                    location.reload();
-                    scheduleReload();
+
+                    fetch(location.href, {credentials: 'include', redirect: 'follow'})
+                        .then(function (response) {
+
+                            if (response.redirected) {
+                                window.location.href = response.url;
+                                return;
+                            }
+
+                            scheduleReload();
+                        });
                 }, 5000);
             }
 
