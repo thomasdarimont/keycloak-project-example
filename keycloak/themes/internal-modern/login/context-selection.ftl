@@ -44,13 +44,18 @@
                         <label for="context" class="${properties.kcLabelClass!}">Context</label>
                         <input id="context" list="contextOptions"
                                class="${properties.kcInputClass!}"
+                               <#if currentContext??>placeholder="${currentContext.label!''}"</#if>
                                onchange="restrictInputToAllowedOptions(this);" required/>
-                        <input id="contextKey" name="context.selection.key" type="hidden"/>
+                        <input id="contextKey" name="context.selection.key"
+                               <#if currentContext??>value="${currentContext.value!''}"</#if>
+                               type="hidden"/>
                     </div>
 
                     <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
                         <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
                                type="submit" value="${msg("doSubmit")}"/>
+                        <input class="${properties.kcButtonClass!} ${properties.kcButtonDefaultClass!} ${properties.kcButtonLargeClass!}"
+                               name="cancel" id="kc-cancel" type="submit" value="${msg("doCancel")}" formnovalidate="formnovalidate"/>
                     </div>
                 </form>
             </div>

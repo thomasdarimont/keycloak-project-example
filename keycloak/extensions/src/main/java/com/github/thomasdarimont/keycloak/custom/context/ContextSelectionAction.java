@@ -14,7 +14,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -62,6 +61,8 @@ public class ContextSelectionAction implements RequiredActionProvider {
 
         // TODO check if context selection is required
 
+        // TODO allow to accept contextSelectionKey via URL Parameter
+
         // check if context selection already happened in another user session?
         var userSession = UserSessionUtils.getUserSessionFromAuthenticationSession(context.getSession(), context.getAuthenticationSession());
         // Note, if the user just authenticated there is no user session yet.
@@ -87,9 +88,12 @@ public class ContextSelectionAction implements RequiredActionProvider {
         var allowedContextOptions = computeContextOptions(context);
         // TODO handle case when options are empty
 
+        var currentContextItem = getCurrentContextItem(context, allowedContextOptions);
+
         // show context selection form
         var form = context.form() //
                 .setAttribute("username", context.getUser().getUsername())  //
+                .setAttribute("currentContext", currentContextItem) //
                 .setAttribute("contextOptions", allowedContextOptions);
 
         // allow to customize form, e.g. to add custom error messages
@@ -100,6 +104,18 @@ public class ContextSelectionAction implements RequiredActionProvider {
         // Note, see template in internal-modern theme
         var response = form.createForm("context-selection.ftl");
         context.challenge(response);
+    }
+
+    private static ContextItem getCurrentContextItem(RequiredActionContext context, List<ContextItem> allowedContextOptions) {
+
+        var userSession = UserSessionUtils.getUserSessionFromAuthenticationSession(context.getSession(), context.getAuthenticationSession());
+        var currentContextKey = userSession != null ? userSession.getNote(CONTEXT_KEY) : null;
+
+        if (currentContextKey == null) {
+            return null;
+        }
+
+        return allowedContextOptions.stream().filter(item -> item.getKey().equals(currentContextKey)).findAny().orElse(null);
     }
 
     private List<ContextItem> computeContextOptions(RequiredActionContext actionContext) {
@@ -123,6 +139,12 @@ public class ContextSelectionAction implements RequiredActionProvider {
     public void processAction(RequiredActionContext context) {
 
         var formData = context.getHttpRequest().getDecodedFormParameters();
+
+        if (formData.containsKey("cancel")) {
+            context.success();
+            return;
+        }
+
         if (!formData.containsKey(CONTEXT_FORM_ATTRIBUTE)) {
             // TODO show empty selection is not allowed error
             showContextSelectionForm(context, null);
