@@ -57,6 +57,7 @@ class start {
     static final String EXTENSIONS_OPT_CLASSES = "classes";
     static final String EXTENSIONS_OPT_JAR = "jar";
     static final String DETACH_OPT = "--detach";
+    static final String TRACING_OPT = "--tracing";
 
     public static void main(String[] args) throws Exception {
 
@@ -79,6 +80,7 @@ class start {
         var ci = argList.stream().filter(s -> s.startsWith(CI_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(null);
         var useDetach = argList.contains(DETACH_OPT);
         var verbose = argList.contains(VERBOSE_OPT);
+        var useTracing = argList.contains(TRACING_OPT);
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
@@ -210,6 +212,14 @@ class start {
             envFiles.add("deployments/local/dev/keycloak-provisioning.env");
         }
 
+        if (useTracing) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
+            if (useHttps) {
+                commandLine.add("--file");
+                commandLine.add("deployments/local/dev/docker-compose-tracing-tls.yml");
+            }
+        }
 
         if (Files.exists(Path.of("local.env"))) {
             System.out.println("Adding local.env");

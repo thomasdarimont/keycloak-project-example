@@ -50,6 +50,10 @@ class start {
         commandLine.add("deployments/local/dev/docker-compose-prometheus.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-grafana.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
+        commandLine.add("--file");
+        commandLine.add("deployments/local/dev/docker-compose-tracing-tls.yml");
         commandLine.add("down");
         commandLine.add("--remove-orphans");
 
