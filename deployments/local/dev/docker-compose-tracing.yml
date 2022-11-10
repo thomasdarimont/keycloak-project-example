@@ -1,0 +1,28 @@
+# https://quarkus.io/version/2.7/guides/opentelemetry#run-the-application
+services:
+  acme-otel-collector:
+    image: otel/opentelemetry-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    ports:
+      - "13133:13133" # Health_check extension
+      - "4317:4317"   # OTLP gRPC receiver
+    volumes:
+      - ../../../config/stage/dev/otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml:z
+    extra_hosts:
+      # 172.17.0.1 is host.docker.internal
+      - "id.acme.test:172.17.0.1"
+      - "apps.acme.test:172.17.0.1"
+      - "ops.acme.test:172.17.0.1"
+  acme-jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "14250:14250"
+    extra_hosts:
+      # 172.17.0.1 is host.docker.internal
+      - "id.acme.test:172.17.0.1"
+      - "apps.acme.test:172.17.0.1"
+      - "ops.acme.test:172.17.0.1"
+  acme-keycloak:
+    volumes:
+      - ../../../keycloak/config/quarkus-tracing.properties:/opt/keycloak/conf/quarkus.properties:z

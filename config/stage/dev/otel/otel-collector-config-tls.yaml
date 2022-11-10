@@ -1,0 +1,35 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: acme-otel-collector:4317
+        tls:
+          cert_file: /cert.pem
+          key_file: /key.pem
+          min_version: "1.2"
+          max_version: "1.3"
+
+exporters:
+  jaeger:
+    endpoint: ops.acme.test:14250
+    tls:
+      min_version: "1.2"
+      max_version: "1.3"
+      ca_file: /rootca.pem
+      cert_file: /cert.pem
+      key_file: /key.pem
+  logging:
+    loglevel: debug
+processors:
+  batch:
+
+extensions:
+  health_check:
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [jaeger]

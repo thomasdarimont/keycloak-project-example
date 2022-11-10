@@ -52,6 +52,7 @@ services:
       - "--cache=local"
       - "--proxy=passthrough"
 #      - "--log-console-output=json"
+      - "--log-console-format='%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n'"
       - "--https-protocols=TLSv1.3,TLSv1.2"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
@@ -75,6 +76,7 @@ services:
       # 172.17.0.1 is host.docker.internal
       - "id.acme.test:172.17.0.1"
       - "apps.acme.test:172.17.0.1"
+      - "ops.acme.test:172.17.0.1"
     ports:
       - "8080:8080"
       - "8443:8443"

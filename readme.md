@@ -43,7 +43,8 @@ d) **Operator** configuring realm and server for different stages
 - Examples for running a cluster behind a reverse proxy with examples for [HAProxy](deployments/local/cluster/haproxy), [Apache](deployments/local/cluster/apache), [nginx](deployments/local/cluster/nginx), [caddy](deployments/local/cluster/caddy)
 - Examples for running a Keycloak cluster with an external infinispan cluster with [remote cache store](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml) and [hotrod cache store](deployments/local/cluster/haproxy-external-ispn/docker-compose-haproxy-ispn-hotrod.yml).
 - Example for Keycloak with [Graylog](https://www.graylog.org/) for log analysis, dashboards and alerting.
-- Example for metrics collection and dashboards with [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com/oss). 
+- Example for metrics collection and dashboards with [Prometheus](https://prometheus.io) and [Grafana](https://grafana.com/oss).
+- Example for tracing with [OpenTelemetry](https://opentelemetry.io/) and [Jaeger](https://www.jaegertracing.io/)
 
 ## Usage envcheck
 
@@ -204,6 +205,35 @@ Manual steps when logged in as an Admin (Example User: devops_fallback, Password
     * Add e.g. prometheus as datasource (http://acme-prometheus:9090/ installed by default) (see [Grafana](#enable-prometheus))
     * Add e.g. elastic-search as datasource (http://acme-graylog-lo:9090/) (see [Graylog](#enable-graylog) services)
 * Import Boards of your choice from [Grafana](https://grafana.com/grafana/dashboards) (for testing an [exported board](../../../config/stage/dev/grafana/microprofile-wildfly-16-metrics_rev1.json) can be used) 
+
+### Enable Tracing
+With [OpenTelemetry](https://opentelemetry.io/) and [Jaeger](https://www.jaegertracing.io/), it is possible to trace requests traveling through Keycloak and the systems integrating it.
+This uses the Quarkus OpenTelemetry extension in order to create traces, which are then sent to the [otel-collector](https://opentelemetry.io/docs/collector/).
+The collector then passes the information on to Jaeger, where they can be viewed in the web interface
+
+#### Run with Tracing
+```
+java start.java --tracing
+```
+Open [Jaeger](http://ops.acme.test:16686) or [Jaeger with TLS](https://ops.acme.test:16686), depending on configuration.
+Like with Grafana, for TLS access to work, `acme.test+1-key.pem` in config/stage/dev/tls needs read permission for the current user.
+When TLS is enabled, it is enabled for all three of the following:
+* Jaeger UI
+* Keycloak -> Collector communication
+* Collector -> Jaeger communication
+
+#### Instrumentation
+In order to gain additional insights, other applications that integrate with Keycloak can also send traces to the collector.
+The [OpenTelemetry Documentation](https://opentelemetry.io/docs/instrumentation/) contains tools to instrument applications in various languages.
+Quarkus applications like Keycloak can also use the [Quarkus OpenTelemetry extension](https://quarkus.io/guides/opentelemetry) instead of the agent.
+An example for running an instrumented Spring Boot app could look like this:
+```
+OTEL_METRICS_EXPORTER=none OTEL_SERVICE_NAME="frontend-webapp-springboot" OTEL_PROPAGATORS="b3multi" \
+ OTEL_EXPORTER_OTLP_ENDPOINT="http://id.acme.test:4317" java -javaagent:bin/opentelemetry-javaagent-1.20.0.jar \
+ -jar apps/frontend-webapp-springboot/target/frontend-webapp-springboot-0.0.1-SNAPSHOT.jar
+```
+The included IDEA run-config for the frontend-webapp-springboot module contains the necessary configuration to run that module with tracing enabled.
+If you then navigate to the [frontend webapp](https://apps.acme.test:4633/webapp/), you can navigate through the application, and then later check the Jaeger UI for traces.
 
 ### Clustering
 
