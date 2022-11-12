@@ -21,6 +21,7 @@
         <microprofile-metrics-api.version>3.0.1</microprofile-metrics-api.version>
         <resteasy.version>4.7.7.Final</resteasy.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
+        <slf4j-jboss-logging.version>1.2.1.Final</slf4j-jboss-logging.version>
     </properties>
 
     <dependencies>
@@ -177,7 +178,13 @@
             <groupId>com.github.dasniko</groupId>
             <artifactId>testcontainers-keycloak</artifactId>
             <version>${testcontainers-keycloak.version}</version>
+            <scope>test</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>org.jboss.slf4j</groupId>
+            <artifactId>slf4j-jboss-logging</artifactId>
+            <version>${slf4j-jboss-logging.version}</version>
             <scope>test</scope>
         </dependency>
 
