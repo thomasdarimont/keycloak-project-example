@@ -216,7 +216,6 @@ The collector then passes the information on to Jaeger, where they can be viewed
 java start.java --tracing
 ```
 Open [Jaeger](http://ops.acme.test:16686) or [Jaeger with TLS](https://ops.acme.test:16686), depending on configuration.
-Like with Grafana, for TLS access to work, `acme.test+1-key.pem` in config/stage/dev/tls needs read permission for the current user.
 When TLS is enabled, it is enabled for all three of the following:
 * Jaeger UI
 * Keycloak -> Collector communication
