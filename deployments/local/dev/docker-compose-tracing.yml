@@ -1,7 +1,9 @@
 # https://quarkus.io/version/2.7/guides/opentelemetry#run-the-application
 services:
   acme-otel-collector:
-    image: otel/opentelemetry-collector
+    build:
+      context: "../../../config/stage/dev/tls"
+      dockerfile: "../../../../deployments/local/dev/otel-collector/Dockerfile"
     command: ["--config=/etc/otel-collector-config.yaml"]
     ports:
       - "13133:13133" # Health_check extension
