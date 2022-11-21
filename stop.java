@@ -1,4 +1,6 @@
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -30,8 +32,11 @@ class start {
         var commandLine = new ArrayList<String>();
         commandLine.add("docker");
         commandLine.add("compose");
-        commandLine.add("--env-file");
-        commandLine.add("keycloak.env");
+        var envFile = Paths.get("generated.env.tmp");
+        if (Files.exists(envFile)) {
+            commandLine.add("--env-file");
+            commandLine.add("generated.env.tmp");
+        }
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("--file");
