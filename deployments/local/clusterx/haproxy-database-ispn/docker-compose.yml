@@ -1,0 +1,91 @@
+services:
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloakx
+    environment:
+      KC_HOSTNAME: id.acme.test:1443
+    ports:
+      - "8080"
+      - "8443"
+      - "18787:8787"
+      - "9990:9990"
+      - "8790:8790"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/auth/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+    volumes:
+      - ./cache-ispn-database.xml:/opt/keycloak/conf/cache-ispn-database.xml:z
+      - ./patch/keycloak-model-infinispan-20.0.1.jar:/opt/keycloak/lib/lib/main/org.keycloak.keycloak-model-infinispan-20.0.1.jar:z
+      - ./lib/infinispan-cachestore-jdbc-common-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc-common.jar:z
+      - ./lib/infinispan-cachestore-jdbc-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc.jar:z
+    command:
+      - "--verbose"
+      - "start"
+      - "--auto-build"
+      - "--https-certificate-file=/etc/x509/https/tls.crt"
+      - "--https-certificate-key-file=/etc/x509/https/tls.key"
+      - "--http-enabled=true"
+      - "--http-relative-path=/auth"
+      - "--http-port=8080"
+      - "--proxy=passthrough"
+      - "--hostname=id.acme.test:1443"
+      - "--cache-config-file=cache-ispn-database.xml"
+      # used by patched keycloak-model-infinispan jar to propagate cache update to the jdbc store
+      - "-Dkeycloak.infinispan.ignoreSkipCacheStore=true"
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloakx
+    environment:
+      KC_HOSTNAME: id.acme.test:1443
+#    depends_on:
+#      acme-keycloak-db:
+#        condition: service_healthy
+    depends_on:
+      acme-keycloak-1:
+        condition: service_healthy
+    volumes:
+      - ./cache-ispn-database.xml:/opt/keycloak/conf/cache-ispn-database.xml:z
+      - ./patch/keycloak-model-infinispan-20.0.1.jar:/opt/keycloak/lib/lib/main/org.keycloak.keycloak-model-infinispan-20.0.1.jar:z
+      - ./lib/infinispan-cachestore-jdbc-common-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc-common.jar:z
+      - ./lib/infinispan-cachestore-jdbc-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc.jar:z
+    command:
+      - "--verbose"
+      - "start"
+      - "--auto-build"
+      - "--https-certificate-file=/etc/x509/https/tls.crt"
+      - "--https-certificate-key-file=/etc/x509/https/tls.key"
+      - "--http-enabled=true"
+      - "--http-relative-path=/auth"
+      - "--http-port=8080"
+      - "--proxy=passthrough"
+      - "--hostname=id.acme.test:1443"
+      - "--cache-config-file=cache-ispn-database.xml"
+      # used by patched keycloak-model-infinispan jar to propagate cache update to the jdbc store
+      - "-Dkeycloak.infinispan.ignoreSkipCacheStore=true"
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-haproxy-lb:
+    build: .
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:z
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
+    ports:
+      - "1443:1443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2

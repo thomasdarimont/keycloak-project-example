@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2019 Red Hat, Inc. and/or its affiliates
+  ~ and other contributors as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<infinispan
+        xmlns="urn:infinispan:config:13.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:infinispan:config:13.0 https://www.infinispan.org/schemas/infinispan-config-13.0.xsd">
+
+    <cache-container name="keycloak">
+        <transport lock-timeout="60000"/>
+        <local-cache name="realms">
+            <encoding>
+                <key media-type="application/x-java-object"/>
+                <value media-type="application/x-java-object"/>
+            </encoding>
+            <memory max-count="10000"/>
+        </local-cache>
+        <local-cache name="users">
+            <encoding>
+                <key media-type="application/x-java-object"/>
+                <value media-type="application/x-java-object"/>
+            </encoding>
+            <memory max-count="10000"/>
+        </local-cache>
+        <distributed-cache name="sessions" owners="2">
+            <expiration/>
+            <persistence>
+                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:13.0" dialect="POSTGRES">
+                    <connection-pool
+                            connection-url="jdbc:postgresql://acme-keycloak-db:5432/keycloak?ApplicationName=keycloak-ispn"
+                            username="keycloak"
+                            password="keycloak"
+                            driver="org.postgresql.Driver"/>
+                    <string-keyed-table create-on-start="true" prefix="ispn">
+                        <id-column name="id" type="VARCHAR(255)"/>
+                        <data-column name="data" type="bytea"/>
+                        <timestamp-column name="ts" type="BIGINT"/>
+                        <segment-column name="seg" type="INT"/>
+                    </string-keyed-table>
+                </string-keyed-jdbc-store>
+            </persistence>
+        </distributed-cache>
+
+        <distributed-cache name="clientSessions" owners="2">
+            <expiration/>
+            <persistence>
+                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:13.0" dialect="POSTGRES">
+                    <connection-pool
+                            connection-url="jdbc:postgresql://acme-keycloak-db:5432/keycloak?ApplicationName=keycloak-ispn"
+                            username="keycloak"
+                            password="keycloak"
+                            driver="org.postgresql.Driver"/>
+                    <string-keyed-table create-on-start="true" prefix="ispn">
+                        <id-column name="id" type="VARCHAR(255)"/>
+                        <data-column name="data" type="bytea"/>
+                        <timestamp-column name="ts" type="BIGINT"/>
+                        <segment-column name="seg" type="INT"/>
+                    </string-keyed-table>
+                </string-keyed-jdbc-store>
+            </persistence>
+        </distributed-cache>
+
+        <distributed-cache name="authenticationSessions" owners="2">
+            <expiration/>
+        </distributed-cache>
+        <distributed-cache name="offlineSessions" owners="2">
+            <expiration/>
+        </distributed-cache>
+        <distributed-cache name="offlineClientSessions" owners="2">
+            <expiration lifespan="-1"/>
+        </distributed-cache>
+        <distributed-cache name="loginFailures" owners="2">
+            <expiration lifespan="-1"/>
+        </distributed-cache>
+        <local-cache name="authorization">
+            <encoding>
+                <key media-type="application/x-java-object"/>
+                <value media-type="application/x-java-object"/>
+            </encoding>
+            <memory max-count="10000"/>
+        </local-cache>
+        <replicated-cache name="work">
+            <expiration lifespan="-1"/>
+        </replicated-cache>
+        <local-cache name="keys">
+            <encoding>
+                <key media-type="application/x-java-object"/>
+                <value media-type="application/x-java-object"/>
+            </encoding>
+            <expiration max-idle="3600000"/>
+            <memory max-count="1000"/>
+        </local-cache>
+        <distributed-cache name="actionTokens" owners="2">
+            <encoding>
+                <key media-type="application/x-java-object"/>
+                <value media-type="application/x-java-object"/>
+            </encoding>
+            <expiration max-idle="-1" lifespan="-1" interval="300000"/>
+            <memory max-count="-1"/>
+        </distributed-cache>
+    </cache-container>
+</infinispan>
