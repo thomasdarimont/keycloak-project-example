@@ -25,11 +25,11 @@ class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
 
-        http.authorizeRequests(arc -> {
+        http.authorizeHttpRequests(ahrc -> {
             // declarative route configuration
             // add additional routes
-            arc.antMatchers("/webjars/**", "/resources/**", "/css/**").permitAll();
-            arc.anyRequest().fullyAuthenticated();
+            ahrc.requestMatchers("/webjars/**", "/resources/**", "/css/**").permitAll();
+            ahrc.anyRequest().fullyAuthenticated();
         });
 
         // by default spring security oauth2 client does not support PKCE for confidential clients for auth code grant flow,
