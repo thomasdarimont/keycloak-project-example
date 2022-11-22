@@ -208,6 +208,7 @@ modules.xml
 
 # Package Files #
 *.jar
+!bin/opentelemetry-javaagent-*.jar
 *.war
 *.nar
 *.ear
