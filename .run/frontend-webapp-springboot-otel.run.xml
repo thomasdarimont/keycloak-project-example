@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="frontend-webapp-springboot-otel" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+        <option name="ACTIVE_PROFILES" />
+        <envs>
+            <env name="OTEL_EXPORTER_OTLP_ENDPOINT" value="https://ops.acme.test:4317" />
+            <env name="OTEL_METRICS_EXPORTER" value="none" />
+            <env name="OTEL_PROPAGATORS" value="b3multi" />
+            <env name="OTEL_SERVICE_NAME" value="acme-frontend-springboot" />
+        </envs>
+        <module name="frontend-webapp-springboot" />
+        <option name="SPRING_BOOT_MAIN_CLASS" value="com.github.thomasdarimont.keycloak.webapp.WebAppSpringBoot" />
+        <option name="VM_PARAMETERS" value="-javaagent:$ProjectFileDir$/bin/opentelemetry-javaagent-1.20.0.jar" />
+        <option name="WORKING_DIRECTORY" value="file://$ProjectFileDir$" />
+        <method v="2">
+            <option name="Make" enabled="true" />
+        </method>
+    </configuration>
+</component>
