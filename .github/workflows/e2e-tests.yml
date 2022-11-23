@@ -52,15 +52,15 @@ jobs:
         if: ${{ always() }}
         run: |
           docker ps -a
-          docker inspect dev_acme-keycloak_1
-          docker logs --details dev_acme-keycloak_1
+          docker inspect dev-acme-keycloak-1
+          docker logs --details dev-acme-keycloak-1
 
       - name: Run cypress tests
         working-directory: ./keycloak/e2e-tests
         # https://docs.cypress.io/guides/references/configuration#Timeouts
         run: |
           yarn install
-          docker run --network container:dev_acme-keycloak_1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:10.8.0 run --config pageLoadTimeout=70000,defaultCommandTimeout=10000,watchForFileChanges=false --env keycloak_host=http://localhost:8080
+          docker run --network container:dev-acme-keycloak-1 --rm -v "${PWD}":/e2e -w /e2e --entrypoint=cypress cypress/included:10.8.0 run --config pageLoadTimeout=70000,defaultCommandTimeout=10000,watchForFileChanges=false --env keycloak_host=http://localhost:8080
 
       - name: Archive testrun video
         if: ${{ always() }}
