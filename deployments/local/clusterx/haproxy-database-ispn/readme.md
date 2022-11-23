@@ -1,5 +1,13 @@
 Keycloak with Database backed Sessions
 ---
+# Generate keys
+
+To generate the certificate and keys install https://github.com/FiloSottile/mkcert and run the following command:
+```
+mkcert -install
+mkcert "*.acme.test"
+```
+
 # Additional libraries
 
 In order to apply the cache store configuration the following libraries are needed that are currently not packaged with Keycloak:
