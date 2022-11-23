@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ class start {
 
     static final String HELP_CMD = "help";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException{
 
         var argList = Arrays.asList(args);
 
@@ -33,16 +34,21 @@ class start {
         commandLine.add("docker");
         commandLine.add("compose");
         var envFile = Paths.get("generated.env.tmp");
+        var useHttps = false;
         if (Files.exists(envFile)) {
             commandLine.add("--env-file");
             commandLine.add("generated.env.tmp");
+
+            useHttps = Files.readString(envFile).contains("CA_ROOT_CERT=");
         }
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-keycloak.yml");
-        commandLine.add("--file");
-        commandLine.add("deployments/local/dev/docker-compose-tls.yml");
+        if (useHttps) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-tls.yml");
+        }
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-openldap.yml");
         commandLine.add("--file");
@@ -57,8 +63,10 @@ class start {
         commandLine.add("deployments/local/dev/docker-compose-grafana.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
-        commandLine.add("--file");
-        commandLine.add("deployments/local/dev/docker-compose-tracing-tls.yml");
+        if (useHttps) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-tracing-tls.yml");
+        }
         commandLine.add("down");
         commandLine.add("--remove-orphans");
 
