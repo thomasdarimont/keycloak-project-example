@@ -23,7 +23,7 @@ jobs:
           node-version: '18.x'
 
       - name: Prepare artifacts (e.g. extensions) for docker-compose stack
-        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DskipTests verify --file pom.xml  --settings maven-settings.xml
+        run: mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -DskipTests verify --file pom.xml  --settings maven-settings.xml -pl keycloak/extensions,keycloak/extensionsx,keycloak/docker
 
       - name: Build the docker-compose stack
         run: |
