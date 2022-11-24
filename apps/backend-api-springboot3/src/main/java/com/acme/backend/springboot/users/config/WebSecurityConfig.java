@@ -45,12 +45,12 @@ class WebSecurityConfig {
             smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         });
         http.cors(this::configureCors);
-        http.authorizeRequests(arc -> {
+        http.authorizeHttpRequests(ahrc -> {
             // declarative route configuration
             // .mvcMatchers("/api").hasAuthority("ROLE_ACCESS")
-            arc.mvcMatchers("/api/**").access("@accessController.checkAccess()");
+            ahrc.requestMatchers("/api/**").access(AccessController::checkAccess);
             // add additional routes
-            arc.anyRequest().fullyAuthenticated(); //
+            ahrc.anyRequest().fullyAuthenticated(); //
         });
         http.oauth2ResourceServer(arsc -> {
             arsc.jwt().jwtAuthenticationConverter(keycloakJwtAuthenticationConverter);
