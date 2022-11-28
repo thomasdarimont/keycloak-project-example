@@ -1,0 +1,27 @@
+services:
+  proxy:
+    # image: quay.io/oauth2-proxy/oauth2-proxy:v7.4.0-amd64
+    build:
+      context: "../../config/stage/dev/tls"
+      dockerfile: "../../../../apps/oauth2-proxy/Dockerfile"
+    ports:
+      - 6443:6443
+    volumes:
+      - ./oauth2-proxy.cfg:/oauth2-proxy.cfg:z
+    command:
+      - "--config"
+      - "/oauth2-proxy.cfg"
+      - "--tls-cert-file=/cert.pem"
+      - "--tls-key-file=/cert.key"
+    extra_hosts:
+      # 172.17.0.1 is host.docker.internal
+      - "id.acme.test:172.17.0.1"
+  upstream-app:
+    image: golang:1.19.3-alpine
+    volumes:
+      - ./app/main.go:/main.go:z
+    command:
+      - "go"
+      - "run"
+      - "/main.go"
+

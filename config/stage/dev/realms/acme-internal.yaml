@@ -313,6 +313,32 @@ clients:
     optionalClientScopes:
       - "phone"
 
+  - clientId: app-oauth2-proxy
+    protocol: openid-connect
+    name: Acme OAuth2 Proxy App
+    description: "Acme App behind Oauth2 Proxy"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    fullScopeAllowed: true
+    secret: "secret"
+    rootUrl: "https://apps.acme.test:6443"
+    baseUrl: "/"
+    redirectUris:
+      - "/oauth2/callback/*"
+      - "/"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+      - "roles"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "post.logout.redirect.uris": "+"
+
   - clientId: test-client
     protocol: openid-connect
     name: Test Client
@@ -674,6 +700,7 @@ users:
     firstName: Theo
     lastName: Tester
     enabled: true
+    emailVerified: true
     attributes:
       locale: ["en"]
       phoneNumber: ["+49178111222333"]
