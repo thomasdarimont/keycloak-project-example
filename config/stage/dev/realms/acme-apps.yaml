@@ -122,6 +122,9 @@ clients:
     optionalClientScopes:
       - "acme.profile"
       - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
 
   - clientId: app-greetme
     protocol: openid-connect
