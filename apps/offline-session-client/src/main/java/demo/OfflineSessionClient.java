@@ -1,20 +1,6 @@
 package demo;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import javax.net.ssl.SSLContext;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +23,23 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.SSLContext;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * keytool -importcert -noprompt -cacerts -alias "id.acme.test" -storepass changeit -file
@@ -48,42 +50,43 @@ import org.springframework.web.client.RestTemplate;
 public class OfflineSessionClient {
 
     public static void main(String[] args) {
-        new SpringApplicationBuilder(OfflineSessionClient.class)
-                .web(WebApplicationType.NONE)
-                .run(args);
+        new SpringApplicationBuilder(OfflineSessionClient.class).web(WebApplicationType.NONE).run(args);
     }
 
     @Bean
     CommandLineRunner clr(TlsRestTemplateCustomizer tlsRestTemplateCustomizer) {
         return args -> {
-            var oauthInfo =
-                    OAuthInfo.builder()
-                            .issuer("https://id.acme.test:8443/auth/realms/acme-internal")
-                            .clientId("app-mobile")
-                            .scope("profile offline_access") // offline_access instructs keycloak to create an offline_session in the KC database
-                            .grantType("password") // for the sake of the demo
-                            .username("tester")
-                            .password("test")
-                            .build();
+            var oauthInfo = OAuthInfo.builder() //
+                    .issuer("https://id.acme.test:8443/auth/realms/acme-internal") //
+                    .clientId("app-mobile") //
+                    // openid scope required for userinfo!
+                    // profile scope allows to read profile info
+                    // offline_access scope instructs keycloak to create an offline_session in the KC database
+                    .scope("openid profile offline_access").grantType("password") // for the sake of the demo we use grant_type=password
+                    .username("tester") //
+                    .password("test") //
+                    .build();
 
             var rt = new RestTemplateBuilder(tlsRestTemplateCustomizer).build();
 
             var oauthClient = new OAuthClient(rt, oauthInfo, 3);
 
-            oauthClient.loadOfflineToken(true, "apps/offline-session-client/data/offline_token");
+            var offlineAccessValid = oauthClient.loadOfflineToken(true, "apps/offline-session-client/data/offline_token");
+            log.info("Offline access valid: {}", offlineAccessValid);
 
             if (Arrays.asList(args).contains("--logout")) {
                 log.info("Logout started...");
-                boolean loggedOut = oauthClient.logout();
+                var loggedOut = oauthClient.logout();
                 log.info("Logout success: {}", loggedOut);
                 System.exit(0);
+                return;
             }
-
-            var userInfo = oauthClient.fetchUserInfo();
-            log.info("UserInfo: {}", userInfo);
 
             var token = oauthClient.getAccessToken();
             log.info("Token: {}", token);
+
+            var userInfo = oauthClient.fetchUserInfo();
+            log.info("UserInfo: {}", userInfo);
         };
     }
 
@@ -147,11 +150,32 @@ public class OfflineSessionClient {
                     return false;
                 }
 
-                boolean result = doRefreshToken(offlineToken);
-                if (result) {
-                    log.info("Refreshed with existing offline token.");
+                var offlineRefreshTokenValid = false;
+                try {
+                    offlineRefreshTokenValid = doRefreshToken(offlineToken);
+                } catch (HttpClientErrorException hcee) {
+                    if (hcee.getStatusCode().value() == 400 && hcee.getMessage() != null && hcee.getMessage().contains("invalid_grant")) {
+                        log.info("Detected stale refresh token");
+                    } else {
+                        throw new RuntimeException(hcee);
+                    }
                 }
-                return result;
+
+                if (offlineRefreshTokenValid) {
+                    log.info("Refreshed with existing offline token.");
+                    return offlineRefreshTokenValid;
+                } else {
+                    log.warn("Refresh with existing offline token failed");
+                    try {
+                        log.warn("Removing stale offline token");
+                        Files.delete(offlineTokenPath);
+                        log.warn("Removed stale offline token");
+                    } catch (IOException e) {
+                        log.error("Failed to remove stale offline token", e);
+                        return false;
+                    }
+                }
+
             }
 
             if (!obtainIfMissing) {
@@ -162,11 +186,7 @@ public class OfflineSessionClient {
             if (success) {
                 log.info("Obtain new offline token...");
                 try {
-                    Files.write(
-                            offlineTokenPath,
-                            accessTokenResponse
-                                    .getRefresh_token()
-                                    .getBytes(StandardCharsets.UTF_8));
+                    Files.write(offlineTokenPath, accessTokenResponse.getRefresh_token().getBytes(StandardCharsets.UTF_8));
                     return true;
                 } catch (IOException e) {
                     log.error("Could not write offline_token", e);
@@ -182,13 +202,8 @@ public class OfflineSessionClient {
             var headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             headers.setBearerAuth(accessTokenResponse.getAccess_token());
-
-            var userInfoResponseEntity =
-                    rt.exchange(
-                            oauthInfo.getUserInfoUrl(),
-                            HttpMethod.GET,
-                            new HttpEntity<>(headers),
-                            UserInfoResponse.class);
+            log.info("Fetching data form userinfo: {}", oauthInfo.getUserInfoUrl());
+            var userInfoResponseEntity = rt.exchange(oauthInfo.getUserInfoUrl(), HttpMethod.GET, new HttpEntity<>(headers), UserInfoResponse.class);
             return userInfoResponseEntity.getBody();
         }
 
@@ -203,18 +218,14 @@ public class OfflineSessionClient {
             requestBody.add("refresh_token", refreshToken);
             requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity =
-                    rt.postForEntity(
-                            oauthInfo.getTokenUrl(),
-                            new HttpEntity<>(requestBody, headers),
-                            AccessTokenResponse.class);
+            var responseEntity = rt.postForEntity(oauthInfo.getTokenUrl(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 return false;
             }
 
             AccessTokenResponse body = responseEntity.getBody();
 
-            if (body.getError() != null) {
+            if (body == null || body.getError() != null) {
                 return false;
             }
 
@@ -234,17 +245,13 @@ public class OfflineSessionClient {
             requestBody.add("password", oauthInfo.password);
             requestBody.add("scope", oauthInfo.scope);
 
-            var responseEntity =
-                    rt.postForEntity(
-                            oauthInfo.getTokenUrl(),
-                            new HttpEntity<>(requestBody, headers),
-                            AccessTokenResponse.class);
+            var responseEntity = rt.postForEntity(oauthInfo.getTokenUrl(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 return false;
             }
 
             AccessTokenResponse body = responseEntity.getBody();
-            if (body.getError() != null) {
+            if (body == null || body.getError() != null) {
                 return false;
             }
 
@@ -255,8 +262,7 @@ public class OfflineSessionClient {
         public void ensureTokenValidSeconds(int minSecondsValid) {
 
             Objects.requireNonNull(accessTokenResponse, "accessTokenResponse");
-            long accessTokenExpiresAtSeconds =
-                    accessTokenResponse.getCreatedAtSeconds() + accessTokenResponse.getExpires_in();
+            long accessTokenExpiresAtSeconds = accessTokenResponse.getCreatedAtSeconds() + accessTokenResponse.getExpires_in();
             long nowSeconds = System.currentTimeMillis() / 1000;
             long remainingLifetimeSeconds = accessTokenExpiresAtSeconds - nowSeconds;
             if (remainingLifetimeSeconds < minSecondsValid) {
@@ -283,11 +289,7 @@ public class OfflineSessionClient {
             requestBody.add("client_id", oauthInfo.clientId);
             requestBody.add("refresh_token", accessTokenResponse.getRefresh_token());
 
-            var responseEntity =
-                    rt.postForEntity(
-                            oauthInfo.getLogoutUrl(),
-                            new HttpEntity<>(requestBody, headers),
-                            Map.class);
+            var responseEntity = rt.postForEntity(oauthInfo.getLogoutUrl(), new HttpEntity<>(requestBody, headers), Map.class);
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 log.error("Could not logout offline-client: logout failed");
                 return false;
@@ -314,10 +316,7 @@ public class OfflineSessionClient {
         @Override
         public void customize(RestTemplate restTemplate) {
 
-            var httpClient =
-                    HttpClients.custom()
-                            .setSSLSocketFactory(new SSLConnectionSocketFactory(createSslContext()))
-                            .build();
+            var httpClient = HttpClients.custom().setSSLSocketFactory(new SSLConnectionSocketFactory(createSslContext())).build();
 
             var requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
@@ -329,12 +328,8 @@ public class OfflineSessionClient {
             SSLContext sslContext = null;
 
             try {
-                TrustStrategy acceptingTrustStrategy =
-                        (X509Certificate[] chain, String authType) -> true;
-                sslContext =
-                        SSLContexts.custom()
-                                .loadTrustMaterial(null, acceptingTrustStrategy)
-                                .build();
+                TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+                sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
             } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
                 e.printStackTrace();
             }
