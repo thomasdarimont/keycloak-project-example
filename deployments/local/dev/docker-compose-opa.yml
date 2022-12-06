@@ -1,6 +1,6 @@
 services:
   acme-opa:
-    image: openpolicyagent/opa:0.46.1-rootless
+    image: openpolicyagent/opa:0.47.0-rootless
     command:
       - run
       - --server
