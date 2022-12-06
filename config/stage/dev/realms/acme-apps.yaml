@@ -118,6 +118,7 @@ clients:
       - "+"
     defaultClientScopes:
       - "email"
+      - "roles"
       - "profile"
     optionalClientScopes:
       - "acme.profile"
