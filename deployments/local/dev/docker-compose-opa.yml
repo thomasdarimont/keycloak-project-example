@@ -6,6 +6,11 @@ services:
       - --server
       - --set
       - "decision_logs.console=true"
+      # Watch for changes in policy folder
+      - "--watch"
+      - "/policies"
+    volumes:
+      - ../../../config/stage/dev/opa:/policies:z
     ports:
       - "18181:8181"
       - "18182:8182"
