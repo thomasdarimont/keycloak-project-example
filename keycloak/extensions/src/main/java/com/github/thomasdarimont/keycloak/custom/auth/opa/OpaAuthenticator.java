@@ -47,7 +47,7 @@ public class OpaAuthenticator implements Authenticator {
 
         if (!access.isAllowed()) {
             var loginForm = session.getProvider(LoginFormsProvider.class);
-            String hint = access.getHint();
+            var hint = access.getHint();
             if (hint == null) {
                 hint = Messages.ACCESS_DENIED;
             }
