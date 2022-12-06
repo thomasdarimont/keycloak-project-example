@@ -603,6 +603,10 @@ authenticationFlows:
       - flowAlias: "2FA Forms"
         requirement: CONDITIONAL
         autheticatorFlow: true
+      - authenticator: acme-opa-authenticator
+        #requirement: REQUIRED
+        requirement: DISABLED
+        authenticatorConfig: "acme-opa-auth-default"
 
   - alias: "2FA Forms"
     description: "Sub-Flow to ask user for 2FA"
@@ -632,6 +636,13 @@ authenticatorConfig:
       ttl: "300"
       attempts: "5"
       useWebOtp: true
+  - alias: "acme-opa-auth-default"
+    config:
+      # realmAttributes: "acme.greeting"
+      authzUrl: "http://acme-opa:8181/v1/data/iam/keycloak/allow"
+      useUserAttributes: "true"
+      useClientAttributes: "true"
+      useRealmAttributes: "true"
 
 roles:
 # Realm specific roles
