@@ -2,6 +2,11 @@ package iam.keycloak
 
 import future.keywords.in
 
+# Map required client roles to clientId
+client_access_map := {
+    "app-mini-spa": "acme-user"
+}
+
 default allow = {
     "allow": false,
     "message": "access-denied"
@@ -10,8 +15,10 @@ default allow = {
 # Users of the acme-internal realm need the acme-user role to access
 allow = result {
 
-    input.resource.realm == "acme-internal"
-    "acme-user" in input.subject.realmRoles
+    isRealm("acme-internal")
+
+#    requiredRole == client_access_map[input.resource.clientId]
+#    requiredRole in input.subject.realmRoles
 
     result = _allow(true, "acme-user can access")
 }
@@ -19,8 +26,7 @@ allow = result {
 # Users of other realms can access
 allow = result {
 
-    input.resource.realm != "acme-internal"
-
+    not isRealm("acme-internal")
     result = _allow(true, "every user can access")
 }
 
@@ -30,4 +36,8 @@ _allow(allow, hint) = result {
         "allow": allow,
         "message": hint
     }
+}
+
+isRealm(realmName) = result {
+    result := input.resource.realm == realmName
 }
