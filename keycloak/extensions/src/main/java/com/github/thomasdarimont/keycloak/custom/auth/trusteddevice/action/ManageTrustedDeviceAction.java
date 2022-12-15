@@ -50,7 +50,6 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
         // NOOP
-        log.info("ManageTrustedDeviceAction evaluateTriggers");
     }
 
     @Override
@@ -111,8 +110,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
 
             TrustedDeviceCredentialModel trustedDeviceModel = TrustedDeviceCredentialModel.lookupTrustedDevice(user, receivedTrustedDeviceToken);
             if (trustedDeviceModel != null) {
-                boolean deleted = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProvider.ID)
-                        .deleteCredential(realm, user, trustedDeviceModel.getId());
+                boolean deleted = session.getProvider(CredentialProvider.class, TrustedDeviceCredentialProvider.ID).deleteCredential(realm, user, trustedDeviceModel.getId());
                 if (deleted) {
 
                     AccountActivity.onTrustedDeviceChange(session, realm, user, new TrustedDeviceInfo(trustedDeviceModel.getUserLabel()), MfaChange.REMOVE);
@@ -181,8 +179,7 @@ public class ManageTrustedDeviceAction implements RequiredActionProvider {
         var user = context.getUser();
         var scm = user.credentialManager();
 
-        scm.getStoredCredentialsByTypeStream(TrustedDeviceCredentialModel.TYPE)
-                .forEach(cm -> scm.removeStoredCredentialById(cm.getId()));
+        scm.getStoredCredentialsByTypeStream(TrustedDeviceCredentialModel.TYPE).forEach(cm -> scm.removeStoredCredentialById(cm.getId()));
     }
 
     protected TrustedDeviceToken createDeviceToken(String deviceId, int numberOfDaysToTrustDevice) {
