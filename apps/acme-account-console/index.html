@@ -609,14 +609,18 @@
 
         // use email from IDToken directly
         let email = escapeHtml(keycloak.idTokenParsed['email']);
+        let emailVerified = keycloak.idTokenParsed['email_verified'];
         if (!email) {
             email = "N/A";
+            emailVerified = false;
         }
 
         // use phoneNumber from IDToken directly
         let phoneNumber = escapeHtml(keycloak.idTokenParsed['phone_number']);
+        let phoneNumberVerified = keycloak.idTokenParsed['phone_number_verified']
         if (!phoneNumber){
             phoneNumber = "N/A";
+            phoneNumberVerified = false;
         }
 
         let profileHtml = `
@@ -625,20 +629,24 @@
                     <td class="label">First name</td>
                     <td><input type="text" id="firstName" name="firstName" value="${firstName}" pattern="[\w\d][\w\d\s]{0,64}" placeholder="Firstname" required></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">Last name</td>
                     <td><input type="text" id="lastName" name="lastName" value="${lastName}" pattern="[\w\d][\w\d\s]{0,64}" placeholder="Lastname" required></td>
                     <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">Email</td>
                     <td><span id="email">${email}</span></td>
+                    <td title="${ emailVerified ? 'Email verified' : ''}">${ emailVerified ? '&#10004;' : ''}</td>
                     <td><a id="changeEmail" href="#" onclick="changeEmail();return false">Update</a></td>
                 </tr>
                 <tr>
                     <td class="label">Phone</td>
                     <td><span id="phoneNumber">${phoneNumber}</span></td>
+                    <td title="${ phoneNumberVerified ? 'Phone number verified' : ''}">${ phoneNumberVerified ? '&#10004;' : ''}</td>
                     <td></td>
                 </tr>
             </table>
