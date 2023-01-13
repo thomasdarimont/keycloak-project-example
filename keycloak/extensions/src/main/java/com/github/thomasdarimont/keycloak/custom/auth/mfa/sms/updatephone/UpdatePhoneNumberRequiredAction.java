@@ -7,10 +7,8 @@ import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsAuthenticator;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.SmsCodeSender;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.client.SmsClientFactory;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
-import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
@@ -27,8 +25,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
-import org.keycloak.services.resources.LoginActionsService;
-import org.keycloak.services.validation.Validation;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -87,17 +83,17 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         UserModel user = context.getUser();
         form.setAttribute("username", user.getUsername());
 
-        AuthenticationSessionModel authSession = context.getAuthenticationSession();
-        if (authSession.getAuthNote(PHONE_NUMBER_AUTH_NOTE) != null) {
-            // we are already sent a code
-            return form.createForm("update-phone-number-form.ftl");
-        }
-
         String phoneNumber = user.getFirstAttribute(PHONE_NUMBER_ATTRIBUTE);
         form.setAttribute("currentMobile", phoneNumber == null ? "" : phoneNumber);
 
         if (formCustomizer != null) {
             formCustomizer.accept(form);
+        }
+
+        AuthenticationSessionModel authSession = context.getAuthenticationSession();
+        if (authSession.getAuthNote(PHONE_NUMBER_AUTH_NOTE) != null) {
+            // we are already sent a code
+            return form.createForm("update-phone-number-form.ftl");
         }
 
         // use form from src/main/resources/theme-resources/templates/
@@ -106,14 +102,6 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
 
     @Override
     public void processAction(RequiredActionContext context) {
-
-        if (isCancelApplicationInitiatedAction(context)) {
-            RequiredActionUtils.cancelApplicationInitiatedAction(context, ID, authSession -> {
-                authSession.removeAuthNote(SmsAuthenticator.AUTH_NOTE_CODE);
-                authSession.removeAuthNote(PHONE_NUMBER_AUTH_NOTE);
-            });
-            return;
-        }
 
         // TODO trigger phone number verification via SMS
         // user submitted the form
@@ -125,15 +113,13 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         KeycloakSession session = context.getSession();
 
         event.event(EventType.UPDATE_PROFILE);
-
         String phoneNumber = formData.getFirst(PHONE_NUMBER_FIELD);
 
         EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PROFILE_ERROR).client(authSession.getClient()).user(authSession.getAuthenticatedUser());
 
-
         if (formData.getFirst(FORM_ACTION_UPDATE) != null) {
 
-            if (Validation.isBlank(phoneNumber) || phoneNumber.length() < 3) {
+            if (!isValidPhoneNumber(phoneNumber)) {
 
                 Response challenge = createForm(context, form -> {
                     form.addError(new FormMessage(PHONE_NUMBER_FIELD, "Invalid Input"));
@@ -177,7 +163,7 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
             user.setSingleAttribute(PHONE_NUMBER_VERIFIED_ATTRIBUTE, "true");
             user.removeRequiredAction(ID);
 
-            updateSmsMfaCredential(realm, user, session, phoneNumberFromAuthNote);
+            afterPhoneNumberVerified(realm, user, session, phoneNumberFromAuthNote);
 
             context.success();
             return;
@@ -186,8 +172,9 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         context.failure();
     }
 
-    protected SmsCodeSender createSmsSender(RequiredActionContext context) {
-        return new SmsCodeSender();
+    protected void afterPhoneNumberVerified(RealmModel realm, UserModel user, KeycloakSession session, String phoneNumberFromAuthNote) {
+        // TODO split this up into a separate required action, e.g. UpdateMfaSmsCodeRequiredAction
+        updateSmsMfaCredential(realm, user, session, phoneNumberFromAuthNote);
     }
 
     protected void updateSmsMfaCredential(RealmModel realm, UserModel user, KeycloakSession session, String phoneNumber) {
@@ -208,11 +195,19 @@ public class UpdatePhoneNumberRequiredAction implements RequiredActionProvider {
         }
     }
 
-    protected boolean isCancelApplicationInitiatedAction(RequiredActionContext context) {
+    private static boolean isValidPhoneNumber(String phoneNumber) {
 
-        HttpRequest httpRequest = context.getHttpRequest();
-        MultivaluedMap<String, String> formParams = httpRequest.getDecodedFormParameters();
-        return formParams.containsKey(LoginActionsService.CANCEL_AIA);
+        if (phoneNumber == null) {
+            return false;
+        }
+
+        String phone = phoneNumber.trim();
+        // TODO use libphonenumber to validate phone number here
+        return phone.length() > 3;
+    }
+
+    protected SmsCodeSender createSmsSender(RequiredActionContext context) {
+        return new SmsCodeSender();
     }
 
     @Override

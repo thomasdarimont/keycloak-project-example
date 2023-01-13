@@ -13,7 +13,9 @@
                     <label for="mobile">${msg('phoneNumber')}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input id="mobile" type="tel" name="mobile" value="${currentMobile}" required aria-invalid="<#if messagesPerField.existsError('mobile')>true</#if>"/>
+                    <input id="mobile" type="tel" name="mobile" value="${currentMobile}" required
+                           class="${properties.kcInputClass!}"
+                           aria-invalid="<#if messagesPerField.existsError('mobile')>true</#if>"/>
 
                     <#if messagesPerField.existsError('mobile')>
                         <span id="input-error-mobile" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
