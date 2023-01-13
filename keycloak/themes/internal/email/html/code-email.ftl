@@ -1,5 +1,4 @@
-<#ftl output_format="plainText">
 <#import "template.ftl" as layout>
 <@layout.emailLayout>
-${msg("acmeAccountBlockedBody",user.username)}
+${kcSanitize(msg("emailCodeBody", code))?no_esc}
 </@layout.emailLayout>

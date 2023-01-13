@@ -1,6 +1,4 @@
-<html>
-<body>
+<#import "template.ftl" as layout>
+<@layout.emailLayout>
 ${kcSanitize(msg("acmeAccountDeletionRequestedBodyHtml",user.username,actionTokenUrl))?no_esc}
-</body>
-</html>
-
+</@layout.emailLayout>

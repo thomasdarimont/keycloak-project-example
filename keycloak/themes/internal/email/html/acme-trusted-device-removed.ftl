@@ -1,5 +1,4 @@
-<html>
-<body>
+<#import "template.ftl" as layout>
+<@layout.emailLayout>
 ${kcSanitize(msg("acmeTrustedDeviceRemovedBodyHtml",user.username,trustedDeviceInfo.deviceName))?no_esc}
-</body>
-</html>
+</@layout.emailLayout>
