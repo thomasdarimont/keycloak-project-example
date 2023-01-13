@@ -528,7 +528,8 @@
     function changeEmail() {
 
         keycloak.login({
-            action: "acme-update-email"
+            action: "acme-update-email" // use custom update email action
+            // action: "UPDATE_EMAIL" // use native update email action
         });
     }
 

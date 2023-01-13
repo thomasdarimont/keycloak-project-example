@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.custom.profile.emailupdate;
 
-import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.jboss.resteasy.spi.HttpRequest;
@@ -89,8 +88,8 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
             return form.createForm("verify-email-form.ftl");
         }
 
-//        String email = context.getUser().getEmail();
-        form.setAttribute("currentEmail", "");
+        String email = context.getUser().getEmail();
+        form.setAttribute("currentEmail", email);
 
         if (formCustomizer != null) {
             formCustomizer.accept(form);
@@ -103,14 +102,6 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
     @Override
     public void processAction(RequiredActionContext context) {
 
-        if (isCancelApplicationInitiatedAction(context)) {
-            RequiredActionUtils.cancelApplicationInitiatedAction(context, ID, authSession -> {
-                authSession.removeAuthNote(AUTH_NOTE_CODE);
-                authSession.removeAuthNote(UPDATE_EMAIL_AUTH_NOTE);
-            });
-            return;
-        }
-
         // TODO trigger email verification via email
         // user submitted the form
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
@@ -121,6 +112,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
         KeycloakSession session = context.getSession();
 
         String newEmail = String.valueOf(formData.getFirst(EMAIL_FIELD)).trim();
+
         event.detail(Details.EMAIL, newEmail);
 
         EventBuilder errorEvent = event.clone().event(EventType.UPDATE_EMAIL_ERROR)
@@ -129,7 +121,6 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
 
         if (formData.getFirst("update") != null) {
-
             final String emailError;
             if (Validation.isBlank(newEmail) || !Validation.isEmailValid(newEmail)) {
                 emailError = "invalidEmailMessage";

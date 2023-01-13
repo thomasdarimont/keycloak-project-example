@@ -13,7 +13,9 @@
                     <label for="email">${msg('email')}</label>
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
-                    <input id="email" type="email" name="email" value="${currentEmail}" required
+                    <input id="email" type="email" name="email" value="" required
+                           placeholder="${currentEmail}"
+                           class="${properties.kcInputClass!}"
                            aria-invalid="<#if messagesPerField.existsError('email')>true</#if>" autocomplete="off"/>
 
                     <#if messagesPerField.existsError('email')>
