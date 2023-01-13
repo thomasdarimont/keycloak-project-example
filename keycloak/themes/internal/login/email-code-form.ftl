@@ -12,6 +12,7 @@
                     <div class="${properties.kcInputWrapperClass!}">
                         <label for="emailCode">${msg('accessCode')}:</label>
                         <input id="emailCode" name="emailCode" type="text" inputmode="numeric" pattern="[\w\d-]*" autofocus
+                               class="${properties.kcInputClass!}"
                                required autocomplete="one-time-code"/>
                     </div>
                 </div>

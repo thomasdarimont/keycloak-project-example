@@ -171,7 +171,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
             EmailTemplateProvider emailProvider = session.getProvider(EmailTemplateProvider.class);
             emailProvider.setRealm(realm);
             emailProvider.setUser(user);
-            // Don't forget to add the welcome-email.ftl (html and text) template to your theme.
+            // Don't forget to add the code-email.ftl (html and text) template to your theme.
             emailProvider.send("emailCodeSubject", subjectParams, "code-email.ftl", mailBodyAttributes);
         } catch (EmailException eex) {
             log.errorf(eex, "Failed to send access code email. realm=%s user=%s", realm.getId(), user.getUsername());
