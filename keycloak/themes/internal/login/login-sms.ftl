@@ -3,6 +3,16 @@
     <#if section = "header">
         ${msg("smsAuthTitle",realm.displayName)}
     <#elseif section = "form">
+
+        <script>
+            function trySubmitForm() {
+                let code = document.querySelector("#code").value;
+                if (code.length === 6) {
+                    document.querySelector("#kc-sms-code-login-form").submit();
+                }
+            }
+        </script>
+
         <form id="kc-sms-code-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
@@ -11,6 +21,7 @@
                 <div class="${properties.kcInputWrapperClass!}">
                     <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus
                            inputmode="numeric" pattern="\d{6,8}" autocomplete="one-time-code"
+                           onkeyup="trySubmitForm()"
                            aria-invalid="<#if messagesPerField.existsError('code')>true</#if>"/>
 
                     <#if messagesPerField.existsError('code')>

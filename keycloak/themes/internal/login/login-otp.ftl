@@ -3,6 +3,16 @@
     <#if section="header">
         ${msg("doLogIn")}
     <#elseif section="form">
+
+        <script>
+            function trySubmitForm() {
+                let code = document.querySelector("#otp").value;
+                if (code.length === 6) {
+                    document.querySelector("#kc-otp-login-form").submit();
+                }
+            }
+        </script>
+
         <form id="kc-otp-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}"
               method="post">
             <#if otpLogin.userOtpCredentials?size gt 1>
@@ -34,6 +44,7 @@
 
                 <div class="${properties.kcInputWrapperClass!}">
                     <input id="otp" name="otp" autocomplete="off" type="text" class="${properties.kcInputClass!}"
+                           inputmode="numeric" pattern="\d{6,8}" onkeyup="trySubmitForm()"
                            autofocus aria-invalid="<#if messagesPerField.existsError('totp')>true</#if>"/>
 
                     <#if messagesPerField.existsError('totp')>
