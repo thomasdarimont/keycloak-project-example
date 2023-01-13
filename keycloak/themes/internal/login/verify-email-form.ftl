@@ -14,6 +14,7 @@
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input id="code" type="text" name="code" value="" required autocomplete="one-time-code"
+                           class="${properties.kcInputClass!}"
                            aria-invalid="<#if messagesPerField.existsError('code')>true</#if>"/>
 
                     <#if messagesPerField.existsError('code')>
