@@ -49,6 +49,7 @@ services:
       - "--http-port=8080"
       - "--metrics-enabled=true"
       - "--health-enabled=true"
+      - "--features=preview"
       - "--cache=local"
       - "--proxy=passthrough"
 #      - "--log-console-output=json"
