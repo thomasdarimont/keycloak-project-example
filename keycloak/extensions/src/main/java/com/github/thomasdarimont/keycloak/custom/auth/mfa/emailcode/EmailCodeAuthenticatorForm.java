@@ -23,7 +23,6 @@ import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.messages.Messages;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +68,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
             return;
         }
 
-        String emailCode = SecretGenerator.getInstance().randomString(LENGTH, SecretGenerator.DIGITS);
+        var emailCode = SecretGenerator.getInstance().randomString(LENGTH, SecretGenerator.DIGITS);
         sendEmailWithCode(context.getRealm(), context.getUser(), toDisplayCode(emailCode));
 
         context.getAuthenticationSession().setAuthNote(EMAIL_CODE, emailCode);
@@ -86,7 +85,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
     @Override
     public void action(AuthenticationFlowContext context) {
 
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+        var formData = context.getHttpRequest().getDecodedFormParameters();
 
         if (formData.containsKey("resend")) {
             resetEmailCode(context);
@@ -100,11 +99,8 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
             return;
         }
 
-        String givenEmailCode = fromDisplayCode(formData.getFirst(EMAIL_CODE));
-
-        boolean valid = validateCode(context, givenEmailCode);
-
-
+        var givenEmailCode = fromDisplayCode(formData.getFirst(EMAIL_CODE));
+        var valid = validateCode(context, givenEmailCode);
         // TODO add brute-force protection for email code auth
 
         context.getEvent().realm(context.getRealm()).user(context.getUser()).detail("authenticator", ID);
@@ -116,9 +112,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
         }
 
         resetEmailCode(context);
-
         context.getEvent().event(EventType.LOGIN).success();
-
         context.success();
     }
 
@@ -127,7 +121,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
     }
 
     private boolean validateCode(AuthenticationFlowContext context, String givenCode) {
-        String emailCode = context.getAuthenticationSession().getAuthNote(EMAIL_CODE);
+        var emailCode = context.getAuthenticationSession().getAuthNote(EMAIL_CODE);
         return emailCode.equals(givenCode);
     }
 
@@ -138,8 +132,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
 
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
-        // TODO determine if email code auth is configured for current user
-        return true;
+        return user.credentialManager().isConfiguredFor(EmailCodeCredentialModel.TYPE);
     }
 
     @Override
@@ -164,11 +157,11 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
         mailBodyAttributes.put("code", code);
 
 
-        String realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
+        var realmName = realm.getDisplayName() != null ? realm.getDisplayName() : realm.getName();
         List<Object> subjectParams = List.of(realmName);
 
         try {
-            EmailTemplateProvider emailProvider = session.getProvider(EmailTemplateProvider.class);
+            var emailProvider = session.getProvider(EmailTemplateProvider.class);
             emailProvider.setRealm(realm);
             emailProvider.setUser(user);
             // Don't forget to add the code-email.ftl (html and text) template to your theme.

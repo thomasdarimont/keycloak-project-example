@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.endpoints.credentials;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
+import com.github.thomasdarimont.keycloak.custom.auth.mfa.emailcode.EmailCodeCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.sms.credentials.SmsCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceCookie;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDeviceToken;
@@ -47,10 +48,10 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 public class UserCredentialsInfoResource {
 
     private static final Set<String> RELEVANT_CREDENTIAL_TYPES = Set.of(PasswordCredentialModel.TYPE, SmsCredentialModel.TYPE, OTPCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE,
-            RecoveryAuthnCodesCredentialModel.TYPE);
+            RecoveryAuthnCodesCredentialModel.TYPE, EmailCodeCredentialModel.TYPE);
 
     private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(SmsCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, OTPCredentialModel.TYPE,
-            RecoveryAuthnCodesCredentialModel.TYPE);
+            RecoveryAuthnCodesCredentialModel.TYPE, EmailCodeCredentialModel.TYPE);
 
     private final KeycloakSession session;
     private final AccessToken token;

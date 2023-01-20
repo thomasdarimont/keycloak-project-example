@@ -320,7 +320,7 @@ public class SmsAuthenticator implements Authenticator {
                     .property().name(SmsAuthenticator.CONFIG_PHONENUMBER_PATTERN)
                     .type(ProviderConfigProperty.STRING_TYPE)
                     .label("Phone Number Pattern")
-                    .defaultValue("\\+49.*")
+                    .defaultValue("(\\+49).*")
                     .helpText("Regex Pattern for validation of Phone Numbers")
                     .add()
 

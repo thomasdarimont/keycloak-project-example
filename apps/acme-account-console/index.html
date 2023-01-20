@@ -349,6 +349,7 @@
         let passwordInfo = credentialsData.credentialInfos['password'];
         let otpInfo = credentialsData.credentialInfos['otp'];
         let smsInfo = credentialsData.credentialInfos['mfa-sms'];
+        let emailCodeInfo = credentialsData.credentialInfos['mfa-email-code'];
         let trustedDeviceInfo = credentialsData.credentialInfos['acme-trusted-device'];
         let recoveryCodeInfo = credentialsData.credentialInfos['recovery-authn-codes'];
 
@@ -361,8 +362,8 @@
                     <td>MFA OTP</td>
                     <td>${!!optInfoItem ? escapeHtml(optInfoItem.credentialLabel) : ''}</td>
                     <td>${!!optInfoItem ? formatDate(optInfoItem.createdAt) : '-'}</td>
-                    <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
                     <td>${!!optInfoItem ? '<a href="#" onclick="removeMfa(\'otp\',\'' + optInfoItem.credentialId + '\');return false">Remove</a>' : ''}</td>
+                    <td><a href="#" onclick="changeMfa('otp');return false">Add another</a></td>
                 </tr>`;
             }
         } else {
@@ -373,6 +374,29 @@
                     <td></td>
                     <td>-</td>
                     <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
+                    <td></td>
+                </tr>`;
+        }
+
+        let emailCodeAuthHtml = "";
+        if (emailCodeInfo) {
+            emailCodeAuthHtml += `
+                <tr>
+                    <td>${!!emailCodeInfo[0] ? "&check;" : ""}</td>
+                    <td>MFA E-Mail Code</td>
+                    <td></td>
+                    <td>${!!emailCodeInfo[0] ? formatDate(emailCodeInfo[0].createdAt) : '-'}</td>
+                    <td>${!!emailCodeInfo[0] ? '<a href="#" onclick="removeMfa(\'mfa-email-code\',\'' + emailCodeInfo[0].credentialId + '\');return false">Remove</a>' : ''}</td>
+                    <td></td>
+                </tr>`;
+        } else {
+            emailCodeAuthHtml += `
+                <tr>
+                    <td></td>
+                    <td>MFA E-mail Code</td>
+                    <td></td>
+                    <td>-</td>
+                    <td><a href="#" onclick="changeMfa('mfa-email-code');return false">Add</a></td>
                     <td></td>
                 </tr>`;
         }
@@ -445,6 +469,8 @@
                  <td><a href="#" onclick="changeMfa('recovery-authn-codes');return false">Update</a></td>
                  <td>${!!recoveryCodeInfo ? '<a href="#" onclick="removeMfa(\'recovery-authn-codes\');return false">Remove</a>' : ''}</td>
             </tr>
+
+            ${emailCodeAuthHtml}
 
             ${otpAuthHtml}
             </tbody>
@@ -540,6 +566,7 @@
             "mfa-sms": "acme-update-phonenumber",
             "acme-trusted-device": "acme-manage-trusted-device",
             "recovery-authn-codes": "CONFIGURE_RECOVERY_AUTHN_CODES",
+            "mfa-email-code": "acme-register-email-code",
         }
 
         let action = actions[method];
@@ -555,7 +582,7 @@
 
     async function removeMfa(credentialType, credentialId) {
 
-        if (!(["otp", "mfa-sms", "acme-trusted-device", "recovery-authn-codes"].includes(credentialType))) {
+        if (!(["otp", "mfa-sms", "acme-trusted-device", "recovery-authn-codes", "mfa-email-code"].includes(credentialType))) {
             return;
         }
 

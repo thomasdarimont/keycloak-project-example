@@ -4,11 +4,21 @@
     console.log("internal modern theme");
 
     // hack to add mobile icon for sms authenticator, needs to be called after dom ready
-    function updateMobileIconOnSmsAuthenticatorInAuthenticationSelector() {
-        let elements = [...document.querySelectorAll('div.pf-c-title')].filter(elem => elem.textContent.includes('SMS'));
-        if (elements && elements.length > 0) {
-            console.log("patch mobile icon");
-            elements[0].parentElement.parentElement.querySelector("i").classList.add("fa-mobile");
+    function updateAuthenticatorIconsInAuthenticationSelector() {
+        {
+            let elements = [...document.querySelectorAll('div.pf-c-title')].filter(elem => elem.textContent.includes('SMS'));
+            if (elements && elements.length > 0) {
+                console.log("patch mobile icon");
+                elements[0].parentElement.parentElement.querySelector("i").classList.add("fa-mobile");
+            }
+        }
+
+        {
+            let emailCodeAuthElements = [...document.querySelectorAll('div.pf-c-title')].filter(elem => elem.textContent.toLowerCase().replace("-","").includes('email code'));
+            if (emailCodeAuthElements && emailCodeAuthElements.length > 0) {
+                console.log("patch email-code icon");
+                emailCodeAuthElements[0].parentElement.parentElement.querySelector("i").classList.add("fa-envelope");
+            }
         }
     }
 
@@ -60,7 +70,7 @@
     }
 
     function onDomContentLoaded() {
-        updateMobileIconOnSmsAuthenticatorInAuthenticationSelector();
+        updateAuthenticatorIconsInAuthenticationSelector();
         updateBackupCodeIconOnBackupCodeAuthenticatorInAuthenticationSelector();
 
         enableInactivityMonitoring();

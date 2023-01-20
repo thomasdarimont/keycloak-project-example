@@ -156,6 +156,12 @@ requiredActions:
     enabled: true
     defaultAction: false
     priority: 1200
+  - alias: acme-register-email-code
+    name:  'Acme: Register MFA via E-Mail code'
+    providerId: acme-register-email-code
+    enabled: true
+    defaultAction: false
+    priority: 1300
   - alias: acme-update-email
     name: 'Acme: Update Email'
     providerId: acme-update-email
@@ -623,6 +629,8 @@ authenticationFlows:
       - authenticator: acme-sms-authenticator
         requirement: ALTERNATIVE
         authenticatorConfig: "acme-sms-auth-default"
+      - authenticator: acme-email-code-form
+        requirement: ALTERNATIVE
       - authenticator: auth-recovery-authn-code-form
         requirement: ALTERNATIVE
 

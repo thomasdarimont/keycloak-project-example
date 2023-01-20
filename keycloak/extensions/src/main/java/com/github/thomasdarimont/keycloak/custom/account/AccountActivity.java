@@ -24,7 +24,7 @@ public class AccountActivity {
         try {
             var realmDisplayName = getRealmDisplayName(realm);
             var credentialLabel = getCredentialLabel(credential);
-            var mfaInfo = new MfaInfo(credentialLabel);
+            var mfaInfo = new MfaInfo(credential.getType(), credentialLabel);
             switch (change) {
                 case ADD:
                     AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
@@ -105,25 +105,18 @@ public class AccountActivity {
         return realmDisplayName;
     }
 
-    private static String toReadableCredentialType(CredentialModel credential) {
-        if (OTPCredentialModel.TYPE.equals(credential.getType())) {
-            return credential.getType().toUpperCase();
-        }
-        return credential.getType();
-    }
-
     private static String getCredentialLabel(CredentialModel credential) {
-        var label = credential.getUserLabel();
+
         var type = credential.getType();
-
-        if (label != null && type != null) {
-            return label + " " + toReadableCredentialType(credential);
+        if (OTPCredentialModel.TYPE.equals(type)) {
+            return type.toUpperCase();
         }
 
-        if (label != null) {
-            return label;
+        var label = credential.getUserLabel();
+        if (label == null || !label.isEmpty()) {
+            return "";
         }
 
-        return toReadableCredentialType(credential);
+        return credential.getUserLabel();
     }
 }
