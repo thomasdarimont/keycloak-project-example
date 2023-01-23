@@ -10,4 +10,6 @@ public class UserProfile {
     String lastname;
 
     String email;
+
+    String phoneNumber;
 }

@@ -5,10 +5,13 @@ import com.github.thomasdarimont.keycloak.webapp.domain.ApplicationEntry;
 import com.github.thomasdarimont.keycloak.webapp.domain.CredentialEntry;
 import com.github.thomasdarimont.keycloak.webapp.domain.SettingEntry;
 import com.github.thomasdarimont.keycloak.webapp.domain.UserProfile;
-import com.github.thomasdarimont.keycloak.webapp.support.TokenAccessor;
+import com.github.thomasdarimont.keycloak.webapp.support.OAuth2AuthorizedClientAccessor;
+import com.github.thomasdarimont.keycloak.webapp.support.keycloakclient.KeycloakClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +22,11 @@ import java.util.List;
 @RequiredArgsConstructor
 class UiController {
 
-    private final TokenAccessor tokenAccessor;
+    private final OAuth2AuthorizedClientAccessor oauth2AuthorizedClientAccessor;
+
+    private final KeycloakClient keycloakClient;
 
     @GetMapping("/")
-
     public String showIndex(Model model) {
         return "index";
     }
@@ -30,20 +34,38 @@ class UiController {
     @GetMapping("/profile")
     public String showProfile(Model model, Authentication auth) {
 
-        OAuth2AccessToken accessToken = tokenAccessor.getAccessToken(auth);
+        var authorizedClient = oauth2AuthorizedClientAccessor.getOAuth2AuthorizedClient(auth);
+        if (authorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:";
+        }
 
-        var profile = new UserProfile();
-        profile.setFirstname("Thomas");
-        profile.setLastname("Darimont");
-        profile.setEmail("thomas.darimont@gmail.com");
-
+        var principal = (DefaultOidcUser) auth.getPrincipal();
+        var profile = buildUserProfile(authorizedClient, principal);
         model.addAttribute("profile", profile);
 
         return "profile";
     }
 
+    private UserProfile buildUserProfile(OAuth2AuthorizedClient oAuth2AuthorizedClient, DefaultOidcUser oidcUser) {
+
+        var keycloakUserInfo = keycloakClient.userInfo(oAuth2AuthorizedClient, oidcUser.getIdToken());
+        var profile = new UserProfile();
+        profile.setFirstname(keycloakUserInfo.getFirstname());
+        profile.setLastname(keycloakUserInfo.getLastname());
+        profile.setEmail(keycloakUserInfo.getEmail());
+        profile.setPhoneNumber(keycloakUserInfo.getPhoneNumber());
+        return profile;
+    }
+
     @GetMapping("/settings")
-    public String showSettings(Model model) {
+    public String showSettings(Model model, Authentication auth) {
+
+        var authorizedClient = oauth2AuthorizedClientAccessor.getOAuth2AuthorizedClient(auth);
+        if (authorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:settings";
+        }
 
         var setting1 = new SettingEntry();
         setting1.setName("setting1");
@@ -63,7 +85,13 @@ class UiController {
     }
 
     @GetMapping("/security")
-    public String showSecurity(Model model) {
+    public String showSecurity(Model model, Authentication auth) {
+
+        var authorizedClient = oauth2AuthorizedClientAccessor.getOAuth2AuthorizedClient(auth);
+        if (authorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:security";
+        }
 
         var credential1 = new CredentialEntry();
         credential1.setId("cred1");
@@ -83,7 +111,13 @@ class UiController {
     }
 
     @GetMapping("/applications")
-    public String showApplications(Model model) {
+    public String showApplications(Model model, Authentication auth) {
+
+        var authorizedClient = oauth2AuthorizedClientAccessor.getOAuth2AuthorizedClient(auth);
+        if (authorizedClient == null) {
+            SecurityContextHolder.clearContext();
+            return "redirect:applications";
+        }
 
         var appEntry1 = new ApplicationEntry();
         appEntry1.setClientId("app1");
