@@ -11,7 +11,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.3",
     "https": "^1.0.0",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-saml": "^3.2.1",
     "spdy": "^4.0.2",
     "stoppable": "^1.1.0",
