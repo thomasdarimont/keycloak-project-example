@@ -51,6 +51,7 @@ function configureSaml(app, config) {
             issuer: config.SP_ISSUER,
             host: config.HOSTNAME,
             protocol: "https://",
+            signatureAlgorithm: "sha256",
             privateKey: config.SAML_SP_KEY,
             cert: config.SAML_IDP_CERT,
             passReqToCallback: true,
@@ -120,12 +121,16 @@ function configureRoutes(app, config) {
 
     app.get('/logout',
         ensureAuthenticated,
-        (req, res) => {
+        (req, res, next) => {
 
             if (req.user != null) {
                 return samlStrategy.logout(req, (err, uri) => {
-                    req.logout();
-                    return res.redirect(uri);
+                    req.logout(err => {
+                        if (err) {
+                            return next(err);
+                        }
+                        res.redirect('/');
+                    });
                 });
             }
 
