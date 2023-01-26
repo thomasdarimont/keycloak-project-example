@@ -5,6 +5,7 @@ import com.google.auto.service.AutoService;
 import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
@@ -29,6 +30,8 @@ public class ContextSelectionAction implements RequiredActionProvider {
     public static final String ID = "acme-context-selection-action";
 
     private static final String CONTEXT_KEY = "acme.context.key";
+
+    private static final String CONTEXT_SELECTION_PARAM = "contextSelectionKey";
 
     private static final String CONTEXT_FORM_ATTRIBUTE = "context.selection.key";
 
@@ -63,8 +66,28 @@ public class ContextSelectionAction implements RequiredActionProvider {
 
         // TODO allow to accept contextSelectionKey via URL Parameter
 
+        // handle dynamic context selection for legacy apps with grant_type=password
+        var formParams = context.getHttpRequest().getFormParameters();
+        if (OAuth2Constants.PASSWORD.equals(formParams.getFirst(OAuth2Constants.GRANT_TYPE))) {
+            // allow to accept contextSelectionKey via form post Parameter
+            if (formParams.containsKey(CONTEXT_SELECTION_PARAM)) {
+                var contextKey = formParams.getFirst(CONTEXT_SELECTION_PARAM);
+                if (isValidContextKey(context, contextKey)) {
+                    authSession.setUserSessionNote(CONTEXT_KEY, contextKey);
+                } else {
+                    // contextSelectionKey provided with invalid value
+                    context.failure();
+                }
+            }
+            authSession.removeRequiredAction(ID);
+            return;
+        }
+
+        // handle dynamic context selection for standard flow
+
         // check if context selection already happened in another user session?
         var userSession = UserSessionUtils.getUserSessionFromAuthenticationSession(context.getSession(), context.getAuthenticationSession());
+
         // Note, if the user just authenticated there is no user session yet.
         if (userSession != null) {
             var userSessionNotes = userSession.getNotes();
@@ -76,6 +99,18 @@ public class ContextSelectionAction implements RequiredActionProvider {
 
         // add this required action to the auth session to force execution after authentication
         authSession.addRequiredAction(ID);
+    }
+
+    private boolean isValidContextKey(RequiredActionContext context, String contextKey) {
+        var options = computeContextOptions(context);
+        var foundValidContextKey = false;
+        for (var option : options) {
+            if (option.getKey().equals(contextKey)) {
+                foundValidContextKey = true;
+                break;
+            }
+        }
+        return foundValidContextKey;
     }
 
     @Override
