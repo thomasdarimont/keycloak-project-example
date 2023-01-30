@@ -2,7 +2,6 @@ package com.github.thomasdarimont.keycloak.custom.profile.emailupdate;
 
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
@@ -23,7 +22,6 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.FormMessage;
-import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import org.keycloak.storage.adapter.InMemoryUserAdapter;
@@ -204,6 +202,11 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
                 return;
             }
 
+            // update username if necessary
+            if (realm.isEditUsernameAllowed() && realm.isLoginWithEmailAllowed()) {
+                currentUser.setUsername(emailFromAuthNote);
+            }
+
             currentUser.setEmail(emailFromAuthNote);
             currentUser.setEmailVerified(true);
             currentUser.removeRequiredAction(ID);
@@ -216,14 +219,6 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
         context.failure();
     }
-
-    protected boolean isCancelApplicationInitiatedAction(RequiredActionContext context) {
-
-        HttpRequest httpRequest = context.getHttpRequest();
-        MultivaluedMap<String, String> formParams = httpRequest.getDecodedFormParameters();
-        return formParams.containsKey(LoginActionsService.CANCEL_AIA);
-    }
-
 
     @Override
     public void close() {
