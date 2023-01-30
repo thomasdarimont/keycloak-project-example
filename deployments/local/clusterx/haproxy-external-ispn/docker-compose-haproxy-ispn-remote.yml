@@ -48,13 +48,10 @@ services:
       - ./ispn/ispn-truststore.jks:/opt/keycloak/conf/ispn-truststore.jks:z
 # Patched cacerts without the expired certificates
       - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
-# Add missing elytron jar file
-# See https://github.com/keycloak/keycloak/discussions/8654#discussioncomment-2113475
-      - ./patch/wildfly-elytron-1.18.3.Final.jar:/opt/keycloak/providers/wildfly-elytron.jar:z
     command:
       - "--verbose"
       - "start"
-      - "--auto-build"
+#      - "--auto-build"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
       - "--http-enabled=true"
@@ -64,6 +61,8 @@ services:
       # Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
       - "--hostname=id.acme.test:1443"
       - "--cache-config-file=cache-ispn-remote.xml"
+      # Disable infinispan session affinity since we control this with the load-balancer
+      - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
       - "-Djboss.site.name=site1"
     depends_on:
       acme-ispn-1:
@@ -85,14 +84,10 @@ services:
       - ./ispn/ispn-truststore.jks:/opt/keycloak/conf/ispn-truststore.jks:z
 # Patched cacerts without the expired certificates
       - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
-# Add missing elytron jar file
-# See https://github.com/keycloak/keycloak/discussions/8654#discussioncomment-2113475
-#      - ./patch/wildfly-elytron-1.15.3.Final.jar:/opt/keycloak/providers/wildfly-elytron.jar:z
-      - ./patch/wildfly-elytron-1.18.3.Final.jar:/opt/keycloak/providers/wildfly-elytron.jar:z
     command:
       - "--verbose"
       - "start"
-      - "--auto-build"
+#      - "--auto-build"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
       - "--http-enabled=true"
@@ -102,6 +97,8 @@ services:
       # Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
       - "--hostname=id.acme.test:1443"
       - "--cache-config-file=cache-ispn-remote.xml"
+      # Disable infinispan session affinity since we control this with the load-balancer
+      - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
       - "-Djboss.site.name=site1"
     depends_on:
       acme-keycloak-db:

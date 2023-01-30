@@ -1,4 +1,4 @@
-FROM quay.io/infinispan/server:13.0.6.Final-1
+FROM quay.io/infinispan/server:13.0.15.Final-1
 
 USER 0
 
