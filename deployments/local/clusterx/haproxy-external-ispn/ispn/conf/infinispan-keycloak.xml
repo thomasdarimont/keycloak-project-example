@@ -9,7 +9,7 @@
 
     <cache-container name="default" statistics="true">
 
-        <!-- TODO revise jgroups stack to use -->
+        <!-- TODO configure custom jgroups stack: +auth +encryption -->
         <transport
                 cluster="${infinispan.cluster.name:REMOTE}"
                 stack="${infinispan.cluster.stack:udp}"
@@ -79,7 +79,7 @@
 
         <socket-bindings default-interface="public" port-offset="${infinispan.socket.binding.port-offset:0}">
             <socket-binding name="default" port="${infinispan.bind.port:11222}"/>
-            <socket-binding name="memcached" port="11221"/>
+<!--            <socket-binding name="memcached" port="11221"/>-->
         </socket-bindings>
 
         <security>
