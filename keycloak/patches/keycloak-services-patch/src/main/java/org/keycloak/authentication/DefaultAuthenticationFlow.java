@@ -32,7 +32,6 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -341,36 +340,32 @@ public class DefaultAuthenticationFlow implements AuthenticationFlow {
             return;
         }
 
-        // collect indices of known authenticators
-        var origIndex = new HashMap<String, Integer>();
-        for (var i = 0; i < alternativeList.size(); i++) {
-            origIndex.put(alternativeList.get(i).getAuthenticator(), i);
+        // only attempt to filter if the alternative executions contains authenticators from the preference list.
+        if (alternativeList.stream().noneMatch(execution-> execution.getAuthenticator() != null && authPreferenceList.contains(execution.getAuthenticator()))) {
+            return;
         }
 
-        // swap executions according to authenticator preference string
-        for (int cur = 1, prev = 0, len = authPreferenceList.size(); cur < len;) {
-
-            // pairwise step through the preference list and swap
-            var prevId = authPreferenceList.get(prev);
-            var curId = authPreferenceList.get(cur);
-
-            var prevIdx = origIndex.get(prevId);
-            var curIdx = origIndex.get(curId);
-
-            if (prevIdx == null || curIdx == null) {
-                // authenticators to swap could not be found in the existing alternatives list
-                prev = cur++;
-                continue;
+         /* Transform alternative execution list:
+         Initial Executions List: [device,otp,sms,email,bla]
+         Authenticator execution order preference: [email,sms] -> email then sms
+         New Executions List-> [device,otp,bla,email,sms] -> append the auth execution preference at the end in order
+         */
+        var preferredExecutions = new ArrayList<AuthenticationExecutionModel>();
+        for (var authPreference : authPreferenceList) {
+            for (var iter = alternativeList.iterator(); iter.hasNext(); ) {
+                var execution = iter.next();
+                var authenticator = execution.getAuthenticator();
+                if (authenticator == null) {
+                    continue;
+                }
+                if (authenticator.equals(authPreference)) {
+                    preferredExecutions.add(execution);
+                    // remove the preferred authenticator executions from the list, later we append all preferred executions in precedence order
+                    iter.remove();
+                }
             }
-
-            var prevItem = alternativeList.get(prevIdx);
-            var curItem = alternativeList.get(curIdx);
-
-            alternativeList.set(curIdx, prevItem);
-            alternativeList.set(prevIdx, curItem);
-
-            prev = cur++;
         }
+        alternativeList.addAll(preferredExecutions);
     }
 
     /**
