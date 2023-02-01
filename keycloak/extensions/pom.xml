@@ -33,6 +33,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <!-- for debugging purposes -->
+            <groupId>com.github.thomasdarimont.keycloak</groupId>
+            <artifactId>keycloak-services-patch</artifactId>
+            <version>20.0.3.0-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Required for custom SAML role mapper -->
         <dependency>
             <groupId>org.keycloak</groupId>

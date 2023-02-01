@@ -32,7 +32,7 @@ services:
 
       # Append additional JVM Options besides the default JVM_OPTS
       # See: https://github.com/keycloak/keycloak/blob/main/distribution/server-x-dist/src/main/content/bin/kc.sh#L66
-      JAVA_OPTS_APPEND: "-XX:+UseStringDeduplication"
+      JAVA_OPTS_APPEND: ""
 
       # Allow access via visualvm and jmc (remote jmx connection to localhost 8790 without ssl)
       # see https://docs.oracle.com/en/java/javase/11/management/monitoring-and-management-using-jmx-technology.html#GUID-D4CBA2D6-2E24-4856-A7D8-62B3DFFB76EA
@@ -98,6 +98,8 @@ services:
 # Add Keycloak.X specific extensions
       - ../../../keycloak/extensionsx/target/extensionsx.jar:/opt/keycloak/providers/extensionsx.jar:z
 #      - ../../../keycloak/extensionsx/target/classes:/opt/keycloak/providers/extensionsx.jar:z
+# Add Keycloak Patches:
+      - ../../../keycloak/patches/keycloak-services-patch/target/keycloak-services-patch.jar:/opt/keycloak/lib/lib/main/org.keycloak.keycloak-services-20.0.3.jar:z
 # Add third-party extensions
       - ./keycloak-ext/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-metrics-spi-2.5.3-SNAPSHOT.jar:z
       - ./keycloak-ext/keycloak-restrict-client-auth-19.0.0.jar:/opt/keycloak/providers/keycloak-restrict-client-auth-17.0.0.jar:z
