@@ -1,0 +1,204 @@
+<infinispan
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:infinispan:config:13.0"
+        xsi:schemaLocation="urn:infinispan:config:13.0 https://infinispan.org/schemas/infinispan-config-13.0.xsd urn:infinispan:server:13.0 https://infinispan.org/schemas/infinispan-server-13.0.xsd">
+
+    <!-- TODO configure JGROUPS tcp Stack with encryption -->
+
+    <!-- see https://docs.jboss.org/infinispan/13.0/configdocs/infinispan-config-13.0.html -->
+
+    <jgroups>
+        <!-- TCP local cluster with JDBCPING discovery -->
+        <stack name="tcpjdbc" extends="tcp">
+            <JDBC_PING  stack.combine="REPLACE" stack.position="MPING"
+                        datasource_jndi_name="jdbc/datasource"
+                        initialize_sql="CREATE TABLE IF NOT EXISTS JGROUPSPING (own_addr varchar(200) NOT NULL,cluster_name varchar(200) NOT NULL,updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,ping_data BYTEA,constraint PK_JGROUPSPING PRIMARY KEY (own_addr, cluster_name))"
+                        insert_single_sql="INSERT INTO JGROUPSPING (own_addr, cluster_name, ping_data) values (?, ?, ?)"
+                        delete_single_sql="DELETE FROM JGROUPSPING WHERE own_addr=? AND cluster_name=?"
+                        select_all_pingdata_sql="SELECT ping_data FROM JGROUPSPING WHERE cluster_name=?" />
+            <FD_SOCK stack.combine="REMOVE"/>
+            <pbcast.GMS join_timeout="30000" />
+            <RSVP timeout="60000" resend_interval="500" ack_on_delivery="true" />
+        </stack>
+    </jgroups>
+
+    <cache-container name="default" statistics="true">
+
+        <!-- TODO configure custom jgroups stack: +auth +encryption -->
+        <transport
+                cluster="${infinispan.cluster.name:kcispn}"
+                stack="${infinispan.cluster.stack:tcpjdbc}"
+                node-name="${infinispan.node.name:}"/>
+
+        <replicated-cache-configuration name="replicated-cache-cfg"
+                                        xmlns:jdbc="urn:infinispan:config:store:jdbc:13.0"
+                                        mode="SYNC"
+                                        statistics="true"
+                                        segments="256"
+                                        unreliable-return-values="false">
+            <encoding>
+                <key media-type="application/x-jboss-marshalling"/>
+                <value media-type="application/x-jboss-marshalling"/>
+            </encoding>
+
+            <transaction mode="NON_XA"
+                         locking="OPTIMISTIC"/>
+
+            <persistence passivation="false">
+                <jdbc:string-keyed-jdbc-store fetch-state="false" shared="true" preload="false">
+                    <jdbc:data-source jndi-url="jdbc/datasource"/>
+                    <jdbc:string-keyed-table drop-on-exit="false" create-on-start="true" prefix="ispn">
+                        <jdbc:id-column name="id" type="VARCHAR(255)"/>
+                        <jdbc:data-column name="datum" type="bytea"/>
+                        <jdbc:timestamp-column name="version" type="BIGINT"/>
+                        <jdbc:segment-column name="S" type="INT"/>
+                    </jdbc:string-keyed-table>
+                </jdbc:string-keyed-jdbc-store>
+            </persistence>
+        </replicated-cache-configuration>
+
+        <distributed-cache-configuration name="distributed-cache-cfg"
+                                         xmlns:jdbc="urn:infinispan:config:store:jdbc:13.0"
+                                         mode="SYNC"
+                                         owners="2"
+                                         remote-timeout="60000"
+                                         statistics="true"
+                                         segments="256"
+                                         unreliable-return-values="false">
+            <encoding>
+                <key media-type="application/x-jboss-marshalling"/>
+                <value media-type="application/x-jboss-marshalling"/>
+            </encoding>
+
+            <locking isolation="REPEATABLE_READ"
+                     striping="false"
+                     acquire-timeout="10000"
+                     concurrency-level="32"/>
+
+            <transaction mode="NON_XA"
+                         locking="OPTIMISTIC"/>
+
+            <expiration lifespan="-1"
+                        max-idle="-1"
+                        interval="60000" />
+
+            <memory max-count="-1" when-full="NONE" storage="HEAP"/>
+
+            <partition-handling when-split="ALLOW_READ_WRITES" />
+
+            <persistence passivation="false">
+                <jdbc:string-keyed-jdbc-store fetch-state="false" shared="true" preload="false">
+                    <jdbc:data-source jndi-url="jdbc/datasource"/>
+                    <jdbc:string-keyed-table drop-on-exit="false" create-on-start="true" prefix="ispn">
+                        <jdbc:id-column name="id" type="VARCHAR(255)"/>
+                        <jdbc:data-column name="datum" type="bytea"/>
+                        <jdbc:timestamp-column name="version" type="BIGINT"/>
+                        <jdbc:segment-column name="S" type="INT"/>
+                    </jdbc:string-keyed-table>
+                </jdbc:string-keyed-jdbc-store>
+            </persistence>
+
+
+            <state-transfer enabled="true"
+                            timeout="240000"
+                            chunk-size="240000"
+                            await-initial-transfer="true"/>
+        </distributed-cache-configuration>
+
+        <replicated-cache name="work" configuration="replicated-cache-cfg">
+        </replicated-cache>
+
+        <distributed-cache name="sessions" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="authenticationSessions" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="offlineSessions" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="clientSessions" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="offlineClientSessions" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="loginFailures" configuration="distributed-cache-cfg">
+        </distributed-cache>
+
+        <distributed-cache name="actionTokens" configuration="distributed-cache-cfg">
+            <memory max-count="-1">
+            </memory>
+            <expiration interval="300000" max-idle="-1"/>
+        </distributed-cache>
+
+<!--        <security>-->
+<!--            <authorization>-->
+<!--                <roles>-->
+<!--                    <role name="supervisor" permissions="READ WRITE EXEC CREATE"/>-->
+<!--                </roles>-->
+<!--            </authorization>-->
+<!--        </security>-->
+    </cache-container>
+
+    <!-- https://docs.jboss.org/infinispan/13.0/configdocs/infinispan-server-13.0.html# -->
+    <server xmlns="urn:infinispan:server:13.0">
+
+        <interfaces>
+            <interface name="public">
+                <!-- we bind to the eth0 interface instead of a specific ip address to ease access -->
+                <!--                <inet-address value="${infinispan.bind.address:127.0.0.1}"/>-->
+                <match-interface value="eth0"/>
+                <!-- or use any-address element -->
+            </interface>
+        </interfaces>
+
+        <socket-bindings default-interface="public" port-offset="${infinispan.socket.binding.port-offset:0}">
+            <socket-binding name="default" port="${infinispan.bind.port:11222}"/>
+<!--            <socket-binding name="memcached" port="11221"/>-->
+        </socket-bindings>
+
+        <security>
+            <security-realms>
+                <security-realm name="default">
+                    <!--  Uncomment to enable TLS on the realm  -->
+                    <server-identities>
+                        <ssl>
+                            <keystore path="ispn-server.jks" relative-to="infinispan.server.config.path"
+                                      password="password" alias="server" key-password="password"
+                                      generate-self-signed-certificate-host="localhost"/>
+                        </ssl>
+                    </server-identities>
+                    <properties-realm groups-attribute="Roles">
+                        <user-properties path="users.properties" relative-to="infinispan.server.config.path"
+                                         plain-text="true"/>
+                        <group-properties path="groups.properties" relative-to="infinispan.server.config.path"/>
+                    </properties-realm>
+                </security-realm>
+            </security-realms>
+        </security>
+
+        <data-sources>
+            <data-source name="KeycloakDS" jndi-name="jdbc/datasource" statistics="true">
+                <connection-factory driver="org.postgresql.Driver"
+                                    username="${env.DB_USERNAME}"
+                                    password="${env.DB_PASSWORD}"
+                                    url="jdbc:postgresql://${env.DB_HOSTNAME}/${env.DB_DATABASE}?ApplicationName=keycloak-ispn"
+                                    new-connection-sql="SELECT 1" transaction-isolation="READ_COMMITTED">
+                </connection-factory>
+                <connection-pool initial-size="1" max-size="10"  min-size="3" background-validation="1000" idle-removal="1" blocking-timeout="1000" leak-detection="10000"/>
+            </data-source>
+        </data-sources>
+
+        <!-- see https://docs.jboss.org/infinispan/13.0/configdocs/infinispan-server-13.0.html#endpoints -->
+        <endpoints>
+            <endpoint socket-binding="default" security-realm="default">
+                <hotrod-connector name="hotrod" security-realm="default"/>
+                <rest-connector>
+<!--                    <authentication mechanisms="DIGEST BASIC"/>-->
+                </rest-connector>
+            </endpoint>
+        </endpoints>
+    </server>
+
+</infinispan>

@@ -1,0 +1,138 @@
+services:
+
+  acme-ispn-1:
+    build: ./ispn
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./ispn/conf/infinispan-keycloak-database.xml:/opt/infinispan/server/conf/infinispan-keycloak.xml:z
+      - ./ispn/conf/users.properties:/opt/infinispan/server/conf/users.properties:z
+      - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
+#      - ./ispn/data/ispn-1:/opt/infinispan/server/mydata:z
+    environment:
+      DB_HOSTNAME: acme-keycloak-db
+      DB_USERNAME: keycloak
+      DB_PASSWORD: keycloak
+      DB_DATABASE: keycloak
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):11222"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-ispn-2:
+    build: ./ispn
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ./ispn/conf/infinispan-keycloak-database.xml:/opt/infinispan/server/conf/infinispan-keycloak.xml:z
+      - ./ispn/conf/users.properties:/opt/infinispan/server/conf/users.properties:z
+      - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
+#      - ./ispn/data/ispn-2:/opt/infinispan/server/mydata:z
+    environment:
+      DB_HOSTNAME: acme-keycloak-db
+      DB_USERNAME: keycloak
+      DB_PASSWORD: keycloak
+      DB_DATABASE: keycloak
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):11222"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+  acme-keycloak-1:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloakx
+    environment:
+      DEBUG: "true"
+      DEBUG_PORT: "*:8787"
+    env_file:
+      - ./haproxy-external-ispn.env
+    volumes:
+      - ./cache-ispn-remote.xml:/opt/keycloak/conf/cache-ispn-remote.xml:z
+      - ./ispn/ispn-truststore.jks:/opt/keycloak/conf/ispn-truststore.jks:z
+# Patched cacerts without the expired certificates
+      - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
+    command:
+      - "--verbose"
+      - "start"
+#      - "--auto-build"
+      - "--https-certificate-file=/etc/x509/https/tls.crt"
+      - "--https-certificate-key-file=/etc/x509/https/tls.key"
+      - "--http-enabled=true"
+      - "--http-relative-path=/auth"
+      - "--http-port=8080"
+      - "--proxy=passthrough"
+      # Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
+      - "--hostname=id.acme.test:1443"
+      - "--cache-config-file=cache-ispn-remote.xml"
+      # Disable infinispan session affinity since we control this with the load-balancer
+      - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
+      - "-Djboss.site.name=site1"
+    depends_on:
+      acme-ispn-1:
+        condition: service_healthy
+    ports:
+      - "8080"
+      - "8443"
+      - "9990:9990"
+      - "8787:8787"
+
+  acme-keycloak-2:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloakx
+    env_file:
+      - ./haproxy-external-ispn.env
+    volumes:
+      - ./cache-ispn-remote.xml:/opt/keycloak/conf/cache-ispn-remote.xml:z
+      - ./ispn/ispn-truststore.jks:/opt/keycloak/conf/ispn-truststore.jks:z
+# Patched cacerts without the expired certificates
+      - ./ispn/cacerts:/etc/pki/ca-trust/extracted/java/cacerts:z
+    command:
+      - "--verbose"
+      - "start"
+#      - "--auto-build"
+      - "--https-certificate-file=/etc/x509/https/tls.crt"
+      - "--https-certificate-key-file=/etc/x509/https/tls.key"
+      - "--http-enabled=true"
+      - "--http-relative-path=/auth"
+      - "--http-port=8080"
+      - "--proxy=passthrough"
+      # Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
+      - "--hostname=id.acme.test:1443"
+      - "--cache-config-file=cache-ispn-remote.xml"
+      # Disable infinispan session affinity since we control this with the load-balancer
+      - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
+      - "-Djboss.site.name=site1"
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+      acme-ispn-1:
+        condition: service_healthy
+
+  acme-keycloak-db:
+    extends:
+      file: ../docker-compose.yml
+      service: acme-keycloak-db
+
+  acme-haproxy-lb:
+    build: ../haproxy
+    volumes:
+      # relative paths needs to be relative to the docker-compose cwd.
+      - ../haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:z
+    #      - ../../../../config/stage/dev/tls/acme.test+1.pem:/etc/haproxy/haproxy.crt.pem:z
+    #      - ../../../../config/stage/dev/tls/acme.test+1-key.pem:/etc/haproxy/haproxy.crt.pem.key:z
+    # - ../run/haproxy/run:/var/run:z
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
+    ports:
+      - "1443:1443"
+    depends_on:
+      - acme-keycloak-1
+      - acme-keycloak-2

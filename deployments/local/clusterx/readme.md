@@ -41,6 +41,20 @@ Stop:
 docker compose --env-file ../../../keycloak.env --file haproxy/docker-compose-haproxy.yml down --remove-orphans
 ```
 
+# Run Keycloak.X cluster with database backed user sessions
+
+Start:
+```
+docker compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose.yml up --remove-orphans --build
+```
+
+Browse to: https://id.acme.test:1443/auth
+
+Stop:
+```
+docker compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose.yml down --remove-orphans
+```
+
 # Run Keycloak.X cluster behind HA-Proxy with external Infinispan
 
 Start:
@@ -55,16 +69,16 @@ Stop:
 docker compose --env-file ../../../keycloak.env --file haproxy-external-ispn/docker-compose-haproxy-ispn-remote.yml down --remove-orphans
 ```
 
-# Run Keycloak.X cluster with database backed user sessions
+# Run Keycloak.X cluster behind HA-Proxy with external Infinispan and database persistence
 
 Start:
 ```
-docker compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose.yml up --remove-orphans --build
+docker compose --env-file ../../../keycloak.env --file haproxy-external-ispn-database/docker-compose-haproxy-ispn-remote-database.yml up --remove-orphans --build
 ```
 
 Browse to: https://id.acme.test:1443/auth
 
 Stop:
 ```
-docker compose --env-file ../../../keycloak.env --file haproxy-database-ispn/docker-compose.yml down --remove-orphans
+docker compose --env-file ../../../keycloak.env --file haproxy-external-ispn-database/docker-compose-haproxy-ispn-remote-database.yml down --remove-orphans
 ```
