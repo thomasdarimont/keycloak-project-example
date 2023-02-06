@@ -104,8 +104,8 @@
                             await-initial-transfer="true"/>
         </distributed-cache-configuration>
 
-        <replicated-cache name="work" configuration="replicated-cache-cfg">
-        </replicated-cache>
+<!--        <replicated-cache name="work" configuration="replicated-cache-cfg">-->
+<!--        </replicated-cache>-->
 
         <distributed-cache name="sessions" configuration="distributed-cache-cfg">
         </distributed-cache>
@@ -194,7 +194,7 @@
             <endpoint socket-binding="default" security-realm="default">
                 <hotrod-connector name="hotrod" security-realm="default"/>
                 <rest-connector>
-<!--                    <authentication mechanisms="DIGEST BASIC"/>-->
+                    <authentication mechanisms="BASIC"/>
                 </rest-connector>
             </endpoint>
         </endpoints>
