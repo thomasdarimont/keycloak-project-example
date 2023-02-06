@@ -43,15 +43,14 @@
 
             <transaction mode="NON_XA"
                          locking="OPTIMISTIC"/>
-
             <persistence passivation="false">
                 <jdbc:string-keyed-jdbc-store fetch-state="false" shared="true" preload="false">
                     <jdbc:data-source jndi-url="jdbc/datasource"/>
                     <jdbc:string-keyed-table drop-on-exit="false" create-on-start="true" prefix="ispn">
                         <jdbc:id-column name="id" type="VARCHAR(255)"/>
-                        <jdbc:data-column name="datum" type="bytea"/>
-                        <jdbc:timestamp-column name="version" type="BIGINT"/>
-                        <jdbc:segment-column name="S" type="INT"/>
+                        <jdbc:data-column name="data" type="bytea"/>
+                        <jdbc:timestamp-column name="ts" type="BIGINT"/>
+                        <jdbc:segment-column name="seg" type="INT"/>
                     </jdbc:string-keyed-table>
                 </jdbc:string-keyed-jdbc-store>
             </persistence>
@@ -91,9 +90,9 @@
                     <jdbc:data-source jndi-url="jdbc/datasource"/>
                     <jdbc:string-keyed-table drop-on-exit="false" create-on-start="true" prefix="ispn">
                         <jdbc:id-column name="id" type="VARCHAR(255)"/>
-                        <jdbc:data-column name="datum" type="bytea"/>
-                        <jdbc:timestamp-column name="version" type="BIGINT"/>
-                        <jdbc:segment-column name="S" type="INT"/>
+                        <jdbc:data-column name="data" type="bytea"/>
+                        <jdbc:timestamp-column name="ts" type="BIGINT"/>
+                        <jdbc:segment-column name="seg" type="INT"/>
                     </jdbc:string-keyed-table>
                 </jdbc:string-keyed-jdbc-store>
             </persistence>
