@@ -1,4 +1,4 @@
-package com.acme.backend.springboot.users.support.access;
+package com.acme.backend.springboot.users.config;
 
 import java.util.function.Supplier;
 
