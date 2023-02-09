@@ -1,6 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="frontend-webapp-springboot3" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" />
     <module name="frontend-webapp-springboot3" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.github.thomasdarimont.keycloak.webapp.WebAppSpringBoot3" />
     <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />
