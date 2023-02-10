@@ -9,17 +9,17 @@ services:
       - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
 #      - ./ispn/data/ispn-1:/opt/infinispan/server/mydata:z
     environment:
-      DB_HOSTNAME: acme-keycloak-db
-      DB_USERNAME: keycloak
-      DB_PASSWORD: keycloak
-      DB_DATABASE: keycloak
+      DB_HOSTNAME: acme-ispn-db
+      DB_USERNAME: ispn
+      DB_PASSWORD: ispn
+      DB_DATABASE: ispn
     healthcheck:
       test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):11222"]
       interval: 10s
       timeout: 5s
       retries: 5
     depends_on:
-      acme-keycloak-db:
+      acme-ispn-db:
         condition: service_healthy
 
   acme-ispn-2:
@@ -31,17 +31,17 @@ services:
       - ./ispn/ispn-server.jks:/opt/infinispan/server/conf/ispn-server.jks:z
 #      - ./ispn/data/ispn-2:/opt/infinispan/server/mydata:z
     environment:
-      DB_HOSTNAME: acme-keycloak-db
-      DB_USERNAME: keycloak
-      DB_PASSWORD: keycloak
-      DB_DATABASE: keycloak
+      DB_HOSTNAME: acme-ispn-db
+      DB_USERNAME: ispn
+      DB_PASSWORD: ispn
+      DB_DATABASE: ispn
     healthcheck:
       test: ["CMD-SHELL", "curl -k https://$$(ip route get 1.2.3.4 | awk '{print $$7}'):11222"]
       interval: 10s
       timeout: 5s
       retries: 5
     depends_on:
-      acme-keycloak-db:
+      acme-ispn-db:
         condition: service_healthy
 
   acme-keycloak-1:
@@ -61,7 +61,6 @@ services:
     command:
       - "--verbose"
       - "start"
-#      - "--auto-build"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
       - "--http-enabled=true"
@@ -97,7 +96,6 @@ services:
     command:
       - "--verbose"
       - "start"
-#      - "--auto-build"
       - "--https-certificate-file=/etc/x509/https/tls.crt"
       - "--https-certificate-key-file=/etc/x509/https/tls.key"
       - "--http-enabled=true"
@@ -121,8 +119,28 @@ services:
       file: ../docker-compose.yml
       service: acme-keycloak-db
 
+  acme-ispn-db:
+    image: postgres:11.12
+    environment:
+      POSTGRES_USER: ispn
+      POSTGRES_PASSWORD: ispn
+      POSTGRES_DB: ispn
+    ports:
+      - "56432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ispn"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ../run/postgres-ispn/data:/var/lib/postgresql/data:z
+
   acme-haproxy-lb:
     build: ../haproxy
+    networks:
+      default:
+        aliases:
+          - infinispan-lb
     volumes:
       # relative paths needs to be relative to the docker-compose cwd.
       - ../haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:z
