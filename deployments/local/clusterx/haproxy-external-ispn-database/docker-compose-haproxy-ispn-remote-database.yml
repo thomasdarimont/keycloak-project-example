@@ -69,6 +69,8 @@ services:
       - "--proxy=passthrough"
       # Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
       - "--hostname=id.acme.test:1443"
+      - "--spi-events-listener-jboss-logging-success-level=info"
+      - "--spi-events-listener-jboss-logging-error-level=warn"
       - "--cache-config-file=cache-ispn-remote.xml"
       # Disable infinispan session affinity since we control this with the load-balancer
       - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
@@ -104,6 +106,8 @@ services:
       - "--proxy=passthrough"
       # Note upcoming versions of Keycloak.X will leave out the port in the hostname parameter
       - "--hostname=id.acme.test:1443"
+      - "--spi-events-listener-jboss-logging-success-level=info"
+      - "--spi-events-listener-jboss-logging-error-level=warn"
       - "--cache-config-file=cache-ispn-remote.xml"
       # Disable infinispan session affinity since we control this with the load-balancer
       - "--spi-sticky-session-encoder-infinispan-should-attach-route=false"
@@ -154,3 +158,13 @@ services:
     depends_on:
       - acme-keycloak-1
       - acme-keycloak-2
+
+  mailhog:
+    # Web Interface: http://localhost:1080/#
+    # Web API: http://localhost:1080/api/v2/messages
+    image: mailhog/mailhog:v1.0.1@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
+    logging:
+      driver: none
+    ports:
+      - "1080:8025"
+      - "1025:1025"
