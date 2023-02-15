@@ -65,7 +65,7 @@
                           purge="false"
                           preload="false"
                           shared="true" segmented="false"
-                          connect-timeout="${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT:2000}">
+                          connect-timeout="${env.KEYCLOAK_REMOTE_ISPN_CONN_TIMEOUT:2000}" >
                 <remote-server host="acme-ispn-1" port="${infinispan.bind.port:11222}"/>
                 <remote-server host="acme-ispn-2" port="${infinispan.bind.port:11222}"/>
 
