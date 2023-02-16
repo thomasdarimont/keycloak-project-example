@@ -6,17 +6,20 @@ import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
 import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.common.util.Time;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.UserModel;
 
 @JBossLog
 public class AccountPostLoginAction implements RequiredActionProvider {
 
-    public static final String LAST_SUCCESS_LOGIN_ATTR = "lastSuccessfulLoginTimestamp";
+    public static final String LAST_ACTIVITY_TIMESTAMP_ATTR = "lastActivityTimestamp";
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
 
+        // Prevent multiple executions within current flow
         var authSession = context.getAuthenticationSession();
         if (authSession.getAuthNote(getClass().getSimpleName()) != null) {
             return; // action was already executed
@@ -24,9 +27,11 @@ public class AccountPostLoginAction implements RequiredActionProvider {
         authSession.setAuthNote(getClass().getSimpleName(), "true");
 
         log.infof("Post-processing account");
+        updateLastActivityTimestamp(context.getUser());
+    }
 
-        var user = context.getUser();
-        user.setSingleAttribute(LAST_SUCCESS_LOGIN_ATTR, String.valueOf(System.currentTimeMillis()));
+    private void updateLastActivityTimestamp(UserModel user) {
+        user.setSingleAttribute(LAST_ACTIVITY_TIMESTAMP_ATTR, String.valueOf(Time.currentTimeMillis()));
     }
 
     @Override
