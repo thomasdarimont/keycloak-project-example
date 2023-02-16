@@ -4,6 +4,7 @@ import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import org.keycloak.models.KeycloakContext;
@@ -79,5 +80,10 @@ public class CustomResource {
     @Path("me/account")
     public AcmeAccountResource account() {
         return resourceContext.initResource(new AcmeAccountResource(session, token));
+    }
+
+    @Path("mobile/session-propagation")
+    public OfflineSessionPropagationResource sessionPropagation() {
+        return resourceContext.initResource(new OfflineSessionPropagationResource(session, token));
     }
 }
