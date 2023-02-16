@@ -409,6 +409,8 @@ clients:
       - "profile"
     optionalClientScopes:
       - "phone"
+    attributes:
+      "post.logout.redirect.uris": "+"
 
   - clientId: app-demo-service
     protocol: openid-connect
