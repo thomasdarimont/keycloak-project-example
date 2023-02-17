@@ -58,6 +58,7 @@ class start {
     static final String EXTENSIONS_OPT_JAR = "jar";
     static final String DETACH_OPT = "--detach";
     static final String TRACING_OPT = "--tracing";
+    static final String DOCKER_HOST_OPT = "--docker-host=";
 
     public static void main(String[] args) throws Exception {
 
@@ -81,6 +82,7 @@ class start {
         var useDetach = argList.contains(DETACH_OPT);
         var verbose = argList.contains(VERBOSE_OPT);
         var useTracing = argList.contains(TRACING_OPT);
+        var dockerHost = argList.stream().filter(s -> s.startsWith(DOCKER_HOST_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst();
 
         var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
         if (showHelp) {
@@ -247,6 +249,10 @@ class start {
             }
         }
 
+        if (dockerHost.isPresent()) {
+            envVariables.append(String.format("DOCKER_HOST_IP=\"%s\"", dockerHost.get()));
+        }
+
         if (!envVariables.toString().isBlank()) {
             String generatedEnvFile = "generated.env.tmp";
             Files.writeString(Paths.get(generatedEnvFile), envVariables.toString());
@@ -288,6 +294,8 @@ class start {
         System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
         System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background and prints the container name.. (Optional)");
         System.out.printf("  %s: %s%n", VERBOSE_OPT, "Shows debug information, such as the generated command");
+        System.out.printf("  %s: %s%n", DOCKER_HOST_OPT, "Allows configuring of a non-default IP for reaching the docker host from inside the containers, " +
+                "which is used for name resolution. This is useful for using WiFi on ICE trains, which use the same network as docker by default. This causes the wifi to not work correctly.");
 
         System.out.printf("%n%s supports the following commands: %n", "start.java");
         System.out.println("");
@@ -302,6 +310,7 @@ class start {
         System.out.printf("  %s %s%n", "java start.java --https --database=postgres", "# Start Keycloak Environment with PostgreSQL database");
         System.out.printf("  %s %s%n", "java start.java --https --openldap --database=postgres", "# Start Keycloak Environment with PostgreSQL database and OpenLDAP");
         System.out.printf("  %s %s%n", "java start.java --extensions=classes", "# Start Keycloak with extensions mounted from classes folder. Use --extensions=jar to mount the jar file into the container");
+        System.out.printf("  %s %s%n", "java start.java --docker-host=172.19.0.1", "# Configure a non-default IP for the docker host.");
     }
 
     private static int runCommandAndWait(ArrayList<String> commandLine) {
