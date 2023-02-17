@@ -46,13 +46,17 @@ public class OfflineSessionPropagationResource {
      *
      * <pre>
      *   KC_OFFLINE_ACCESS_TOKEN="ey...."
+     *   # For transient user session (session cookie)
      *   curl -k -v -H "Authorization: Bearer $KC_OFFLINE_ACCESS_TOKEN" -d "client_id=app-minispa" https://id.acme.test:8443/auth/realms/acme-internal/custom-resources/mobile/session-propagation | jq -C .
+     *
+     *   # For persistent user session (persistent cookie)
+     *   curl -k -v -H "Authorization: Bearer $KC_OFFLINE_ACCESS_TOKEN" -d "client_id=app-minispa" -d "rememberMe=true" https://id.acme.test:8443/auth/realms/acme-internal/custom-resources/mobile/session-propagation | jq -C .
      * </pre>
      */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response propagateSession(@FormParam("client_id") String targetClientId) {
+    public Response propagateSession(@FormParam("client_id") String targetClientId, @FormParam("rememberMe") Boolean rememberMe) {
 
         // validate token
         if (token == null) {
@@ -85,7 +89,7 @@ public class OfflineSessionPropagationResource {
 
         var userId = user.getId();
         int absoluteExpirationInSecs = Time.currentTime() + DEFAULT_TOKEN_VALIDITY_IN_SECONDS;
-        var actionToken = new SessionPropagationActionToken(userId, absoluteExpirationInSecs, targetClientId, targetUri.toString(), sourceClientId);
+        var actionToken = new SessionPropagationActionToken(userId, absoluteExpirationInSecs, targetClientId, targetUri.toString(), sourceClientId, rememberMe);
         var actionTokenString = actionToken.serialize(session, realm, context.getUri());
         var uriBuilder = LoginActionsService.actionTokenProcessor(session.getContext().getUri()).queryParam(Constants.KEY, actionTokenString);
         var actionTokenLink = uriBuilder.build(realm.getName()).toString();

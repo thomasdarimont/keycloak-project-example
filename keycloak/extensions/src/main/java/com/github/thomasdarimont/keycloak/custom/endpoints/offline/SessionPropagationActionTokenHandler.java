@@ -13,7 +13,9 @@ import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
 import org.keycloak.models.SingleUseObjectProvider;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
+import org.keycloak.services.ErrorPageException;
 import org.keycloak.services.managers.AuthenticationManager;
+import org.keycloak.services.messages.Messages;
 
 import javax.ws.rs.core.Response;
 import java.net.URI;
@@ -41,19 +43,41 @@ public class SessionPropagationActionTokenHandler extends AbstractActionTokenHan
 
         var authSession = tokenContext.getAuthenticationSession();
         var authenticatedUser = authSession.getAuthenticatedUser();
+        var redirectUri = token.getRedirectUri();
 
+        // check for existing user session
+        var authResult = AuthenticationManager.authenticateIdentityCookie(session, realm, true);
+        if (authResult != null) {
+
+            if (!authenticatedUser.getId().equals(authResult.getUser().getId())) {
+                // detected existing user session for different user, abort propagation.
+                log.warnf("Skipped Offline-Session to User-Session propagation detected existing session for different user. realm=%s userId=%s sourceClientId=%s targetClientId=%s", authSession.getRealm().getName(), authenticatedUser.getId(), token.getSourceClientId(), token.getIssuedFor());
+                throw new ErrorPageException(session, authSession, Response.Status.BAD_REQUEST, Messages.DIFFERENT_USER_AUTHENTICATED, authResult.getUser().getUsername());
+            }
+
+            // detected existing session for current user, reuse the existing session instead of creating a new one.
+            log.infof("Skipped Offline-Session to User-Session propagation due to existing session. realm=%s userId=%s sourceClientId=%s targetClientId=%s", authSession.getRealm().getName(), authenticatedUser.getId(), token.getSourceClientId(), token.getIssuedFor());
+            return redirectTo(redirectUri);
+        }
+
+        // no user session found so create a new one.
         authSession.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
         authSession.setClientNote(OIDCLoginProtocol.ISSUER, token.getIssuer());
         authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, "openid");
 
-        var userSession = session.sessions().createUserSession(realm, authSession.getAuthenticatedUser(), authSession.getAuthenticatedUser().getUsername(), clientConnection.getRemoteAddr(), OIDCLoginProtocol.LOGIN_PROTOCOL, false, null, null);
+        var rememberMe = token.getRememberMe();
+        var userSession = session.sessions().createUserSession(realm, authSession.getAuthenticatedUser(), authSession.getAuthenticatedUser().getUsername(), clientConnection.getRemoteAddr(), OIDCLoginProtocol.LOGIN_PROTOCOL, rememberMe, null, null);
 
         AuthenticationManager.setClientScopesInSession(authSession);
         AuthenticationManager.createLoginCookie(session, realm, userSession.getUser(), userSession, tokenContext.getUriInfo(), clientConnection);
 
         log.infof("Propagated Offline-Session to User-Session. realm=%s userId=%s sourceClientId=%s targetClientId=%s", authSession.getRealm().getName(), authenticatedUser.getId(), token.getSourceClientId(), token.getIssuedFor());
 
-        return Response.temporaryRedirect(URI.create(token.getRedirectUri())).build();
+        return redirectTo(redirectUri);
+    }
+
+    private Response redirectTo(String redirectUri) {
+        return Response.temporaryRedirect(URI.create(redirectUri)).build();
     }
 
     @Override

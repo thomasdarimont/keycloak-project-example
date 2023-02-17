@@ -13,11 +13,14 @@ public class SessionPropagationActionToken extends DefaultActionToken {
 
     private static final String SOURCE_CLIENT_ID = CLAIM_PREFIX + "sourceClientId";
 
-    public SessionPropagationActionToken(String userId, int absoluteExpirationInSecs, String clientId, String redirectUri, String sourceClientId) {
+    private static final String REMEMBER_ME = CLAIM_PREFIX + "rememberMe";
+
+    public SessionPropagationActionToken(String userId, int absoluteExpirationInSecs, String clientId, String redirectUri, String sourceClientId, Boolean rememberMe) {
         super(userId, TOKEN_TYPE, absoluteExpirationInSecs, null);
         this.issuedFor = clientId;
         setRedirectUri(redirectUri);
         setSourceClientId(sourceClientId);
+        setRememberMe(rememberMe);
     }
 
     /**
@@ -49,6 +52,16 @@ public class SessionPropagationActionToken extends DefaultActionToken {
     @JsonProperty(SOURCE_CLIENT_ID)
     public void setSourceClientId(String clientId) {
         getOtherClaims().put(SOURCE_CLIENT_ID, clientId);
+    }
+
+    @JsonProperty(REMEMBER_ME)
+    public boolean getRememberMe() {
+        return Boolean.parseBoolean(String.valueOf(getOtherClaims().get(REMEMBER_ME)));
+    }
+
+    @JsonProperty(REMEMBER_ME)
+    public void setRememberMe(Boolean rememberMe) {
+        getOtherClaims().put(REMEMBER_ME, rememberMe);
     }
 
 }
