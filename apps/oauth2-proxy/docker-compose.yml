@@ -14,8 +14,8 @@ services:
       - "--tls-cert-file=/cert.pem"
       - "--tls-key-file=/cert.key"
     extra_hosts:
-      # 172.17.0.1 is host.docker.internal
-      - "id.acme.test:172.17.0.1"
+      # ${DOCKER_HOST_IP:-172.17.0.1} is host.docker.internal
+      - "id.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
   upstream-app:
     image: golang:1.19.3-alpine
     volumes:

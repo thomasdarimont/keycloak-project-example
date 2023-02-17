@@ -43,9 +43,9 @@ services:
       - "-Dwildfly.statistics-enabled=true"
 #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
-      # 172.17.0.1 is host.docker.internal
-      - "id.acme.test:172.17.0.1"
-      - "apps.acme.test:172.17.0.1"
+      # ${DOCKER_HOST_IP:-172.17.0.1} is host.docker.internal
+      - "id.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
+      - "apps.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
     ports:
       - "8080:8080"
       - "8443:8443"
