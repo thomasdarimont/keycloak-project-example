@@ -18,6 +18,7 @@ com:
       security:
         issuers:
           - location: https://localhost:8443/auth/realms/acme-internal
+            username-claim: preferred_username
             authorities:
               claims:
                 - realm_access.roles
