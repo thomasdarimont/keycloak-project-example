@@ -1,13 +1,10 @@
 package com.github.thomasdarimont.keycloak.custom.metrics.events;
 
-import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetricStore;
 import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetrics;
-import com.github.thomasdarimont.keycloak.custom.metrics.filter.MetricFilter;
-import com.github.thomasdarimont.keycloak.custom.support.KeycloakUtil;
 import com.google.auto.service.AutoService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Metrics;
 import lombok.extern.jbosslog.JBossLog;
-import org.eclipse.microprofile.metrics.MetricRegistry;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.Config;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventListenerProvider;
@@ -15,23 +12,28 @@ import org.keycloak.events.EventListenerProviderFactory;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.RealmModel;
+import org.keycloak.models.utils.PostMigrationEvent;
+import org.keycloak.quarkus.runtime.configuration.Configuration;
+
+import static org.keycloak.quarkus.runtime.configuration.MicroProfileConfigProvider.NS_KEYCLOAK_PREFIX;
 
 public class MetricEventListenerProvider implements EventListenerProvider {
 
     private final MetricEventRecorder recorder;
 
-    public MetricEventListenerProvider() {
-        this.recorder = new MetricEventRecorder();
+    public MetricEventListenerProvider(MetricEventRecorder recorder) {
+        this.recorder = recorder;
     }
 
     @Override
     public void onEvent(Event event) {
-        recorder.lookupUserEventHandler(event).accept(event);
+        recorder.recordEvent(event);
     }
 
     @Override
     public void onEvent(AdminEvent event, boolean includeRepresentation) {
-        recorder.onEvent(event, includeRepresentation);
+        recorder.recordEvent(event, includeRepresentation);
     }
 
     @Override
@@ -43,15 +45,16 @@ public class MetricEventListenerProvider implements EventListenerProvider {
     @AutoService(EventListenerProviderFactory.class)
     public static class Factory implements EventListenerProviderFactory {
 
-        private static final EventListenerProvider INSTANCE = getEventListenerProvider();
+        private EventListenerProvider instance;
 
-        private static EventListenerProvider getEventListenerProvider() {
-            return new MetricEventListenerProvider();
+        @Override
+        public String getId() {
+            return "acme-metrics";
         }
 
         @Override
         public EventListenerProvider create(KeycloakSession session) {
-            return INSTANCE;
+            return instance;
         }
 
         @Override
@@ -60,59 +63,38 @@ public class MetricEventListenerProvider implements EventListenerProvider {
         }
 
         @Override
-        public void postInit(KeycloakSessionFactory factory) {
+        public void postInit(KeycloakSessionFactory sessionFactory) {
 
-            MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
-            registerMetricsWithKeycloak(factory, metricRegistry);
-
-            // This registers the MetricsFilter within environments that use Resteasy < 4.x, e.g. Keycloak on Wildfly / JBossEAP
-            // see workaround for Metrics with Keycloak and Keycloak.X
-            // https://github.com/aerogear/keycloak-metrics-spi/pull/120/files
-
-            if (KeycloakUtil.isRunningOnKeycloak()) {
-                registerMetricsFilterWithResteasy3(metricRegistry);
-            }
-        }
-
-        private void registerMetricsWithKeycloak(KeycloakSessionFactory factory, MetricRegistry metricRegistry) {
-            log.info("Begin register metrics...");
-            KeycloakMetrics metrics = new KeycloakMetrics();
-
-            KeycloakMetricStore metricsStore = new KeycloakMetricStore(factory, metricRegistry, metrics);
-            metrics.registerMetrics(metricRegistry, metricsStore);
-            log.info("Finished register metrics.");
-        }
-
-        protected void registerMetricsFilterWithResteasy3(MetricRegistry metricRegistry) {
-
-            if (!MetricFilter.RECORD_URI_METRICS_ENABLED) {
-                return;
+            var metricsEnabled = Configuration.getOptionalBooleanValue(NS_KEYCLOAK_PREFIX.concat("metrics-enabled")).orElse(false);
+            if (!metricsEnabled) {
+                instance = new NoopEventListenerProvider();
             }
 
-            log.info("Begin register metrics-filter...");
-            MetricFilter metricFilter = new MetricFilter(metricRegistry);
+            var keycloakMetrics = new KeycloakMetrics(lookupMeterRegistry(), sessionFactory);
+            keycloakMetrics.registerInstanceMetrics();
 
-            ResteasyProviderFactory instance = ResteasyProviderFactory.getInstance();
-            instance.getContainerRequestFilterRegistry().registerSingleton(metricFilter);
-            instance.getContainerResponseFilterRegistry().registerSingleton(metricFilter);
-            log.info("Finished register metrics-filter.");
+            sessionFactory.register(event -> {
+
+                if (event instanceof PostMigrationEvent) {
+                    keycloakMetrics.initialize();
+                } else if (event instanceof RealmModel.RealmRemovedEvent) {
+                    var realmRemoved = (RealmModel.RealmRemovedEvent) event;
+                    keycloakMetrics.removeRealmMetrics(realmRemoved.getRealm());
+                }
+            });
+
+            var metricRecorder = new MetricEventRecorder(keycloakMetrics);
+
+            instance = new MetricEventListenerProvider(metricRecorder);
+        }
+
+        protected MeterRegistry lookupMeterRegistry() {
+            return Metrics.globalRegistry;
         }
 
         @Override
         public void close() {
-
-            log.info("Begin unregister metrics...");
-
-            MetricRegistry metricRegistry = KeycloakMetrics.lookupMetricRegistry();
-            // remove all metrics on extension reload
-            metricRegistry.removeMatching((metricID, metric) -> true);
-
-            log.info("Finished unregister metrics.");
-        }
-
-        @Override
-        public String getId() {
-            return "acme-metrics";
+            // NOOP
         }
     }
 

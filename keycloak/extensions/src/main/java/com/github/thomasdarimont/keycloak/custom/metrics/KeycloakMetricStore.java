@@ -1,40 +1,33 @@
 package com.github.thomasdarimont.keycloak.custom.metrics;
 
 import com.google.common.base.Stopwatch;
-import org.eclipse.microprofile.metrics.Gauge;
-import org.eclipse.microprofile.metrics.Metadata;
-import org.eclipse.microprofile.metrics.Metric;
-import org.eclipse.microprofile.metrics.MetricID;
-import org.eclipse.microprofile.metrics.MetricRegistry;
-import org.eclipse.microprofile.metrics.Tag;
-import org.jboss.logging.Logger;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.utils.KeycloakModelUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 
-import static com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetrics.tag;
 
 /**
  * Store for dynamically computed custom metrics.
  * The metrics collection only happens after a configured refresh interval to minimize overhead.
  */
+@JBossLog
 public class KeycloakMetricStore implements KeycloakMetricAccessor {
-
-    private static final Logger LOG = Logger.getLogger(KeycloakMetricStore.class);
 
     // TODO read value from configuration
     private static final int CUSTOM_METRICS_REFRESH_INTERVAL_MILLIS = Integer.getInteger("keycloak.metrics.refresh_interval_millis", 5000);
 
     private final KeycloakSessionFactory sessionFactory;
 
-    private final MetricRegistry metricRegistry;
+    private final MeterRegistry meterRegistry;
 
     private final RealmMetricsUpdater realmMetricsUpdater;
 
@@ -42,14 +35,10 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
 
     private Map<String, Double> metricData;
 
-    public KeycloakMetricStore(KeycloakSessionFactory sessionFactory, MetricRegistry metricRegistry, RealmMetricsUpdater realmMetricsUpdater) {
+    public KeycloakMetricStore(KeycloakSessionFactory sessionFactory, MeterRegistry meterRegistry, RealmMetricsUpdater realmMetricsUpdater) {
         this.sessionFactory = sessionFactory;
-        this.metricRegistry = metricRegistry;
+        this.meterRegistry = meterRegistry;
         this.realmMetricsUpdater = realmMetricsUpdater;
-    }
-
-    public Double getMetricValue(Metadata metric) {
-        return getMetricValue(metric.getName());
     }
 
     public Double getMetricValue(String metricKey) {
@@ -67,8 +56,8 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
         }
 
         // metric no longer present
-        MetricID metricID = toMetricId(metricKey);
-        boolean removed = metricRegistry.remove(metricID);
+//        MetricID metricID = toMetricId(meterId);
+//        boolean removed = meterRegistry.remove(metricID);
 
         return -1.0;
     }
@@ -100,44 +89,37 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
 
     private Map<String, Double> refreshMetrics() {
 
-        LOG.trace("Begin collecting custom metrics");
+        log.trace("Begin collecting custom metrics");
 
         Stopwatch stopwatch = Stopwatch.createStarted();
 
         Map<String, Double> metricBuffer = new HashMap<>();
 
-        // extract current metrics here to avoid excessive object creation
-        Map<MetricID, Metric> currentMetrics = metricRegistry.getMetrics();
-
         KeycloakModelUtils.runJobInTransaction(sessionFactory, session -> {
             // depending on the number of realms this might be expensive!
-            collectCustomRealmMetricsIntoBuffer(session, metricBuffer, currentMetrics::containsKey);
+            collectCustomRealmMetricsIntoBuffer(session, metricBuffer);
         });
 
         long lastUpdateDurationMillis = stopwatch.elapsed().toMillis();
-        LOG.debugf("metrics refresh took %sms", lastUpdateDurationMillis);
-        metricBuffer.put(KeycloakMetrics.SERVER_METRICS_REFRESH.getKey(), (double) lastUpdateDurationMillis);
+        log.debugf("metrics refresh took %sms", lastUpdateDurationMillis);
+        metricBuffer.put(KeycloakMetrics.INSTANCE_METRICS_REFRESH.getName(), (double) lastUpdateDurationMillis);
 
-        LOG.trace("Finished collecting custom metrics.");
+        log.trace("Finished collecting custom metrics.");
 
         return metricBuffer;
     }
 
-    private void collectCustomRealmMetricsIntoBuffer(
-            KeycloakSession session,
-            Map<String, Double> metricsBuffer,
-            Predicate<MetricID> isMetricPresent
-    ) {
+    private void collectCustomRealmMetricsIntoBuffer(KeycloakSession session, Map<String, Double> metricsBuffer) {
 
-        MetricUpdater metricUpdater = (metric, value, realm) -> {
+        RealmMetricUpdater metricUpdater = (metric, value, realm) -> {
 
             if (value == null) {
                 // skip recording empty values
                 return;
             }
 
-            Tag[] tags = realm == null ? KeycloakMetrics.emptyTag() : new Tag[]{tag("realm", realm.getName())};
-            String metricKey = registerCustomMetricIfMissing(metric.getMetadata(), isMetricPresent, tags);
+            Tags tags = realm == null ? Tags.empty() : Tags.of("realm", realm.getName());
+            String metricKey = registerCustomMetricIfMissing(metric, tags);
             Double metricValue = value.doubleValue();
             metricsBuffer.put(metricKey, metricValue);
         };
@@ -149,54 +131,33 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
         });
     }
 
-    private String registerCustomMetricIfMissing(
-            Metadata metric,
-            Predicate<MetricID> isMetricPresent,
-            Tag... tags
-    ) {
+    private String registerCustomMetricIfMissing(KeycloakMetric metric, Tags tags) {
 
         // using a string like metric_name{tag1=value1,tag2=value2} is smaller than MetricID
         String metricKey = toMetricKey(metric.getName(), tags);
 
         // avoid duplicate metric registration
-        boolean metricPresent = isMetricPresent.test(new MetricID(metric.getName(), tags));
+        Gauge gauge = meterRegistry.find(metric.getName()).tags(tags).gauge();
+        boolean metricPresent = gauge != null;
         if (metricPresent) {
             return metricKey;
         }
 
-        switch (metric.getTypeRaw()) {
-            case GAUGE:
-                metricRegistry.register(metric, (Gauge<Double>) () -> getMetricValue(metricKey), tags);
-                break;
-        }
+        Gauge.builder(metric.getName(), () -> getMetricValue(metricKey)) //
+                .description(metric.getDescription()) //
+                .tags(tags) //
+                .register(meterRegistry);
 
         return metricKey;
     }
 
-    private static String toMetricKey(String metricName, Tag... tags) {
+    private static String toMetricKey(String metricName, Tags tags) {
 
         // TreeMap for stable tag order -> stable metricKey strings
         Map<String, String> tagMap = new TreeMap<>();
         for (Tag tag : tags) {
-            tagMap.put(tag.getTagName(), tag.getTagValue());
+            tagMap.put(tag.getKey(), tag.getValue());
         }
         return metricName + tagMap;
-    }
-
-    private static MetricID toMetricId(String metricKey) {
-
-        int labelStart = metricKey.indexOf("{");
-        String metricName = metricKey.substring(0, labelStart);
-        String tagList = metricKey.substring(labelStart + 1, metricKey.length() - 1);
-
-        List<Tag> tags = new ArrayList<>();
-        for (String tagEntry : tagList.split(",")) {
-            int equalsPos = tagEntry.indexOf('=');
-            String key = tagEntry.substring(0, equalsPos);
-            String value = tagEntry.substring(equalsPos + 1, tagEntry.length());
-            tags.add(new Tag(key, value));
-        }
-
-        return new MetricID(metricName, tags.toArray(Tag[]::new));
     }
 }

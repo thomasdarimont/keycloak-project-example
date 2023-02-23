@@ -1,26 +1,15 @@
 package com.github.thomasdarimont.keycloak.custom.metrics;
 
-import org.eclipse.microprofile.metrics.Metadata;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Objects;
-
+@Getter
+@RequiredArgsConstructor
 public class KeycloakMetric {
 
-    private final Metadata metadata;
+    private final String name;
 
-    public KeycloakMetric(Metadata metadata) {
-        this.metadata = Objects.requireNonNull(metadata, "metadata");
-    }
+    private final String description;
 
-    public Metadata getMetadata() {
-        return metadata;
-    }
-
-    public String getKey() {
-        return metadata.getName();
-    }
-
-    public static KeycloakMetric newMetric(Metadata metadata) {
-        return new KeycloakMetric(metadata);
-    }
+    private final KeycloakMetrics.Level level;
 }
