@@ -5,7 +5,6 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialProvider;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
@@ -13,6 +12,7 @@ import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.authentication.CredentialValidator;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialProvider;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;

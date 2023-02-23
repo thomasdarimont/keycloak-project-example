@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice;
 
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.support.UserAgentParser;
-import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.http.HttpRequest;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
 import ua_parser.OS;

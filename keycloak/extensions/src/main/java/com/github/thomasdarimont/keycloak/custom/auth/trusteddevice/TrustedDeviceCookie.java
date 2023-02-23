@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.trusteddevice;
 
 import com.github.thomasdarimont.keycloak.custom.support.CookieUtils;
-import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 
@@ -21,7 +21,7 @@ public class TrustedDeviceCookie {
     }
 
     public static TrustedDeviceToken parseDeviceTokenFromCookie(HttpRequest httpRequest, KeycloakSession session) {
-        String cookieValue = CookieUtils.parseCookie(COOKIE_NAME, httpRequest, session);
+        String cookieValue = CookieUtils.parseCookie(COOKIE_NAME, httpRequest);
 
         if(cookieValue == null) {
             return null;
