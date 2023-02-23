@@ -2,7 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.metrics;
 
 import org.keycloak.models.RealmModel;
 
-public interface MetricUpdater {
+public interface RealmMetricUpdater {
 
     /**
      * Updates a single metric with the given value in the context of a realm.
