@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.profile;
 
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
-import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
@@ -13,7 +13,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Set;
@@ -31,9 +30,6 @@ public class UserProfileResource {
     private final KeycloakSession session;
     private final AccessToken token;
 
-    @Context
-    private HttpRequest request;
-
     public UserProfileResource(KeycloakSession session, AccessToken token) {
         this.session = session;
         this.token = token;
@@ -41,7 +37,7 @@ public class UserProfileResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(request, Response.ok()).build();
+        return withCors(Response.ok()).build();
     }
 
     @GET
@@ -62,8 +58,7 @@ public class UserProfileResource {
         profileData.setFirstName(user.getFirstName());
         profileData.setLastName(user.getLastName());
         profileData.setEmail(user.getEmail());
-
-        return withCors(request, Response.ok(profileData)).build();
+        return withCors(Response.ok(profileData)).build();
     }
 
     @PUT
@@ -98,11 +93,11 @@ public class UserProfileResource {
         }
         user.setLastName(lastName);
         // email update must be performed via application initiated required action
-
-        return withCors(request, Response.ok(newProfileData)).build();
+        return withCors(Response.ok(newProfileData)).build();
     }
 
-    private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
+    private Cors withCors(Response.ResponseBuilder responseBuilder) {
+        var request = session.getContext().getHttpRequest();
         return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "PUT", "OPTIONS"), null);
     }
 }

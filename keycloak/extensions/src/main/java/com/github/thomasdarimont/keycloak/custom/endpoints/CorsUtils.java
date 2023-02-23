@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
-import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.protocol.oidc.utils.WebOriginsUtils;

@@ -10,8 +10,8 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.Trust
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
 import lombok.Data;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.credential.CredentialModel;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakContext;
@@ -56,9 +56,6 @@ public class UserCredentialsInfoResource {
     private final KeycloakSession session;
     private final AccessToken token;
 
-    @Context
-    private HttpRequest request;
-
     public UserCredentialsInfoResource(KeycloakSession session, AccessToken token) {
         this.session = session;
         this.token = token;
@@ -66,7 +63,7 @@ public class UserCredentialsInfoResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(request, Response.ok()).build();
+        return withCors(session.getContext().getHttpRequest(), Response.ok()).build();
     }
 
     @GET
@@ -95,7 +92,7 @@ public class UserCredentialsInfoResource {
 
         var responseBody = new HashMap<String, Object>();
         responseBody.put("credentialInfos", credentialInfos);
-
+        var request = context.getHttpRequest();
         return withCors(request, Response.ok(responseBody)).build();
     }
 
@@ -133,6 +130,7 @@ public class UserCredentialsInfoResource {
         var credentialManager = user.credentialManager();
         var credentials = credentialManager.getStoredCredentialsByTypeStream(credentialType).collect(Collectors.toList());
         if (credentials.isEmpty()) {
+            var request = context.getHttpRequest();
             return withCors(request, Response.status(Response.Status.NOT_FOUND)).build();
         }
 
@@ -149,7 +147,7 @@ public class UserCredentialsInfoResource {
 
         var responseBody = new HashMap<String, Object>();
         responseBody.put("removedCredentialCount", removedCredentialCount);
-
+        var request = context.getHttpRequest();
         return withCors(request, Response.ok(responseBody)).build();
     }
 
@@ -228,7 +226,7 @@ public class UserCredentialsInfoResource {
     }
 
     private boolean isCurrentRequestFromGivenTrustedDevice(CredentialModel credential) {
-
+        var request = session.getContext().getHttpRequest();
         TrustedDeviceToken trustedDeviceToken = TrustedDeviceCookie.parseDeviceTokenFromCookie(request, session);
         if (trustedDeviceToken == null) {
             return false;

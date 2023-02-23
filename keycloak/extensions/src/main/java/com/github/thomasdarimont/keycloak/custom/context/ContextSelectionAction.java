@@ -67,7 +67,7 @@ public class ContextSelectionAction implements RequiredActionProvider {
         // TODO allow to accept contextSelectionKey via URL Parameter
 
         // handle dynamic context selection for legacy apps with grant_type=password
-        var formParams = context.getHttpRequest().getFormParameters();
+        var formParams = context.getHttpRequest().getDecodedFormParameters();
         if (OAuth2Constants.PASSWORD.equals(formParams.getFirst(OAuth2Constants.GRANT_TYPE))) {
             // allow to accept contextSelectionKey via form post Parameter
             if (formParams.containsKey(CONTEXT_SELECTION_PARAM)) {
@@ -173,7 +173,7 @@ public class ContextSelectionAction implements RequiredActionProvider {
     @Override
     public void processAction(RequiredActionContext context) {
 
-        var formData = context.getHttpRequest().getDecodedFormParameters();
+        var formData = context.getSession().getContext().getHttpRequest().getDecodedFormParameters();
 
         if (formData.containsKey("cancel")) {
             context.success();

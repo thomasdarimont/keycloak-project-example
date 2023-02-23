@@ -10,7 +10,6 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.
 import com.github.thomasdarimont.keycloak.custom.support.RequiredActionUtils;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.Config;
 import org.keycloak.authentication.InitiatedActionSupport;
 import org.keycloak.authentication.RequiredActionContext;
@@ -21,6 +20,7 @@ import org.keycloak.credential.CredentialProvider;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;

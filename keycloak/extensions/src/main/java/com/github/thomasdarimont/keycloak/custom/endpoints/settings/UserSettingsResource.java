@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.settings;
 
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
@@ -13,7 +12,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -32,9 +30,6 @@ public class UserSettingsResource {
     private final KeycloakSession session;
     private final AccessToken token;
 
-    @Context
-    private HttpRequest request;
-
     public UserSettingsResource(KeycloakSession session, AccessToken token) {
         this.session = session;
         this.token = token;
@@ -42,7 +37,7 @@ public class UserSettingsResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(request, Response.ok()).build();
+        return withCors(Response.ok()).build();
     }
 
     @GET
@@ -67,7 +62,7 @@ public class UserSettingsResource {
         String value2 = user.getFirstAttribute(SETTINGS_KEY2);
         responseBody.put(SETTINGS_KEY2, "true".equals(value2) ? "on" : "");
 
-        return withCors(request, Response.ok(responseBody)).build();
+        return withCors(Response.ok(responseBody)).build();
     }
 
     @PUT
@@ -97,10 +92,11 @@ public class UserSettingsResource {
         }
 
         Map<String, Object> responseBody = new HashMap<>();
-        return withCors(request, Response.ok(responseBody)).build();
+        return withCors(Response.ok(responseBody)).build();
     }
 
-    private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
+    private Cors withCors(Response.ResponseBuilder responseBuilder) {
+        var request = session.getContext().getHttpRequest();
         return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "PUT", "OPTIONS"), null);
     }
 }

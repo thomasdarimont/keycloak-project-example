@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.support;
 
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.authentication.RequiredActionContext;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.sessions.AuthenticationSessionModel;

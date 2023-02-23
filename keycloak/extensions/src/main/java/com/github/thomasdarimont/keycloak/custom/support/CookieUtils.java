@@ -1,8 +1,8 @@
 package com.github.thomasdarimont.keycloak.custom.support;
 
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.common.util.ServerCookie;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.util.CookieHelper;
@@ -12,7 +12,7 @@ import javax.ws.rs.core.UriBuilder;
 
 public class CookieUtils {
 
-    public static String parseCookie(String cookieName, HttpRequest httpRequest, KeycloakSession session) {
+    public static String parseCookie(String cookieName, HttpRequest httpRequest) {
         Cookie cookie = httpRequest.getHttpHeaders().getCookies().get(cookieName);
         if (cookie == null) {
             return null;
@@ -33,7 +33,8 @@ public class CookieUtils {
         CookieHelper.addCookie(cookieName, cookieValue, path, null,// domain
                 null, // comment
                 maxAge, secure, true, // httponly
-                sameSiteValue);
+                sameSiteValue, // same-site
+                session);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.applications;
 
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.common.util.StringPropertyReplacer;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.AuthenticatedClientSessionModel;
@@ -24,7 +23,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -45,9 +43,6 @@ public class ApplicationsInfoResource {
     private final KeycloakSession session;
     private final AccessToken token;
 
-    @Context
-    private HttpRequest request;
-
     public ApplicationsInfoResource(KeycloakSession session, AccessToken token) {
         this.session = session;
         this.token = token;
@@ -55,7 +50,7 @@ public class ApplicationsInfoResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(request, Response.ok()).build();
+        return withCors(Response.ok()).build();
     }
 
     @GET
@@ -86,7 +81,7 @@ public class ApplicationsInfoResource {
         var responseBody = new HashMap<String, Object>();
         responseBody.put("clients", credentialInfos);
 
-        return withCors(request, Response.ok(responseBody)).build();
+        return withCors(Response.ok(responseBody)).build();
     }
 
     public List<ClientRepresentation> getApplicationsForUser(RealmModel realm, UserModel user, String clientName) {
@@ -166,7 +161,8 @@ public class ApplicationsInfoResource {
         return new ConsentRepresentation(grantedScopes, model.getCreatedDate(), model.getLastUpdatedDate());
     }
 
-    private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
+    private Cors withCors(Response.ResponseBuilder responseBuilder) {
+        var request = session.getContext().getHttpRequest();
         return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "OPTIONS"), null);
     }
 

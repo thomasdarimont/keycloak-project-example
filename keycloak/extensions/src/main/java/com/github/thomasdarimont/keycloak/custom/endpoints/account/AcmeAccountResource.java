@@ -2,7 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.endpoints.account;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
-import org.jboss.resteasy.spi.HttpRequest;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.Constants;
 import org.keycloak.models.KeycloakContext;
@@ -33,9 +33,6 @@ public class AcmeAccountResource {
     @Context
     private UriInfo uriInfo;
 
-    @Context
-    private HttpRequest request;
-
     public AcmeAccountResource(KeycloakSession session, AccessToken token) {
         this.session = session;
         this.token = token;
@@ -43,7 +40,7 @@ public class AcmeAccountResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(request, Response.ok()).build();
+        return withCors(session.getContext().getHttpRequest(), Response.ok()).build();
     }
 
     @DELETE
@@ -71,7 +68,7 @@ public class AcmeAccountResource {
         AccountActivity.onAccountDeletionRequested(session, realm, user, uriInfo);
 
         var responseBody = new HashMap<String, Object>();
-
+        var request = context.getHttpRequest();
         return withCors(request, Response.ok(responseBody)).build();
     }
 
