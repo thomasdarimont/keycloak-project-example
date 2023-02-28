@@ -53,7 +53,7 @@ services:
       - "--cache=local"
       - "--proxy=passthrough"
 #      - "--log-console-output=json"
-      - "--log-console-format='%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n'"
+      - "--log-console-format='%d{HH:mm:ss} %-5p ${TRACING_LOG_FORMAT} [%c{2.}] (%t) %s%e%n'"
       - "--https-protocols=TLSv1.3,TLSv1.2"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
