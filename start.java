@@ -214,6 +214,7 @@ class start {
             envFiles.add("deployments/local/dev/keycloak-provisioning.env");
         }
 
+        String tracingLogFormat;
         if (useTracing) {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
@@ -221,6 +222,9 @@ class start {
                 commandLine.add("--file");
                 commandLine.add("deployments/local/dev/docker-compose-tracing-tls.yml");
             }
+            tracingLogFormat = "traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled}";
+        } else {
+            tracingLogFormat = "";
         }
 
         if (Files.exists(Path.of("local.env"))) {
@@ -230,6 +234,7 @@ class start {
 
         //-BEGIN env vars
         StringBuilder envVariables = new StringBuilder();
+        envVariables.append("TRACING_LOG_FORMAT=").append(tracingLogFormat).append("\n");
         for (String envFile : envFiles) {
             envVariables.append(Files.readString(Paths.get(envFile))).append("\n");
         }
