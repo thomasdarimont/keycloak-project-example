@@ -12,6 +12,7 @@ const LOG_FORMAT = process.env.LOG_FORMAT || 'json'; // plain / json
 const READINESS_PROBE_DELAY = process.env.READINESS_PROBE_DELAY || 1000; // 2 * 2 * 1000; // failureThreshold: 2, periodSeconds: 2 (4s)
 
 const SESSION_SECRET = process.env.SECRET || 'keyboard cat';
+// Private Key generated in SAML client in Keycloak
 let SAML_SP_KEY = process.env.SAML_SP_KEY || fs.readFileSync(process.env.SAML_SP_KEY_FILE, "utf-8") || fs.readFileSync(TLS_KEY_FILE, "utf-8")
 // realm certificate used to sign saml requests from Keycloak
 let SAML_IDP_CERT = process.env.SAML_IDP_CERT;

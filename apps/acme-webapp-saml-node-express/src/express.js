@@ -127,6 +127,7 @@ function configureRoutes(app, config) {
                 return samlStrategy.logout(req, (err, uri) => {
                     req.logout(err => {
                         if (err) {
+                            LOG.warn("Could not logout: " + err);
                             return next(err);
                         }
                         res.redirect('/');
