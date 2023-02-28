@@ -538,7 +538,7 @@ clients:
       "saml.signature.algorithm": "RSA_SHA256"
       "saml.client.signature": "true"
       "saml.allow.ecp.flow": "false"
-      "saml.assertion.signature": "false"
+      "saml.assertion.signature": "true"
       "saml.encrypt": "false"
       "saml.server.signature": "true"
       "saml.artifact.binding.identifier": "HC5ftXuLr0FUnJUosZarVSvzZh0="

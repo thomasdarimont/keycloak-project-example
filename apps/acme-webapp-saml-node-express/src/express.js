@@ -1,7 +1,7 @@
 import express from "express";
 import session from "express-session";
 import passport from "passport";
-import {Strategy as SamlStrategy} from "passport-saml";
+import {Strategy as SamlStrategy} from "@node-saml/passport-saml";
 import {default as bodyParser} from "body-parser";
 
 function createExpressApp(config, LOG) {
@@ -125,12 +125,13 @@ function configureRoutes(app, config) {
 
             if (req.user != null) {
                 return samlStrategy.logout(req, (err, uri) => {
-                    req.logout(err => {
+                    return req.logout(err => {
                         if (err) {
                             LOG.warn("Could not logout: " + err);
                             return next(err);
                         }
-                        res.redirect('/');
+                        req.session.destroy();
+                        res.redirect(uri);
                     });
                 });
             }
