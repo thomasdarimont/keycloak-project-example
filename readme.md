@@ -238,6 +238,23 @@ If you then navigate to the [frontend webapp](https://apps.acme.test:4633/webapp
 
 Clustering examples can be found in the [deployments/local/cluster](deployments/local/cluster) folder.
 
+### Running with non-default docker networks
+
+Some features of this project setup communicate with services inside the docker stack through the host.
+By default, the IP of the host in Docker is `172.17.0.1`, but this can be changed by configuration.
+One reason to change it is because Wi-Fi on ICE trains uses IP addresses from the same network.
+An example for a changed setup from `/etc/docker/daemon.json` can look like this:
+
+````json
+{
+    "default-address-pools":
+    [
+        {"base":"172.19.0.0/16","size":24}
+    ]
+}
+````
+In this case, the host IP is `172.19.0.1`, which can be configured for the project using the start option `--docker-host=172.19.0.1`
+
 ## Acme Example Realm Configuration
 
 ### Realms
