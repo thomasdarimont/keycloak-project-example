@@ -6,10 +6,7 @@
       <script value="start" />
     </scripts>
     <node-interpreter value="project" />
-    <envs>
-      <env name="SAML_IDP_CERT" value="MIICqTCCAZECBgGEbBJbczANBgkqhkiG9w0BAQsFADAYMRYwFAYDVQQDDA1hY21lLWludGVybmFsMB4XDTIyMTExMjEzMzkxM1oXDTMyMTExMjEzNDA1M1owGDEWMBQGA1UEAwwNYWNtZS1pbnRlcm5hbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALii4aSOrKeXBNVTySPy8agpvOyUoD5yuQe75KcOjpsCRgSYm1KephtHZcQuHaBOjSgnOyDxSdWf2pPd9JqXp5OoEIX5b1F0E18xHV4nITo2yG8VlNE186vrGK2hrdIaRBrqxC2ZQWEUQ9SLk9UpyzkBLE4j9rp4DqiAQXQidqQKCcrKMq3vQWKR6xb7HOBKypeu8vi0h/d02oYBjChilpbmpw943fB9hchc5CFX+eoIjl9l6f1Z5NfswM1jPp4ol+rK2d3Gei5gIv7zHKNfKtxeYt07K179fgvkmewZ2FTOp9UpV3EMLTN/XmjGokJIg6UiQ34qbcjUguRvvP0Ao20CAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAmS6GsSmI6r1BFF1954jASKhJoPzvEH5hQoLOWD9XcMOKikgB8kWePNu190PnWbEPkYZQQeGm8SLaqzs1asFIMOO0eKD9shn1krdamkbGcYe+jTG1PXpBXg3oGH0/C99WKLM1c/Q5XK/bKRyS+g504A8DDw/o+HoshQldqxqdgCwK3DcA9VldtKp2icMMleE/x2U9UgM2nahBzSZwKRG/esBXrPEZ00P9LBrGTEWFm4R1g0Ry5ZGymofKUZNf4wvHjEOCh3leIpzREROyY59Xc+T7GTbDLgnOiiOZvrrS/5+5NoPl21uNJqp5QzbTXOdj+OKQLT3gHlHJmOqfOgg0dw==" />
-      <env name="SAML_SP_KEY_FILE" value="sp.key.pem" />
-    </envs>
+    <envs />
     <method v="2" />
   </configuration>
 </component>
