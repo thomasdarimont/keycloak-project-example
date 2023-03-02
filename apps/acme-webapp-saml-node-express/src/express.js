@@ -13,7 +13,7 @@ function createExpressApp(config, LOG) {
     app.use(bodyParser.urlencoded({extended: true}));
 
     configureSession(app, config);
-    configureSaml(app, config);
+    configureSaml(app, config, LOG);
     configureTemplateEngine(app, config);
     configureRoutes(app, config);
 
@@ -31,7 +31,7 @@ function configureSession(app, config) {
 
 let samlStrategy;
 
-function configureSaml(app, config) {
+function configureSaml(app, config, LOG) {
 
     app.use(passport.initialize());
     app.use(passport.session());
@@ -43,33 +43,48 @@ function configureSaml(app, config) {
         done(null, user);
     });
 
-    samlStrategy = new SamlStrategy(
-        // See Config parameter details: https://www.npmjs.com/package/passport-saml
-        // See also https://github.com/node-saml/passport-saml
-        {
-            entryPoint: config.IDP_ISSUER + "/protocol/saml",
-            issuer: config.SP_ISSUER,
-            host: config.HOSTNAME,
-            protocol: "https://",
-            signatureAlgorithm: "sha256",
-            privateKey: config.SAML_SP_KEY,
-            cert: config.SAML_IDP_CERT,
-            passReqToCallback: true,
-            logoutUrl: config.IDP_ISSUER + "/protocol/saml",
-        },
-        function (request, profile, done) {
-            let user = {
-                username: profile["nameID"],
-                firstname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"],
-                lastname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
-                email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
-                // e.g. if you added a Group claim
-                group: profile["http://schemas.xmlsoap.org/claims/Group"],
-            };
-            return done(null, user);
-        }
-    );
-    passport.use(samlStrategy);
+    let idpSamlMetadataUrl = config.IDP_ISSUER + "/protocol/saml/descriptor";
+    LOG.info("Fetching SAML metadata from IdP: " + idpSamlMetadataUrl);
+    fetch(idpSamlMetadataUrl).then(response => response.text()).then(samlMetadata => {
+        LOG.info("Successfully fetched SAML metadata from IdP");
+        // LOG.info("##### SAML Metadata: \n" + samlMetadata)
+        // poor man's IdP metadata parsing
+        let idpCert = samlMetadata.match(/<ds:X509Certificate>(.*)<\/ds:X509Certificate>/)[1];
+
+        samlStrategy = new SamlStrategy(
+            // See Config parameter details: https://www.npmjs.com/package/passport-saml
+            // See also https://github.com/node-saml/passport-saml
+            {
+                entryPoint: config.IDP_ISSUER + "/protocol/saml",
+                issuer: config.SP_ISSUER,
+                host: config.HOSTNAME,
+                protocol: "https://",
+                signatureAlgorithm: "sha256",
+                privateKey: config.SAML_SP_KEY,
+                // cert: config.SAML_IDP_CERT,
+                cert: idpCert,
+                passReqToCallback: true,
+                logoutUrl: config.IDP_ISSUER + "/protocol/saml",
+                identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
+            },
+            function (request, profile, done) {
+                // profile contains user profile data sent from server
+                let user = {
+                    username: profile["nameID"],
+                    firstname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"],
+                    lastname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
+                    email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+                    // e.g. if you added a Group claim
+                    group: profile["http://schemas.xmlsoap.org/claims/Group"],
+                };
+                return done(null, user);
+            }
+        );
+        passport.use(samlStrategy);
+
+    }).catch((error) => {
+        console.error('Could not fetch Saml Metadata from IdP', error);
+    });
 }
 
 function configureTemplateEngine(app, config) {

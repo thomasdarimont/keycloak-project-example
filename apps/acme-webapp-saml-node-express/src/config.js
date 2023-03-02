@@ -13,14 +13,9 @@ const READINESS_PROBE_DELAY = process.env.READINESS_PROBE_DELAY || 1000; // 2 * 
 
 const SESSION_SECRET = process.env.SECRET || 'keyboard cat';
 // Private Key generated in SAML client in Keycloak
-let SAML_SP_KEY = process.env.SAML_SP_KEY || fs.readFileSync(process.env.SAML_SP_KEY_FILE, "utf-8") || fs.readFileSync(TLS_KEY_FILE, "utf-8")
+let SAML_SP_KEY = process.env.SAML_SP_KEY || fs.readFileSync("sp.key.pem", "utf-8")
 // realm certificate used to sign saml requests from Keycloak
 let SAML_IDP_CERT = process.env.SAML_IDP_CERT;
-
-if (!SAML_IDP_CERT) {
-    console.log('Missing SAML_IDP_CERT env variable.');
-    process.exit(1);
-}
 
 export default {
     IDP_ISSUER,

@@ -508,7 +508,7 @@ clients:
     name: Acme Web App SAML Node Express
     rootUrl: 'https://apps.acme.test:4723'
     adminUrl: "/saml"
-    baseUrl: "/"
+    baseUrl: "/app"
     surrogateAuthRequired: false
     enabled: true
     alwaysDisplayInConsole: false
