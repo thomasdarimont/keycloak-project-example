@@ -14,8 +14,8 @@ clients:
   - id: acme-standard-client-1
     clientId: acme-standard-client
     protocol: openid-connect
-    name: Standard Client
-    description: "Standard Client Description v2"
+    name: Client with Standard Flow
+    description: "Standard Client Description"
     enabled: true
     publicClient: false
     standardFlowEnabled: true
@@ -29,7 +29,7 @@ clients:
   - id: acme-implicit-client-1
     clientId: acme-implicit-client
     protocol: openid-connect
-    name: Implicit Client
+    name: Client with Implicit Grant
     description: "Implicit Client Description v2"
     enabled: true
     publicClient: true
@@ -44,7 +44,7 @@ clients:
   - id: acme-direct-access-client-1
     clientId: acme-direct-access-client
     protocol: openid-connect
-    name: Standard Client
+    name: Standard Client with ROPC Grant
     description: "Direct Access Grant Client Description"
     enabled: true
     publicClient: false
@@ -60,7 +60,7 @@ clients:
   - id: acme-service-client-1
     clientId: acme-service-client
     protocol: openid-connect
-    name: Standard Client
+    name: Standard Client with Client Credentials Grant
     description: "Service Client Description"
     enabled: true
     publicClient: false
@@ -71,6 +71,22 @@ clients:
     fullScopeAllowed: false
     redirectUris:
       - "http://localhost/acme-service-client-1/login*"
+
+  - id: acme-device-client
+    clientId: acme-device-client
+    protocol: openid-connect
+    name: Client with Device Flow Grant
+    description: "Device Flow Grant Description"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    secret: "2UcQslvaCOx366z0D0CJj2aRkNk1qeWA"
+    fullScopeAllowed: false
+    attributes:
+      "oauth2.device.authorization.grant.enabled": "true"
+    redirectUris: []
 
 users:
   - username: tester
