@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @JBossLog
 public class OpaClient {
@@ -159,13 +160,17 @@ public class OpaClient {
     }
 
     private static List<String> fetchClientRoles(UserModel user, ClientModel client) {
-        return RoleUtils.expandCompositeRolesStream(user.getClientRoleMappingsStream(client)) //
+        Stream<RoleModel> explicitClientRoles = RoleUtils.expandCompositeRolesStream(user.getClientRoleMappingsStream(client));
+        Stream<RoleModel> implicitClientRoles = RoleUtils.expandCompositeRolesStream(user.getRealmRoleMappingsStream());
+        return Stream.concat(explicitClientRoles, implicitClientRoles) //
+                .filter(RoleModel::isClientRole) //
                 .map(OpaClient::normalizeRoleName) //
                 .collect(Collectors.toList());
     }
 
     private static List<String> fetchRealmRoles(UserModel user) {
         return RoleUtils.expandCompositeRolesStream(user.getRealmRoleMappingsStream()) //
+                .filter(r -> !r.isClientRole())
                 .map(OpaClient::normalizeRoleName) //
                 .collect(Collectors.toList());
     }

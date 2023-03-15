@@ -35,8 +35,8 @@ public class SpringBootDeviceFlowApplication {
             log.info("Running");
 
             var clientId = "acme-device-client";
-            var clientSecret = "Fm8DAPaaMTBHejIV0NWzVhFAP92CZJ3J";
-            var scope = "email";
+            var clientSecret = "2UcQslvaCOx366z0D0CJj2aRkNk1qeWA";
+            var scope = "email offline_access";
 
             var authServerUrl = "https://id.acme.test:8443/auth";
             var realm = "acme-demo";

@@ -155,7 +155,7 @@ public class OpaAuthenticator implements Authenticator {
                     .type(ProviderConfigProperty.BOOLEAN_TYPE) //
                     .label("Use client roles") //
                     .defaultValue("true") //
-                    .helpText("If enabled, client roles for the current client will be sent with authz requests.") //
+                    .helpText("If enabled, client roles will be sent with authz requests.") //
                     .add() //
 
                     .property().name(OpaClient.OPA_USE_GROUPS) //

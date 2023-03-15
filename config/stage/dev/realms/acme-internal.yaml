@@ -654,6 +654,8 @@ authenticatorConfig:
       useUserAttributes: "true"
       useClientAttributes: "true"
       useRealmAttributes: "true"
+      useClientRoles: "true"
+      useRealmRoles: "true"
 
 roles:
 # Realm specific roles
