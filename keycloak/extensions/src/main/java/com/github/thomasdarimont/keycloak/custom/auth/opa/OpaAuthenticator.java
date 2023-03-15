@@ -97,9 +97,9 @@ public class OpaAuthenticator implements Authenticator {
 
                     .property().name(OpaClient.OPA_AUTHZ_URL) //
                     .type(ProviderConfigProperty.STRING_TYPE) //
-                    .label("Authz Server URL") //
+                    .label("Authz Server Policy URL") //
                     .defaultValue(OpaClient.DEFAULT_OPA_AUTHZ_URL) //
-                    .helpText("URL of OPA Authz Server Resource") //
+                    .helpText("URL of OPA Authz Server Policy Resource") //
                     .add() //
 
                     .property().name(OpaClient.OPA_USE_USER_ATTRIBUTES) //
