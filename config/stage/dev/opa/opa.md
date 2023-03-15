@@ -4,10 +4,10 @@ OPA IAM Access Policies
 # Setup
 
 Example Auth-Flow
-![img.png](auth-flow.png)
+![img.png](docs/auth-flow.png)
 
 Example Authenticator Config
-![img.png](auth-config.png)
+![img.png](docs/auth-config.png)
 
 OPA URL: `http://localhost:8181/v1/policies/iam/keycloak/allow`
 Attributes: `acme.greeting`
@@ -21,7 +21,7 @@ curl -v -X PUT --data-binary @config/stage/dev/opa/iam/keycloak/policy.rego  loc
 
 # Examples
 
-![img.png](auth-opa-output.png)
+![img.png](docs/auth-opa-output.png)
 
 ## Manually evaluate policy
 
