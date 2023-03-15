@@ -3,7 +3,7 @@ package iam.keycloak
 import future.keywords.in
 
 # Map required client roles to clientId
-client_required_role_map := {
+required_roles := {
     "app-minispa": "acme-user"
 }
 
@@ -17,7 +17,7 @@ allow = result {
 
     isRealm("acme-internal")
 
-    required_role := client_required_role_map[input.resource.clientId]
+    required_role := required_roles[input.resource.clientId]
     required_role in input.subject.realmRoles
 
     result = _allow(true, "acme-user can access")
