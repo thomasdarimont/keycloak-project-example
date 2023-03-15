@@ -26,6 +26,21 @@ clients:
     redirectUris:
       - "http://localhost/acme-standard-client/login*"
 
+  - id: acme-implicit-client-1
+    clientId: acme-implicit-client
+    protocol: openid-connect
+    name: Implicit Client
+    description: "Implicit Client Description v2"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    implicitFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/acme-implcit-client/oauth/callback"
+
   - id: acme-direct-access-client-1
     clientId: acme-direct-access-client
     protocol: openid-connect
@@ -40,6 +55,7 @@ clients:
     fullScopeAllowed: false
     redirectUris:
       - "http://localhost/acme-direct-access-client-1/login*"
+      - "https://flowsimulator.pragmaticwebsecurity.com/*"
 
   - id: acme-service-client-1
     clientId: acme-service-client
