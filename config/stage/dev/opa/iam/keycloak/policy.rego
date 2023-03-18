@@ -4,7 +4,8 @@ import future.keywords.in
 
 # Map required client roles to clientId
 required_roles := {
-    "app-minispa": "acme-user"
+    "app-minispa": "acme-user",
+    "app-keycloak-website": "acme-developer"
 }
 
 default allow = {
@@ -17,8 +18,7 @@ allow = result {
 
     isRealm("acme-internal")
 
-    required_role := required_roles[input.resource.clientId]
-    required_role in input.subject.realmRoles
+    hasRequiredRoleForClient(input.resource.clientId)
 
     result = _allow(true, "acme-user can access")
 }
@@ -40,4 +40,13 @@ _allow(allow, hint) = result {
 
 isRealm(realmName) = result {
     result := input.resource.realm == realmName
+}
+
+hasRequiredRoleForClient(clientId) = result {
+
+    # if no explicit required_role is configured just use one of the existing realm roles
+    requiredRole := object.get(required_roles, clientId, input.subject.realmRoles[0])
+
+    # check if user contains required role
+    result = requiredRole in input.subject.realmRoles
 }

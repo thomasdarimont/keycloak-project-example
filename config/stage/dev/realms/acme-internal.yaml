@@ -384,10 +384,10 @@ clients:
       - "acme.profile"
       - "acme.ageinfo"
 
-  - clientId: app-keycloak-demo
+  - clientId: app-keycloak-website
     protocol: openid-connect
-    name: Keycloak Demo App
-    description: "Keycloak Demo App Description"
+    name: Keycloak Website App
+    description: "Keycloak Website App Description"
     enabled: true
     publicClient: true
     standardFlowEnabled: true
@@ -398,7 +398,7 @@ clients:
     #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "https://www.keycloak.org/app"
-    baseUrl: "/#url=https://id.acme.test:8443/auth&realm=acme-internal&client=app-keycloak-demo"
+    baseUrl: "/#url=https://id.acme.test:8443/auth&realm=acme-internal&client=app-keycloak-website"
     adminUrl: ""
     redirectUris:
       - "/*"
@@ -662,6 +662,9 @@ roles:
   realm:
   - name: "acme-user"
     description: "Acme User"
+
+  - name: "acme-developer"
+    description: "Acme Developer"
 
   - name: "acme-user-support"
     description: "Acme Support User"

@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.auth.opa;
 
+import com.github.thomasdarimont.keycloak.custom.config.MapConfig;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
@@ -43,7 +44,7 @@ public class OpaAuthenticator implements Authenticator {
 
         var authenticatorConfig = context.getAuthenticatorConfig();
         var config = authenticatorConfig != null ? authenticatorConfig.getConfig() : null;
-        var access = opaClient.checkAccess(session, config, realm, user, authSession.getClient(), OpaClient.OPA_ACTION_LOGIN);
+        var access = opaClient.checkAccess(session, new MapConfig(config), realm, user, authSession.getClient(), OpaClient.OPA_ACTION_LOGIN);
 
         if (!access.isAllowed()) {
             var loginForm = session.getProvider(LoginFormsProvider.class);
