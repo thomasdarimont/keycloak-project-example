@@ -2,6 +2,7 @@ use std::env;
 
 pub mod auth;
 pub mod cors;
+pub mod logging;
 
 #[cfg(debug_assertions)]
 pub fn expect_env_var(name: &str, default: &str) -> String {

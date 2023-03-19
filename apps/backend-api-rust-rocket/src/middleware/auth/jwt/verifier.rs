@@ -76,10 +76,12 @@ impl JwtVerifier {
         // validation.set_audience(&[&self.middleware.audience]);
 
         // TODO adapt to support multiple issuers
-        validation.iss = Some(self.config.issuer.clone());
+        let mut issuers = std::collections::HashSet::new();
+        issuers.insert(self.config.issuer.clone());
+        validation.iss = Some(issuers.into());
 
-        let key = DecodingKey::from_rsa_components(&key.n, &key.e);
-        return decode::<Claims>(token, &key, &validation)
+        let key = DecodingKey::from_rsa_components(&key.n, &key.e).unwrap();
+        return decode::<Claims>(&token, &key, &validation)
             .map_err(|_| VerificationError::InvalidSignature);
     }
 }

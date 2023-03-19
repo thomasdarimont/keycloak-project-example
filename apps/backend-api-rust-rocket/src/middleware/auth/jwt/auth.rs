@@ -1,9 +1,9 @@
-use crate::middleware::auth::jwt;
-use crate::middleware::auth::jwt::{fetch_keys, Claims, JwkKeys, JwtVerifier};
+use crate::middleware::auth::jwt::{fetch_jwks_keys, Claims, JwkKeys, JwtVerifier};
 use crate::support::scheduling::use_repeating_job;
 use jsonwebtoken::TokenData;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use log;
 
 type CleanupFn = Box<dyn Fn() -> () + Send>;
 
@@ -22,7 +22,7 @@ impl Drop for JwtAuth {
 
 impl JwtAuth {
     pub fn new() -> JwtAuth {
-        let jwk_key_result = jwt::fetch_keys();
+        let jwk_key_result = fetch_jwks_keys();
         let jwk_keys: JwkKeys = match jwk_key_result {
             Ok(keys) => keys,
             Err(_) => {
@@ -48,14 +48,11 @@ impl JwtAuth {
     fn start_key_update(&mut self) {
         let verifier_ref = Arc::clone(&self.verifier);
 
-        let stop = use_repeating_job(move || match fetch_keys() {
+        let stop = use_repeating_job(move || match fetch_jwks_keys() {
             Ok(jwk_keys) => {
                 let mut verifier = verifier_ref.lock().unwrap();
                 verifier.set_keys(jwk_keys.keys);
-                println!(
-                    "Updated JWK keys. Next refresh will be in {:?}",
-                    jwk_keys.validity
-                );
+                log::info!("Updated JWK keys. Next refresh will be in {:?}", jwk_keys.validity);
                 jwk_keys.validity
             }
             Err(_) => Duration::from_secs(10),

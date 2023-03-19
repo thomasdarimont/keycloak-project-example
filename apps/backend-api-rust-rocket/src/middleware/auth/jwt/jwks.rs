@@ -19,6 +19,7 @@ pub struct JwkKey {
     pub n: String,
 }
 
+#[derive(Debug, Deserialize, Eq, PartialEq)]
 pub struct JwkKeys {
     pub keys: Vec<JwkKey>,
     pub validity: Duration,
@@ -27,10 +28,11 @@ pub struct JwkKeys {
 // TODO make JWKS fetch FALLBACK_TIMEOUT configurable
 const FALLBACK_TIMEOUT: Duration = Duration::from_secs(300);
 
-pub fn fetch_keys_for_config(config: &JwtConfig) -> Result<JwkKeys, Box<dyn std::error::Error>> {
-    let http_response = reqwest::blocking::get(&config.jwk_url)?;
+pub fn fetch_keys_for_config(config: &JwtConfig) -> Result<JwkKeys, Box<dyn Error + Send>> {
+    log::info!("Fetching JWKS Keys from URL={}", &config.jwk_url);
+    let http_response = reqwest::blocking::get::<>(&config.jwk_url).unwrap();
     let max_age = get_max_age(&http_response).unwrap_or(FALLBACK_TIMEOUT);
-    let result = Result::Ok(http_response.json::<KeyResponse>()?);
+    let result = Ok(http_response.json::<KeyResponse>().unwrap());
 
     return result.map(|res| JwkKeys {
         keys: res.keys,
@@ -38,6 +40,6 @@ pub fn fetch_keys_for_config(config: &JwtConfig) -> Result<JwkKeys, Box<dyn std:
     });
 }
 
-pub fn fetch_keys() -> Result<JwkKeys, Box<dyn Error>> {
+pub fn fetch_jwks_keys() -> Result<JwkKeys, Box<dyn Error + Send>> {
     return fetch_keys_for_config(&jwt::get_config());
 }

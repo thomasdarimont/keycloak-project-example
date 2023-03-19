@@ -1,4 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+//#![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use]
 extern crate rocket;
@@ -9,10 +9,13 @@ use std::error::Error;
 use crate::domain::user::User;
 use crate::middleware::auth::jwt::JwtAuth;
 use chrono::Utc;
+use log;
 use rocket::serde::json::Json;
+use rocket::tokio::task::spawn_blocking;
 
 use serde::Deserialize;
 use serde::Serialize;
+use crate::middleware::logging;
 
 pub mod domain;
 pub mod middleware;
@@ -30,6 +33,8 @@ fn options_me_info() -> () {}
 
 #[get("/api/users/me")]
 fn get_me_info(user: User) -> Json<MeInfo> {
+    log::info!("Handle user info request. username={}", &user.username);
+
     let info = MeInfo {
         datetime: Utc::now().to_string().clone(),
         message: format!("Hello, {}!", user.username.to_string()),
@@ -41,10 +46,15 @@ fn get_me_info(user: User) -> Json<MeInfo> {
 
 #[rocket::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    rocket::build()
+
+    logging::init_logging();
+
+    let auth = spawn_blocking(JwtAuth::new).await?;
+
+    let _ = rocket::build()
         .attach(middleware::cors::Cors)
         .mount("/", routes![get_me_info, options_me_info])
-        .manage(JwtAuth::new())
+        .manage(auth)
         .launch()
         .await?;
 

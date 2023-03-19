@@ -4,8 +4,6 @@ address = "127.0.0.1"
 port = 4853
 workers = 2
 keep_alive = 5
-read_timeout = 5
-write_timeout = 5
 log_level = "normal"
 
 limits = { forms = 32768 }
