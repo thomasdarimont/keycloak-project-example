@@ -373,12 +373,12 @@ To import/export of an existing realm as JSON start the docker-compose infrastru
 The export will create a file like `acme-apps-realm.json` in the `./keycloak/imex` folder.
 
 ```
-java bin/realm.java --realm=acme-apps
+java bin/realmImex.java --realm=acme-internal --verbose
 ```
 
 The import would search an file `acme-apps-realm.json` in the `./keycloak/imex` folder.
 ```
-java bin/realm.java --realm=acme-apps --action=import
+java bin/realmImex.java --realm=acme-internal --verbose --action=import
 ```
 
 # Tools

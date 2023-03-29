@@ -63,17 +63,24 @@ class realmImex {
         commandLine.add("deployments/local/dev/docker-compose.yml");
         commandLine.add("exec");
         commandLine.add("-T");
+        commandLine.add("-e");
+        commandLine.add("DEBUG=false");
         commandLine.add("acme-keycloak");
-        commandLine.add("/opt/jboss/keycloak/bin/standalone.sh");
-        commandLine.add("-c");
-        commandLine.add("standalone.xml");
-        commandLine.add("-Djboss.socket.binding.port-offset=10000");
-        commandLine.add("-Dkeycloak.migration.action=" + migrationAction);
-        commandLine.add("-Dkeycloak.migration.file=/opt/jboss/imex/" + realmName + "-realm.json");
-        commandLine.add("-Dkeycloak.migration.provider=singleFile");
-        commandLine.add("-Dkeycloak.migration.realmName=" + realmName);
+        commandLine.add("/opt/keycloak/bin/kc.sh");
+        commandLine.add(migrationAction);
+        commandLine.add("--file");
+        commandLine.add("/opt/keycloak/imex/" + realmName + "-realm.json");
+        commandLine.add("--users");
+        commandLine.add("skip");
+        commandLine.add("--realm");
+        commandLine.add(realmName);
         if (additionalOptions != null && !"".equals(additionalOptions.trim())) {
             commandLine.add(additionalOptions);
+        }
+
+        if (verbose) {
+            System.out.println("Command-Line: ");
+            System.out.println(commandLine);
         }
 
         System.out.printf("Starting realm %s.%n", migrationAction);
