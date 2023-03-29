@@ -15,9 +15,13 @@ class scanImage {
 
     static final String TRIVY_VERSION_OPT = "--trivy-version";
     static final String TRIVY_VERSION_ENV = "TRIVY_VERSION";
-    static final String TRIVY_VERSION_DEFAULT = "0.27.1";
+    static final String TRIVY_VERSION_DEFAULT = "0.38.3";
 
     static final String VERBOSE_CMD = "--verbose";
+
+    static final String TIMEOUT_OPT = "--timeout";
+
+    static final String TIMEOUT_DEFAULT = "15m";
 
     public static void main(String[] args) throws Exception {
         var argList = Arrays.asList(args);
@@ -33,6 +37,7 @@ class scanImage {
             System.out.printf("%s: %s%n", TRIVY_VERSION_OPT, "override the version of trivy use for scanning");
             System.out.printf("%s: %s%n", CACHE_DIR_OPT, "override the cachedir for cve-index.");
             System.out.printf("%s: %s%n", VERBOSE_CMD, "make the output of the export process visible on stdout");
+            System.out.printf("%s: %s%n", TIMEOUT_OPT, "timeout for image scan, e.g. 15m");
             System.out.println("");
             System.out.printf("Example: %s=%s %s=%s", IMAGE_NAME_OPT, "<some image>", TRIVY_VERSION_OPT, TRIVY_VERSION_DEFAULT);
             System.out.println("");
@@ -42,6 +47,7 @@ class scanImage {
         var trivyVersion = Optional.ofNullable(System.getenv(TRIVY_VERSION_ENV)).orElse(argList.stream().filter(s -> s.startsWith(TRIVY_VERSION_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(TRIVY_VERSION_DEFAULT));
         var imageName = Optional.ofNullable(System.getenv(IMAGE_NAME_ENV)).orElse(argList.stream().filter(s -> s.startsWith(IMAGE_NAME_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElseThrow(() -> new IllegalStateException("Please provide image name to scan with "+IMAGE_NAME_OPT)));
         var cacheDir = argList.stream().filter(s -> s.startsWith(CACHE_DIR_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(CACHE_DIR_DEFAULT);
+        var timeout = argList.stream().filter(s -> s.startsWith(TIMEOUT_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(TIMEOUT_DEFAULT);
 
         var cacheDirFile = new File(cacheDir);
         if (!cacheDirFile.exists()) {
@@ -63,6 +69,8 @@ class scanImage {
         commandLine.add("aquasec/trivy:" + trivyVersion);
         commandLine.add("image");
         commandLine.add(imageName);
+        commandLine.add("--timeout");
+        commandLine.add(timeout);
 
         var pb = new ProcessBuilder(commandLine);
         pb.inheritIO();
