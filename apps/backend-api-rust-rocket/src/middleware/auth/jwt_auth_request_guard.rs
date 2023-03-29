@@ -24,8 +24,8 @@ fn get_token_from_header(header: &str) -> Option<String> {
     }
 }
 
-fn verify_token(token: &String, auth: &JwtAuth) -> request::Outcome<User, AuthError> {
-    let verified_token = auth.verify(&token);
+fn verify_token(token: &str, auth: &JwtAuth) -> request::Outcome<User, AuthError> {
+    let verified_token = auth.verify(token);
 
     // TODO externalize claims to JWT User conversion
     let maybe_user = verified_token.map(|token| User {
@@ -80,7 +80,7 @@ impl<'r> FromRequest<'r> for User {
         match configured_auth.await {
             Outcome::Success(auth) => match auth_headers.len() {
                 0 => Outcome::Failure((Status::Unauthorized, AuthError::NoAuthorizationHeader)),
-                1 => parse_and_verify_auth_header(auth_headers[0], &auth),
+                1 => parse_and_verify_auth_header(auth_headers[0], auth),
                 _ => Outcome::Failure((Status::BadRequest, AuthError::MultipleKeysProvided)),
             },
             _ => Outcome::Failure((Status::InternalServerError, AuthError::NoJwkVerifier)),

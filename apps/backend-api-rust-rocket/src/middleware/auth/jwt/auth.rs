@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use log;
 
-type CleanupFn = Box<dyn Fn() -> () + Send>;
+type CleanupFn = Box<dyn Fn() + Send>;
 
 pub struct JwtAuth {
     verifier: Arc<Mutex<JwtVerifier>>,
@@ -32,7 +32,7 @@ impl JwtAuth {
         let verifier = Arc::new(Mutex::new(JwtVerifier::new(jwk_keys.keys)));
 
         let mut instance = JwtAuth {
-            verifier: verifier,
+            verifier,
             cleanup: Mutex::new(Box::new(|| {})),
         };
 
@@ -40,7 +40,7 @@ impl JwtAuth {
         instance
     }
 
-    pub fn verify(&self, token: &String) -> Option<TokenData<Claims>> {
+    pub fn verify(&self, token: &str) -> Option<TokenData<Claims>> {
         let verifier = self.verifier.lock().unwrap();
         verifier.verify(token)
     }
@@ -60,5 +60,11 @@ impl JwtAuth {
 
         let mut cleanup = self.cleanup.lock().unwrap();
         *cleanup = stop;
+    }
+}
+
+impl Default for JwtAuth {
+    fn default() -> Self {
+        Self::new()
     }
 }

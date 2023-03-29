@@ -9,7 +9,6 @@ use std::error::Error;
 use crate::domain::user::User;
 use crate::middleware::auth::jwt::JwtAuth;
 use chrono::Utc;
-use log;
 use rocket::serde::json::Json;
 use rocket::tokio::task::spawn_blocking;
 
@@ -29,19 +28,19 @@ pub struct MeInfo {
 }
 
 #[options("/api/users/me")]
-fn options_me_info() -> () {}
+fn options_me_info() {}
 
 #[get("/api/users/me")]
 fn get_me_info(user: User) -> Json<MeInfo> {
     log::info!("Handle user info request. username={}", &user.username);
 
     let info = MeInfo {
-        datetime: Utc::now().to_string().clone(),
-        message: format!("Hello, {}!", user.username.to_string()),
-        backend: String::from("rust-rocket").clone(),
+        datetime: Utc::now().to_string(),
+        message: format!("Hello, {}!", user.username),
+        backend: String::from("rust-rocket"),
     };
 
-    return Json(info);
+    Json(info)
 }
 
 #[rocket::main]

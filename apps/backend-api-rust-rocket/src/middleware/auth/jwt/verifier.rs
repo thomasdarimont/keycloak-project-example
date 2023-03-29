@@ -34,7 +34,7 @@ impl JwtVerifier {
         }
     }
 
-    pub fn verify(&self, token: &String) -> Option<TokenData<Claims>> {
+    pub fn verify(&self, token: &str) -> Option<TokenData<Claims>> {
         let token_kid = match decode_header(token).map(|header| header.kid) {
             Ok(Some(header)) => header,
             _ => return None,
@@ -62,7 +62,7 @@ impl JwtVerifier {
     fn decode_token_with_key(
         &self,
         key: &JwkKey,
-        token: &String,
+        token: &str,
     ) -> Result<TokenData<Claims>, VerificationError> {
         // TODO ensure that "none" algorithm cannot be used!
         let algorithm = match Algorithm::from_str(&key.alg) {
@@ -78,10 +78,10 @@ impl JwtVerifier {
         // TODO adapt to support multiple issuers
         let mut issuers = std::collections::HashSet::new();
         issuers.insert(self.config.issuer.clone());
-        validation.iss = Some(issuers.into());
+        validation.iss = Some(issuers);
 
         let key = DecodingKey::from_rsa_components(&key.n, &key.e).unwrap();
-        return decode::<Claims>(&token, &key, &validation)
-            .map_err(|_| VerificationError::InvalidSignature);
+        decode::<Claims>(token, &key, &validation)
+            .map_err(|_| VerificationError::InvalidSignature)
     }
 }

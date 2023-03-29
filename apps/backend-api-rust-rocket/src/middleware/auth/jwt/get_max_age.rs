@@ -21,9 +21,9 @@ pub fn get_max_age(response: &Response) -> Result<Duration, MaxAgeParseError> {
 }
 
 fn parse_max_age_value(cache_control_value: &str) -> Result<Duration, MaxAgeParseError> {
-    let tokens: Vec<&str> = cache_control_value.split(",").collect();
+    let tokens: Vec<&str> = cache_control_value.split(',').collect();
     for token in tokens {
-        let key_value: Vec<&str> = token.split("=").map(|s| s.trim()).collect();
+        let key_value: Vec<&str> = token.split('=').map(|s| s.trim()).collect();
         let key = key_value.first().unwrap();
         let val = key_value.get(1);
 
@@ -40,7 +40,7 @@ fn parse_max_age_value(cache_control_value: &str) -> Result<Duration, MaxAgePars
             }
         }
     }
-    return Err(MaxAgeParseError::NoMaxAgeSpecified);
+    Err(MaxAgeParseError::NoMaxAgeSpecified)
 }
 
 fn parse_cache_control_header(header_value: &HeaderValue) -> Result<Duration, MaxAgeParseError> {

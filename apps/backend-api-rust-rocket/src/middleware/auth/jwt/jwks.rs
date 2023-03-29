@@ -34,10 +34,10 @@ pub fn fetch_keys_for_config(config: &JwtConfig) -> Result<JwkKeys, Box<dyn Erro
     let max_age = get_max_age(&http_response).unwrap_or(FALLBACK_TIMEOUT);
     let result = Ok(http_response.json::<KeyResponse>().unwrap());
 
-    return result.map(|res| JwkKeys {
+    result.map(|res| JwkKeys {
         keys: res.keys,
         validity: max_age,
-    });
+    })
 }
 
 pub fn fetch_jwks_keys() -> Result<JwkKeys, Box<dyn Error + Send>> {
