@@ -13,7 +13,7 @@ default allow = {
     "message": "access-denied"
 }
 
-# Users of the acme-internal realm need the acme-user role to access
+# Users from acme-internal realm need the required roles to access
 allow = result {
 
     isRealm("acme-internal")
@@ -23,7 +23,7 @@ allow = result {
     result = _allow(true, "acme-user can access")
 }
 
-# Users of other realms can access
+# Users from other realms can access
 allow = result {
 
     not isRealm("acme-internal")
