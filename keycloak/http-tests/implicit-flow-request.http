@@ -1,0 +1,3 @@
+### Implicit flow request
+
+GET {{ISSUER}}/protocol/openid-connect/auth?client_id={{TEST_CLIENT_IMPLICIT}}&redirect_uri={{TEST_CLIENT_IMPLICIT_REDIRECT}}&state=12345678&response_type=token&scope=openid profile email
