@@ -48,12 +48,12 @@ keytool  \
 ### Configure Truststore with kcadm
 
 ```
-kcadm config truststore --storepass $TRUSTSTORE_PASSWORD /opt/jboss/.keycloak/kcadm-truststore.jks
+kcadm config truststore --storepass $TRUSTSTORE_PASSWORD /opt/keycloak/.keycloak/kcadm-truststore.jks
 ```
 
 ## Configure credentials
 ```
-kcadm config credentials --server $KEYCLOAK_URL --realm master --user $KEYCLOAK_ADMIN_USER --password $KEYCLOAK_ADMIN_PASSWORD --trustpass $TRUSTSTORE_PASSWORD
+kcadm config credentials --server $KEYCLOAK_URL --realm master --user $KEYCLOAK_ADMIN --password $KEYCLOAK_ADMIN_PASSWORD --trustpass $TRUSTSTORE_PASSWORD
 ```
 
 # Use cases
@@ -195,5 +195,5 @@ kcadm add-roles -r $KEYCLOAK_REALM --uusername vadmin --rolename user --rolename
 ## Partial export
 
 ```
-kcadm create realms/$KEYCLOAK_REALM/partial-export -s exportGroupsAndRoles=true -s exportClients=true -o
+kcadm create realms/$KEYCLOAK_REALM/partial-export -s exportGroupsAndRoles=true -s exportClients=true -o  --trustpass $TRUSTSTORE_PASSWORD
 ```
