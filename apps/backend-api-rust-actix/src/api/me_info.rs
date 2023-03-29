@@ -28,7 +28,7 @@ pub async fn handle_me_info(user: AuthenticatedUser<FoundClaims>) -> HttpRespons
     let obj = MeInfo {
         message: format!("Hello, {}!", username),
         backend: "rust-actix".into(),
-        datetime: Utc::now().to_string().into(),
+        datetime: Utc::now().to_string(),
     };
     HttpResponse::Ok().json(obj)
 }

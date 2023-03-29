@@ -7,15 +7,15 @@ authors = ["Thomas Darimont <thomas.darimont@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = { version = "4.0.1", features = ["openssl"] }
-actix-cors = "0.6.1"
-actix-4-jwt-auth = "0.4.2"
-openssl = "0.10.40"
-serde = { version = "1.0.137", features = ["derive"] }
-serde_json = { version = "1.0.81" }
-chrono = "0.4.19"
-env_logger = "0.9.0"
+actix-web = { version = "4.3.1", features = ["openssl"] }
+actix-cors = "0.6.4"
+actix-4-jwt-auth = "0.4.2" # TODO update to 1.0.0
+openssl = "0.10.48"
+serde = { version = "1.0.159", features = ["derive"] }
+serde_json = { version = "1.0.95" }
+chrono = "0.4.24"
+env_logger = "0.10.0"
 
 [dev-dependencies]
-# cargo watch --quiet --clear --exec run
-cargo-watch = "8.1.1"
+# cargo +nightly watch --quiet --clear --exec run
+cargo-watch = "8.4.0"

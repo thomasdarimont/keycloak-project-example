@@ -19,7 +19,7 @@ pub struct FoundClaims {
 
 impl FoundClaims {
     pub fn has_scope(&self, scope: &str) -> bool {
-        self.scope.split_ascii_whitespace().into_iter().any(|s| s == scope)
+        self.scope.split_ascii_whitespace().any(|s| s == scope)
     }
 }
 
