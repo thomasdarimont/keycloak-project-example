@@ -1,6 +1,6 @@
 services:
   acme-opa:
-    image: openpolicyagent/opa:0.50.1
+    image: openpolicyagent/opa:0.50.2
     command:
       - run
       - --server
