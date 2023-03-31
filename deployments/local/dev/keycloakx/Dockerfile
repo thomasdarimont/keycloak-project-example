@@ -1,5 +1,5 @@
 #see https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=21.0.1
+ARG KEYCLOAK_VERSION=21.0.2
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 ARG QUARKUS_VERSION=2.13.7.Final
 ARG OTEL_VERSION=1.17.0

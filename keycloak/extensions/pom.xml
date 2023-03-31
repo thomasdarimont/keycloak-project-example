@@ -187,13 +187,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.jboss.slf4j</groupId>
-            <artifactId>slf4j-jboss-logging</artifactId>
-            <version>${slf4j-jboss-logging.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Additional Keycloak Libraries as "provided" dependencies to ease debugging -->
 
         <dependency>
@@ -203,10 +196,26 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <!-- needed for ResteasyClientBuilder.newBuilder().build() -->
+            <groupId>org.wildfly.client</groupId>
+            <artifactId>wildfly-client-config</artifactId>
+            <version>1.0.1.Final</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <!-- needed for ResteasyClientBuilder.newBuilder().build() -->
+            <groupId>org.wildfly.common</groupId>
+            <artifactId>wildfly-common</artifactId>
+            <version>1.6.0.Final</version>
+            <scope>test</scope>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>org.jgroups</groupId>-->
 <!--            <artifactId>jgroups</artifactId>-->
-<!--            <version>4.2.11.Final</version>-->
+<!--            <version>5.2.10.Final</version>-->
 <!--            <scope>provided</scope>-->
 <!--        </dependency>-->
 
