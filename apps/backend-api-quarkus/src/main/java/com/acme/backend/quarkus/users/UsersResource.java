@@ -3,6 +3,7 @@ package com.acme.backend.quarkus.users;
 import io.quarkus.security.Authenticated;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
+import org.jboss.resteasy.spi.HttpRequest;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -35,6 +36,9 @@ public class UsersResource {
 
     @Context
     UriInfo uriInfo;
+
+    @Context
+    HttpRequest request;
 
     @GET
     @Path("/me")
