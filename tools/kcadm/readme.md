@@ -197,3 +197,9 @@ kcadm add-roles -r $KEYCLOAK_REALM --uusername vadmin --rolename user --rolename
 ```
 kcadm create realms/$KEYCLOAK_REALM/partial-export -s exportGroupsAndRoles=true -s exportClients=true -o  --trustpass $TRUSTSTORE_PASSWORD
 ```
+
+## Export profile
+
+```
+kcadm get realms/workshop/users/profile -o --trustpass $TRUSTSTORE_PASSWORD
+```
