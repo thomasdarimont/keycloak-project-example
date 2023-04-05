@@ -1,13 +1,13 @@
 #see https://www.keycloak.org/server/containers
 ARG KEYCLOAK_VERSION=21.0.2
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
-ARG QUARKUS_VERSION=2.13.7.Final
-ARG OTEL_VERSION=1.17.0
-ARG OTEL_ALPHA_VERSION=1.17.0-alpha
+ARG OTEL_AGENT_VERSION=1.24.0
 USER root
 
-# Add nashorn javascript engine for new Java versions (JDK>14)
-# RUN curl -o /opt/keycloak/providers/nashorn-core-15.3.jar https://search.maven.org/remotecontent?filepath=org/openjdk/nashorn/nashorn-core/15.3/nashorn-core-15.3.jar
+#RUN echo "Add nashorn javascript engine"
+#RUN --mount=from=busybox:1.36.0,src=/bin/,dst=/bin/ \
+# wget -O /opt/keycloak/providers/nashorn-core-15.3.jar https://search.maven.org/remotecontent?filepath=org/openjdk/nashorn/nashorn-core/15.3/nashorn-core-15.3.jar
+
 
 ## Workaround for adding the current certifcate to the cacerts truststore
 # Import certificate into cacerts truststore
@@ -19,5 +19,9 @@ RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass ch
 #     curl https://github.com/aerogear/keycloak-metrics-spi/releases/download/$AEROGEAR_VERSION/keycloak-metrics-spi-$AEROGEAR_VERSION.jar \
 #     --location \
 #     --output /opt/jboss/keycloak/providers/keycloak-metrics-spi-$AEROGEAR_VERSION.jar
+
+RUN echo "Downloading OpenTelemetry JavaAgent"
+RUN --mount=from=busybox:1.36.0,src=/bin/,dst=/bin/ \
+ wget -O /opt/keycloak/opentelemetry-javaagent.jar https://search.maven.org/remotecontent?filepath=io/opentelemetry/javaagent/opentelemetry-javaagent/$OTEL_AGENT_VERSION/opentelemetry-javaagent-$OTEL_AGENT_VERSION.jar
 
 USER keycloak
