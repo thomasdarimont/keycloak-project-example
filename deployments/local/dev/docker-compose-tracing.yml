@@ -26,5 +26,7 @@ services:
       - "apps.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
   acme-keycloak:
+    environment:
+      JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar'
     volumes:
       - ../../../keycloak/config/quarkus-tracing.properties:/opt/keycloak/conf/quarkus.properties:z
