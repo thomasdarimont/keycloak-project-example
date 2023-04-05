@@ -30,6 +30,8 @@ services:
       OTEL_JAVAAGENT_EXCLUDE_CLASSES: 'io.micrometer.*'
       OTEL_SERVICE_NAME: 'acme-keycloak'
       OTEL_PROPAGATORS: 'b3multi'
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'https://ops.acme.test:4317'
       # TODO add https configuration for otel
     volumes:
       - ../../../keycloak/config/quarkus-tracing-tls.properties:/opt/keycloak/conf/quarkus.properties:z
