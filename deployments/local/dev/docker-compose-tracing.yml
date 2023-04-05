@@ -28,5 +28,10 @@ services:
   acme-keycloak:
     environment:
       JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar'
+      OTEL_SERVICE_NAME: 'acme-keycloak'
+      OTEL_PROPAGATORS: 'b3multi'
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://ops.acme.test:4317'
+
     volumes:
       - ../../../keycloak/config/quarkus-tracing.properties:/opt/keycloak/conf/quarkus.properties:z

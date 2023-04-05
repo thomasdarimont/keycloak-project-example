@@ -25,5 +25,10 @@ services:
       - "--reporter.grpc.tls.ca=/rootca.pem"
       - "--reporter.grpc.host-port=ops.acme.test:14250"
   acme-keycloak:
+    environment:
+      JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar'
+      OTEL_SERVICE_NAME: 'acme-keycloak'
+      OTEL_PROPAGATORS: 'b3multi'
+      # TODO add https configuration for otel
     volumes:
       - ../../../keycloak/config/quarkus-tracing-tls.properties:/opt/keycloak/conf/quarkus.properties:z
