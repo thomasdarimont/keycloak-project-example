@@ -16,7 +16,7 @@ services:
       - "apps.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
   acme-jaeger:
-    image: jaegertracing/all-in-one:1.39
+    image: jaegertracing/all-in-one:1.43
     ports:
       - "16686:16686"
       - "14250:14250"
