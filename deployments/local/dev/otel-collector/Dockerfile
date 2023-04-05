@@ -1,4 +1,4 @@
-ARG OTEL_VERSION=0.64.1
+ARG OTEL_VERSION=0.75.0
 FROM otel/opentelemetry-collector:$OTEL_VERSION
 
 USER 0
