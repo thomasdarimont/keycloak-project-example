@@ -27,6 +27,7 @@ services:
   acme-keycloak:
     environment:
       JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar'
+      OTEL_JAVAAGENT_EXCLUDE_CLASSES: 'io.micrometer.*'
       OTEL_SERVICE_NAME: 'acme-keycloak'
       OTEL_PROPAGATORS: 'b3multi'
       # TODO add https configuration for otel
