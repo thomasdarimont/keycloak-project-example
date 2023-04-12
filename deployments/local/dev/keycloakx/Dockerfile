@@ -1,6 +1,7 @@
 #see https://www.keycloak.org/server/containers
 ARG KEYCLOAK_VERSION=21.0.2
-FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+#FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+FROM thomasdarimont/keycloak:21.0.999.1
 ARG OTEL_AGENT_VERSION=1.24.0
 USER root
 
@@ -23,5 +24,8 @@ RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass ch
 RUN echo "Downloading OpenTelemetry JavaAgent"
 RUN --mount=from=busybox:1.36.0,src=/bin/,dst=/bin/ \
  wget -O /opt/keycloak/opentelemetry-javaagent.jar https://search.maven.org/remotecontent?filepath=io/opentelemetry/javaagent/opentelemetry-javaagent/$OTEL_AGENT_VERSION/opentelemetry-javaagent-$OTEL_AGENT_VERSION.jar
+
+RUN --mount=from=busybox:1.36.0,src=/bin/,dst=/bin/ \
+ wget -O /opt/keycloak/providers/opentelemetry-extension-trace-propagators.jar https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-trace-propagators/1.25.0/opentelemetry-extension-trace-propagators-1.25.0.jar
 
 USER keycloak

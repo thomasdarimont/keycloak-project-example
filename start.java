@@ -214,17 +214,28 @@ class start {
             envFiles.add("deployments/local/dev/keycloak-provisioning.env");
         }
 
-        String tracingLogFormat;
         if (useTracing) {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
             if (useHttps) {
                 commandLine.add("--file");
                 commandLine.add("deployments/local/dev/docker-compose-tracing-tls.yml");
+
+                var certPath = Path.of("config/stage/dev/tls/acme.test+1.pem");
+                if (certPath.toFile().exists()) {
+                    var targetPath = Path.of("deployments/local/dev/otel-collector").resolve(certPath.getFileName());
+                    System.out.printf("Copy cert files for otel-collector from %s to %s%n", certPath, targetPath);
+                    Files.copy(certPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                var keyPath = Path.of("config/stage/dev/tls/acme.test+1-key.pem");
+                if (keyPath.toFile().exists()) {
+                    var targetPath = Path.of("deployments/local/dev/otel-collector").resolve(keyPath.getFileName());
+                    System.out.printf("Copy cert files for otel-collector from %s to %s%n", keyPath, targetPath);
+                    Files.copy(keyPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                }
             }
-            tracingLogFormat = "traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled}";
-        } else {
-            tracingLogFormat = "";
+            envFiles.add("deployments/local/dev/keycloak-tracing.env");
         }
 
         if (Files.exists(Path.of("local.env"))) {
@@ -234,7 +245,6 @@ class start {
 
         //-BEGIN env vars
         StringBuilder envVariables = new StringBuilder();
-        envVariables.append("TRACING_LOG_FORMAT=").append(tracingLogFormat).append("\n");
         for (String envFile : envFiles) {
             envVariables.append(Files.readString(Paths.get(envFile))).append("\n");
         }

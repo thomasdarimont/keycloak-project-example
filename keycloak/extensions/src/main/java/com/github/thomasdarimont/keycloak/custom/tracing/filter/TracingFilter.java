@@ -36,10 +36,12 @@ public class TracingFilter implements ContainerRequestFilter, ContainerResponseF
             MDC.put(REALM, realmName);
         }
 
-        // var spanId = requestContext.getHeaderString("X-SpanID");
-        // var traceId = requestContext.getHeaderString("X-TraceID");
-        // MDC.put("spanId", spanId);
-        // MDC.put("traceId", traceId);
+//        var span = LocalRootSpan.current(); // Span.current();
+//        if (span.isRecording()) {
+//            var spanContext = span.getSpanContext();
+//            MDC.put("spanId", spanContext.getSpanId());
+//            MDC.put("traceId", spanContext.getTraceId());
+//        }
     }
 
     @Override
