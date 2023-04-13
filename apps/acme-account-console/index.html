@@ -145,6 +145,7 @@
         <button name="switchContextBtn" onclick="switchContext()" class="switchContext">Switch Context</button>
         <button name="accountBtn" onclick="keycloak.accountManagement()" class="account">Account</button>
         <button name="logoutBtn" onclick="keycloak.logout()" class="logout">Logout</button>
+        <button name="revokeBtn" onclick="revokeToken()" class="revoke">Revoke</button>
     </div>
 
     <div id="data" class="content"></div>
@@ -228,8 +229,8 @@
 
     };
 
-    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext"];
-    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext"];
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext", "revoke"];
+    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext", "revoke"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
         return !contextClassesToHideDefault.includes(value);
     });
@@ -317,6 +318,26 @@
             loginHint: keycloak.tokenParsed.preferred_username,
             maxAge: 12
         });
+    }
+
+    async function revokeToken() {
+
+        const bodyData = new URLSearchParams();
+        bodyData.append("token", keycloak.refreshToken);
+        bodyData.append("client_id", clientId);
+
+        let response = await sendRequest(`${keycloakUrl}/realms/${realm}/protocol/openid-connect/revoke`, {
+            method: "POST",
+            credentials: "include", // send auth cookies
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: bodyData
+        });
+
+        console.log(response);
+        // window.location.reload();
     }
 
     function switchContext() {

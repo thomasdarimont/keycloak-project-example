@@ -14,6 +14,8 @@ emailTheme: "internal-modern"
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"
 
+# update 123
+
 # Custom realm attributes
 attributes:
   # for http variant: http://apps.acme.test:4000
