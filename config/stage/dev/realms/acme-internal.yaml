@@ -14,6 +14,15 @@ emailTheme: "internal-modern"
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"
 
+browserSecurityHeaders:
+  contentSecurityPolicyReportOnly: ""
+  xContentTypeOptions: "nosniff"
+  xRobotsTag: "none"
+  xFrameOptions: "SAMEORIGIN"
+  contentSecurityPolicy: "frame-src 'self'; frame-ancestors 'self'; object-src 'none';"
+  xXSSProtection: "1; mode=block"
+  strictTransportSecurity: "max-age=31536000; includeSubDomains"
+
 # update 123
 
 # Custom realm attributes
