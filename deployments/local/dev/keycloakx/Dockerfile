@@ -10,6 +10,9 @@ USER root
 #RUN microdnf update -y && microdnf install -y java-11-openjdk-devel && microdnf clean all
 RUN microdnf update -y && microdnf install -y java-17-openjdk-devel && microdnf clean all
 
+# Use Java 17 by default
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk
+
 # Add nashorn javascript engine for new Java versions (JDK>14)
 # RUN curl -o /opt/keycloak/providers/nashorn-core-15.3.jar https://search.maven.org/remotecontent?filepath=org/openjdk/nashorn/nashorn-core/15.3/nashorn-core-15.3.jar
 
