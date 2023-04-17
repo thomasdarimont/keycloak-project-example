@@ -20,14 +20,12 @@ services:
     extra_hosts:
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
   acme-keycloak:
+    env_file:
+      - ./keycloak-tracing.env
+
     environment:
-      #JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar'
+      JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar -Dotel.javaagent.debug=false'
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://ops.acme.test:4317'
-      OTEL_JAVAAGENT_EXCLUDE_CLASSES: 'io.micrometer.*'
-      OTEL_SERVICE_NAME: acme-keycloak
-      #OTEL_PROPAGATORS: b3multi
-      OTEL_PROPAGATORS: tracecontext
-      OTEL_TRACES_EXPORTER: otlp
 
     volumes:
       - ../../../keycloak/config/quarkus-tracing.properties:/opt/keycloak/conf/quarkus.properties:z
