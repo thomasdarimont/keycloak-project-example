@@ -26,6 +26,3 @@ services:
     environment:
       JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar -Dotel.javaagent.debug=false'
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://ops.acme.test:4317'
-
-    volumes:
-      - ../../../keycloak/config/quarkus-tracing.properties:/opt/keycloak/conf/quarkus.properties:z

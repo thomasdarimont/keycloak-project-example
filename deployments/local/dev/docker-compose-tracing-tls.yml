@@ -27,6 +27,3 @@ services:
   acme-keycloak:
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: 'https://ops.acme.test:4317'
-
-    volumes:
-      - ../../../keycloak/config/quarkus-tracing-tls.properties:/opt/keycloak/conf/quarkus.properties:z
