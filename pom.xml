@@ -18,7 +18,7 @@
         <module>apps/backend-api-springboot</module>
         <module>apps/backend-api-springboot-reactive</module>
         <module>apps/backend-api-springboot3</module>
-        <module>apps/backend-api-micronaut</module>
+<!--        <module>apps/backend-api-micronaut</module>-->
         <module>apps/offline-session-client</module>
         <module>apps/spring-boot-device-flow-client</module>
         <module>apps/frontend-webapp-springboot</module>
