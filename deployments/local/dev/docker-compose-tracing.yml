@@ -1,5 +1,6 @@
 # https://quarkus.io/version/2.7/guides/opentelemetry#run-the-application
 services:
+
   acme-otel-collector:
     build:
       context: "../../../config/stage/dev/tls"
@@ -12,6 +13,7 @@ services:
       - ../../../config/stage/dev/otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml:z
     extra_hosts:
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
+
   acme-jaeger:
     image: jaegertracing/all-in-one:1.43
     ports:
@@ -19,6 +21,7 @@ services:
       - "14250:14250"
     extra_hosts:
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
+
   acme-keycloak:
     env_file:
       - ./keycloak-tracing.env
