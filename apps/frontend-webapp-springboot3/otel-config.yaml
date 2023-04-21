@@ -1,0 +1,9 @@
+otel:
+  trace:
+    ignore:
+      resources: [
+        "/health",
+        "/metrics",
+        "/webjars/**",
+        "/static"
+      ]

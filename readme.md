@@ -224,11 +224,14 @@ When TLS is enabled, it is enabled for all three of the following:
 #### Instrumentation
 In order to gain additional insights, other applications that integrate with Keycloak can also send traces to the collector.
 The [OpenTelemetry Documentation](https://opentelemetry.io/docs/instrumentation/) contains tools to instrument applications in various languages.
+
+You can use the `bin/downloadOtel.java` scrtipt to download the otel agent.
+
 Quarkus applications like Keycloak can also use the [Quarkus OpenTelemetry extension](https://quarkus.io/guides/opentelemetry) instead of the agent.
 An example for running an instrumented Spring Boot app could look like this:
 ```
 OTEL_METRICS_EXPORTER=none OTEL_SERVICE_NAME="frontend-webapp-springboot" OTEL_PROPAGATORS="b3multi" \
- OTEL_EXPORTER_OTLP_ENDPOINT="http://id.acme.test:4317" java -javaagent:bin/opentelemetry-javaagent-1.20.0.jar \
+ OTEL_EXPORTER_OTLP_ENDPOINT="http://id.acme.test:4317" java -javaagent:bin/opentelemetry-javaagent.jar \
  -jar apps/frontend-webapp-springboot/target/frontend-webapp-springboot-0.0.1-SNAPSHOT.jar
 ```
 The included IDEA run-config for the frontend-webapp-springboot module contains the necessary configuration to run that module with tracing enabled.
