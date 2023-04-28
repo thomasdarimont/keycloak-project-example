@@ -36,7 +36,8 @@ services:
       KC_DB: mssql
       KC_DB_PASSWORD: Keycloak123
       KC_DB_SCHEMA: dbo
-      KC_DB_URL_PROPERTIES: ";encrypt=true;trustServerCertificate=true;applicationName=keycloak"
+      # https://www.keycloak.org/server/db#_unicode_support_for_a_microsoft_sql_server_database
+      KC_DB_URL_PROPERTIES: ";encrypt=true;trustServerCertificate=true;applicationName=keycloak;sendStringParametersAsUnicode=false"
       # Workaround for Keycloak.X and MSSQL, see: https://groups.google.com/g/keycloak-dev/c/ZGuX0CFWqwo/m/fhhT8qnOBgAJ?utm_medium=email&utm_source=footer&pli=1
       KC_TRANSACTION_XA_ENABLED: "false"
       #KC_DB_DRIVER: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
