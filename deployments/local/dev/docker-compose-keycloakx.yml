@@ -29,6 +29,7 @@ services:
     # Enable remote debugging
       DEBUG: "true"
       DEBUG_PORT: "*:8787"
+      # DEBUG_SUSPEND: "y"
 
       # Append additional JVM Options besides the default JVM_OPTS
       # See: https://github.com/keycloak/keycloak/blob/main/distribution/server-x-dist/src/main/content/bin/kc.sh#L66
@@ -72,6 +73,8 @@ services:
 # see: org.keycloak.protocol.oidc.endpoints.LogoutEndpoint.logout(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
       - "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
 #      - "--log-level=info,org.hibernate:debug"
+#      - "--log-level=info,org.hibernate.SQL:debug"
+#      - "--log-level=info,org.hibernate.SQL:debug,org.hibernate.type.descriptor.sql.BasicBinder:trace"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
     extra_hosts:
