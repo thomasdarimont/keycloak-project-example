@@ -15,6 +15,12 @@ services:
       - "ssl_cert_file=/var/lib/postgresql/server.crt"
       - "-c"
       - "ssl_key_file=/var/lib/postgresql/server.key"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
+      - "-c"
+      - "pg_stat_statements.track=all"
+      - "-c"
+      - "max_connections=200"
     ports:
       - "55432:5432"
     healthcheck:
