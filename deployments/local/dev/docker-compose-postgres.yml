@@ -35,11 +35,22 @@ services:
     env_file:
       - ./keycloak-db.env
     environment:
-      DB_VENDOR: POSTGRES
-# See postgres JDBC URL parameters: https://jdbc.postgresql.org/documentation/head/connect.html
-      JDBC_PARAMS: ApplicationName=keycloak&ssl=true&sslmode=verify-ca&sslrootcert=/etc/x509/ca/tls.crt
+
+      # default 0
+      QUARKUS_DATASOURCE_JDBC_INITIAL_SIZE: 64
+
+      # default 0
+      QUARKUS_DATASOURCE_JDBC_MIN_SIZE: 64
+      # default 20, see https://quarkus.io/version/2.13/guides/all-config#quarkus-agroal_quarkus.datasource.jdbc.max-size
+      QUARKUS_DATASOURCE_JDBC_MAX_SIZE: 64
+      # default 20, see https://quarkus.io/version/2.13/guides/all-config#quarkus-vertx_quarkus.vertx.worker-pool-size
+      QUARKUS_VERTX_WORKER_POOL_SIZE: 64
+
+      # default 5 seconds, see https://quarkus.io/version/2.13/guides/all-config#quarkus-agroal_quarkus.datasource.jdbc.acquisition-timeout
+      QUARKUS_DATASOURCE_JDBC_ACQUISITION_TIMEOUT: 20
 
       KC_DB: postgres
+      # See postgres JDBC URL parameters: https://jdbc.postgresql.org/documentation/head/connect.html
       KC_DB_URL_PROPERTIES: "?ApplicationName=keycloak&ssl=true&sslmode=verify-ca&sslrootcert=/etc/x509/ca/tls.crt"
     volumes:
       # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
