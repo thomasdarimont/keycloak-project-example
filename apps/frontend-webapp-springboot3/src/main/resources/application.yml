@@ -35,3 +35,4 @@ logging:
     org:
       springframework:
         web: info
+#        security: trace
