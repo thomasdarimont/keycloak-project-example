@@ -143,6 +143,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "error", error);
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_USERINFO_REQUEST_ERROR_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_USERINFO_REQUEST_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordOauthUserInfoRequest(Event event) {
@@ -152,6 +153,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId));
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_USERINFO_REQUEST_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_USERINFO_REQUEST_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordOauthTokenExchange(Event event) {
@@ -161,6 +163,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId));
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_EXCHANGE_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_EXCHANGE_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordOauthTokenExchangeError(Event event) {
@@ -170,7 +173,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "error", event.getError());
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_EXCHANGE_ERROR_TOTAL.getName(), tags).increment();
-
+        metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_EXCHANGE_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordUserLogout(Event event) {
@@ -203,6 +206,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "provider", provider, "client_id", resolveClientId(clientId), "error", error);
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_CODE_TO_TOKEN_ERROR_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_CODE_TO_TOKEN_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordOauthCodeToToken(Event event) {
@@ -213,6 +217,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "provider", provider, "client_id", resolveClientId(clientId));
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_CODE_TO_TOKEN_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_CODE_TO_TOKEN_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordClientLogin(Event event) {
@@ -222,6 +227,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId));
 
         metricRegistry.counter(KeycloakMetrics.AUTH_CLIENT_LOGIN_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.AUTH_CLIENT_LOGIN_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordClientLoginError(Event event) {
@@ -232,6 +238,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "error", error);
 
         metricRegistry.counter(KeycloakMetrics.AUTH_CLIENT_LOGIN_ERROR_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.AUTH_CLIENT_LOGIN_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordOauthTokenRefreshError(Event event) {
@@ -243,6 +250,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "error", error, "provider", provider);
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_REFRESH_ERROR_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_REFRESH_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordOauthTokenRefresh(Event event) {
@@ -252,6 +260,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId));
 
         metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_REFRESH_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.OAUTH_TOKEN_REFRESH_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordUserRegistrationError(Event event) {
@@ -263,6 +272,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "error", error, "provider", provider);
 
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_REGISTER_ERROR_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_REGISTER_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordUserRegistration(Event event) {
@@ -272,6 +282,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId));
 
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_REGISTER_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_REGISTER_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordUserLoginError(Event event) {
@@ -283,6 +294,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "error", error, "provider", provider);
 
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_ERROR_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     protected void recordUserLogin(Event event) {
@@ -293,6 +305,7 @@ public class MetricEventRecorder {
         var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "provider", provider);
 
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_SUCCESS_TOTAL.getName(), tags).increment();
+        metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_ATTEMPT_TOTAL.getName(), tags).increment();
     }
 
     /**

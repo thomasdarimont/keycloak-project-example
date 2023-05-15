@@ -34,9 +34,13 @@ public class KeycloakMetrics {
 
     public static final KeycloakMetric INVENTORY_GROUPS_TOTAL = newKeycloakMetric("keycloak_inventory_groups_total", "Total groups per realm", Level.REALM);
 
+    public static final KeycloakMetric AUTH_CLIENT_LOGIN_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_auth_client_login_attempt_total", "Total attempted client logins", Level.REALM);
+
     public static final KeycloakMetric AUTH_CLIENT_LOGIN_SUCCESS_TOTAL = newKeycloakMetric("keycloak_auth_client_login_success_total", "Total successful client logins", Level.REALM);
 
     public static final KeycloakMetric AUTH_CLIENT_LOGIN_ERROR_TOTAL = newKeycloakMetric("keycloak_auth_client_login_error_total", "Total errors during client logins", Level.REALM);
+
+    public static final KeycloakMetric AUTH_USER_LOGIN_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_auth_user_login_attempt_total", "Total attempted user logins", Level.REALM);
 
     public static final KeycloakMetric AUTH_USER_LOGIN_SUCCESS_TOTAL = newKeycloakMetric("keycloak_auth_user_login_success_total", "Total successful user logins", Level.REALM);
 
@@ -46,21 +50,31 @@ public class KeycloakMetrics {
 
     public static final KeycloakMetric AUTH_USER_LOGOUT_ERROR_TOTAL = newKeycloakMetric("keycloak_auth_user_logout_error_total", "Total errors during user logouts", Level.REALM);
 
+    public static final KeycloakMetric AUTH_USER_REGISTER_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_auth_user_register_attempt_total", "Total attempted user registrations", Level.REALM);
+
     public static final KeycloakMetric AUTH_USER_REGISTER_SUCCESS_TOTAL = newKeycloakMetric("keycloak_auth_user_register_success_total", "Total user registrations", Level.REALM);
 
     public static final KeycloakMetric AUTH_USER_REGISTER_ERROR_TOTAL = newKeycloakMetric("keycloak_auth_user_register_error_total", "Total errors during user registrations", Level.REALM);
+
+    public static final KeycloakMetric OAUTH_TOKEN_REFRESH_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_oauth_token_refresh_attempt_total", "Total attempted token refreshes", Level.REALM);
 
     public static final KeycloakMetric OAUTH_TOKEN_REFRESH_SUCCESS_TOTAL = newKeycloakMetric("keycloak_oauth_token_refresh_success_total", "Total token refreshes", Level.REALM);
 
     public static final KeycloakMetric OAUTH_TOKEN_REFRESH_ERROR_TOTAL = newKeycloakMetric("keycloak_oauth_token_refresh_error_total", "Total errors during token refreshes", Level.REALM);
 
+    public static final KeycloakMetric OAUTH_CODE_TO_TOKEN_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_oauth_code_to_token_attempts_total", "Total attempts for code to token exchanges", Level.REALM);
+
     public static final KeycloakMetric OAUTH_CODE_TO_TOKEN_SUCCESS_TOTAL = newKeycloakMetric("keycloak_oauth_code_to_token_success_total", "Total code to token exchanges", Level.REALM);
 
     public static final KeycloakMetric OAUTH_CODE_TO_TOKEN_ERROR_TOTAL = newKeycloakMetric("keycloak_oauth_code_to_token_error_total", "Total errors during code to token exchanges", Level.REALM);
 
+    public static final KeycloakMetric OAUTH_USERINFO_REQUEST_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_oauth_userinfo_request_attempt_total", "Total attempted user info requests", Level.REALM);
+
     public static final KeycloakMetric OAUTH_USERINFO_REQUEST_SUCCESS_TOTAL = newKeycloakMetric("keycloak_oauth_userinfo_request_success_total", "Total user info requests", Level.REALM);
 
     public static final KeycloakMetric OAUTH_USERINFO_REQUEST_ERROR_TOTAL = newKeycloakMetric("keycloak_oauth_userinfo_request_error_total", "Total errors during user info requests", Level.REALM);
+
+    public static final KeycloakMetric OAUTH_TOKEN_EXCHANGE_ATTEMPT_TOTAL = newKeycloakMetric("keycloak_oauth_token_exchange_attempt_total", "Total attempted token refreshes", Level.REALM);
 
     public static final KeycloakMetric OAUTH_TOKEN_EXCHANGE_SUCCESS_TOTAL = newKeycloakMetric("keycloak_oauth_token_exchange_success_total", "Total token refreshes", Level.REALM);
 
@@ -144,7 +158,6 @@ public class KeycloakMetrics {
             Meter meter = meterRegistry.find(keycloakMetric.getName()).tags(realmTag).meter();
             if (meter != null) {
                 meterRegistry.remove(meter);
-                continue;
             }
         }
     }
