@@ -27,6 +27,9 @@ services:
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "resource_access.grafana.roles[0]"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT: "true"
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-piechart-panel"
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: "mailhog"
+      GF_SMTP_PORT: 1025
     volumes:
 #      - ./run/grafana:/var/lib/grafana:z
 #      - ../../../config/stage/dev/grafana/provisioning:/etc/grafana/provisioning:z
