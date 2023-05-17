@@ -73,6 +73,7 @@ services:
 # Workaround to allow logouts via old Keycloak Admin-Console
 # see: org.keycloak.protocol.oidc.endpoints.LogoutEndpoint.logout(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
       - "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
+#      - "--log-level=info,org.keycloak.models.sessions.infinispan.InfinispanUserSessionProvider:debug"
 #      - "--log-level=info,org.hibernate:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug,org.hibernate.type.descriptor.sql.BasicBinder:trace"
