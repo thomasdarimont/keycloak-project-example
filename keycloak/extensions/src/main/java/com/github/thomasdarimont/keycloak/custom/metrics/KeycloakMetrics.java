@@ -132,18 +132,8 @@ public class KeycloakMetrics {
 
     private RealmSessionStats collectRealmSessionStats(KeycloakSession session, RealmModel realm) {
 
-        Map<String, Long> userSessionsCounts = session.sessions().getActiveClientSessionStats(realm, false);
-        Map<String, Long> offlineUserSessionCounts = session.sessions().getActiveClientSessionStats(realm, false);
-
-        long userSessionsCount = 0L;
-        for (var entry : userSessionsCounts.entrySet()) {
-            userSessionsCount += entry.getValue();
-        }
-
-        long offlineSessionsCount = 0L;
-        for (var entry : offlineUserSessionCounts.entrySet()) {
-            offlineSessionsCount += entry.getValue();
-        }
+        var userSessionsCount = session.sessions().getActiveClientSessionStats(realm, false).values().stream().reduce(0L, Long::sum);
+        var offlineSessionsCount = session.sessions().getActiveClientSessionStats(realm, false).values().stream().reduce(0L, Long::sum);
 
         return new RealmSessionStats(userSessionsCount, offlineSessionsCount);
     }
