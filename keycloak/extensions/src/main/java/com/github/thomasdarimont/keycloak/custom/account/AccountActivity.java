@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.account;
 
 import com.github.thomasdarimont.keycloak.custom.auth.mfa.MfaInfo;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.TrustedDeviceInfo;
+import com.github.thomasdarimont.keycloak.custom.support.RealmUtils;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.email.EmailException;
@@ -22,7 +23,7 @@ public class AccountActivity {
     public static void onUserMfaChanged(KeycloakSession session, RealmModel realm, UserModel user, CredentialModel credential, MfaChange change) {
 
         try {
-            var realmDisplayName = getRealmDisplayName(realm);
+            var realmDisplayName = RealmUtils.getDisplayName(realm);
             var credentialLabel = getCredentialLabel(credential);
             var mfaInfo = new MfaInfo(credential.getType(), credentialLabel);
             switch (change) {
@@ -47,7 +48,7 @@ public class AccountActivity {
     }
 
     public static void onAccountDeletionRequested(KeycloakSession session, RealmModel realm, UserModel user, UriInfo uriInfo) {
-        var realmDisplayName = getRealmDisplayName(realm);
+        var realmDisplayName = RealmUtils.getDisplayName(realm);
         try {
             URI actionTokenUrl = AccountDeletion.createActionToken(session, realm, user, uriInfo);
             AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
@@ -62,7 +63,7 @@ public class AccountActivity {
 
     public static void onTrustedDeviceChange(KeycloakSession session, RealmModel realm, UserModel user, TrustedDeviceInfo trustedDeviceInfo, MfaChange change) {
         try {
-            var realmDisplayName = getRealmDisplayName(realm);
+            var realmDisplayName = RealmUtils.getDisplayName(realm);
 
             switch (change) {
                 case ADD:
@@ -86,7 +87,7 @@ public class AccountActivity {
     }
 
     public static void onAccountLockedOut(KeycloakSession session, RealmModel realm, UserModel user, UserLoginFailureModel userLoginFailure) {
-        var realmDisplayName = getRealmDisplayName(realm);
+        var realmDisplayName = RealmUtils.getDisplayName(realm);
         try {
             AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                 attributes.put("userLoginFailure", userLoginFailure);
@@ -95,14 +96,6 @@ public class AccountActivity {
         } catch (EmailException e) {
             log.errorf(e, "Failed to send email for user account block. userId=%s", userLoginFailure.getUserId());
         }
-    }
-
-    private static String getRealmDisplayName(RealmModel realm) {
-        var realmDisplayName = realm.getDisplayName();
-        if (realmDisplayName == null) {
-            realmDisplayName = realm.getName();
-        }
-        return realmDisplayName;
     }
 
     private static String getCredentialLabel(CredentialModel credential) {
