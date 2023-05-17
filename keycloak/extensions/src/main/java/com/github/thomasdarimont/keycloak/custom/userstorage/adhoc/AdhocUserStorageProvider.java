@@ -24,6 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Adhoc User storage that dynamically generates a local user for a lookup to ease load-tests, every password is valid, unless it starts with "invalid".
+ * Lookups for usernames that starts with "notfound" will always fail.
+ */
 public class AdhocUserStorageProvider implements UserStorageProvider, //
         UserLookupProvider,  //
         UserRegistrationProvider, //
@@ -96,8 +100,10 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
 
     @Override
     public boolean isValid(RealmModel realm, UserModel user, CredentialInput credentialInput) {
-        // accept all password for load test
-        return true;
+        // accept all password for load test, except if the password starts with "invalid", then always reject the password.
+
+        String challengeResponse = credentialInput.getChallengeResponse();
+        return challengeResponse == null || !challengeResponse.startsWith("invalid");
     }
 
     @Override
@@ -130,7 +136,7 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
 
         @Override
         public String getHelpText() {
-            return "Generates requested users on the fly. Useful for load-testing. Username lookup will fail for username and emails beginnging with 'notfound'. All provided passwords will be considered valid.";
+            return "Generates requested users on the fly. Useful for load-testing. Username lookup will fail for username and emails beginning with 'notfound'. All provided passwords will be considered valid, unless they begin with 'invalid'.";
         }
 
         @Override
