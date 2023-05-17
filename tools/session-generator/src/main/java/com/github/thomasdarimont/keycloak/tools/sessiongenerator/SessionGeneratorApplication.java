@@ -11,10 +11,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,31 +45,105 @@ public class SessionGeneratorApplication {
     @Bean
     CommandLineRunner clr() {
         return args -> {
-            var rt = new RestTemplate();
-            var headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            int sessions = 50_000;
-            int maxConcrrentRequests = 2048;
+            String baseUrl = "https://id.acme.test/auth";
+            var realmName = "acme-offline-test";
+            var issuerUri = baseUrl + "/realms/" + realmName;
+            var adminUri = baseUrl + "/admin/realms/" + realmName;
 
-            var sessionsCreated = new AtomicInteger();
-            var sessionsFailed = new AtomicInteger();
+//            deleteOfflineSession(issuerUri, adminUri, "897768ae-be97-3c8f-9e47-07e006360799", "app-mobile");
 
-            var issuerUri = "https://id.acme.test:8443/auth/realms/acme-offline-test";
-            var tokenUri = issuerUri + "/protocol/openid-connect/token";
+            generateOfflineSessions(issuerUri, 100_000);
+        };
+    }
+
+    private boolean deleteOfflineSession(String issuerUri, String adminUri, String userUuid, String clientId) {
+
+        var userUri = adminUri + "/users/" + userUuid;
+        var consentUri = userUri + "/consents/" + clientId;
+
+        var rt = new RestTemplate();
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBearerAuth(getAdminSvcAccessToken(issuerUri));
+
+
+        var request = new HttpEntity<>(headers);
+        try {
+            var deleteConsentResponse = rt.exchange(consentUri, HttpMethod.DELETE, request, Map.class);
+            System.out.println(deleteConsentResponse.getStatusCode());
+            return deleteConsentResponse.getStatusCode().is2xxSuccessful();
+        } catch (HttpClientErrorException hcee) {
+            System.out.printf("Could not delete client session %s%n", hcee.getMessage());
+            return false;
+        }
+    }
+
+    private static String getAdminSvcAccessToken(String issuerUri) {
+        var rt = new RestTemplate();
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        var requestBody = new LinkedMultiValueMap<String, String>();
+        requestBody.add("client_id", "acme-admin-svc");
+        requestBody.add("client_secret", "jOOgfhjFT2OWpimKUzRCj0or5FsUEqaK");
+        requestBody.add("grant_type", "client_credentials");
+        requestBody.add("scope", "email");
+
+        var request = new HttpEntity<>(requestBody, headers);
+
+        var tokenUri = issuerUri + "/protocol/openid-connect/token";
+        var accessTokenResponse = rt.exchange(tokenUri, HttpMethod.POST, request, Map.class);
+
+        var accessTokenResponseBody = accessTokenResponse.getBody();
+        return (String) accessTokenResponseBody.get("access_token");
+    }
+
+    private static void generateOfflineSessions(String issuerUri, int sessions) {
+        var rt = new RestTemplate();
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        var tokenUri = issuerUri + "/protocol/openid-connect/token";
+
+        int maxConcurrentRequests = 180;
+
+        var sessionsCreated = new AtomicInteger();
+        var sessionsFailed = new AtomicInteger();
+
+        var sessionsFile = Paths.get("data/" + DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss").format(LocalDateTime.now()) + ".sessions");
+
+
+        var generatedTokens = new ConcurrentLinkedDeque<Map.Entry<Integer, String>>();
+
+        try (var offlineTokenWriter = new PrintWriter(Files.newBufferedWriter(sessionsFile, StandardOpenOption.CREATE_NEW))) {
 
             Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
                 log.info("Sessions created: {} failed: {}", sessionsCreated.get(), sessionsFailed.get());
 
                 if (sessionsCreated.get() + sessionsFailed.get() >= sessions) {
                     System.exit(0);
+                    return;
                 }
+
+                int tokenCount = 0;
+                Map.Entry<Integer, String> entry;
+                while ((entry = generatedTokens.poll()) != null) {
+                    Integer idx = entry.getKey();
+                    String refreshToken = entry.getValue();
+
+                    offlineTokenWriter.print(idx);
+                    offlineTokenWriter.print('=');
+                    offlineTokenWriter.println(refreshToken);
+                    tokenCount++;
+                }
+                log.info("Wrote {} tokens to disk.", tokenCount);
 
             }, 1, 3, TimeUnit.SECONDS);
 
             var results = new ArrayList<Future<?>>();
             try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-                var semaphore = new Semaphore(maxConcrrentRequests);
+                var semaphore = new Semaphore(maxConcurrentRequests);
                 for (var i = 0; i < sessions; i++) {
 
                     var idx = i;
@@ -80,10 +165,12 @@ public class SessionGeneratorApplication {
 
                                     var response = rt.exchange(tokenUri, HttpMethod.POST, request, Map.class);
                                     if (response.getStatusCode().value() == 200) {
+                                        var refeshToken = (String) response.getBody().get("refresh_token");
                                         // System.out.println("Session created " + i);
                                         sessionsCreated.incrementAndGet();
+                                        generatedTokens.add(new AbstractMap.SimpleImmutableEntry<>(idx, refeshToken));
                                     } else {
-                                        //                            System.err.println("Failed to create session status=" + response.getStatusCodeValue());
+                                        // System.err.println("Failed to create session status=" + response.getStatusCodeValue());
                                         sessionsFailed.incrementAndGet();
                                     }
                                     return;
@@ -112,6 +199,8 @@ public class SessionGeneratorApplication {
             });
 
             System.out.printf("Generation of %s completed.%n", sessions);
-        };
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
