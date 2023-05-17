@@ -1,10 +1,13 @@
 package com.github.thomasdarimont.keycloak.custom.metrics;
 
+import com.github.thomasdarimont.keycloak.custom.metrics.RealmMetricUpdater.MetricUpdateValue;
+import com.github.thomasdarimont.keycloak.custom.metrics.RealmMetricUpdater.MultiMetricUpdateValues;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
+import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
 import org.hibernate.jpa.QueryHints;
 import org.keycloak.common.Version;
@@ -14,6 +17,7 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -27,6 +31,8 @@ public class KeycloakMetrics {
     public static final KeycloakMetric INSTANCE_METRICS_REFRESH = newKeycloakMetric("keycloak_instance_metrics_refresh_total_milliseconds", "Duration of Keycloak Metrics refresh in milliseconds.", Level.INSTANCE);
 
     public static final KeycloakMetric INVENTORY_REALMS_TOTAL = newKeycloakMetric("keycloak_inventory_realms_total", "Total realms per instance", Level.INSTANCE);
+
+    public static final KeycloakMetric INVENTORY_SESSIONS_TOTAL = newKeycloakMetric("keycloak_inventory_sessions_total", "Total sessions per realm", Level.REALM);
 
     public static final KeycloakMetric INVENTORY_USERS_TOTAL = newKeycloakMetric("keycloak_inventory_users_total", "Total users per realm", Level.REALM);
 
@@ -104,7 +110,7 @@ public class KeycloakMetrics {
                 log.debugf("Updating realm count");
                 var em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
                 Number realmCount = (Number) em.createQuery("select count(r) from RealmEntity r").setHint(QueryHints.HINT_READONLY, true).getSingleResult();
-                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_REALMS_TOTAL, realmCount, null);
+                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_REALMS_TOTAL, new MetricUpdateValue<>(realmCount), null);
                 log.debugf("Updated realm count");
             }
 
@@ -112,11 +118,41 @@ public class KeycloakMetrics {
             public void updateRealmMetrics(KeycloakSession session, RealmMetricUpdater metricUpdater, RealmModel realm, long lastUpdateTimestamp) {
                 // Performs the dynamic metrics collection on realm level: this is called when metrics need to be refreshed
 
-                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_USERS_TOTAL, session.users().getUsersCount(realm), realm);
-                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_CLIENTS_TOTAL, session.clients().getClientsCount(realm), realm);
-                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_GROUPS_TOTAL, session.groups().getGroupsCount(realm, false), realm);
+                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_USERS_TOTAL, new MetricUpdateValue<>(session.users().getUsersCount(realm)), realm);
+                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_CLIENTS_TOTAL, new MetricUpdateValue<>(session.clients().getClientsCount(realm)), realm);
+                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_GROUPS_TOTAL, new MetricUpdateValue<>(session.groups().getGroupsCount(realm, false)), realm);
+
+
+                var realmSessionStats = collectRealmSessionStats(session, realm);
+                var metricUpdateValue = new MultiMetricUpdateValues(Map.of(Tags.of("type", "online"), realmSessionStats.getOnlineSessions(), Tags.of("type", "offline"), realmSessionStats.getOfflineSessions()));
+                metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_SESSIONS_TOTAL, metricUpdateValue, realm);
             }
         });
+    }
+
+    private RealmSessionStats collectRealmSessionStats(KeycloakSession session, RealmModel realm) {
+
+        Map<String, Long> userSessionsCounts = session.sessions().getActiveClientSessionStats(realm, false);
+        Map<String, Long> offlineUserSessionCounts = session.sessions().getActiveClientSessionStats(realm, false);
+
+        long userSessionsCount = 0L;
+        for (var entry : userSessionsCounts.entrySet()) {
+            userSessionsCount += entry.getValue();
+        }
+
+        long offlineSessionsCount = 0L;
+        for (var entry : offlineUserSessionCounts.entrySet()) {
+            offlineSessionsCount += entry.getValue();
+        }
+
+        return new RealmSessionStats(userSessionsCount, offlineSessionsCount);
+    }
+
+    @Data
+    static class RealmSessionStats {
+
+        private final long onlineSessions;
+        private final long offlineSessions;
     }
 
     public void registerInstanceMetrics() {

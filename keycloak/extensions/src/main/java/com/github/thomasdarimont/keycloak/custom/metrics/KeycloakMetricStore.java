@@ -1,5 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.metrics;
 
+import com.github.thomasdarimont.keycloak.custom.metrics.RealmMetricUpdater.MetricUpdateValue;
+import com.github.thomasdarimont.keycloak.custom.metrics.RealmMetricUpdater.MultiMetricUpdateValues;
 import com.google.common.base.Stopwatch;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -118,10 +120,27 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
                 return;
             }
 
-            Tags tags = realm == null ? Tags.empty() : Tags.of("realm", realm.getName());
-            String metricKey = registerCustomMetricIfMissing(metric, tags);
-            Double metricValue = value.doubleValue();
-            metricsBuffer.put(metricKey, metricValue);
+            if (value instanceof MultiMetricUpdateValues) {
+
+                Map<Tags, Number> tagsToMetrics = ((MultiMetricUpdateValues) value).getValue();
+                Tags realmTags = realm == null ? Tags.empty() : Tags.of("realm", realm.getName());
+                for (var entry : tagsToMetrics.entrySet()) {
+                    Tags tags = entry.getKey();
+                    Number val = entry.getValue();
+
+                    var metricTags = Tags.concat(realmTags, tags);
+                    String metricKey = registerCustomMetricIfMissing(metric, metricTags);
+                    Double metricValue = val.doubleValue();
+                    metricsBuffer.put(metricKey, metricValue);
+                }
+            } else if (value instanceof MetricUpdateValue) {
+
+                Tags tags = realm == null ? Tags.empty() : Tags.of("realm", realm.getName());
+                String metricKey = registerCustomMetricIfMissing(metric, tags);
+                Double metricValue = ((MetricUpdateValue<? extends Number>) value).getValue().doubleValue();
+                metricsBuffer.put(metricKey, metricValue);
+
+            }
         };
 
         realmMetricsUpdater.updateGlobalMetrics(session, metricUpdater, lastUpdateTimestamp);
