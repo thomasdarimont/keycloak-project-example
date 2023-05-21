@@ -1,3 +1,5 @@
 services:
   acme-keycloak:
     user: "${USER}:${GROUP}"
+    # github ci only supports 2 CPUs max
+    cpus: 2
