@@ -133,7 +133,7 @@ public class KeycloakMetrics {
     private RealmSessionStats collectRealmSessionStats(KeycloakSession session, RealmModel realm) {
 
         var userSessionsCount = session.sessions().getActiveClientSessionStats(realm, false).values().stream().reduce(0L, Long::sum);
-        var offlineSessionsCount = session.sessions().getActiveClientSessionStats(realm, false).values().stream().reduce(0L, Long::sum);
+        var offlineSessionsCount = session.sessions().getActiveClientSessionStats(realm, true).values().stream().reduce(0L, Long::sum);
 
         return new RealmSessionStats(userSessionsCount, offlineSessionsCount);
     }
