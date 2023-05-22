@@ -30,7 +30,7 @@ services:
 
 # Default JAVA_OPTS
       #JAVA_OPTS: -Xms64m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true
-      JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+DisableExplicitGC -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -Djava.net.preferIPv4Stack=true"
+      JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+DisableExplicitGC -Djava.net.preferIPv4Stack=true"
 
       # Allow access via visualvm and jmc
       JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
