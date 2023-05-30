@@ -14,7 +14,13 @@ services:
       IMPORT_VALIDATE: "true"
 
 # See https://github.com/adorsys/keycloak-config-cli#log-level
-      #LOGGING_LEVEL_KEYCLOAKCONFIGCLI: "debug"
+      #LOGGING_LEVEL_KEYCLOAK_CONFIG_CLI: "DEBUG"
+      # Note: the above does not work but _KCC does
+      LOGGING_LEVEL_KCC: "DEBUG"
+
+      # Veeeeery verbose HTTP log!
+      #LOGGING_LEVEL_HTTP: "DEBUG"
+
       #LOGGING_LEVEL_ROOT: "DEBUG"
       LOGGING_LEVEL_ROOT: "INFO"
 

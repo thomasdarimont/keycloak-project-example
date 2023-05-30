@@ -1,7 +1,7 @@
 realm: acme-internal
 enabled: true
 displayName: Acme Internal
-displayNameHtml: Acme Internal
+displayNameHtml: "Acme Internal"
 loginWithEmailAllowed: true
 internationalizationEnabled: true
 supportedLocales: ["en","de"]
