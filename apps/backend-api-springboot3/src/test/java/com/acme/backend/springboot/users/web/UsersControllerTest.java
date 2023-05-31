@@ -1,4 +1,4 @@
-package com.acme.backend.springboot.users;
+package com.acme.backend.springboot.users.web;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -7,17 +7,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.acme.backend.springboot.users.config.WebSecurityConfig;
+import com.acme.backend.springboot.users.support.keycloak.KeycloakJwtAuthenticationConverter;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.OpenIdClaims;
 import com.c4_soft.springaddons.security.oauth2.test.annotations.WithMockJwtAuth;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class BackendApiSpringboot3AppTests {
+@WebMvcTest(controllers = UsersController.class)
+@Import({ WebSecurityConfig.class, KeycloakJwtAuthenticationConverter.class })
+class UsersControllerTest {
 
 	@Autowired
 	MockMvc api;
