@@ -9,14 +9,26 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${acme.jwt.issuerUri}
-          jwk-set-uri: ${acme.jwt.issuerUri}/protocol/openid-connect/certs
-# Use mock-service jwks-endpoint to obtain public key for testing
-#          jwk-set-uri: http://localhost:9999/jwks
+          audiences:
+          - https://localhost:${server.port}
 
-acme:
-  jwt:
-    issuerUri: https://id.acme.test:8443/auth/realms/acme-internal
+com:
+  c4-soft:
+    springaddons:
+      security:
+        issuers:
+          - location: https://localhost:8443/auth/realms/acme-internal
+            username-claim: preferred_username
+            authorities:
+              claims:
+                - realm_access.roles
+                - resource_access.spring-addons-confidential.roles
+              caze: UPPER
+              prefix: ROLE_
+        cors:
+        - path: "/api/**"
+          allowed-origins: "https://localhost:4443"
+        permit-all: 
 
 server:
   port: 4623
@@ -24,4 +36,3 @@ server:
     enabled: true
     key-store: ../../config/stage/dev/tls/acme.test+1.p12
     key-store-password: changeit
-    key-store-type: PKCS12
