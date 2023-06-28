@@ -84,7 +84,7 @@ class start {
         var useTracing = argList.contains(TRACING_OPT);
         var dockerHost = argList.stream().filter(s -> s.startsWith(DOCKER_HOST_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst();
 
-        var showHelp = argList.contains(HELP_CMD) || argList.isEmpty();
+        var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
             showHelp();
             System.exit(0);
