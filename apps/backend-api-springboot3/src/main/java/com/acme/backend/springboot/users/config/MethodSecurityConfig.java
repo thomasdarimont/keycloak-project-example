@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 
@@ -19,27 +18,26 @@ import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper
  */
 @Configuration
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, proxyTargetClass = true)
-class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
+@EnableMethodSecurity
+class MethodSecurityConfig {
 
     private final ApplicationContext applicationContext;
 
     private final PermissionEvaluator permissionEvaluator;
 
-    @Override
-    protected MethodSecurityExpressionHandler createExpressionHandler() {
+    @Bean
+    MethodSecurityExpressionHandler customMethodSecurityExpressionHandler() {
 
-        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        var expressionHandler = new DefaultMethodSecurityExpressionHandler();
         expressionHandler.setApplicationContext(applicationContext);
         expressionHandler.setPermissionEvaluator(permissionEvaluator);
-
         return expressionHandler;
     }
 
     @Bean
     GrantedAuthoritiesMapper keycloakAuthoritiesMapper() {
 
-        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
+        var mapper = new SimpleAuthorityMapper();
         mapper.setConvertToUpperCase(true);
         return mapper;
     }

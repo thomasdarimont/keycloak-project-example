@@ -53,7 +53,9 @@ class WebSecurityConfig {
             ahrc.anyRequest().fullyAuthenticated(); //
         });
         http.oauth2ResourceServer(arsc -> {
-            arsc.jwt().jwtAuthenticationConverter(keycloakJwtAuthenticationConverter);
+            arsc.jwt(jc -> {
+                jc.jwtAuthenticationConverter(keycloakJwtAuthenticationConverter);
+            });
         });
 
         return http.build();
