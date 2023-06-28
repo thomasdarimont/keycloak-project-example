@@ -40,7 +40,7 @@ public class KeycloakTestSupport {
     }
 
     public static KeycloakContainer createKeycloakContainer(String realmImportFileName) {
-        return createKeycloakContainer("quay.io/keycloak/keycloak:21.1.1", realmImportFileName);
+        return createKeycloakContainer("quay.io/keycloak/keycloak:21.1.2", realmImportFileName);
     }
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
