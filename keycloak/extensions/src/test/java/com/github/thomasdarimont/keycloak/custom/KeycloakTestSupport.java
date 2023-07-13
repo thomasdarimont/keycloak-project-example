@@ -19,9 +19,9 @@ import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriBuilder;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
@@ -40,7 +40,7 @@ public class KeycloakTestSupport {
     }
 
     public static KeycloakContainer createKeycloakContainer(String realmImportFileName) {
-        return createKeycloakContainer("quay.io/keycloak/keycloak:21.1.2", realmImportFileName);
+        return createKeycloakContainer("quay.io/keycloak/keycloak:22.0.0", realmImportFileName);
     }
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
@@ -100,7 +100,10 @@ public class KeycloakTestSupport {
 
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
-        var keycloakConfigCli = new GenericContainer<>("quay.io/adorsys/keycloak-config-cli:5.5.0-20.0.1");
+        var keycloakConfigCli = new GenericContainer<>(
+        //        "quay.io/adorsys/keycloak-config-cli:5.6.1-21.0.1"
+                "docker.io/thomasdarimont/keycloak-config-cli:5.7.0-22.0.0-edge"
+        );
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
         keycloakConfigCli.addEnv("IMPORT_FILES_LOCATION", "/config/*");

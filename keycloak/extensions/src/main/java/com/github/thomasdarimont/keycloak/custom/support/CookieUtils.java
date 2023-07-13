@@ -7,8 +7,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.util.CookieHelper;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.UriBuilder;
 
 public class CookieUtils {
 

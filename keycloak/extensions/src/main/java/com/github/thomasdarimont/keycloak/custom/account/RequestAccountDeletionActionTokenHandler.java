@@ -11,7 +11,7 @@ import org.keycloak.authentication.actiontoken.TokenUtils;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.time.LocalDate;
 

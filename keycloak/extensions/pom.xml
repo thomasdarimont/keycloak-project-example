@@ -14,12 +14,12 @@
     <name>${project.organization.name} Keycloak Extensions</name>
 
     <properties>
-        <cdi-api.version>2.0.2</cdi-api.version>
-        <smallrye-health.version>3.3.0</smallrye-health.version>
-        <microprofile-health-api.version>3.1</microprofile-health-api.version>
-        <micrometer.version>1.9.4</micrometer.version>
-        <resteasy.version>4.7.7.Final</resteasy.version>
-        <httpcomponents.version>4.5.13</httpcomponents.version>
+        <cdi-api.version>4.0.1</cdi-api.version>
+        <smallrye-health.version>4.0.2</smallrye-health.version>
+        <microprofile-health-api.version>4.0.1</microprofile-health-api.version>
+        <micrometer.version>1.11.1</micrometer.version>
+<!--        <resteasy.version>4.7.7.Final</resteasy.version>-->
+        <httpcomponents.version>4.5.14</httpcomponents.version>
         <slf4j-jboss-logging.version>1.2.1.Final</slf4j-jboss-logging.version>
     </properties>
 

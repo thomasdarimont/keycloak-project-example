@@ -29,7 +29,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.provider.ProviderConfigProperty;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.List;
 
 public class AcmeOTPFormAuthenticator extends OTPFormAuthenticator {

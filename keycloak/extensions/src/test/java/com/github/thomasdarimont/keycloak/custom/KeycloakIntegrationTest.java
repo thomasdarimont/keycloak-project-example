@@ -16,12 +16,12 @@ import org.keycloak.representations.IDToken;
 import org.testcontainers.containers.output.ToStringConsumer;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +141,7 @@ public class KeycloakIntegrationTest {
 
         @GET
         @Consumes(MediaType.APPLICATION_JSON)
-        @javax.ws.rs.Path("/realms/{realm}/custom-resources/ping")
+        @jakarta.ws.rs.Path("/realms/{realm}/custom-resources/ping")
         Map<String, Object> ping(@PathParam("realm") String realm, @HeaderParam("Authorization") String token);
     }
 }

@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="backend-api-quarkus" type="QuarkusRunConfigurationType" factoryName="Quarkus">
     <module name="backend-api-quarkus" />
-    <QsMavenRunConfiguration>
+    <backend-api-quarkus>
       <MavenSettings>
         <option name="myGeneralSettings" />
         <option name="myRunnerSettings" />
@@ -25,7 +25,8 @@
         </option>
       </MavenSettings>
       <targetMavenLocalRepo />
-    </QsMavenRunConfiguration>
+      <emulateTerminal>true</emulateTerminal>
+    </backend-api-quarkus>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

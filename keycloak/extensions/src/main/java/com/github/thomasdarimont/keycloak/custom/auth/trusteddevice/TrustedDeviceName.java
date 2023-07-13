@@ -7,7 +7,7 @@ import org.owasp.html.PolicyFactory;
 import ua_parser.OS;
 import ua_parser.UserAgent;
 
-import javax.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.HttpHeaders;
 
 public class TrustedDeviceName {
 
