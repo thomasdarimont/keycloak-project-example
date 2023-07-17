@@ -1,7 +1,6 @@
 services:
   acme-keycloak-provisioning:
-    image: docker.io/thomasdarimont/keycloak-config-cli:5.7.0-22.0.0-edge
-    #image: adorsys/keycloak-config-cli:5.6.1-21.0.1
+    image: adorsys/keycloak-config-cli:5.8.0-22.0.0
     env_file:
 # generated via start.java
       - ./../../../generated.env.tmp

@@ -101,8 +101,7 @@ public class KeycloakTestSupport {
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
         var keycloakConfigCli = new GenericContainer<>(
-        //        "quay.io/adorsys/keycloak-config-cli:5.6.1-21.0.1"
-                "docker.io/thomasdarimont/keycloak-config-cli:5.7.0-22.0.0-edge"
+                "quay.io/adorsys/keycloak-config-cli:5.8.0-22.0.0"
         );
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
