@@ -7,13 +7,11 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
+import org.keycloak.events.Details;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
-import org.keycloak.events.admin.OperationType;
-import org.keycloak.events.admin.ResourceType;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,8 +43,6 @@ public class MetricEventRecorder {
 
     private static final String ADMIN_EVENT_METRIC_NAME = "keycloak_admin_event";
 
-    private final Map<String, Counter> genericCounters;
-
     private final MeterRegistry metricRegistry;
 
     private final Map<EventType, Consumer<Event>> customUserEventHandlers;
@@ -56,7 +52,6 @@ public class MetricEventRecorder {
     public MetricEventRecorder(KeycloakMetrics keycloakMetrics) {
         this.metricRegistry = keycloakMetrics.getMeterRegistry();
         this.customUserEventHandlers = registerCustomUserEventHandlers();
-        this.genericCounters = registerGenericEventCounters();
     }
 
     private Map<EventType, Consumer<Event>> registerCustomUserEventHandlers() {
@@ -80,13 +75,6 @@ public class MetricEventRecorder {
         return map;
     }
 
-    private Map<String, Counter> registerGenericEventCounters() {
-        Map<String, Counter> initCounters = new HashMap<>();
-        registerUserEventCounter(initCounters);
-        registerAdminEventCounter(initCounters);
-        return Collections.unmodifiableMap(initCounters);
-    }
-
     public void recordEvent(Event event) {
         lookupUserEventHandler(event).accept(event);
     }
@@ -95,44 +83,23 @@ public class MetricEventRecorder {
 
         // TODO add capability to ignore certain admin events
 
-        OperationType operationType = event.getOperationType();
-        String counterName = ADMIN_EVENT_METRIC_NAME;
-        Counter counterMetadata = genericCounters.get(counterName);
-        ResourceType resourceType = event.getResourceType();
-        String realmName = resolveRealmName(event.getRealmId());
+        recordGenericAdminEvent(event);
+    }
 
-        if (counterMetadata == null) {
-            log.warnf("Counter %s for admin event operation type %s does not exist. Resource type: %s, realm: %s", counterName, operationType.name(), resourceType.name(), realmName);
-            return;
-        }
+    private void recordGenericAdminEvent(AdminEvent event) {
 
-        var tags = Tags.of("realm", realmName, "resource", resourceType.name(), "operation_type", operationType.name());
+        var operationType = event.getOperationType();
+        var resourceType = event.getResourceType();
+        var realmName = resolveRealmName(event.getRealmId());
+        var resourceTypeName = resourceType.name();
+        var operationTypeName = operationType.name();
+        var tags = Tags.of("realm", realmName, "resource", resourceTypeName, "operation_type", operationTypeName);
 
-        metricRegistry.counter(counterName, tags).increment();
+        metricRegistry.counter(ADMIN_EVENT_METRIC_NAME, tags).increment();
     }
 
     public Consumer<Event> lookupUserEventHandler(Event event) {
         return customUserEventHandlers.getOrDefault(event.getType(), this::recordGenericUserEvent);
-    }
-
-    /**
-     * Counter for all user events
-     */
-    private void registerUserEventCounter(Map<String, Counter> counters) {
-
-        var counterName = USER_EVENT_METRIC_NAME;
-        var counter = createCounter(counterName, false);
-        counters.put(counterName, counter);
-    }
-
-    /**
-     * Counter for all admin events
-     */
-    protected void registerAdminEventCounter(Map<String, Counter> counters) {
-
-        var counterName = ADMIN_EVENT_METRIC_NAME;
-        var counter = createCounter(counterName, true);
-        counters.put(counterName, counter);
     }
 
     protected void recordOauthUserInfoRequestError(Event event) {
@@ -301,8 +268,8 @@ public class MetricEventRecorder {
 
         var provider = getIdentityProvider(event);
         var realmName = resolveRealmName(event.getRealmId());
-        var clientId = event.getClientId();
-        var tags = Tags.of("realm", realmName, "client_id", resolveClientId(clientId), "provider", provider);
+        var clientId = resolveClientId(event.getClientId());
+        var tags = Tags.of("realm", realmName, "client_id", clientId, "provider", provider);
 
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_SUCCESS_TOTAL.getName(), tags).increment();
         metricRegistry.counter(KeycloakMetrics.AUTH_USER_LOGIN_ATTEMPT_TOTAL.getName(), tags).increment();
@@ -316,17 +283,15 @@ public class MetricEventRecorder {
     protected void recordGenericUserEvent(Event event) {
 
         var eventType = event.getType();
-        var counterName = USER_EVENT_METRIC_NAME;
-        var counter = genericCounters.get(counterName);
         var realmName = resolveRealmName(event.getRealmId());
+        var eventTypeName = eventType.name();
+        var tags = Tags.of("realm", realmName, "event_type", eventTypeName);
 
-        if (counter == null) {
-            log.warnf("Counter %s for event type %s does not exist. Realm: %s", counterName, eventType.name(), realmName);
-            return;
+        if (eventType == EventType.CUSTOM_REQUIRED_ACTION) {
+            tags = Tags.concat(tags, Tags.of("custom_required_action", event.getDetails().get(Details.CUSTOM_REQUIRED_ACTION)));
         }
 
-        var tags = Tags.of("realm", realmName, "event_type", eventType.name());
-        metricRegistry.counter(counterName, tags).increment();
+        metricRegistry.counter(USER_EVENT_METRIC_NAME, tags).increment();
     }
 
     /**
