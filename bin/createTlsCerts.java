@@ -36,6 +36,13 @@ class createTlsCerts {
     static final String TARGET_DIR_DEFAULT = "./config/stage/dev/tls";
 
     static final String P12_OPT = "--pkcs12";
+
+    static final String P12_FILE_OPT= "--p12-file";
+    static final String P12_FILE_ENV= "P12_FILE";
+    static final String P12_FILE_DEFAULT = "acme.test+1.p12";
+
+    static final String CLIENT = "--client";
+
     static final String KEEP_OPT = "--keep";
 
     static final String PEM_FILE_GLOB = "glob:**/*.pem";
@@ -64,7 +71,7 @@ class createTlsCerts {
         /* Set options from env, commandline or default */
         var domain = Optional.ofNullable(System.getenv(DOMAIN_ENV)).orElse(argList.stream().filter(s -> s.startsWith(DOMAIN_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(DOMAIN_DEFAULT));
         var targetDir = Optional.ofNullable(System.getenv(TARGET_DIR_ENV)).orElse(argList.stream().filter(s -> s.startsWith(TARGET_DIR_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(TARGET_DIR_DEFAULT));
-
+        var p12File = Optional.ofNullable(System.getenv(P12_FILE_ENV)).orElse(argList.stream().filter(s -> s.startsWith(P12_FILE_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst().orElse(P12_FILE_DEFAULT));
         /* Assure required folder exists */
         var folder = new File(targetDir);
         if (!folder.exists()) {
@@ -85,6 +92,11 @@ class createTlsCerts {
         commandLine.add("-install");
         if (argList.contains(P12_OPT)) {
             commandLine.add("-pkcs12");
+        }
+        if (argList.contains(CLIENT)) {
+            commandLine.add("-p12-file");
+            commandLine.add(p12File);
+            commandLine.add("-client");
         }
 
         commandLine.add(domain);
