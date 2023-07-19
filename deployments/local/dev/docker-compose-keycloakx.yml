@@ -54,6 +54,7 @@ services:
       - "start-dev"
       - "--http-enabled=true"
       - "--http-port=8080"
+      - "--https-client-auth=request"
       - "--metrics-enabled=true"
       - "--health-enabled=true"
       - "--features=preview"
@@ -78,7 +79,7 @@ services:
 #      - "--spi-well-known-openid-configuration-include-client-scopes=true"
 # Workaround to allow logouts via old Keycloak Admin-Console
 # see: org.keycloak.protocol.oidc.endpoints.LogoutEndpoint.logout(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-      - "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=true"
+      - "--spi-login-protocol-openid-connect-legacy-logout-redirect-uri=false"
 #      - "--log-level=info,org.keycloak.models.sessions.infinispan.InfinispanUserSessionProvider:debug"
 #      - "--log-level=info,org.hibernate:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug"
