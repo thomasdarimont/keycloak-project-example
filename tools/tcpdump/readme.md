@@ -17,9 +17,10 @@ docker build -t thomasdarimont/tcpdump .
 ## run examples
 Simply see what keycloak does with plain http:
 ```
-docker run --tty --net=container:dev_acme-keycloak_1 thomasdarimont/tcpdump tcpdump -N -A 'port 8080'
+docker run --tty --net=container:dev-acme-keycloak-1 thomasdarimont/tcpdump tcpdump -N -A 'port 8080'
 ```
 Pipe https traffic directly into wireshark: 
 ```
-docker run --tty --net=container:dev_acme-keycloak_1 thomasdarimont/tcpdump tcpdump -N -A 'port 8443' | wireshark -k -i -
+docker run --net=container:dev-acme-keycloak-1 thomasdarimont/tcpdump tcpdump -N -A 'port 8443' -U -s 65535  -w - 2>/dev/null | wireshark -k -i -
 ```
+
