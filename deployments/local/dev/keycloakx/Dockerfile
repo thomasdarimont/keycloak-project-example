@@ -2,7 +2,7 @@
 ARG KEYCLOAK_VERSION=22.0.1
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 #FROM thomasdarimont/keycloak:21.0.999.1
-ARG OTEL_AGENT_VERSION=1.25.0
+ARG OTEL_AGENT_VERSION=1.28.0
 USER root
 
 #RUN echo "Add nashorn javascript engine"
