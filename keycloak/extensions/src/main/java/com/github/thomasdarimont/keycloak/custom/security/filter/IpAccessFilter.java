@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloakx.custom.security;
+package com.github.thomasdarimont.keycloak.custom.security.filter;
 
 import io.netty.handler.ipfilter.IpFilterRuleType;
 import io.netty.handler.ipfilter.IpSubnetFilterRule;
@@ -19,9 +19,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Filter to restrict access to Keycloak Endpoints via CIDR IP ranges.
+ */
 @JBossLog
 @Provider
-public class AccessFilter implements ContainerRequestFilter {
+public class IpAccessFilter implements ContainerRequestFilter {
 
     public static final String DEFAULT_IP_FILTER_RULES = "127.0.0.1/24,192.168.80.1/16,172.0.0.1/8";
     public static final String ADMIN_IP_FILTER_RULES_ALLOW = "acme.keycloak.admin.ip-filter-rules.allow";
@@ -32,7 +35,7 @@ public class AccessFilter implements ContainerRequestFilter {
     @Context
     private HttpServerRequest httpServerRequest;
 
-    public AccessFilter() {
+    public IpAccessFilter() {
         this.adminPathIpFilterRules = createAdminIpFilterRules(Configuration.getConfig());
     }
 

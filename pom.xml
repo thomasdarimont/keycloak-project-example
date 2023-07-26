@@ -12,7 +12,6 @@
 
     <modules>
         <module>keycloak/extensions</module>
-        <module>keycloak/extensionsx</module>
         <module>keycloak/docker</module>
         <module>apps/backend-api-quarkus</module>
         <module>apps/backend-api-springboot</module>
