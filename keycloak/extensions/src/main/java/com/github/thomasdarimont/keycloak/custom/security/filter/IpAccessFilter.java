@@ -3,21 +3,22 @@ package com.github.thomasdarimont.keycloak.custom.security.filter;
 import io.netty.handler.ipfilter.IpFilterRuleType;
 import io.netty.handler.ipfilter.IpSubnetFilterRule;
 import io.vertx.core.http.HttpServerRequest;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.ext.Provider;
 import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.config.Config;
 import org.keycloak.quarkus.runtime.configuration.Configuration;
 import org.keycloak.utils.StringUtil;
 
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.ext.Provider;
 import java.net.InetSocketAddress;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Filter to restrict access to Keycloak Endpoints via CIDR IP ranges.
@@ -29,6 +30,8 @@ public class IpAccessFilter implements ContainerRequestFilter {
     public static final String DEFAULT_IP_FILTER_RULES = "127.0.0.1/24,192.168.80.1/16,172.0.0.1/8";
     public static final String ADMIN_IP_FILTER_RULES_ALLOW = "acme.keycloak.admin.ip-filter-rules.allow";
     public static final ForbiddenException FORBIDDEN_EXCEPTION = new ForbiddenException();
+    public static final Pattern SLASH_SPLIT_PATTERN = Pattern.compile("/");
+    public static final Pattern COMMA_SPLIT_PATTERN = Pattern.compile(",");
 
     private final PathIpFilterRules adminPathIpFilterRules;
 
@@ -53,10 +56,10 @@ public class IpAccessFilter implements ContainerRequestFilter {
 
         var rules = new LinkedHashSet<IpSubnetFilterRule>();
         var ruleType = IpFilterRuleType.ACCEPT;
-        var ruleDefinitions = List.of(filterRules.split(","));
+        var ruleDefinitions = List.of(COMMA_SPLIT_PATTERN.split(filterRules));
 
         for (var rule : ruleDefinitions) {
-            var ipAndCidrPrefix = rule.split("/");
+            var ipAndCidrPrefix = SLASH_SPLIT_PATTERN.split(rule);
             var ip = ipAndCidrPrefix[0];
             var cidrPrefix = Integer.parseInt(ipAndCidrPrefix[1]);
             rules.add(new IpSubnetFilterRule(ip, cidrPrefix, ruleType));
