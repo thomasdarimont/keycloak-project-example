@@ -374,6 +374,31 @@ identityProviders:
       pkceEnabled: "true"
       pkceMethod: "S256"
 
+  - alias: "linkedin"
+    providerId: "linkedin"
+    enabled: true
+    updateProfileFirstLoginMode: on
+    trustEmail: true
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: "first broker login"
+    # also uses acme-idp-mapper-linkedin-user-importer, see identityProviderMappers
+    config:
+      guiOrder: "6000"
+      syncMode: "FORCE"
+      clientId: "$(env:ACME_LINKEDIN_IDP_CLIENT_ID:-dummy)"
+      clientSecret: "$(env:ACME_LINKEDIN_IDP_CLIENT_SECRET:-dummysecret)"
+      # see https://learn.microsoft.com/en-us/linkedin/shared/references/v2/profile/lite-profile
+      defaultScope: "openid email r_liteprofile"
+      acceptsPromptNoneForwardFromClient: "false"
+      disableUserInfo: "false"
+      filteredByClaim: "false"
+      hideOnLoginPage: "false"
+      # see https://learn.microsoft.com/en-us/linkedin/shared/integrations/people/profile-api
+      profileProjection: "(id,firstName,lastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
+
 identityProviderMappers:
   - name: lastname-importer
     identityProviderAlias: idp-acme-saml
@@ -391,6 +416,11 @@ identityProviderMappers:
       user.attribute: firstName
       attributes: "[]"
       attribute.friendly.name: givenName
+  - name: "linkedin-profile-importer"
+    identityProviderAlias: "linkedin"
+    identityProviderMapper: "acme-idp-mapper-linkedin-user-importer"
+    config:
+      syncMode: "FORCE"
 
 authenticationFlows:
   ## Custom User Registration Flow
