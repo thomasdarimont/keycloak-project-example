@@ -745,6 +745,8 @@ users:
       phoneNumberVerified: ["true"]
       title: [""]
       salutation: ["mr"]
+      # Thomas
+      picture: ["https://en.gravatar.com/userimage/52342809/a957ac868585f91edf7eb9b7463328b9.jpeg?size=64"]
     credentials:
       - type: password
         userLabel: initial

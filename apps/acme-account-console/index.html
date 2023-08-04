@@ -671,6 +671,12 @@
             phoneNumberVerified = false;
         }
 
+        let picture = escapeHtml(keycloak.idTokenParsed['picture']);
+        if (!picture) {
+            // https://png-pixel.com
+            picture = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+        }
+
         let profileHtml = `
             <table class="profile">
                 <tr>
@@ -678,10 +684,12 @@
                     <td><input type="text" id="firstName" name="firstName" value="${firstName}" pattern="[\w\d][\w\d\s]{0,64}" placeholder="Firstname" required></td>
                     <td></td>
                     <td></td>
+                    <th rowspan="2"><img src="${picture}"></th>
                 </tr>
                 <tr>
                     <td class="label">Last name</td>
                     <td><input type="text" id="lastName" name="lastName" value="${lastName}" pattern="[\w\d][\w\d\s]{0,64}" placeholder="Lastname" required></td>
+                    <td></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -690,11 +698,13 @@
                     <td><span id="email">${email}</span></td>
                     <td title="${ emailVerified ? 'Email verified' : ''}">${ emailVerified ? '&#10004;' : ''}</td>
                     <td><a id="changeEmail" href="#" onclick="changeEmail();return false">Update</a></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">Phone</td>
                     <td><span id="phoneNumber">${phoneNumber}</span></td>
                     <td title="${ phoneNumberVerified ? 'Phone number verified' : ''}">${ phoneNumberVerified ? '&#10004;' : ''}</td>
+                    <td></td>
                     <td></td>
                 </tr>
             </table>
