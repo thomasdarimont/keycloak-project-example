@@ -781,3 +781,25 @@ users:
       realm-management:
         - view-identity-providers
         - view-users
+
+  - username: demo@local
+    email: demo@local
+    firstName: Dora
+    lastName: Demo
+    enabled: true
+    emailVerified: true
+    attributes:
+      locale: ["en"]
+      phoneNumber: ["+49178111222333"]
+      phoneNumberVerified: ["true"]
+      title: [""]
+      salutation: ["ms"]
+      # Thomas
+      picture: ["https://en.gravatar.com/userimage/52342809/a957ac868585f91edf7eb9b7463328b9.jpeg?size=64"]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false
+    groups:
+      - "Users"
