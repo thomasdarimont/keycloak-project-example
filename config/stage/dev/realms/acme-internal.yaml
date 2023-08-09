@@ -321,6 +321,7 @@ clients:
     secret: "$(env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret)"
     redirectUris:
       - "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps/broker/idp-acme-internal/endpoint/*"
+      - "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-apps/broker/idp-acme-internal/endpoint/*"
     webOrigins:
       - "+"
     defaultClientScopes:
@@ -328,6 +329,8 @@ clients:
       - "profile"
     optionalClientScopes:
       - "phone"
+    attributes:
+      "post.logout.redirect.uris": "+"
 
   - clientId: app-oauth2-proxy
     protocol: openid-connect
