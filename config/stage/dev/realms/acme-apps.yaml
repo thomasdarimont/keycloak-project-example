@@ -4,7 +4,7 @@ displayName: Acme Apps
 displayNameHtml: Acme Apps
 loginWithEmailAllowed: true
 registrationAllowed: true
-registrationEmailAsUsername: true
+registrationEmailAsUsername: false
 #loginTheme: apps
 loginTheme: internal-modern
 accountTheme: keycloak
