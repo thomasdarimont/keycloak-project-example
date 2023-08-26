@@ -179,6 +179,28 @@
                 </div>
             </#if>
 
+            <#if friendlyCaptchaEnabled??>
+                <!-- friendly-captcha integration -->
+                <script type="module" src="${friendlyCaptchaSourceModule}" async="" defer="" class=""></script>
+                <script nomodule="" src="${friendlyCaptchaSourceNoModule}" async="" defer=""></script>
+
+                <#-- See: https://docs.friendlycaptcha.com/#/widget_api?id=attribute-api-html-tags -->
+                <div class="frc-captcha"
+                     data-sitekey="${friendlyCaptchaSiteKey}"
+                     data-start="${friendlyCaptchaStart}"
+                     data-lang="${friendlyCaptchaLang}"
+                     data-solution-field-name="${friendlyCaptchaSolutionFieldName}"
+                     data-callback="captchaSolvedCallback"
+                ></div>
+
+                <script defer>
+                    function captchaSolvedCallback(solution) {
+                        let btnRegister = document.getElementById("kc-register");
+                        btnRegister.disabled = false;
+                    }
+                </script>
+            </#if>
+
             <div class="${properties.kcFormGroupClass!}">
                 <div id="kc-form-options" class="${properties.kcFormOptionsClass!}">
                     <div class="${properties.kcFormOptionsWrapperClass!}">
@@ -187,7 +209,8 @@
                 </div>
 
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
-                    <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
+                    <input id="kc-register" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
+                           <#if friendlyCaptchaEnabled??>disabled=""</#if>
                            type="submit" value="${msg("doRegister")}"/>
                  </div>
             </div>

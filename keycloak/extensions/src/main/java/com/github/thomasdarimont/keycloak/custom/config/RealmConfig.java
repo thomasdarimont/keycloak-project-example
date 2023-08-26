@@ -8,6 +8,10 @@ public class RealmConfig implements ConfigAccessor {
 
     private final RealmModel realm;
 
+    public RealmModel getRealm() {
+        return realm;
+    }
+
     @Override
     public String getType() {
         return "Realm";

@@ -46,6 +46,28 @@
                     </#if>
                 </div>
 
+                <#if friendlyCaptchaEnabled??>
+                    <!-- friendly-captcha integration -->
+                    <script type="module" src="${friendlyCaptchaSourceModule}" async="" defer="" class=""></script>
+                    <script nomodule="" src="${friendlyCaptchaSourceNoModule}" async="" defer=""></script>
+
+                <#-- See: https://docs.friendlycaptcha.com/#/widget_api?id=attribute-api-html-tags -->
+                    <div class="frc-captcha"
+                         data-sitekey="${friendlyCaptchaSiteKey}"
+                         data-start="${friendlyCaptchaStart}"
+                         data-lang="${friendlyCaptchaLang}"
+                         data-solution-field-name="${friendlyCaptchaSolutionFieldName}"
+                         data-callback="captchaSolvedCallback"
+                    ></div>
+
+                    <script defer>
+                        function captchaSolvedCallback(solution) {
+                            let btnKcLogin = document.getElementById("kc-login");
+                            btnKcLogin.disabled = false;
+                        }
+                    </script>
+                </#if>
+
                 <div class="${properties.kcFormGroupClass!} ${properties.kcFormSettingClass!}">
                     <div id="kc-form-options">
                         <#if realm.rememberMe && !usernameHidden??>
@@ -70,7 +92,12 @@
 
                   <div id="kc-form-buttons" class="${properties.kcFormGroupClass!}">
                       <input type="hidden" id="id-hidden-input" name="credentialId" <#if auth.selectedCredential?has_content>value="${auth.selectedCredential}"</#if>/>
-                      <input tabindex="4" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}" name="login" id="kc-login" type="submit" value="${msg("doLogIn")}"/>
+                      <input tabindex="4" class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonBlockClass!} ${properties.kcButtonLargeClass!}"
+                             name="login"
+                             id="kc-login"
+                             type="submit"
+                             <#if friendlyCaptchaEnabled??>disabled=""</#if>
+                             value="${msg("doLogIn")}"/>
                   </div>
             </form>
         </#if>

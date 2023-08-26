@@ -12,6 +12,7 @@ import org.keycloak.common.util.Time;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
 import org.keycloak.models.SingleUseObjectProvider;
+import org.keycloak.models.UserSessionModel;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.services.ErrorPageException;
 import org.keycloak.services.managers.AuthenticationManager;
@@ -66,7 +67,7 @@ public class SessionPropagationActionTokenHandler extends AbstractActionTokenHan
         authSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, "openid");
 
         var rememberMe = token.getRememberMe();
-        var userSession = session.sessions().createUserSession(realm, authSession.getAuthenticatedUser(), authSession.getAuthenticatedUser().getUsername(), clientConnection.getRemoteAddr(), OIDCLoginProtocol.LOGIN_PROTOCOL, rememberMe, null, null);
+        var userSession = session.sessions().createUserSession(null, realm, authSession.getAuthenticatedUser(), authSession.getAuthenticatedUser().getUsername(), clientConnection.getRemoteAddr(), OIDCLoginProtocol.LOGIN_PROTOCOL, rememberMe, null, null, UserSessionModel.SessionPersistenceState.PERSISTENT);
 
         AuthenticationManager.setClientScopesInSession(authSession);
         AuthenticationManager.createLoginCookie(session, realm, userSession.getUser(), userSession, tokenContext.getUriInfo(), clientConnection);
