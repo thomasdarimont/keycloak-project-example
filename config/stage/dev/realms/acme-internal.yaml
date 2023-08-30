@@ -677,6 +677,9 @@ roles:
   - name: "acme-user"
     description: "Acme User"
 
+  - name: "acme-admin"
+    description: "Acme Admin"
+
   - name: "acme-developer"
     description: "Acme Developer"
 
