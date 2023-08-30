@@ -5,6 +5,7 @@ import future.keywords.in
 # Map required client roles to clientId
 required_roles := {
     "app-minispa": "acme-user",
+#    "app-minispa": "acme-developer",
 #    "app-keycloak-website": "acme-developer"
 }
 
