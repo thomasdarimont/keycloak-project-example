@@ -8,6 +8,7 @@ import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
 import org.keycloak.models.utils.KeycloakModelUtils;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
@@ -127,7 +128,49 @@ public class TokenUtils {
         TokenManager.AccessTokenResponseBuilder tokenResponseBuilder = tokenManager.responseBuilder(realm, client, eventBuilder, session, iamUserSession, clientSessionCtx);
         AccessToken accessToken = tokenResponseBuilder.generateAccessToken().getAccessToken();
 
-        tokenAdjuster.accept(accessToken);
+        if (tokenAdjuster != null) {
+            tokenAdjuster.accept(accessToken);
+        }
+
+        AccessTokenResponse tokenResponse = tokenResponseBuilder.build();
+
+        return tokenResponse.getToken();
+    }
+
+    public static String generateAccessToken(KeycloakSession session, RealmModel realm, UserModel user, String clientId, String scope, Consumer<AccessToken> tokenAdjuster) {
+
+        KeycloakContext context = session.getContext();
+        ClientModel client = session.clients().getClientByClientId(realm, clientId);
+        String issuer = Urls.realmIssuer(session.getContext().getUri().getBaseUri(), realm.getName());
+
+        RootAuthenticationSessionModel rootAuthSession = new AuthenticationSessionManager(session).createAuthenticationSession(realm, false);
+        AuthenticationSessionModel iamAuthSession = rootAuthSession.createAuthenticationSession(client);
+
+        iamAuthSession.setAuthenticatedUser(user);
+        iamAuthSession.setProtocol(OIDCLoginProtocol.LOGIN_PROTOCOL);
+        iamAuthSession.setClientNote(OIDCLoginProtocol.ISSUER, issuer);
+        iamAuthSession.setClientNote(OIDCLoginProtocol.SCOPE_PARAM, scope);
+
+        ClientConnection connection = context.getConnection();
+        UserSessionModel iamUserSession = session.sessions().createUserSession(KeycloakModelUtils.generateId(), realm, user, user.getUsername(), connection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, TRANSIENT);
+
+        AuthenticationManager.setClientScopesInSession(iamAuthSession);
+        ClientSessionContext clientSessionCtx = TokenManager.attachAuthenticationSession(session, iamUserSession, iamAuthSession);
+
+        // Notes about client details
+        iamUserSession.setNote(ServiceAccountConstants.CLIENT_ID, client.getClientId());
+        iamUserSession.setNote(ServiceAccountConstants.CLIENT_HOST, connection.getRemoteHost());
+        iamUserSession.setNote(ServiceAccountConstants.CLIENT_ADDRESS, connection.getRemoteAddr());
+
+        TokenManager tokenManager = new TokenManager();
+
+        EventBuilder eventBuilder = new EventBuilder(realm, session, connection);
+        TokenManager.AccessTokenResponseBuilder tokenResponseBuilder = tokenManager.responseBuilder(realm, client, eventBuilder, session, iamUserSession, clientSessionCtx);
+        AccessToken accessToken = tokenResponseBuilder.generateAccessToken().getAccessToken();
+
+        if (tokenAdjuster != null) {
+            tokenAdjuster.accept(accessToken);
+        }
 
         AccessTokenResponse tokenResponse = tokenResponseBuilder.build();
 

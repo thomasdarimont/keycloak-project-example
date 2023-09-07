@@ -273,6 +273,23 @@ clients:
     defaultClientScopes: []
     optionalClientScopes: []
 
+  - clientId: acme-api-gateway
+    protocol: openid-connect
+    name: Acme API Gateway
+    description: "Acme API Gateway can translate API keys to access tokens via token-exchange"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+      - "roles"
+    optionalClientScopes:
+      - "phone"
+
 users:
   - username: employee
     email: employee@local
@@ -300,4 +317,15 @@ users:
       - type: password
         userLabel: initial
         value: test
+        temporary: false
+
+  - username: api-user-42
+    enabled: true
+    realmRoles: []
+    clientRoles:
+      account: []
+    credentials:
+      - type: password
+        userLabel: initial
+        value: "7FTt1Q0PG5yv3YqaZGhEB19KIollpNFurA"
         temporary: false
