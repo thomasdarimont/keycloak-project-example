@@ -3,11 +3,15 @@ package demo.jwtclientauth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.util.Base64URL;
+import com.nimbusds.jose.util.X509CertUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.boot.CommandLineRunner;
@@ -27,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -54,7 +59,7 @@ public class JwtClientAuthApp {
             var tokenLifeTime = Duration.ofHours(24);
 
             //  generate client JWT
-            String clientJwtToken = generateClientJwtToken(clientId, issuer, issuedAt, tokenLifeTime);
+            var clientJwtToken = generateClientJwtToken(clientId, issuer, issuedAt, tokenLifeTime);
             log.info("Client JWT Token: {}", clientJwtToken);
 
             var accessTokenResponse = requestToken(issuer, clientJwtToken);
@@ -90,15 +95,40 @@ public class JwtClientAuthApp {
                 Map.entry("exp", issuedAt.plus(tokenLifeTime).getEpochSecond()),  //
                 Map.entry("jti", UUID.randomUUID().toString()) //
         );
+
+        // x5t header
+
         log.info("Payload: {}", new ObjectMapper().writeValueAsString(clientJwtPayload));
 
-        var jwsObject = new JWSObject(new JWSHeader.Builder(JWSAlgorithm.RS256).build(), new Payload(clientJwtPayload));
+        var cert = parseCertificate("apps/jwt-client-authentication/client_cert.pem");
+        var privateKey = readPrivateKeyFile("apps/jwt-client-authentication/client_key.pem");
+        var base64URL = createKeyThumbprint(cert, "SHA-1");
 
-        var signer = new RSASSASigner(readPrivateKeyFile("apps/jwt-client-authentication/client_key.pem"));
+        var jwsObject = new JWSObject(new JWSHeader
+                .Builder(JWSAlgorithm.RS256)
+                .type(JOSEObjectType.JWT)
+                .x509CertThumbprint(base64URL) // SHA-1
+                .build(), new Payload(clientJwtPayload));
+
+        var signer = new RSASSASigner(privateKey);
         jwsObject.sign(signer);
 
         var clientJwtToken = jwsObject.serialize();
         return clientJwtToken;
+    }
+
+    private X509Certificate parseCertificate(String path) {
+        try {
+            var cert = X509CertUtils.parse(Files.readString(Path.of(path), Charset.defaultCharset()));
+            return cert;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Base64URL createKeyThumbprint(X509Certificate cert, String hashAlgorithm) throws JOSEException {
+        var rsaKey = RSAKey.parse(cert);
+        return rsaKey.computeThumbprint(hashAlgorithm);
     }
 
     static RSAPrivateKey readPrivateKeyFile(String path) {
