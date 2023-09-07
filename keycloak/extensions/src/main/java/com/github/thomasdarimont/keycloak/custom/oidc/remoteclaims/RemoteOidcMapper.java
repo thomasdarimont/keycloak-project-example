@@ -68,6 +68,10 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
 
     private static final String CONFIG_ADD_AUTH_HEADER = "addAuthHeader";
 
+    private static final String CONFIG_INTERNAL_CLIENT_ID = "internalClientId";
+
+    private static final String DEFAULT_INTERNAL_CLIENT_ID = "admin-cli";
+
     public static final String DEFAULT_REMOTE_CLAIM_URL = "https://id.acme.test:4543/api/users/claims?userId={userId}&username={username}&clientId={clientId}&issuer={issuer}";
 
     public static final String ROOT_OBJECT = "$ROOT$";
@@ -90,7 +94,15 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
                 .type(ProviderConfigProperty.BOOLEAN_TYPE)
                 .label("Add Authorization Header")
                 .helpText("If set to true, an dynamically generated access-token will added to the Authorization header of the request")
-                .defaultValue(false)
+                .defaultValue(true)
+                .add()
+
+                .property()
+                .name(CONFIG_INTERNAL_CLIENT_ID)
+                .type(ProviderConfigProperty.STRING_TYPE)
+                .label("Internal Client ID")
+                .helpText("The client_id to generate the internal access-token for the Authorization header. Defaults to admin-cli.")
+                .defaultValue(DEFAULT_INTERNAL_CLIENT_ID)
                 .add()
 
                 .build();
@@ -143,6 +155,13 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
             issuer = Urls.realmIssuer(context.getUri().getBaseUri(), context.getRealm().getName());
         }
 
+
+        var internalClientId = mappingModel.getConfig().getOrDefault(CONFIG_INTERNAL_CLIENT_ID, DEFAULT_INTERNAL_CLIENT_ID);
+        if (internalClientId.equals(clientId)) {
+            // workaround for infinite loop when generating remote claims into access-token.
+            return;
+        }
+
         Object claimValue = fetchRemoteClaims(mappingModel, userSession, session, issuer, clientId);
         LOGGER.infof("setClaim %s=%s", mappingModel.getName(), claimValue);
 
@@ -169,19 +188,23 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
     private Object fetchRemoteClaims(ProtocolMapperModel mappingModel, UserSessionModel userSession, KeycloakSession session, String issuer, String clientId) {
 
         try {
-            String url = createUri(mappingModel, userSession, issuer, clientId);
-            SimpleHttp http = SimpleHttp.doGet(url, session);
+            var url = createUri(mappingModel, userSession, issuer, clientId);
+            var http = SimpleHttp.doGet(url, session);
 
-            addAuthHeaderIfNecessary(mappingModel, http, userSession, session);
-
-            SimpleHttp.Response response = http.asResponse();
-
-            if (response.getStatus() != 200) {
-                log.warnf("Could not fetch remote claims for user. status=%s", response.getStatus());
-                return null;
+            if (Boolean.parseBoolean(mappingModel.getConfig().getOrDefault(CONFIG_ADD_AUTH_HEADER, "false"))) {
+                var accessToken = createInternalAccessToken(userSession, session);
+                http.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
             }
 
-            return response.asJson();
+            try (var response = http.asResponse()) {
+
+                if (response.getStatus() != 200) {
+                    log.warnf("Could not fetch remote claims for user. status=%s", response.getStatus());
+                    return null;
+                }
+
+                return response.asJson();
+            }
         } catch (IOException e) {
             log.warnf("Could not fetch remote claims for user. error=%s", e.getMessage());
         }
@@ -189,17 +212,11 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
         return null;
     }
 
-    protected void addAuthHeaderIfNecessary(ProtocolMapperModel mappingModel, SimpleHttp http, UserSessionModel userSession, KeycloakSession session) {
-
-        if (!Boolean.parseBoolean(mappingModel.getConfig().getOrDefault(CONFIG_ADD_AUTH_HEADER, "false"))) {
-            return;
-        }
-
-        String accessToken = TokenUtils.generateAccessToken(session, userSession, "admin-cli", "iam", token -> {
+    private String createInternalAccessToken(UserSessionModel userSession, KeycloakSession session) {
+        return TokenUtils.generateAccessToken(session, userSession, "admin-cli", "iam", token -> {
             // mark this token request as an internal iam request
             token.getOtherClaims().put("groups", List.of("iam"));
         });
-        http.header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
     }
 
     protected String createUri(ProtocolMapperModel mappingModel, UserSessionModel userSession, String issuer, String clientId) {
