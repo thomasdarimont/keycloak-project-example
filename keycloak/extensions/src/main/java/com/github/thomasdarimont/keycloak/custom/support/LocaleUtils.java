@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.custom.support;
 
-import org.jetbrains.annotations.NotNull;
 import org.keycloak.http.HttpRequest;
 import org.keycloak.models.RealmModel;
 
@@ -8,7 +7,6 @@ import java.util.Locale;
 
 public class LocaleUtils {
 
-    @NotNull
     public static Locale extractLocaleWithFallbackToRealmLocale(HttpRequest request, RealmModel realm) {
 
         if (request == null && realm == null) {

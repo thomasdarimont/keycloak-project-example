@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.security.friendlycaptcha;
 
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
-import org.jetbrains.annotations.NotNull;
 import org.keycloak.models.RealmModel;
 
 public class FriendlyCaptchaConfig extends RealmConfig {
@@ -12,12 +11,10 @@ public class FriendlyCaptchaConfig extends RealmConfig {
         super(realm);
     }
 
-    @NotNull
     public String getSiteKey() {
         return getString("friendlyCaptchaSiteKey");
     }
 
-    @NotNull
     public String getSolutionFieldName() {
         return getString("friendlyCaptchaSolutionFieldName");
     }
