@@ -72,9 +72,11 @@ public class UsersResource {
         log.infof("### Generating dynamic claims for user. issuer=%s client_id=%s user_id=%s username=%s",
                 issuer, clientId, userId, username
         );
-        Map<String, Object> data = new HashMap<>();
-        data.put("acme", Map.of("roles", List.of(clientId + "_user")));
 
-        return data;
+        var acmeData = new HashMap<String, Object>();
+        acmeData.put("roles", List.of(clientId + "_user"));
+        acmeData.put("foo", "bar");
+
+        return Map.of("acme", acmeData);
     }
 }
