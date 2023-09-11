@@ -384,7 +384,7 @@ identityProviders:
       pkceMethod: "S256"
 
   - alias: "linkedin"
-    providerId: "linkedin"
+    providerId: "linkedin-openid-connect"
     enabled: true
     updateProfileFirstLoginMode: on
     trustEmail: true
@@ -400,13 +400,14 @@ identityProviders:
       clientId: "$(env:ACME_LINKEDIN_IDP_CLIENT_ID:-dummy)"
       clientSecret: "$(env:ACME_LINKEDIN_IDP_CLIENT_SECRET:-dummysecret)"
       # see https://learn.microsoft.com/en-us/linkedin/shared/references/v2/profile/lite-profile
-      defaultScope: "openid email r_liteprofile"
+      defaultScope: "openid email profile r_liteprofile"
       acceptsPromptNoneForwardFromClient: "false"
       disableUserInfo: "false"
       filteredByClaim: "false"
       hideOnLoginPage: "false"
       # see https://learn.microsoft.com/en-us/linkedin/shared/integrations/people/profile-api
-      profileProjection: "(id,firstName,lastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
+      # profileProjection not supported by new linkedin-openid-connect provider
+      # profileProjection: "(id,firstName,lastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
 
 identityProviderMappers:
   - name: lastname-importer

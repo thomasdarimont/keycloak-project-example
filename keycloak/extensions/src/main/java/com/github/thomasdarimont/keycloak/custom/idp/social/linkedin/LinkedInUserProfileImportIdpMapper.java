@@ -52,9 +52,22 @@ public class LinkedInUserProfileImportIdpMapper extends AbstractIdentityProvider
     }
 
     @Override
-    public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+    public void importNewUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
+        log.debugf("Create User based on linkedin profile data. realm=%s userId=%s", realm.getName(), user.getId());
+        updateUser(realm, user, context, Action.CREATE);
+    }
 
+    @Override
+    public void updateBrokeredUser(KeycloakSession session, RealmModel realm, UserModel user, IdentityProviderMapperModel mapperModel, BrokeredIdentityContext context) {
         log.debugf("Update User based on linkedin profile data. realm=%s userId=%s", realm.getName(), user.getId());
+        updateUser(realm, user, context, Action.UPDATE);
+    }
+
+    enum Action {
+        CREATE, UPDATE
+    }
+
+    private static void updateUser(RealmModel realm, UserModel user, BrokeredIdentityContext context, Action action) {
 
         Map<String, Object> contextData = context.getContextData();
         if (contextData == null) {
@@ -66,12 +79,11 @@ public class LinkedInUserProfileImportIdpMapper extends AbstractIdentityProvider
             return;
         }
         try {
-            String profilePictureUrl = userInfo.get("profilePicture").get("displayImage~").get("elements").get(0).get("identifiers").get(0).get("identifier").asText();
+            String profilePictureUrl = userInfo.get("picture").asText();
             user.setSingleAttribute("picture", profilePictureUrl);
         } catch (Exception ex) {
             log.warnf("Could not extract user profile picture from linkedin profile data. realm=%s userId=%s error=%s", realm.getName(), user.getId(), ex.getMessage());
         }
-
     }
 
     @Override

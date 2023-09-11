@@ -40,7 +40,7 @@ public class KeycloakTestSupport {
     }
 
     public static KeycloakContainer createKeycloakContainer(String realmImportFileName) {
-        return createKeycloakContainer("quay.io/keycloak/keycloak:22.0.1", realmImportFileName);
+        return createKeycloakContainer("quay.io/keycloak/keycloak:22.0.2", realmImportFileName);
     }
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
@@ -115,6 +115,8 @@ public class KeycloakTestSupport {
         keycloakConfigCli.addEnv("APPS_FRONTEND_URL_MINISPA", "http://localhost:4000");
         keycloakConfigCli.addEnv("APPS_FRONTEND_URL_GREETME", "http://localhost:4000");
         keycloakConfigCli.addEnv("ACME_AZURE_AAD_TENANT_URL", "https://login.microsoftonline.com/dummy-azuread-tenant-id");
+        keycloakConfigCli.addEnv("LOGGING_LEVEL_ROOT", "INFO");
+
 
         // TODO make the realm config folder parameterizable
         keycloakConfigCli.addFileSystemBind("../../config/stage/dev/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
