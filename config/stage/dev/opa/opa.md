@@ -10,7 +10,7 @@ Example Authenticator Config
 ![img.png](docs/auth-config.png)
 
 OPA URL: `http://localhost:8181/v1/policies/iam/keycloak/allow`
-Attributes: `acme.greeting`
+Attributes: `acme_greeting`
 
 # Deploy policies
 

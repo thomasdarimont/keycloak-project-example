@@ -2,23 +2,28 @@ package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
-import org.keycloak.models.KeycloakContext;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
-import org.keycloak.representations.AccessToken;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.container.ResourceContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.keycloak.forms.login.LoginFormsProvider;
+import org.keycloak.models.KeycloakContext;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.RealmModel;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.services.ErrorResponseException;
+import org.keycloak.services.managers.AuthenticationManager;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +57,7 @@ public class CustomResource {
         payload.put("realm", realm.getName());
         payload.put("user", token == null ? "anonymous" : token.getPreferredUsername());
         payload.put("timestamp", System.currentTimeMillis());
-        payload.put("greeting", new RealmConfig(realm).getString("acme.greeting", "Greetings!"));
+        payload.put("greeting", new RealmConfig(realm).getString("acme_greeting", "Greetings!"));
 
         return Response.ok(payload).build();
     }
@@ -85,5 +90,27 @@ public class CustomResource {
     @Path("mobile/session-propagation")
     public OfflineSessionPropagationResource sessionPropagation() {
         return resourceContext.initResource(new OfflineSessionPropagationResource(session, token));
+    }
+
+    /**
+     * https://id.acme.test:8443/auth/realms/acme-internal/custom-resources/admin/settings
+     *
+     * @return
+     */
+    @Path("admin/settings")
+    public AdminSettingsResource adminSettings() {
+        KeycloakContext context = session.getContext();
+        var authResult = AuthenticationManager.authenticateIdentityCookie(session, context.getRealm(), true);
+        if (authResult == null) {
+            throw new ErrorResponseException("access_denied", "Admin auth required", Response.Status.FORBIDDEN);
+        }
+
+        var localRealmAdminRole = context.getRealm().getClientByClientId("realm-management").getRole("realm-admin");
+        if (!authResult.getUser().hasRole(localRealmAdminRole)) {
+            var loginForm = session.getProvider(LoginFormsProvider.class);
+            throw new WebApplicationException(loginForm.createErrorPage(Response.Status.FORBIDDEN));
+        }
+
+        return resourceContext.initResource(new AdminSettingsResource(session, authResult));
     }
 }

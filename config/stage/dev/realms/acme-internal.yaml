@@ -34,7 +34,7 @@ attributes:
   "acme_privacy_url": "https://apps.acme.test:4443/site/privacy.html"
   #"acme_logo_url": "no example, should be taken from client or null"
   "acme_account_deleted_url": "https://apps.acme.test:4443/site/accountdeleted.html"
-  "acme.greeting": "Hello!"
+  "acme_greeting": "Hello"
 
 # Bruteforce Protection
 bruteForceProtected: true
@@ -663,7 +663,7 @@ authenticatorConfig:
       useWebOtp: true
   - alias: "acme-opa-auth-default"
     config:
-      # realmAttributes: "acme.greeting"
+      # realmAttributes: "acme_greeting"
       authzUrl: "http://acme-opa:8181/v1/data/iam/keycloak/allow"
       useUserAttributes: "true"
       useClientAttributes: "true"
@@ -679,6 +679,11 @@ roles:
 
   - name: "acme-admin"
     description: "Acme Admin"
+    composite: true
+    composites:
+      client:
+        "realm-management":
+          - realm-admin
 
   - name: "acme-developer"
     description: "Acme Developer"
@@ -779,6 +784,23 @@ users:
     - "acme-user-support"
     groups:
       - "Users"
+
+  - username: admin
+    email: admin@local
+    firstName: Arno
+    lastName: Admin
+    enabled: true
+    attributes:
+      locale: ["de"]
+      title: [""]
+      salutation: ["mr"]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false
+    realmRoles:
+      - "acme-admin"
 
   - username: service-account-app-demo-service
     enabled: true
