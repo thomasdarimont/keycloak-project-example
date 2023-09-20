@@ -25,6 +25,32 @@ clients:
     fullScopeAllowed: false
     redirectUris:
       - "http://localhost/acme-standard-client/login*"
+      - "https://flowsimulator.pragmaticwebsecurity.com"
+    webOrigins:
+      - "+"
+    attributes:
+#      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
+
+  - id: acme-public-client-1
+    clientId: acme-public-client-1
+    protocol: openid-connect
+    name: Client with Standard Flow
+    description: "Public Client Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    fullScopeAllowed: false
+    redirectUris:
+      - "http://localhost/acme-public-client/login*"
+      - "https://flowsimulator.pragmaticwebsecurity.com"
+    webOrigins:
+      - "+"
+    attributes:
+      #      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
 
   - id: acme-implicit-client-1
     clientId: acme-implicit-client
