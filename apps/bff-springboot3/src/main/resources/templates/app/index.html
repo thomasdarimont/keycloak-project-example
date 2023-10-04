@@ -1,0 +1,83 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>SPA BFF3 Demo</title>
+
+    <script>
+        (function checkLoginState() {
+
+            function enableInactivityMonitoring() {
+
+                var hidden, visibilityChange;
+                if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+                    hidden = "hidden";
+                    visibilityChange = "visibilitychange";
+                } else if (typeof document.msHidden !== "undefined") {
+                    hidden = "msHidden";
+                    visibilityChange = "msvisibilitychange";
+                } else if (typeof document.webkitHidden !== "undefined") {
+                    hidden = "webkitHidden";
+                    visibilityChange = "webkitvisibilitychange";
+                }
+
+                function handleVisibilityChange(event) {
+
+                    if (document[hidden]) {
+                        return;
+                    }
+
+                    fetch("/bff/auth/check-session", {credentials: 'include', redirect: 'follow'})
+                        .then(function (response) {
+                            if (!response.ok && response.status == 401) {
+                                window.location.reload();
+                                return;
+                            }
+
+                            if (response.redirected) {
+                                window.location.href = response.url;
+                                return;
+                            }
+                        });
+                }
+
+                if (!(typeof document.addEventListener === "undefined" || hidden === undefined)) {
+                    document.addEventListener(visibilityChange, handleVisibilityChange, false);
+                }
+            }
+
+            function onDomContentLoaded() {
+                enableInactivityMonitoring();
+            }
+
+            document.addEventListener('DOMContentLoaded', evt => onDomContentLoaded());
+        })();
+
+    </script>
+</head>
+<body>
+
+<a href="/bff/" id="login">login</a>
+<a href="#" id="logout" onclick="logoutForm.submit(); return false;">Logout</a>
+
+<form id="logoutForm" th:action="@{/logout}" method="POST">
+    <!--/* CSRF token will be emitted by Spring Security */-->
+</form>
+
+<div id="app">
+    <div id="username"><span sec:authentication="name">Anonymous</span></div>
+    <pre id="userInfo"></pre>
+</div>
+
+
+<script defer th:src="@{${appScript}}">
+
+</script>
+
+</body>
+</html>

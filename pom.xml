@@ -23,6 +23,7 @@
         <module>apps/frontend-webapp-springboot</module>
         <module>apps/frontend-webapp-springboot3</module>
         <module>apps/bff-springboot</module>
+        <module>apps/bff-springboot3</module>
         <module>apps/jwt-client-authentication</module>
         <!--        <module>keycloak/patches/keycloak-model-infinispan-patch</module>-->
 <!--        <module>keycloak/patches/wildfly-clustering-infinispan-extension-patch-25.0.x</module>-->
@@ -67,4 +68,14 @@
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>

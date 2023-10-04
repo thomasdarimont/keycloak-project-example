@@ -1,0 +1,40 @@
+server:
+  port: 4693
+  ssl:
+    enabled: true
+    key-store: config/stage/dev/tls/acme.test+1.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+  servlet:
+    context-path: /bff
+  error:
+    include-stacktrace: never
+
+logging:
+  level:
+    root: info
+    org:
+      springframework:
+        web: info
+
+spring:
+  thymeleaf:
+    cache: false
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuerUri: https://id.acme.test:8443/auth/realms/acme-internal
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: 'acme-bff-springboot'
+            client-secret: 'secret'
+            client-authentication-method: client_secret_post
+            authorizationGrantType: authorization_code
+            redirect-uri: '{baseUrl}/login/oauth2/code/{registrationId}'
+            scope: openid
+  data:
+    redis:
+      client-name: "acme-bff"
