@@ -1,0 +1,101 @@
+# Example for modelling API clients
+realm: acme-api
+enabled: true
+displayName: Acme API
+loginWithEmailAllowed: true
+registrationAllowed: true
+registrationEmailAsUsername: true
+#loginTheme: apps
+loginTheme: keycloak
+accountTheme: keycloak.v3
+adminTheme: keycloak
+emailTheme: keycloak
+internationalizationEnabled: true
+supportedLocales: ["en","de"]
+defaultLocale: "en"
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
+#browserFlow: "Browser Identity First with IdP Routing"
+#registrationFlow: "Custom Registration"
+
+# Custom realm attributes
+attributes:
+  # for http variant: http://apps.acme.test:4000
+  "acme_site_url": "https://apps.acme.test:4443"
+
+
+smtpServer:
+  port: 1025
+  host: mailhog
+  from: "acme-api-sso@local"
+  fromDisplayName: "Acme API Account"
+  replyTo: "no-reply@localhost"
+  replyToDisplayName: "Acme API Support"
+
+clientScopes:
+# Custom OAuth2 client-scope to centrally configure mappers / role scopes
+  - name: acme
+    description: Acme Access
+    protocol: openid-connect
+
+clientScopeMappings:
+# Expose api-user / api-admin client roles when referencing the scope "acme"
+  "acme-api":
+    - clientScope: "acme"
+      roles:
+        - "api-user"
+
+roles:
+  # Client specific role definitions for the acme-api client
+  client:
+    "acme-api":
+      - name: "api-default"
+        description: "API default role"
+        composite: true
+        composites:
+          client:
+            "acme-api":
+              - "api-user"
+      - name: "api-user"
+        description: "API User Role"
+        clientRole: true
+
+clients:
+
+# The generic acme-api client to define roles (see roles above)
+  - clientId: acme-api
+    protocol: openid-connect
+    name: Acme API
+    description: "Acme API that represents API clients"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: false
+    fullScopeAllowed: false
+
+# Represents the acme-api instance for customer1
+  - clientId: acme-api-customer1
+    protocol: openid-connect
+    name: Acme API for Customer 1
+    description: "Acme API for Customer 1 that can obtain tokens via grant_type=client_credentials"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    fullScopeAllowed: false
+    # this secret would be individual for each customer
+    secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+      - "roles"
+      - "acme"
+
+users:
+  - username: service-account-acme-api-customer1
+    enabled: true
+    serviceAccountClientId: acme-api-customer1
+    clientRoles:
+      "acme-api":
+        - "api-default"
