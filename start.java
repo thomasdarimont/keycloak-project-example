@@ -312,6 +312,7 @@ class start {
         System.out.printf("  %s: %s%n", DOCKER_HOST_OPT, "Allows configuring of a non-default IP for reaching the docker host from inside the containers, " +
                 "which is used for name resolution. This is useful for using WiFi on ICE trains, which use the same network as docker by default. This causes the wifi to not work correctly.");
         System.out.printf("  %s: %s%n", TRACING_OPT, "enables tracing with open-telemetry. Injects the otel agent into Keycloak, starts an otel-collector and jaeger container");
+        System.out.printf("  %s: %s%n", PROMETHEUS_OPT, "enables metrics collection to prometheus. Starts a prometheus metrics container");
 
         System.out.printf("%n%s supports the following commands: %n", "start.java");
         System.out.println("");
