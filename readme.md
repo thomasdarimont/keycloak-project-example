@@ -399,19 +399,6 @@ Password: admin
 
 # Misc
 
-## Add external tool in IntelliJ to trigger extension deployment
-
-Instead of running the deployment trigger script yourself, you can register it as an external tool in IntelliJ as shown below.
-
-- Name: `kc-deploy-extensions`
-- Description: `Deploy Extensions to Keycloak Docker Container`
-- Program: `$JDKPath$/bin/java`
-- Arguments: `$ProjectFileDir$/bin/deployExtensions.java`
-- Working directory: `$ProjectFileDir$`
-- Only select: `Synchronize files after execution.`
-
-The extensions can now be redeployed by running `Tools -> External Tools -> kc-deploy-extensions`
-
 ## Add external tool in IntelliJ to trigger realm configuration
 
 Instead of running the Keycloak Config CLI script yourself, you can register it as an external tool in IntelliJ as shown below.
