@@ -356,18 +356,11 @@ yarn run cypress:open
 
 # Scripts
 
-## Check prequisits
+## Check prerequisites
 
-To manually check if all prequisits are fulfilled.
+To manually check if all prerequisites are fulfilled.
 ```
 java bin/envcheck.java
-```
-
-## Manually Trigger Extension Deployment
-
-To manually trigger an extension redeployment after extension code changes / build, you can run the following script:
-```
-java bin/deployExtensions.java
 ```
 
 ## Import-/Exporting a Realm
