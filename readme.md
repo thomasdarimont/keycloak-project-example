@@ -52,8 +52,7 @@ d) **Operator** configuring realm and server for different stages
 |------|--------
 | Java | 17
 | mvn  | 3.8
-| docker | 20.10
-| docker-compose | 1.29 
+| docker | 24.0 (with docker compose)
 
 # Development Environment
 
@@ -129,15 +128,6 @@ The example environment can be configured to use Postgresql as a database via th
 ```
 java start.java --database=postgres
 ```
-
-#### Run with Legacy Keycloak
-By default, we use the quarkus based Keycloak distribution to run the example environment.
-To use the legacy wildfly based Keycloak distribution, add the flag `--keycloak=keycloak`. 
-
-```
-java start.java --keycloak=keycloak
-```
-
 
 ### Access metrics
 
@@ -230,9 +220,12 @@ You can use the `bin/downloadOtel.java` scrtipt to download the otel agent.
 Quarkus applications like Keycloak can also use the [Quarkus OpenTelemetry extension](https://quarkus.io/guides/opentelemetry) instead of the agent.
 An example for running an instrumented Spring Boot app could look like this:
 ```
-OTEL_METRICS_EXPORTER=none OTEL_SERVICE_NAME="frontend-webapp-springboot" OTEL_PROPAGATORS="b3multi" \
- OTEL_EXPORTER_OTLP_ENDPOINT="http://id.acme.test:4317" java -javaagent:bin/opentelemetry-javaagent.jar \
- -jar apps/frontend-webapp-springboot/target/frontend-webapp-springboot-0.0.1-SNAPSHOT.jar
+OTEL_METRICS_EXPORTER=none \
+OTEL_SERVICE_NAME="frontend-webapp-springboot" \
+OTEL_PROPAGATORS="b3multi" \
+OTEL_EXPORTER_OTLP_ENDPOINT="http://id.acme.test:4317" \
+java -javaagent:bin/opentelemetry-javaagent.jar \
+-jar apps/frontend-webapp-springboot/target/frontend-webapp-springboot-0.0.1-SNAPSHOT.jar
 ```
 The included IDEA run-config for the frontend-webapp-springboot module contains the necessary configuration to run that module with tracing enabled.
 If you then navigate to the [frontend webapp](https://apps.acme.test:4633/webapp/), you can navigate through the application, and then later check the Jaeger UI for traces.
@@ -332,14 +325,15 @@ The custom docker image created during the build can be stared with the followin
 ```
 docker run \
 --name acme-keycloak \
--e KEYCLOAK_USER=admin \
--e KEYCLOAK_PASSWORD=admin \
--e KEYCLOAK_CONFIG_FILE=standalone-ha.xml \
--v $PWD/imex:/opt/jboss/imex:z \
+-e KEYCLOAK_ADMIN=admin \
+-e KEYCLOAK_ADMIN_PASSWORD=admin \
+-e KC_HTTP_RELATIVE_PATH=auth \
 -it \
 --rm \
 -p 8080:8080 \
-acme/acme-keycloak:latest
+acme/acme-keycloak:latest \
+start-dev \
+--features=preview
 ```
 # Testing
 ## Run End to End Tests
