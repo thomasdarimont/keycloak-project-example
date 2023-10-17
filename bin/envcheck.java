@@ -21,7 +21,7 @@ class envcheck {
         }
 
         /* Check required tools: docker compose */
-        var pbDockerComposer = new ProcessBuilder(List.of("docker", "compose", "-v"));
+        var pbDockerComposer = new ProcessBuilder(List.of("docker", "compose", "version"));
         pbDockerComposer.inheritIO();
         var processDockerComposer = pbDockerComposer.start();
         returnCode += processDockerComposer.waitFor();
