@@ -72,4 +72,4 @@ jobs:
 
       - name: Shutdown the docker-compose stack
         if: ${{ always() }}
-        run: java stop.java
+        run: java stop.java --skip=grafana

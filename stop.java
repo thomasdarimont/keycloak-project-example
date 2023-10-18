@@ -59,8 +59,14 @@ class start {
         commandLine.add("deployments/local/dev/docker-compose-graylog.yml");
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-prometheus.yml");
-        commandLine.add("--file");
-        commandLine.add("deployments/local/dev/docker-compose-grafana.yml");
+
+        if (argList.contains("--skip=grafana")) {
+            // ignore grafana to fix invalid spec: :/etc/ssl/certs/ca-cert-acme-root.crt:z: empty section between colons
+        } else {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-grafana.yml");
+        }
+
         commandLine.add("--file");
         commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
         if (useHttps) {
