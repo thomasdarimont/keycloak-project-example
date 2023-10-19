@@ -467,3 +467,19 @@ authenticationFlows:
         requirement: "REQUIRED"
         userSetupAllowed: false
         autheticatorFlow: false
+
+
+  - alias: "Custom Post Broker Login"
+    description: "Custom Post Broker Login with logging"
+    providerId: "basic-flow"
+    topLevel: true
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: "acme-debug-auth"
+        requirement: "REQUIRED"
+        authenticatorConfig: "acme-debug-auth-post-broker"
+        userSetupAllowed: true
+
+authenticatorConfig:
+  - alias: "acme-debug-auth-post-broker"
+    config: {}
