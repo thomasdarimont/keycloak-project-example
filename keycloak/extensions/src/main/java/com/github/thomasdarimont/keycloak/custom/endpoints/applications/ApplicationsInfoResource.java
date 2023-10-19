@@ -107,6 +107,9 @@ public class ApplicationsInfoResource {
 
         realm.getAlwaysDisplayInConsoleClientsStream().forEach(clients::add);
 
+        ClientModel accountConsole = realm.getClientByClientId(Constants.ACCOUNT_CONSOLE_CLIENT_ID);
+        clients.add(accountConsole);
+
         Locale locale = session.getContext().resolveLocale(user);
         Properties messages = getAccountMessages(locale);
         return clients.stream().filter(client -> !client.isBearerOnly() && client.getBaseUrl() != null && !client.getClientId().isEmpty())
