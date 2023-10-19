@@ -1,0 +1,126 @@
+realm: acme-stepup
+displayName: "Acme Step-up"
+enabled: true
+
+browserFlow: "Browser Step-Up"
+
+attributes:
+  "acr.loa.map": "{\"cookie\":\"0\",\"pw\":\"1\",\"2fa\":\"2\"}"
+
+clients:
+  - clientId: app-minispa
+    protocol: openid-connect
+    name: Acme Account Console
+    description: "Acme Account Console Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: true
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
+    baseUrl: "/?realm=acme-stepup&show=profile,apps,security,token,idToken,stepup,reauth,logout"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "roles"
+      - "profile"
+      - "acr"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
+
+authenticationFlows:
+  - alias: "Browser Step-Up"
+    description: "This flow implements a custom browser pattern"
+    providerId: basic-flow
+    builtIn: false
+    topLevel: true
+    authenticationExecutions:
+      - authenticator: auth-cookie
+        requirement: ALTERNATIVE
+      - flowAlias: "Identity Forms"
+        requirement: ALTERNATIVE
+        autheticatorFlow: true
+
+  - alias: "Identity Forms"
+    description: "Sub-Flow to ask user for username an password"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+
+      - flowAlias: "Password Condition"
+        requirement: CONDITIONAL
+        autheticatorFlow: true
+      - flowAlias: "2FA Condition"
+        requirement: CONDITIONAL
+        autheticatorFlow: true
+
+  - alias: "Password Condition"
+    description: "Sub-Flow to ask user for username / password"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: conditional-level-of-authentication
+        requirement: REQUIRED
+        authenticatorConfig: "username-password"
+      - authenticator: auth-username-password-form
+        requirement: REQUIRED
+
+  - alias: "2FA Condition"
+    description: "Sub-Flow to ask user for 2FA during stepup"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: conditional-user-configured
+        requirement: REQUIRED
+      - authenticator: conditional-level-of-authentication
+        requirement: REQUIRED
+        authenticatorConfig: "2fa-stepup"
+      - authenticator: acme-auth-otp-form
+        requirement: ALTERNATIVE
+      - authenticator: auth-recovery-authn-code-form
+        requirement: ALTERNATIVE
+
+authenticatorConfig:
+  - alias: "username-password"
+    config:
+      "loa-condition-level": "1"
+      "loa-max-age": "36000"
+  - alias: "2fa-stepup"
+    config:
+      "loa-condition-level": "2"
+      "loa-max-age": "300"
+
+users:
+  - username: tester
+    email: tester@local
+    firstName: Theo
+    lastName: Tester
+    enabled: true
+    emailVerified: true
+    attributes:
+      locale: [ "en" ]
+      phoneNumber: [ "+49178111222333" ]
+      phoneNumberVerified: [ "true" ]
+      title: [ "" ]
+      salutation: [ "mr" ]
+      # Thomas
+      picture: [ "https://en.gravatar.com/userimage/52342809/a957ac868585f91edf7eb9b7463328b9.jpeg?size=64" ]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false

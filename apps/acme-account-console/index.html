@@ -142,6 +142,7 @@
         <button name="securityBtn" onclick="showSecurity()" class="security">Security</button>
         <button name="appsBtn" onclick="showApps()" class="apps">Apps</button>
         <button name="reauthBtn" onclick="enforceCurrentAuth()" class="reauth">ReAuth</button>
+        <button name="stepupBtn" onclick="showStepUp()" class="stepup">Stepup</button>
         <button name="switchContextBtn" onclick="switchContext()" class="switchContext">Switch Context</button>
         <button name="accountBtn" onclick="keycloak.accountManagement()" class="account">Account</button>
         <button name="logoutBtn" onclick="keycloak.logout()" class="logout">Logout</button>
@@ -167,7 +168,7 @@
 
     // ?scope=openid+email+custom.profile+custom.ageinfo
     //let scope = searchParams.get("scope") || 'openid email acme.profile  acme.ageinfo';
-    let scope = searchParams.get("scope") || 'openid email acme.profile';
+    let scope = searchParams.get("scope") || 'openid email';
     // &show=profile,settings,apps,security,logout
     // &show=profile,settings,apps,security,logout,token,idToken,userinfo
     // &show=profile,logout,token,idToken,userinfo,reauth,account
@@ -229,8 +230,8 @@
 
     };
 
-    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext", "revoke"];
-    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext", "revoke"];
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext", "revoke", "stepup"];
+    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext", "revoke", "stepup"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
         return !contextClassesToHideDefault.includes(value);
     });
@@ -264,7 +265,7 @@
 
         // workaround for changes with oidc logout in Keycloak 18.0.0
         // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
-        keycloak.createLogoutUrl = function(options) {
+        keycloak.createLogoutUrl = function (options) {
             return keycloak.endpoints.logout()
                 + '?id_token_hint=' + keycloak.idToken
                 + '&post_logout_redirect_uri=' + encodeURIComponent(window.location.href);
@@ -500,6 +501,24 @@
         show(securityHtml, "message-content");
     }
 
+    async function showStepUp() {
+
+        let stepupHtml = `
+            <button onclick="stepUpAuth()">Stepup MFA</button>
+        `;
+
+        show(stepupHtml, "message-content");
+    }
+
+    function stepUpAuth() {
+        keycloak.login({
+            acr: {
+                values: ["2fa"],
+                essential: true
+            }
+        });
+    }
+
     async function showApps() {
 
         await keycloak.updateToken(5);
@@ -666,7 +685,7 @@
         // use phoneNumber from IDToken directly
         let phoneNumber = escapeHtml(keycloak.idTokenParsed['phone_number']);
         let phoneNumberVerified = keycloak.idTokenParsed['phone_number_verified']
-        if (!phoneNumber){
+        if (!phoneNumber) {
             phoneNumber = "N/A";
             phoneNumberVerified = false;
         }
@@ -696,14 +715,14 @@
                 <tr>
                     <td class="label">Email</td>
                     <td><span id="email">${email}</span></td>
-                    <td title="${ emailVerified ? 'Email verified' : ''}">${ emailVerified ? '&#10004;' : ''}</td>
+                    <td title="${emailVerified ? 'Email verified' : ''}">${emailVerified ? '&#10004;' : ''}</td>
                     <td><a id="changeEmail" href="#" onclick="changeEmail();return false">Update</a></td>
                     <td></td>
                 </tr>
                 <tr>
                     <td class="label">Phone</td>
                     <td><span id="phoneNumber">${phoneNumber}</span></td>
-                    <td title="${ phoneNumberVerified ? 'Phone number verified' : ''}">${ phoneNumberVerified ? '&#10004;' : ''}</td>
+                    <td title="${phoneNumberVerified ? 'Phone number verified' : ''}">${phoneNumberVerified ? '&#10004;' : ''}</td>
                     <td></td>
                     <td></td>
                 </tr>
