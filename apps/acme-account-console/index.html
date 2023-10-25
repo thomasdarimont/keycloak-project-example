@@ -161,6 +161,7 @@
     let searchParams = new URLSearchParams(window.location.search);
     let keycloakBaseUrl = searchParams.get("base_url") || (window.location.protocol === "http:" ? "http://id.acme.test:8080" : "https://id.acme.test:8443");
     let keycloakUrl = keycloakBaseUrl + (searchParams.get("path") || "/auth");
+    let keycloakJsSrc = searchParams.get("kc_js_src");
 
     let realm = searchParams.get("realm") || 'acme-internal';
     let clientId = searchParams.get("client_id") || 'app-minispa';
@@ -251,7 +252,7 @@
     // dynamically add keycloak.js script
     let script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = keycloakUrl + "/js/keycloak.js";
+    script.src = keycloakJsSrc || keycloakUrl + "/js/keycloak.js";
     document.getElementsByTagName('head')[0].appendChild(script);
 
     window.onload = () => {
@@ -504,19 +505,29 @@
     async function showStepUp() {
 
         let stepupHtml = `
-            <button onclick="stepUpAuth()">Stepup MFA</button>
+            <ul>
+                <li><a onclick="stepUpAuth('acr')" href="#">Stepup MFA (ACR via Claims)</a></li>
+                <li><a onclick="stepUpAuth('acrValues')" href="#">Stepup MFA (ACR_VALUES)</a></li> <!-- available in Keycloak 23.x -->
+            </ul>
         `;
 
         show(stepupHtml, "message-content");
     }
 
-    function stepUpAuth() {
-        keycloak.login({
-            acr: {
-                values: ["2fa"],
-                essential: true
-            }
-        });
+    function stepUpAuth(mode) {
+
+        if (mode === 'acr') {
+            keycloak.login({
+                acr: {
+                    values: ["2fa"],
+                    essential: true
+                }
+            });
+        } else if (mode === 'acrValues') {
+            keycloak.login({
+                acrValues: "2fa"
+            });
+        }
     }
 
     async function showApps() {
