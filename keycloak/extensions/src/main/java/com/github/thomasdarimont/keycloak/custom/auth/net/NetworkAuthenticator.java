@@ -60,52 +60,69 @@ public class NetworkAuthenticator implements Authenticator {
     /**
      * Authenticates within Browser and Direct Grant flow authentication flows.
      *
-     * @param flowContext
+     * @param context
      */
     @Override
-    public void authenticate(AuthenticationFlowContext flowContext) {
+    public void authenticate(AuthenticationFlowContext context) {
 
         var remoteIp = resolveRemoteIp( //
-                flowContext.getAuthenticatorConfig(), //
-                flowContext.getHttpRequest(), //
-                flowContext.getConnection().getRemoteAddr() //
+                context.getAuthenticatorConfig(), //
+                context.getHttpRequest(), //
+                context.getConnection().getRemoteAddr() //
         );
 
-        if (remoteIp == null) {
-            flowContext.attempted();
-            return;
-        }
-
-        var authSession = flowContext.getAuthenticationSession();
-        var realm = authSession.getRealm();
+        var realm = context.getRealm();
+        var authSession = context.getAuthenticationSession();
         var client = authSession.getClient();
 
-        var allowedNetworks = resolveAllowedNetworks(flowContext.getAuthenticatorConfig(), client);
+        var allowedNetworks = resolveAllowedNetworks(context.getAuthenticatorConfig(), client);
         if (allowedNetworks == null) {
             // skip check since we don't have any network restrictions configured
-            log.debugf("Skip check for source IP based on network. realm=%s, client=%s, IP=%s", realm.getName(), client.getClientId(), remoteIp);
-            flowContext.success();
+            log.debugf("Skip check for source IP based on network. realm=%s, client=%s, IP=%s", //
+                    realm.getName(), client.getClientId(), remoteIp);
+            context.success();
             return;
         }
+
+        if (remoteIp == null) {
+            context.attempted();
+            log.warnf("Could not determine remoteIp, step marked as attempted. realm=%s, client=%s", //
+                    realm.getName(), client.getClientId());
+            return;
+        }
+
+        var ipAllowed = isAccessAllowed(allowedNetworks, remoteIp, realm, client);
+        if (ipAllowed) {
+            log.debugf("Allowed source IP based on allowed networks. realm=%s, client=%s, IP=%s", //
+                    realm.getName(), client.getClientId(), remoteIp);
+            context.success();
+            return;
+        }
+
+        log.debugf("Rejected source IP based on allowed networks. realm=%s, client=%s, IP=%s", //
+                realm.getName(), client.getClientId(), remoteIp);
+
+        var challengeResponse = errorResponse(context, Response.Status.UNAUTHORIZED.getStatusCode(), "invalid_request", "Access denied", authSession.getAuthNote("auth_type"));
+        context.failure(AuthenticationFlowError.ACCESS_DENIED, challengeResponse);
+    }
+
+
+    @VisibleForTesting
+    boolean isAccessAllowed(String allowedNetworks, String remoteIp, RealmModel realm, ClientModel client) {
 
         var ipAllowed = false;
         for (String allowedNetwork : allowedNetworks.split(",")) {
             ipAllowed = isRemoteIpAllowed(allowedNetwork, remoteIp);
             if (ipAllowed) {
-                log.debugf("Allowed source IP based on network. realm=%s, client=%s, IP=%s, network=%s", realm.getName(), client.getClientId(), remoteIp, allowedNetwork);
+                log.debugf("Matched source IP based on allowed network. realm=%s, client=%s, IP=%s, network=%s", //
+                        realm.getName(), client.getClientId(), remoteIp, allowedNetwork);
                 break;
+            } else {
+                log.tracef("Rejected source IP based on allowed network. realm=%s, client=%s, IP=%s, network=%s", //
+                        realm.getName(), client.getClientId(), remoteIp, allowedNetwork);
             }
         }
-
-        if (ipAllowed) {
-            flowContext.success();
-            return;
-        }
-
-        log.debugf("Rejected source IP based on allowed networks. realm=%s, client=%s, IP=%s", realm.getName(), client.getClientId(), remoteIp);
-
-        var challengeResponse = errorResponse(flowContext, Response.Status.UNAUTHORIZED.getStatusCode(), "invalid_request", "Access denied", authSession.getAuthNote("auth_type"));
-        flowContext.failure(AuthenticationFlowError.ACCESS_DENIED, challengeResponse);
+        return ipAllowed;
     }
 
     /**
@@ -172,23 +189,28 @@ public class NetworkAuthenticator implements Authenticator {
     @VisibleForTesting
     boolean isRemoteIpAllowed(String allowedNetwork, String remoteIp) {
 
-        boolean matches = false;
+        boolean allowed = false;
 
         if (allowedNetwork.contains("/")) {
-            // CIDR notation
+            /*
+             CIDR notation, e.g:
+             192.168.178.0/24 - Allow access from a subnet
+             192.168.178.10/32 - Allow access from a single IP
+             */
             var ipAndCidrRange = allowedNetwork.split("/");
             var ip = ipAndCidrRange[0];
             int cidrRange = Integer.parseInt(ipAndCidrRange[1]);
             var rule = new IpSubnetFilterRule(ip, cidrRange, IpFilterRuleType.ACCEPT);
-            matches = rule.matches(new InetSocketAddress(remoteIp, 1 /* unsed */));
+            allowed = rule.matches(new InetSocketAddress(remoteIp, 1 /* unsed */));
         } else {
-            // explicit IP addresses
-            if (remoteIp.equals(allowedNetwork.trim())) {
-                matches = true;
-            }
+            /*
+             explicit IP addresses, e.g:
+             192.168.178.10 - Allow access from a single IP
+             */
+            allowed = remoteIp.equals(allowedNetwork.trim());
         }
 
-        return matches;
+        return allowed;
     }
 
     @VisibleForTesting
@@ -268,12 +290,6 @@ public class NetworkAuthenticator implements Authenticator {
 
         static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
 
-        static final String DISPLAY_NAME = "Acme: Network Authenticator";
-
-        static final String REFERENCE_CATEGORY = "network";
-
-        static final String HELP_TEXT = "Controls access by checking the network address of the incoming request.";
-
         static {
             var list = ProviderConfigurationBuilder.create() //
                     .property().name(REMOTE_IP_HEADER_PROPERTY) //
@@ -289,7 +305,6 @@ public class NetworkAuthenticator implements Authenticator {
                     .defaultValue(null) //
                     .helpText("Comma separated list of allowed networks. This supports CIDR network ranges and single IP adresses. If left empty ALL networks are allowed. Configuration can be overriden via client attribute acmeAllowedNetworks. Examples: 192.168.178.0/24, 192.168.178.12/32, 192.168.178.13") //
                     .add() //
-
 
                     .build();
 
