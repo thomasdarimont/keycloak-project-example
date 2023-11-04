@@ -65,12 +65,6 @@ public class NetworkAuthenticator implements Authenticator {
     @Override
     public void authenticate(AuthenticationFlowContext context) {
 
-        var remoteIp = resolveRemoteIp( //
-                context.getAuthenticatorConfig(), //
-                context.getHttpRequest(), //
-                context.getConnection().getRemoteAddr() //
-        );
-
         var realm = context.getRealm();
         var authSession = context.getAuthenticationSession();
         var client = authSession.getClient();
@@ -78,12 +72,17 @@ public class NetworkAuthenticator implements Authenticator {
         var allowedNetworks = resolveAllowedNetworks(context.getAuthenticatorConfig(), client);
         if (allowedNetworks == null) {
             // skip check since we don't have any network restrictions configured
-            log.debugf("Skip check for source IP based on network. realm=%s, client=%s, IP=%s", //
-                    realm.getName(), client.getClientId(), remoteIp);
+            log.debugf("Skip check for source IP based on network. realm=%s, client=%s", //
+                    realm.getName(), client.getClientId());
             context.success();
             return;
         }
 
+        var remoteIp = resolveRemoteIp( //
+                context.getAuthenticatorConfig(), //
+                context.getHttpRequest(), //
+                context.getConnection().getRemoteAddr() //
+        );
         if (remoteIp == null) {
             context.attempted();
             log.warnf("Could not determine remoteIp, step marked as attempted. realm=%s, client=%s", //
