@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.audit;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
+import com.github.thomasdarimont.keycloak.custom.account.AccountChange;
 import com.github.thomasdarimont.keycloak.custom.account.MfaChange;
 import com.github.thomasdarimont.keycloak.custom.support.CredentialUtils;
 import com.google.auto.service.AutoService;
@@ -49,18 +50,21 @@ public class AcmeAuditListener implements EventListenerProvider {
             var authSession = context.getAuthenticationSession();
             var user = authSession == null ? null : authSession.getAuthenticatedUser();
 
+            if (user == null) {
+                return;
+            }
+
             switch (event.getType()) {
+                case UPDATE_EMAIL:
+                    AccountActivity.onAccountUpdate(session, realm, user, new AccountChange("email", user.getEmail()));
+                    break;
                 case UPDATE_TOTP:
-                    if (user != null) {
-                        CredentialUtils.findFirstOtpCredential(user).ifPresent(credential -> //
-                                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD));
-                    }
+                    CredentialUtils.findFirstOtpCredential(user).ifPresent(credential -> //
+                            AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.ADD));
                     break;
                 case REMOVE_TOTP:
-                    if (user != null) {
-                        CredentialUtils.findFirstOtpCredential(user).ifPresent(credential -> //
-                                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
-                    }
+                    CredentialUtils.findFirstOtpCredential(user).ifPresent(credential -> //
+                            AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
                     break;
             }
         } catch (Exception ex) {

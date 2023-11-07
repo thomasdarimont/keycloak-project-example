@@ -103,17 +103,16 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
         // TODO trigger email verification via email
         // user submitted the form
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
-        EventBuilder event = context.getEvent().clone().event(EventType.UPDATE_EMAIL);
+
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
         RealmModel realm = context.getRealm();
         UserModel currentUser = context.getUser();
         KeycloakSession session = context.getSession();
 
+        String oldEmail = currentUser.getEmail();
         String newEmail = String.valueOf(formData.getFirst(EMAIL_FIELD)).trim();
 
-        event.detail(Details.EMAIL, newEmail);
-
-        EventBuilder errorEvent = event.clone().event(EventType.UPDATE_EMAIL_ERROR)
+        EventBuilder errorEvent = context.getEvent().clone().event(EventType.UPDATE_EMAIL_ERROR)
                 .client(authSession.getClient())
                 .user(authSession.getAuthenticatedUser());
 
@@ -211,6 +210,9 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
             currentUser.setEmailVerified(true);
             currentUser.removeRequiredAction(ID);
 
+            EventBuilder event = context.getEvent().clone().event(EventType.UPDATE_EMAIL);
+            event.detail("email_old", oldEmail);
+            event.detail(Details.EMAIL, newEmail);
             event.success();
 
             context.success();
