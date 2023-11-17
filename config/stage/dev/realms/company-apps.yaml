@@ -3,10 +3,10 @@ enabled: true
 displayName: Company Apps
 displayNameHtml: Company Apps
 loginWithEmailAllowed: true
-registrationAllowed: true
+registrationAllowed: false
 registrationEmailAsUsername: true
 #loginTheme: apps
-loginTheme: keycloak
+loginTheme: internal-modern
 accountTheme: keycloak.v3
 adminTheme: keycloak
 emailTheme: keycloak
@@ -41,8 +41,8 @@ clientScopes:
     protocol: openid-connect
 
 identityProviders:
-  - alias: "idp-acme-internal"
-    displayName: "Acme Employee Login"
+  - alias: "idp-company-users"
+    displayName: "Company Users Login"
     providerId: "oidc"
     enabled: true
     updateProfileFirstLoginMode: on
@@ -55,14 +55,14 @@ identityProviders:
 #    postBrokerLoginFlowAlias: "Custom Post Broker Login"
     config:
       guiOrder: "1000"
-      issuer: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal"
-      tokenUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/token"
-      jwksUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/certs"
-      userInfoUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/userinfo"
-      authorizationUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/auth"
-      logoutUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-internal/protocol/openid-connect/logout"
-      clientId: "acme_internal_idp_broker"
-      clientSecret: "$(env:ACME_APPS_INTERNAL_IDP_BROKER_SECRET:-secret)"
+      issuer: "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-users"
+      tokenUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-users/protocol/openid-connect/token"
+      jwksUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-users/protocol/openid-connect/certs"
+      userInfoUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-users/protocol/openid-connect/userinfo"
+      authorizationUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-users/protocol/openid-connect/auth"
+      logoutUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-users/protocol/openid-connect/logout"
+      clientId: "acme-company-apps-broker"
+      clientSecret: "secret"
       clientAuthMethod: "client_secret_post"
       defaultScope: "openid"
       loginHint: "true"
@@ -72,9 +72,10 @@ identityProviders:
       syncMode: "FORCE"
       pkceMethod: "S256"
       pkceEnabled: "true"
+      acmeEmailDomainRegex: "(company\\.com)"
 
   - alias: "idp-acme-azuread"
-    displayName: "Acme AzureAD Login"
+    displayName: "Company Partner AzureAD Login"
     providerId: "oidc"
     enabled: true
     updateProfileFirstLoginMode: on
@@ -104,6 +105,8 @@ identityProviders:
       syncMode: "FORCE"
       pkceMethod: "S256"
       pkceEnabled: "true"
+      hideOnLoginPage: true
+      acmeEmailDomainRegex: "(partner\\.com)"
 
 authenticationFlows:
   ## Identity First Browser Login Flow
@@ -115,8 +118,6 @@ authenticationFlows:
     authenticationExecutions:
       - authenticator: auth-cookie
         requirement: ALTERNATIVE
-      - authenticator: identity-provider-redirector
-        requirement: ALTERNATIVE
       - flowAlias: "Identity Forms"
         requirement: ALTERNATIVE
         autheticatorFlow: true
@@ -127,12 +128,9 @@ authenticationFlows:
     topLevel: false
     builtIn: false
     authenticationExecutions:
-      - authenticator: auth-username-form
+      - authenticator: acme-auth-username-idp-select
         requirement: REQUIRED
-      - authenticator: acme-dynamic-idp-selector
-        requirement: REQUIRED
-      - authenticator: auth-password-form
-        requirement: REQUIRED
+        authenticatorConfig: "acme-auth-username-idp-select"
       - flowAlias: "2FA Forms"
         requirement: CONDITIONAL
         autheticatorFlow: true
@@ -153,3 +151,40 @@ authenticationFlows:
         requirement: ALTERNATIVE
       - authenticator: auth-recovery-authn-code-form
         requirement: ALTERNATIVE
+
+authenticatorConfig:
+  - alias: "acme-auth-username-idp-select"
+    config:
+      lookupRealmName: "company-users"
+      lookupRealmIdpAlias: "idp-company-users"
+
+clients:
+  - clientId: app-minispa
+    protocol: openid-connect
+    name: Company Account Console
+    description: "Company Account Console Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: true
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
+    baseUrl: "/?realm=company-apps&show=profile,settings,apps,security,logout"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "roles"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"

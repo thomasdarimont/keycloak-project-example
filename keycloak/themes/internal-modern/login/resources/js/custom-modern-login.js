@@ -69,9 +69,23 @@
         }
     }
 
+    function autoSubmitLoginHintForUsernameFormForCompanyApps() {
+
+        if (window.location.href.includes("/company-users/") && new URLSearchParams(window.location.search).get("login_hint")) {
+            // only for company-users realm if login hint is present
+            if (document.querySelector("input[name=username]") && !document.querySelector("input[name=password]")) {
+                log.info("autoSubmitLoginHintForUsernameFormForCompanyApps");
+                // we are in username name form
+                document.querySelector("#kc-form-login").submit();
+            }
+        }
+    }
+
     function onDomContentLoaded() {
         updateAuthenticatorIconsInAuthenticationSelector();
         updateBackupCodeIconOnBackupCodeAuthenticatorInAuthenticationSelector();
+
+        autoSubmitLoginHintForUsernameFormForCompanyApps();
 
         enableInactivityMonitoring();
     }

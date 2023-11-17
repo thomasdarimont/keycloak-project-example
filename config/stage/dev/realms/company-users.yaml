@@ -1,0 +1,105 @@
+realm: company-users
+enabled: true
+displayName: Company Users
+displayNameHtml: Company Users
+loginWithEmailAllowed: true
+registrationAllowed: true
+registrationEmailAsUsername: true
+#loginTheme: apps
+loginTheme: internal-modern
+accountTheme: keycloak.v3
+adminTheme: keycloak
+emailTheme: keycloak
+internationalizationEnabled: true
+supportedLocales: ["en","de"]
+defaultLocale: "en"
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
+browserFlow: "Browser Identity First with IdP Routing"
+#registrationFlow: "Custom Registration"
+
+# Custom realm attributes
+attributes:
+  # for http variant: http://apps.acme.test:4000
+  "acme_site_url": "https://apps.acme.test:4443"
+  "acme_terms_url": "https://apps.acme.test:4443/site/terms.html"
+  "acme_imprint_url": "https://apps.acme.test:4443/site/imprint.html"
+  "acme_privacy_url": "https://apps.acme.test:4443/site/privacy.html"
+  #"acme_logo_url": "no example, should be taken from client or null"
+  "acme_account_deleted_url": "https://apps.acme.test:4443/site/accountdeleted.html"
+
+smtpServer:
+  replyToDisplayName: "Company Users Support"
+  port: 1025
+  host: mailhog
+  replyTo: "no-reply@localhost"
+  from: "company-apps-sso@local"
+  fromDisplayName: "Company Users Account"
+
+authenticationFlows:
+  ## Identity First Browser Login Flow
+  - alias: "Browser Identity First with IdP Routing"
+    description: "This flow implements the Identity First pattern"
+    providerId: basic-flow
+    builtIn: false
+    topLevel: true
+    authenticationExecutions:
+      - authenticator: auth-cookie
+        requirement: ALTERNATIVE
+      - flowAlias: "Identity Forms"
+        requirement: ALTERNATIVE
+        autheticatorFlow: true
+
+  - alias: "Identity Forms"
+    description: "Sub-Flow to ask user for username an password"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: auth-username-form
+        requirement: REQUIRED
+      - authenticator: auth-password-form
+        requirement: REQUIRED
+      - flowAlias: "2FA Forms"
+        requirement: CONDITIONAL
+        autheticatorFlow: true
+
+  - alias: "2FA Forms"
+    description: "Sub-Flow to ask user for 2FA"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: conditional-user-configured
+        requirement: REQUIRED
+      - authenticator: acme-auth-trusted-device
+        requirement: ALTERNATIVE
+      - authenticator: acme-auth-otp-form
+        requirement: ALTERNATIVE
+      - authenticator: acme-email-code-form
+        requirement: ALTERNATIVE
+      - authenticator: auth-recovery-authn-code-form
+        requirement: ALTERNATIVE
+
+clients:
+  - clientId: acme-company-apps-broker
+    protocol: openid-connect
+    name: "Company Apps"
+    description: "Company IdP Broker Client"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    fullScopeAllowed: false
+    secret: "secret"
+    redirectUris:
+      - "$(env:KEYCLOAK_FRONTEND_URL)/realms/company-apps/broker/idp-company-users/endpoint/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
