@@ -1,4 +1,5 @@
-FROM quay.io/keycloak/keycloak:20.0.3
+ARG KEYCLOAK_VERSION=22.0.5
+FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 
 USER 0
 
