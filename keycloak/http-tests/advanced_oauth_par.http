@@ -3,7 +3,7 @@
 POST {{ISSUER}}/protocol/openid-connect/ext/par/request
 Content-Type: application/x-www-form-urlencoded
 
-&response_type=code&client_id={{TEST_CLIENT4_ID}}&client_secret={{TEST_CLIENT_SECRET}}&nonce=abc123456&redirect_uri=https%3A%2F%2Fapps.acme.test%3A4633%2Fwebapp%2Flogin%2Foauth2%2Fcode%2Fkeycloak&scope=openid%20profile
+response_type=code&client_id={{TEST_CLIENT4_ID}}&client_secret={{TEST_CLIENT_SECRET}}&nonce=abc123456&redirect_uri=https%3A%2F%2Fapps.acme.test%3A4633%2Fwebapp%2Flogin%2Foauth2%2Fcode%2Fkeycloak&scope=openid%20profile
 
 > {%
     client.global.set("KC_REQUEST_URI", response.body.request_uri);
