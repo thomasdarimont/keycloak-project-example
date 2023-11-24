@@ -95,8 +95,6 @@ clients:
     serviceAccountsEnabled: true
     secret: acme-service-client-1-secret
     fullScopeAllowed: false
-    redirectUris:
-      - "http://localhost/acme-service-client-1/login*"
 
   - id: acme-device-client
     clientId: acme-device-client
@@ -104,13 +102,13 @@ clients:
     name: Client with Device Flow Grant
     description: "Device Flow Grant Description"
     enabled: true
-    publicClient: false
+    publicClient: true
     standardFlowEnabled: false
     directAccessGrantsEnabled: false
     serviceAccountsEnabled: false
-    secret: "2UcQslvaCOx366z0D0CJj2aRkNk1qeWA"
     fullScopeAllowed: false
     attributes:
+      "use.refresh.tokens": "false"
       "oauth2.device.authorization.grant.enabled": "true"
     redirectUris: []
 

@@ -35,8 +35,7 @@ public class SpringBootDeviceFlowApplication {
             log.info("Running");
 
             var clientId = "acme-device-client";
-            var clientSecret = "2UcQslvaCOx366z0D0CJj2aRkNk1qeWA";
-            var scope = "email offline_access";
+            var scope = "email";
 
             var authServerUrl = "https://id.acme.test:8443/auth";
             var realm = "acme-demo";
@@ -46,7 +45,7 @@ public class SpringBootDeviceFlowApplication {
 
             log.info("Browse to {} and enter the following code.", deviceAuthUrl);
 
-            var deviceCodeResponseEntity = requestDeviceCode(clientId, clientSecret, scope, deviceAuthUrl);
+            var deviceCodeResponseEntity = requestDeviceCode(clientId, scope, deviceAuthUrl);
 
             log.info("Response code: {}", deviceCodeResponseEntity.getStatusCodeValue());
             var deviceCodeResponse = deviceCodeResponseEntity.getBody();
@@ -62,7 +61,7 @@ public class SpringBootDeviceFlowApplication {
             while (Instant.now().isBefore(expiresAt)) {
                 log.info("Start device flow");
                 try {
-                    var deviceFlowResponse = checkForDeviceFlowCompletion(clientId, clientSecret, deviceCodeResponse.getDevice_code(), tokenUrl);
+                    var deviceFlowResponse = checkForDeviceFlowCompletion(clientId, deviceCodeResponse.getDevice_code(), tokenUrl);
                     log.info("Got response status: {}", deviceFlowResponse.getStatusCodeValue());
                     if (deviceFlowResponse.getStatusCodeValue() == 200) {
                         log.info("Success!");
@@ -81,13 +80,12 @@ public class SpringBootDeviceFlowApplication {
         };
     }
 
-    private ResponseEntity<DeviceCodeResponse> requestDeviceCode(String clientId, String clientSecret, String scope, String deviceAuthUrl) {
+    private ResponseEntity<DeviceCodeResponse> requestDeviceCode(String clientId, String scope, String deviceAuthUrl) {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         var requestBody = new LinkedMultiValueMap<String, String>();
         requestBody.add("client_id", clientId);
-        requestBody.add("client_secret", clientSecret);
         requestBody.add("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
         requestBody.add("scope", scope);
 
@@ -96,13 +94,12 @@ public class SpringBootDeviceFlowApplication {
         return rt.postForEntity(deviceAuthUrl, new HttpEntity<>(requestBody, headers), DeviceCodeResponse.class);
     }
 
-    private ResponseEntity<AccessTokenResponse> checkForDeviceFlowCompletion(String clientId, String clientSecret, String deviceCode, String tokenUrl) {
+    private ResponseEntity<AccessTokenResponse> checkForDeviceFlowCompletion(String clientId, String deviceCode, String tokenUrl) {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         var requestBody = new LinkedMultiValueMap<String, String>();
         requestBody.add("client_id", clientId);
-        requestBody.add("client_secret", clientSecret);
         requestBody.add("device_code", deviceCode);
         requestBody.add("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
 
