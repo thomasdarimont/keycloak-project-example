@@ -1,0 +1,86 @@
+services:
+
+  database:
+    image: docker.io/postgres:15
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: passw0rd
+    ports:
+      - 25432:5432
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    build:
+      dockerfile: ./keycloak/Dockerfile
+    command: start-dev
+    env_file: .env
+    environment:
+      DEBUG: 'true'
+      DEBUG_PORT: '*:8787'
+
+      # Keycloak DB
+      KC_DB: postgres
+      KC_DB_URL_HOST: database
+      KC_DB_URL_PORT: '5432'
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: passw0rd
+
+      KC_LOG_LEVEL: INFO,com.acme.iam.keycloak:debug
+
+      KC_FEATURES: preview
+
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/certs/cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/certs/cert-key.pem
+
+      KC_HOSTNAME: id.acme.test
+      KC_PROXY: edge
+
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "8787:8787"
+    volumes:
+      - ./keycloak/providers:/opt/keycloak/providers
+      - ./keycloak/themes:/opt/keycloak/themes
+      - ./keycloak/conf/keycloak.conf:/opt/keycloak/conf/keycloak.conf
+      - ./keycloak/conf/quarkus.properties:/opt/keycloak/conf/quarkus.properties
+      - ./config/certs/keycloak-cert.pem:/opt/keycloak/conf/certs/cert.pem
+      - ./config/certs/keycloak-cert-key.pem:/opt/keycloak/conf/certs/cert-key.pem
+
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./config/certs/acme.test-cert.pem:/etc/tls/cert.pem
+      - ./config/certs/acme.test-cert-key.pem:/etc/tls/cert-key.pem
+      - ./config/certs/rootCA.pem:/etc/tls/rootCA.pem
+    ports:
+      - "443:443"
+    depends_on:
+      - keycloak
+
+  mailserver:
+    # Web Interface: http://localhost:1080/#
+    # Web API: http://localhost:1080/api/v2/messages
+    image: mailhog/mailhog:v1.0.1@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
+    logging:
+      driver: none
+    # Disable mailhog logging, see: https://github.com/mailhog/MailHog/issues/56
+    entrypoint: [ "/bin/sh", "-c", "MailHog &>/dev/null" ]
+    ports:
+      - "1080:8025"
+      - "1025:1025"
+
+volumes:
+  keycloak-db-data:
+    name: keycloak-db-data
