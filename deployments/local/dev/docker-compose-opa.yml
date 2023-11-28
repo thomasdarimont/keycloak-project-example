@@ -1,6 +1,6 @@
 services:
   acme-opa:
-    image: openpolicyagent/opa:0.55.0
+    image: openpolicyagent/opa:0.58.0
     platform: linux/amd64
     command:
       - run
@@ -14,4 +14,3 @@ services:
       - ../../../config/stage/dev/opa:/policies:z
     ports:
       - "18181:8181"
-      - "18182:8182"
