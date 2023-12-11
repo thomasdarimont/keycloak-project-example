@@ -42,7 +42,7 @@
                     }
 
                     fetch("/webapp/auth/check-session", {credentials: 'include', redirect: 'follow'})
-                        .then(function (response) {
+                        .then(response => {
                             if (!response.ok && response.status == 401) {
                                 window.location.reload();
                             }
