@@ -40,7 +40,7 @@ public class SessionPropagationActionTokenHandler extends AbstractActionTokenHan
 
         // mark token as consumed
         var singleUseObjectProvider = session.getProvider(SingleUseObjectProvider.class);
-        singleUseObjectProvider.put(token.serializeKey(), token.getExp() - Time.currentTime(), null); // Token is invalidated
+        singleUseObjectProvider.put(token.serializeKey(), token.getExp() - Time.currentTime() + 1, null); // mark token as invalidated, +1 second to account for rounding to seconds
 
         var authSession = tokenContext.getAuthenticationSession();
         var authenticatedUser = authSession.getAuthenticatedUser();
