@@ -1,7 +1,12 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.offline;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.common.util.Time;
 import org.keycloak.models.ClientModel;
@@ -11,13 +16,6 @@ import org.keycloak.representations.AccessToken;
 import org.keycloak.services.resources.LoginActionsService;
 import org.keycloak.services.util.ResolveRelative;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.FormParam;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Map;
 
@@ -32,9 +30,6 @@ public class OfflineSessionPropagationResource {
     private final KeycloakSession session;
 
     private final AccessToken token;
-
-    @Context
-    private HttpRequest request;
 
     public OfflineSessionPropagationResource(KeycloakSession session, AccessToken token) {
         this.session = session;

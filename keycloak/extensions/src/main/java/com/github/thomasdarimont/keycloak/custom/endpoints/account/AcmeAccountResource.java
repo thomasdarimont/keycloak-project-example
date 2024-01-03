@@ -2,6 +2,11 @@ package com.github.thomasdarimont.keycloak.custom.endpoints.account;
 
 import com.github.thomasdarimont.keycloak.custom.account.AccountActivity;
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.http.HttpRequest;
 import org.keycloak.models.AccountRoles;
 import org.keycloak.models.Constants;
@@ -12,13 +17,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.services.resources.Cors;
 
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.OPTIONS;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -29,9 +27,6 @@ public class AcmeAccountResource {
 
     private final KeycloakSession session;
     private final AccessToken token;
-
-    @Context
-    private UriInfo uriInfo;
 
     public AcmeAccountResource(KeycloakSession session, AccessToken token) {
         this.session = session;
@@ -65,6 +60,7 @@ public class AcmeAccountResource {
             return Response.status(FORBIDDEN).build();
         }
 
+        var uriInfo = session.getContext().getHttpRequest().getUri();
         AccountActivity.onAccountDeletionRequested(session, realm, user, uriInfo);
 
         var responseBody = new HashMap<String, Object>();

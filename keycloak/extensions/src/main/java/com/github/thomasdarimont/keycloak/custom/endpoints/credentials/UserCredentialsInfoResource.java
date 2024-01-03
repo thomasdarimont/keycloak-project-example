@@ -9,6 +9,13 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDevic
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.TrustedDeviceInfo;
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.credentials.TrustedDeviceCredentialModel;
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.Data;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.http.HttpRequest;
@@ -25,14 +32,6 @@ import org.keycloak.representations.AccessToken;
 import org.keycloak.services.resources.Cors;
 import org.keycloak.util.JsonSerialization;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.OPTIONS;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

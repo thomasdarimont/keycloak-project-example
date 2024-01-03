@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.offline;
 
 import com.google.auto.service.AutoService;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.TokenVerifier;
 import org.keycloak.authentication.actiontoken.AbstractActionTokenHandler;
@@ -18,7 +19,6 @@ import org.keycloak.services.ErrorPageException;
 import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
 
-import jakarta.ws.rs.core.Response;
 import java.net.URI;
 
 @JBossLog

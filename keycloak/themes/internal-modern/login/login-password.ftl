@@ -10,11 +10,19 @@
                     <div class="${properties.kcFormGroupClass!} no-bottom-margin">
                         <hr/>
                         <label for="password" class="${properties.kcLabelClass!}">${msg("password")}</label>
-                        <input tabindex="0" id="password" class="${properties.kcInputClass!}" name="password"
-                               placeholder=""
-                               type="password" autocomplete="current-password" required autofocus
-                               aria-invalid="<#if messagesPerField.existsError('password')>true</#if>"
-                        />
+                        <div class="${properties.kcInputGroup!}">
+                            <input tabindex="2" id="password" class="${properties.kcInputClass!}" name="password"
+                                   type="password" autocomplete="on" autofocus
+                                   aria-invalid="<#if messagesPerField.existsError('password')>true</#if>"
+                            />
+                            <button class="${properties.kcFormPasswordVisibilityButtonClass!}" type="button" aria-label="${msg('showPassword')}"
+                                    aria-controls="password"  data-password-toggle
+                                    data-icon-show="${properties.kcFormPasswordVisibilityIconShow!}" data-icon-hide="${properties.kcFormPasswordVisibilityIconHide!}"
+                                    data-label-show="${msg('showPassword')}" data-label-hide="${msg('hidePassword')}">
+                                <i class="${properties.kcFormPasswordVisibilityIconShow!}" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
                         <#if messagesPerField.existsError('password')>
                             <span id="input-error-password" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
                                 ${kcSanitize(messagesPerField.get('password'))?no_esc}
@@ -39,6 +47,8 @@
             </form>
         </div>
       </div>
+
+        <script type="module" src="${url.resourcesPath}/js/passwordVisibility.js"></script>
     </#if>
 
 </@layout.registrationLayout>

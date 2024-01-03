@@ -1,12 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.settings;
 
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
-import org.keycloak.models.KeycloakContext;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.UserModel;
-import org.keycloak.representations.AccessToken;
-import org.keycloak.services.resources.Cors;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.OPTIONS;
@@ -14,6 +8,12 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.keycloak.models.KeycloakContext;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.UserModel;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.services.resources.Cors;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

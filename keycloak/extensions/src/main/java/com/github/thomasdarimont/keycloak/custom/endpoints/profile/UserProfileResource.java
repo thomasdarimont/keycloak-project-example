@@ -1,13 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.profile;
 
 import com.github.thomasdarimont.keycloak.custom.endpoints.CorsUtils;
-import org.keycloak.http.HttpRequest;
-import org.keycloak.models.KeycloakContext;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.UserModel;
-import org.keycloak.representations.AccessToken;
-import org.keycloak.services.resources.Cors;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.OPTIONS;
@@ -15,6 +8,12 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.keycloak.models.KeycloakContext;
+import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.UserModel;
+import org.keycloak.representations.AccessToken;
+import org.keycloak.services.resources.Cors;
+
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -24,10 +23,8 @@ public class UserProfileResource {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("[\\w\\d][\\w\\d\\s]{0,64}");
 
-    private final static String firstName = "firstName";
-    private final static String lastName = "lastName";
-
     private final KeycloakSession session;
+
     private final AccessToken token;
 
     public UserProfileResource(KeycloakSession session, AccessToken token) {

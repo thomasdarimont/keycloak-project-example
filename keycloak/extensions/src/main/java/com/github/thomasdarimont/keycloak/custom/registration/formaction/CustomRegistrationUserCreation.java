@@ -78,8 +78,7 @@ public class CustomRegistrationUserCreation extends RegistrationUserCreation {
 
         String scope = context.getAuthenticationSession().getClientNotes().get("scope");
 
-        var upc = UserProfileContext.REGISTRATION_USER_CREATION;
-        var profileMetadata = new UserProfileMetadata(upc);
+        var profileMetadata = new UserProfileMetadata(UserProfileContext.REGISTRATION);
 
         var groupAnnotations = Map.<String, Object>of();
         var additionalAttributeGroupMetadata = new AttributeGroupMetadata("additionalData", "Additional Data", "Additional Profile Data", groupAnnotations);

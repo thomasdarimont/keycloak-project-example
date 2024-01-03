@@ -12,8 +12,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.container.ResourceContext;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.forms.login.LoginFormsProvider;
@@ -36,9 +34,6 @@ public class CustomResource {
 
     private final KeycloakSession session;
     private final AccessToken token;
-
-    @Context
-    private ResourceContext resourceContext;
 
     public CustomResource(KeycloakSession session, AccessToken accessToken) {
         this.session = session;
@@ -64,32 +59,32 @@ public class CustomResource {
 
     @Path("me/settings")
     public UserSettingsResource settings() {
-        return resourceContext.initResource(new UserSettingsResource(session, token));
+        return new UserSettingsResource(session, token);
     }
 
     @Path("me/credentials")
     public UserCredentialsInfoResource credentials() {
-        return resourceContext.initResource(new UserCredentialsInfoResource(session, token));
+        return new UserCredentialsInfoResource(session, token);
     }
 
     @Path("me/applications")
     public ApplicationsInfoResource applications() {
-        return resourceContext.initResource(new ApplicationsInfoResource(session, token));
+        return new ApplicationsInfoResource(session, token);
     }
 
     @Path("me/profile")
     public UserProfileResource profile() {
-        return resourceContext.initResource(new UserProfileResource(session, token));
+        return new UserProfileResource(session, token);
     }
 
     @Path("me/account")
     public AcmeAccountResource account() {
-        return resourceContext.initResource(new AcmeAccountResource(session, token));
+        return new AcmeAccountResource(session, token);
     }
 
     @Path("mobile/session-propagation")
     public OfflineSessionPropagationResource sessionPropagation() {
-        return resourceContext.initResource(new OfflineSessionPropagationResource(session, token));
+        return new OfflineSessionPropagationResource(session, token);
     }
 
     /**
@@ -111,6 +106,6 @@ public class CustomResource {
             throw new WebApplicationException(loginForm.createErrorPage(Response.Status.FORBIDDEN));
         }
 
-        return resourceContext.initResource(new AdminSettingsResource(session, authResult));
+        return new AdminSettingsResource(session, authResult);
     }
 }

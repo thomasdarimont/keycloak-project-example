@@ -46,27 +46,27 @@
         <docker.file>keycloakx/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>22.0.5</keycloak.version>
+        <keycloak.version>23.0.3</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
         <revision>1.0.0</revision>
         <changelist>0-SNAPSHOT</changelist>
 
         <!-- Dependencies for extensions -->
-        <freemarker.version>2.3.31</freemarker.version>
+        <freemarker.version>2.3.32</freemarker.version>
 
         <!-- Testing -->
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <assertj-core.version>3.22.0</assertj-core.version>
         <resteasy.version>6.2.4.Final</resteasy.version>
-        <testcontainers-keycloak.version>3.0.0</testcontainers-keycloak.version>
+        <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
 
         <!-- Tooling -->
         <auto-service.version>1.0.1</auto-service.version>
-        <lombok.version>1.18.24</lombok.version>
-        <docker-maven-plugin.version>0.40.2</docker-maven-plugin.version>
-        <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <lombok.version>1.18.30</lombok.version>
+        <docker-maven-plugin.version>0.43.4</docker-maven-plugin.version>
+        <maven-failsafe-plugin.version>3.2.3</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
     </properties>
 
     <build>
@@ -74,7 +74,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.12.1</version>
             </plugin>
         </plugins>
     </build>

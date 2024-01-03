@@ -40,7 +40,7 @@ public class KeycloakTestSupport {
     }
 
     public static KeycloakContainer createKeycloakContainer(String realmImportFileName) {
-        return createKeycloakContainer("quay.io/keycloak/keycloak:22.0.5", realmImportFileName);
+        return createKeycloakContainer("quay.io/keycloak/keycloak:23.0.3", realmImportFileName);
     }
 
     public static KeycloakContainer createKeycloakContainer(String imageName, String realmImportFileName) {
@@ -101,7 +101,7 @@ public class KeycloakTestSupport {
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
         var keycloakConfigCli = new GenericContainer<>(
-                "quay.io/adorsys/keycloak-config-cli:5.9.0-22.0.4"
+                "quay.io/adorsys/keycloak-config-cli:5.10.0-23.0.1"
         );
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
