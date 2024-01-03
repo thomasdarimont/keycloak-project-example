@@ -1,61 +1,71 @@
 realm: acme-user-profile
 enabled: true
 
-components:
-  "org.keycloak.userprofile.UserProfileProvider":
-    - name: "Acme User Profile"
-      providerId: "declarative-user-profile"
-      config:
-        attributes:
-          - name: username
-            displayName: "${username}"
-            validations:
-              length:
-                min: 3
-                max: 255
-          - name: email
-            displayName: "${email}"
-            validations:
-              length:
-                max: 255
-          - name: firstName
-            displayName: "${firstName}"
-            required:
-              roles:
-                - user
-            permissions:
-              view:
-                - admin
-                - user
-              edit:
-                - admin
-                - user
-            validations:
-              length:
-                max: 255
-          - name: lastName
-            displayName: "${lastName}"
-            required:
-              roles:
-                - user
-            permissions:
-              view:
-                - admin
-                - user
-              edit:
-                - admin
-                - user
-            validations:
-              length:
-                max: 255
-          - selector:
-              scopes: [ ]
-            permissions:
-              view:
-                - user
-                - admin
-              edit:
-                - user
-                - admin
-            name: phoneNumber
-            displayName: "${phoneNumber}"
+attributes:
+  userProfileEnabled: true
+
+userProfile:
+  attributes:
+    - name: username
+      displayName: "${username}"
+      validations:
+        length:
+          min: 3
+          max: 255
+    - name: email
+      displayName: "${email}"
+      validations:
+        length:
+          max: 255
+    - name: firstName
+      displayName: "${firstName}"
+      required:
+        roles:
+          - user
+      permissions:
+        view:
+          - admin
+          - user
+        edit:
+          - admin
+          - user
+      validations:
+        length:
+          max: 255
+    - name: lastName
+      displayName: "${lastName}"
+      required:
+        roles:
+          - user
+      permissions:
+        view:
+          - admin
+          - user
+        edit:
+          - admin
+          - user
+      validations:
+        length:
+          max: 255
+    - name: phoneNumber
+      displayName: "${phoneNumber}"
+      annotations:
+        inputType: "html5-tel"
+      validations:
+        length:
+          min: 6
+          max: 64
+      required:
+        roles:
+          - user
+        scopes:
+          - "phone"
+      selector:
+        scopes: [ "phone" ]
+      permissions:
+        view:
+          - user
+          - admin
+        edit:
+          - user
+          - admin
