@@ -44,7 +44,7 @@
 
                 <div class="${properties.kcInputWrapperClass!}">
                     <input id="otp" name="otp" autocomplete="off" type="text" class="${properties.kcInputClass!}"
-                           inputmode="numeric" pattern="\d{6,8}" onkeyup="trySubmitForm()"
+                           inputmode="numeric" pattern="\d{6,8}" oninput="trySubmitForm()"
                            autofocus aria-invalid="<#if messagesPerField.existsError('totp')>true</#if>"/>
 
                     <#if messagesPerField.existsError('totp')>

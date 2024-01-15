@@ -5,7 +5,7 @@
     <#elseif section = "form">
 
         <script>
-            function trySubmitForm() {
+            function tryCompleteForm() {
                 let code = document.querySelector("#code").value;
                 if (code.length === 6) {
                     document.querySelector("#kc-sms-code-login-form").submit();
@@ -20,8 +20,8 @@
                 </div>
                 <div class="${properties.kcInputWrapperClass!}">
                     <input type="text" id="code" name="code" class="${properties.kcInputClass!}" autofocus
-                           inputmode="numeric" pattern="\d{6,8}" autocomplete="one-time-code"
-                           onkeyup="trySubmitForm()"
+                           inputmode="numeric" pattern="\d{6,8}" autocomplete="one-time-code" required
+                           oninput="tryCompleteForm()"
                            aria-invalid="<#if messagesPerField.existsError('code')>true</#if>"/>
 
                     <#if messagesPerField.existsError('code')>
@@ -35,7 +35,8 @@
 
             <div class="checkbox">
                 <label for="registerTrustedDevice" class="${properties.kcLabelClass!}">
-                    <input type="checkbox" id="registerTrustedDevice" name="register-trusted-device" class="${properties.kcCheckboxInputClass!}"
+                    <input type="checkbox" id="registerTrustedDevice" name="register-trusted-device"
+                           class="${properties.kcCheckboxInputClass!}"
                            value=""/>
                     ${msg("trustThisDevice")}
                 </label>
