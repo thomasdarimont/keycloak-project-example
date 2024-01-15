@@ -46,7 +46,7 @@
         <docker.file>keycloakx/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>23.0.3</keycloak.version>
+        <keycloak.version>23.0.4</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
         <revision>1.0.0</revision>
@@ -56,8 +56,8 @@
         <freemarker.version>2.3.32</freemarker.version>
 
         <!-- Testing -->
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
-        <assertj-core.version>3.22.0</assertj-core.version>
+        <junit-jupiter.version>5.9.2</junit-jupiter.version>
+        <assertj-core.version>3.24.2</assertj-core.version>
         <resteasy.version>6.2.4.Final</resteasy.version>
         <testcontainers-keycloak.version>3.2.0</testcontainers-keycloak.version>
 

@@ -287,7 +287,7 @@ public class MetricEventRecorder {
         var eventTypeName = eventType.name();
         var tags = Tags.of("realm", realmName, "event_type", eventTypeName);
 
-        if (eventType == EventType.CUSTOM_REQUIRED_ACTION) {
+        if (eventType == EventType.CUSTOM_REQUIRED_ACTION && event.getDetails().get(Details.CUSTOM_REQUIRED_ACTION) != null) {
             tags = Tags.concat(tags, Tags.of("custom_required_action", event.getDetails().get(Details.CUSTOM_REQUIRED_ACTION)));
         }
 
