@@ -32,7 +32,7 @@ public class KeycloakLogoutHandler implements LogoutHandler {
         try {
             response.sendRedirect(logoutUrl);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Failed to propagate logout", e);
         }
 
     }

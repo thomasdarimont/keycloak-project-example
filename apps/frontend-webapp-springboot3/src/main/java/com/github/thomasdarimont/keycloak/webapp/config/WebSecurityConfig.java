@@ -40,11 +40,15 @@ class WebSecurityConfig {
                     OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI //
             );
             oauth2AuthRequestResolver.setAuthorizationRequestCustomizer(OAuth2AuthorizationRequestCustomizers.withPkce());
-            o2cc.authorizationCodeGrant().authorizationRequestResolver(oauth2AuthRequestResolver);
+            o2cc.authorizationCodeGrant(customizer -> {
+                customizer.authorizationRequestResolver(oauth2AuthRequestResolver);
+            });
         });
 
         http.oauth2Login(o2lc -> {
-            o2lc.userInfoEndpoint().userAuthoritiesMapper(userAuthoritiesMapper());
+            o2lc.userInfoEndpoint(customizer -> {
+                customizer.userAuthoritiesMapper(userAuthoritiesMapper());
+            });
         });
         http.logout(lc -> {
             lc.addLogoutHandler(keycloakLogoutHandler);
