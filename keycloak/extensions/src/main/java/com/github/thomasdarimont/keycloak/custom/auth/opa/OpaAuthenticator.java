@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.opa;
 
 import com.github.thomasdarimont.keycloak.custom.config.MapConfig;
 import com.google.auto.service.AutoService;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -10,7 +11,6 @@ import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticationExecutionModel;
-import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
@@ -19,10 +19,8 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.services.messages.Messages;
 
-import jakarta.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @JBossLog
 public class OpaAuthenticator implements Authenticator {
@@ -103,25 +101,11 @@ public class OpaAuthenticator implements Authenticator {
                     .helpText("URL of OPA Authz Server Policy Resource") //
                     .add() //
 
-                    .property().name(OpaClient.OPA_USE_USER_ATTRIBUTES) //
-                    .type(ProviderConfigProperty.BOOLEAN_TYPE) //
-                    .label("Use user attributes") //
-                    .defaultValue("true") //
-                    .helpText("If enabled, user attributes will be sent with authz requests.") //
-                    .add() //
-
                     .property().name(OpaClient.OPA_USER_ATTRIBUTES) //
                     .type(ProviderConfigProperty.STRING_TYPE) //
                     .label("User Attributes") //
                     .defaultValue(null) //
                     .helpText("Comma separated list of user attributes to send with authz requests.") //
-                    .add() //
-
-                    .property().name(OpaClient.OPA_USE_REALM_ATTRIBUTES) //
-                    .type(ProviderConfigProperty.BOOLEAN_TYPE) //
-                    .label("Use realm attributes") //
-                    .defaultValue("false") //
-                    .helpText("If enabled, realm attributes will be sent with authz requests.") //
                     .add() //
 
                     .property().name(OpaClient.OPA_REALM_ATTRIBUTES) //
@@ -131,11 +115,18 @@ public class OpaAuthenticator implements Authenticator {
                     .helpText("Comma separated list of realm attributes to send with authz requests.") //
                     .add() //
 
-                    .property().name(OpaClient.OPA_USE_CLIENT_ATTRIBUTES) //
-                    .type(ProviderConfigProperty.BOOLEAN_TYPE) //
-                    .label("Use client attributes") //
-                    .defaultValue("false") //
-                    .helpText("If enabled, client attributes will be sent with authz requests.") //
+                    .property().name(OpaClient.OPA_CONTEXT_ATTRIBUTES) //
+                    .type(ProviderConfigProperty.STRING_TYPE) //
+                    .label("Context Attributes") //
+                    .defaultValue(null) //
+                    .helpText("Comma separated list of context attributes to send with authz requests. Supported attributes: remoteAddress") //
+                    .add() //
+
+                    .property().name(OpaClient.OPA_REQUEST_HEADERS) //
+                    .type(ProviderConfigProperty.STRING_TYPE) //
+                    .label("Request Headers") //
+                    .defaultValue(null) //
+                    .helpText("Comma separated list of request headers to send with authz requests.") //
                     .add() //
 
                     .property().name(OpaClient.OPA_CLIENT_ATTRIBUTES) //
@@ -217,7 +208,6 @@ public class OpaAuthenticator implements Authenticator {
 
         @Override
         public void init(Config.Scope config) {
-
             this.opaClient = new OpaClient();
         }
 

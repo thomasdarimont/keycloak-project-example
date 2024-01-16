@@ -20,6 +20,8 @@ public class OpaCheckAccessAction implements RequiredActionProvider {
 
     public static final String ID = "acme-opa-check-access";
 
+    public static final String REALM_ATTRIBUTE_PREFIX = "acme_opa_chk_";
+
     private final OpaClient opaClient;
 
     public OpaCheckAccessAction(OpaClient opaClient) {
@@ -45,7 +47,7 @@ public class OpaCheckAccessAction implements RequiredActionProvider {
         var user = context.getUser();
         var session = context.getSession();
         var authSession = context.getAuthenticationSession();
-        var config = new RealmConfig(realm);
+        var config = new RealmConfig(realm, REALM_ATTRIBUTE_PREFIX); // realm attributes are looked up with prefix
 
         var access = opaClient.checkAccess(session, config, realm, user, authSession.getClient(), OpaClient.OPA_ACTION_CHECK_ACCESS);
 

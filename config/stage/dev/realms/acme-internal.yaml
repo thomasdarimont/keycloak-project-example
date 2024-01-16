@@ -35,6 +35,7 @@ attributes:
   #"acme_logo_url": "no example, should be taken from client or null"
   "acme_account_deleted_url": "https://apps.acme.test:4443/site/accountdeleted.html"
   "acme_greeting": "Hello"
+  "acme_opa_chk_contextAttributes": "remoteAddress"
 
 # Bruteforce Protection
 bruteForceProtected: true
@@ -665,9 +666,6 @@ authenticatorConfig:
     config:
       # realmAttributes: "acme_greeting"
       authzUrl: "http://acme-opa:8181/v1/data/iam/keycloak/allow"
-      useUserAttributes: "true"
-      useClientAttributes: "true"
-      useRealmAttributes: "true"
       useClientRoles: "true"
       useRealmRoles: "true"
 

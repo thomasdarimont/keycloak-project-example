@@ -76,6 +76,24 @@ public interface ConfigAccessor {
         return getValue(key, Boolean::parseBoolean);
     }
 
+    /**
+     * Check if the value is present and non-null and not an empty string.
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    default boolean isConfigured(String key, boolean defaultValue) {
+        if (!containsKey(key)) {
+            return defaultValue;
+        }
+        String value = getValue(key);
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+        return true;
+    }
+
     @RequiredArgsConstructor
     class MissingKeyException extends RuntimeException {
 
