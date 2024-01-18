@@ -48,6 +48,8 @@ class start {
     static final String OPA_OPT = "--opa";
     static final String KEYCLOAK_OPT = "--keycloak=keycloak";
     static final String POSTGRES_OPT = "--database=postgres";
+
+    static final String ORACLE_OPT = "--database=oracle";
     static final String MSSQL_OPT = "--database=mssql";
     static final String MYSQL_OPT = "--database=mysql";
     static final String GRAYLOG_OPT = "--logging=graylog";
@@ -73,7 +75,8 @@ class start {
         var useOpa = argList.contains(OPA_OPT);
         var useMssql = argList.contains(MSSQL_OPT);
         var useMysql = argList.contains(MYSQL_OPT);
-        var useDatabase = usePostgres || useMysql || useMssql;
+        var useOracle = argList.contains(ORACLE_OPT);
+        var useDatabase = usePostgres || useMysql || useMssql || useOracle;
         var useGraylog = argList.contains(GRAYLOG_OPT);
         var useGrafana = argList.contains(GRAFANA_OPT);
         var usePrometheus = argList.contains(PROMETHEUS_OPT);
@@ -187,6 +190,11 @@ class start {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-mssql.yml");
             createFolderIfMissing("deployments/local/dev/run/mssql/data/");
+            requiresBuild = true;
+        } else if (useOracle) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-oracle.yml");
+            createFolderIfMissing("deployments/local/dev/run/oracle/data/");
             requiresBuild = true;
         }
 

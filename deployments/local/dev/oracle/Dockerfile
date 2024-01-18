@@ -1,0 +1,3 @@
+FROM container-registry.oracle.com/database/free
+
+# customizations here...
