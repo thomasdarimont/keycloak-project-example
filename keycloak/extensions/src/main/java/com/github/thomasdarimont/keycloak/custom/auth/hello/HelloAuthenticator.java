@@ -7,6 +7,7 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.models.AuthenticationExecutionModel;
+import org.keycloak.models.AuthenticatorConfigModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
@@ -28,7 +29,8 @@ public class HelloAuthenticator implements Authenticator {
         // entrypoint
         // check auth
         // "force challenge if necessary"
-        String message = context.getAuthenticatorConfig().getConfig().getOrDefault("message", "Hello");
+        var authConfig = context.getAuthenticatorConfig();
+        String message = authConfig == null ? "Hello" : authConfig.getConfig().getOrDefault("message", "Hello");
         String username = context.getAuthenticationSession().getAuthenticatedUser().getUsername();
         log.infof("%s %s%n", message, username);
 
