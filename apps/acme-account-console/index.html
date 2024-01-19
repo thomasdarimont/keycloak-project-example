@@ -269,7 +269,7 @@
         keycloak.createLogoutUrl = function (options) {
             return keycloak.endpoints.logout()
                 + '?id_token_hint=' + keycloak.idToken
-                + '&post_logout_redirect_uri=' + encodeURIComponent(window.location.href);
+                + '&post_logout_redirect_uri=' + encodeURIComponent(options?.redirectUri || window.location.href);
         }
 
         let initConfig = {
