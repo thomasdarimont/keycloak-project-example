@@ -9,7 +9,7 @@ registrationEmailAsUsername: false
 loginTheme: internal-modern
 accountTheme: keycloak
 adminTheme: keycloak
-emailTheme: keycloak
+emailTheme: internal-modern
 internationalizationEnabled: true
 supportedLocales: ["en","de"]
 defaultLocale: "en"
