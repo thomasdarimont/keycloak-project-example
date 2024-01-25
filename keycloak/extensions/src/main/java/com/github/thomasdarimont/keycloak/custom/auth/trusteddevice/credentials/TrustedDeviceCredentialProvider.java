@@ -164,6 +164,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
         return credentialModel != null;
     }
 
+    @SuppressWarnings("rawtypes")
     @AutoService(CredentialProviderFactory.class)
     public static class Factory implements CredentialProviderFactory<TrustedDeviceCredentialProvider> {
 

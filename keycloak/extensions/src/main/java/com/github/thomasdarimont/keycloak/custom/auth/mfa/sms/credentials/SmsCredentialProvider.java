@@ -108,6 +108,7 @@ public class SmsCredentialProvider implements CredentialProvider<CredentialModel
         return builder.build(session);
     }
 
+    @SuppressWarnings("rawtypes")
     @AutoService(CredentialProviderFactory.class)
     public static class Factory implements CredentialProviderFactory<SmsCredentialProvider> {
 

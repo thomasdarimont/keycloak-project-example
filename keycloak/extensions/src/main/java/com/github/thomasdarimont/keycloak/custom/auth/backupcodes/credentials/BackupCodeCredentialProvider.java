@@ -167,6 +167,7 @@ public class BackupCodeCredentialProvider implements CredentialProvider<Credenti
         return builder.build(session);
     }
 
+    @SuppressWarnings("rawtypes")
     @AutoService(CredentialProviderFactory.class)
     public static class Factory implements CredentialProviderFactory<BackupCodeCredentialProvider> {
 

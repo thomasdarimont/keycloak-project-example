@@ -137,6 +137,7 @@ public class KeycloakMetricStore implements KeycloakMetricAccessor {
 
                 Tags tags = realm == null ? Tags.empty() : Tags.of("realm", realm.getName());
                 String metricKey = registerCustomMetricIfMissing(metric, tags);
+                @SuppressWarnings("unchecked")
                 Double metricValue = ((MetricUpdateValue<? extends Number>) value).getValue().doubleValue();
                 metricsBuffer.put(metricKey, metricValue);
 

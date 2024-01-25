@@ -22,6 +22,7 @@ import org.keycloak.services.messages.Messages;
 import java.net.URI;
 
 @JBossLog
+@SuppressWarnings("rawtypes")
 @AutoService(ActionTokenHandlerFactory.class)
 public class SessionPropagationActionTokenHandler extends AbstractActionTokenHandler<SessionPropagationActionToken> {
 
@@ -82,6 +83,7 @@ public class SessionPropagationActionTokenHandler extends AbstractActionTokenHan
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public TokenVerifier.Predicate<? super SessionPropagationActionToken>[] getVerifiers(ActionTokenContext<SessionPropagationActionToken> tokenContext) {
         // TODO add additional checks if necessary
         return TokenUtils.predicates(DefaultActionToken.ACTION_TOKEN_BASIC_CHECKS);

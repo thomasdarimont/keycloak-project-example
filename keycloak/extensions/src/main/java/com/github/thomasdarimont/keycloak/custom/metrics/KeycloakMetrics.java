@@ -9,6 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import lombok.Data;
 import lombok.extern.jbosslog.JBossLog;
+import org.hibernate.jpa.AvailableHints;
 import org.hibernate.jpa.QueryHints;
 import org.keycloak.common.Version;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
@@ -94,13 +95,10 @@ public class KeycloakMetrics {
 
     private final MeterRegistry meterRegistry;
 
-    private final KeycloakSessionFactory sessionFactory;
-
     private final KeycloakMetricStore store;
 
     public KeycloakMetrics(MeterRegistry meterRegistry, KeycloakSessionFactory sessionFactory) {
         this.meterRegistry = meterRegistry;
-        this.sessionFactory = sessionFactory;
 
 
         this.store = new KeycloakMetricStore(sessionFactory, meterRegistry, new RealmMetricsUpdater() {
@@ -109,7 +107,7 @@ public class KeycloakMetrics {
                 // Performs the dynamic metrics collection on global level: this is called when metrics need to be refreshed
                 log.debugf("Updating realm count");
                 var em = session.getProvider(JpaConnectionProvider.class).getEntityManager();
-                Number realmCount = (Number) em.createQuery("select count(r) from RealmEntity r").setHint(QueryHints.HINT_READONLY, true).getSingleResult();
+                Number realmCount = (Number) em.createQuery("select count(r) from RealmEntity r").setHint(AvailableHints.HINT_READ_ONLY, true).getSingleResult();
                 metricUpdater.updateMetricValue(KeycloakMetrics.INVENTORY_REALMS_TOTAL, new MetricUpdateValue<>(realmCount), null);
                 log.debugf("Updated realm count");
             }

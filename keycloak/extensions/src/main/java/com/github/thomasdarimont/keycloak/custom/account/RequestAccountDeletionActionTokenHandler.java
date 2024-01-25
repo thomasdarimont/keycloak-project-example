@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 
 @JBossLog
+@SuppressWarnings("rawtypes")
 @AutoService(ActionTokenHandlerFactory.class)
 public class RequestAccountDeletionActionTokenHandler extends AbstractActionTokenHandler<RequestAccountDeletionActionToken> {
 

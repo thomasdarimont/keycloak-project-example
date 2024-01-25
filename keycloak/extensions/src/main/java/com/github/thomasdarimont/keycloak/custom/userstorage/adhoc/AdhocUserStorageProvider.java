@@ -126,6 +126,7 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
     @AutoService(UserStorageProviderFactory.class)
     public static class Factory implements UserStorageProviderFactory<AdhocUserStorageProvider> {
 

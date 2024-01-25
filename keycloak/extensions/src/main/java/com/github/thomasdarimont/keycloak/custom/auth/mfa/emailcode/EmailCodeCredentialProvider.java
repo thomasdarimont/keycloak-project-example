@@ -93,6 +93,7 @@ public class EmailCodeCredentialProvider implements CredentialProvider<Credentia
         return builder.build(session);
     }
 
+    @SuppressWarnings("rawtypes")
     @AutoService(CredentialProviderFactory.class)
     public static class Factory implements CredentialProviderFactory<EmailCodeCredentialProvider> {
 
