@@ -22,15 +22,6 @@
         }
     }
 
-    // hack to add key icon for backup-code authenticator, needs to be called after dom ready
-    function updateBackupCodeIconOnBackupCodeAuthenticatorInAuthenticationSelector() {
-        let elements = [...document.querySelectorAll('div.pf-c-title')].filter(elem => elem.textContent.includes('Backup'));
-        if (elements && elements.length > 0) {
-            console.log("patch backup-code icon");
-            elements[0].parentElement.parentElement.querySelector("i").classList.add("pficon-key");
-        }
-    }
-
     function enableInactivityMonitoring() {
 
         let idleSinceTimestamp = Date.now();
@@ -83,7 +74,6 @@
 
     function onDomContentLoaded() {
         updateAuthenticatorIconsInAuthenticationSelector();
-        updateBackupCodeIconOnBackupCodeAuthenticatorInAuthenticationSelector();
 
         autoSubmitLoginHintForUsernameFormForCompanyApps();
 
