@@ -1,5 +1,5 @@
 #see https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=23.0.4
+ARG KEYCLOAK_VERSION=23.0.5
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 #FROM thomasdarimont/keycloak:21.0.999.1
 ARG OTEL_AGENT_VERSION=1.32.0
