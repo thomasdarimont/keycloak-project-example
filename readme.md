@@ -34,7 +34,8 @@ d) **Operator** configuring realm and server for different stages
 - Support Keycloak configuration customization via CLI scripts
 - Examples for Integration Tests with [Keycloak-Testcontainers](https://github.com/dasniko/testcontainers-keycloak)
 - Example for End-to-End Tests with [Cypress](https://www.cypress.io/)
-- Realm configuration as Configuration as Code via [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) 
+- Realm configuration as Configuration as Code via [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli)
+- Example configurations to run Keycloak against different databases (PostgreSQL, MySQL, Oracle, MSSQL)
 - Multi-realm setup example with OpenID Connect and SAML based Identity Brokering
 - LDAP based User Federation backed by [Docker-OpenLDAP](https://github.com/osixia/docker-openldap)
 - Mail Server integration backed by [maildev](https://github.com/maildev/maildev)
