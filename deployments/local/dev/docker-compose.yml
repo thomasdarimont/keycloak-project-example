@@ -2,7 +2,7 @@ services:
   # Web Interface: http://localhost:1080/mail
   # Web API: https://github.com/maildev/maildev/blob/master/docs/rest.md
   mail:
-    image: maildev/maildev:2.1.0@sha256:57e0b96fefb5dfeda8b39fb04c666ee7eef7be899ac8ea0e4d983bb0ea64aaff
+    image: maildev/maildev:2.1.0 #@sha256:57e0b96fefb5dfeda8b39fb04c666ee7eef7be899ac8ea0e4d983bb0ea64aaff
     environment:
       MAILDEV_BASE_PATHNAME: "/mail"
     ports:
