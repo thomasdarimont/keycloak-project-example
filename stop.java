@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Controller script to stop the Keycloak environment.
@@ -17,10 +18,12 @@ class start {
 
     static final String HELP_CMD = "help";
 
+    static final String VERBOSE_OPT = "--verbose";
+
     public static void main(String[] args) throws IOException{
 
         var argList = Arrays.asList(args);
-
+        var verbose = argList.contains(VERBOSE_OPT);
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
             System.out.println("Keycloak Environment stopper");
@@ -75,6 +78,12 @@ class start {
         }
         commandLine.add("down");
         commandLine.add("--remove-orphans");
+        commandLine.add("--volumes");
+
+        if (verbose) {
+            System.out.printf("Generated command: %n```%n%s%n```%n",
+                    commandLine.stream().collect(Collectors.joining(" \\\n")));
+        }
 
         var pb = new ProcessBuilder(commandLine);
         pb.directory(new File("."));

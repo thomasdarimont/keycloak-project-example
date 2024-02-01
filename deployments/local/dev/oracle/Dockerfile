@@ -1,3 +1,3 @@
-FROM container-registry.oracle.com/database/free
+FROM gvenzl/oracle-free:latest
 
 # customizations here...

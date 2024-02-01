@@ -4,36 +4,31 @@ services:
       context: "../../../config/stage/dev/tls"
       dockerfile: "../../../../deployments/local/dev/oracle/Dockerfile"
     environment:
-      ORACLE_PWD: training
-    command:
-## Certificates are added in the Dockerfile with the proper permissions for mysql
-#      - "mysqld"
-#      - "--bind-address=0.0.0.0"
-#      - "--require_secure_transport=ON"
-#      - "--ssl-ca=/etc/certs/ca.crt"
-#      - "--ssl-cert=/etc/certs/server.crt"
-#      - "--ssl-key=/etc/certs/server.key"
+      ORACLE_PASSWORD: 'secret'
+      APP_USER: 'keycloak'
+      APP_USER_PASSWORD: 'keycloak'
     ports:
-      - "51521:1521"
-#    healthcheck:
-#      test: "mysqladmin --user root --password=mysql status"
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
+      - "1521:1521"
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
-      - ./run/oracle/data:/opt/oracle/oradata:z
+      - keycloak-data-oracle1:/opt/oracle/oradata:z
 
   acme-keycloak:
-    env_file:
-      - ./keycloak-db.env
     environment:
-      # keycloak-x
       KC_DB: oracle
-#      KC_DB_URL_PROPERTIES: "?requireSSL=true&enabledTLSProtocols=TLSv1.2"
-#      KC_DB_SCHEMA: "keycloak"
-    volumes:
-      # Allow TLS connection to ourself, this is necessary for cross realm Identity Brokering
-#      - ../../../config/stage/dev/tls/acme.test+1.pem:/etc/x509/ca/tls.crt:z
-#    depends_on:
-#      acme-keycloak-db:
-#        condition: service_healthy
+      KC_DB_DRIVER: "oracle.jdbc.OracleDriver"
+      KC_DB_URL: "jdbc:oracle:thin:@acme-keycloak-db:1521/FREEPDB1"
+      KC_TRANSACTION_XA_ENABLED: "false"
+      KC_DB_USERNAME: 'keycloak'
+      KC_DB_PASSWORD: 'keycloak'
+    depends_on:
+      acme-keycloak-db:
+        condition: service_healthy
+
+volumes:
+  keycloak-data-oracle1:
+    name: keycloak-data-oracle1

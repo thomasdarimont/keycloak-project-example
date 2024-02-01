@@ -94,7 +94,7 @@ class start {
             return;
         }
 
-        if (useDatabase && !(useMysql ^ usePostgres ^ useMssql)) {
+        if (useDatabase && !(useMysql ^ usePostgres ^ useMssql ^ useOracle)) {
             System.out.println("Invalid database configuration detected. Only one --database parameter is allowed!");
             showHelp();
             System.exit(-1);
@@ -313,6 +313,7 @@ class start {
         System.out.printf("  %s: %s%n", OPENLDAP_OPT, "enables OpenLDAP support. (Optional)");
         System.out.printf("  %s: %s%n", POSTGRES_OPT, "enables PostgreSQL database support. (Optional) If no other database is provided, H2 database is used");
         System.out.printf("  %s: %s%n", MYSQL_OPT, "enables MySQL database support. (Optional) If no other database is provided, H2 database is used");
+        System.out.printf("  %s: %s%n", ORACLE_OPT, "enables Oracle database support. (Optional) If no other database is provided, H2 database is used");
         System.out.printf("  %s: %s%n", GRAYLOG_OPT, "enables Graylog database support. (Optional)");
         System.out.printf("  %s: %s%n", EXTENSIONS_OPT, "choose dynamic extensions extension based on \"classes\" or static based on \"jar\"");
         System.out.printf("  %s: %s%n", DETACH_OPT, "Detached mode: Run containers in the background and prints the container name.. (Optional)");
