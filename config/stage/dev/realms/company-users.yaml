@@ -30,8 +30,8 @@ attributes:
 smtpServer:
   replyToDisplayName: "Company Users Support"
   port: 1025
-  host: mailhog
-  replyTo: "no-reply@localhost"
+  host: mail
+  replyTo: "no-reply@acme.test"
   from: "company-apps-sso@local"
   fromDisplayName: "Company Users Account"
 

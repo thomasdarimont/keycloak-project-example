@@ -25,10 +25,10 @@ attributes:
 
 smtpServer:
   port: 1025
-  host: mailhog
+  host: mail
   from: "acme-api-sso@local"
   fromDisplayName: "Acme API Account"
-  replyTo: "no-reply@localhost"
+  replyTo: "no-reply@acme.test"
   replyToDisplayName: "Acme API Support"
 
 clientScopes:

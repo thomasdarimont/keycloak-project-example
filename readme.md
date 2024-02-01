@@ -37,7 +37,7 @@ d) **Operator** configuring realm and server for different stages
 - Realm configuration as Configuration as Code via [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) 
 - Multi-realm setup example with OpenID Connect and SAML based Identity Brokering
 - LDAP based User Federation backed by [Docker-OpenLDAP](https://github.com/osixia/docker-openldap)
-- Mail Server integration backed by [MailHog](https://github.com/mailhog/MailHog)
+- Mail Server integration backed by [maildev](https://github.com/maildev/maildev)
 - TLS Support
 - Support for exposing metrics via smallrye-metrics
 - Examples for running a cluster behind a reverse proxy with examples for [HAProxy](deployments/local/cluster/haproxy), [Apache](deployments/local/cluster/apache), [nginx](deployments/local/cluster/nginx), [caddy](deployments/local/cluster/caddy)
@@ -373,10 +373,10 @@ java bin/realmImex.java --realm=acme-internal --verbose --action=import
 
 # Tools
 
-## Mailhog
+## maildev
 
-Web Interface: http://localhost:1080/#
-Web API: http://localhost:1080/api/v2/messages
+Web Interface: http://localhost:1080/mail
+Web API: https://github.com/maildev/maildev/blob/master/docs/rest.md
 
 ## phpldapadmin
 

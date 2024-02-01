@@ -39,8 +39,8 @@ attributes:
 smtpServer:
   replyToDisplayName: "Acme APPS Support"
   port: 1025
-  host: mailhog
-  replyTo: "no-reply@localhost"
+  host: mail
+  replyTo: "no-reply@acme.test"
   from: "acme-apps-sso@local"
   fromDisplayName: "Acme APPS Account"
 

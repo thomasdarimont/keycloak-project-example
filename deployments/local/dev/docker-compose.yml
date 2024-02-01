@@ -1,14 +1,12 @@
 services:
-  mailhog:
-    # Web Interface: http://localhost:1080/#
-    # Web API: http://localhost:1080/api/v2/messages
-    image: mailhog/mailhog:v1.0.1@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
-    logging:
-      driver: none
-    # Disable mailhog logging, see: https://github.com/mailhog/MailHog/issues/56
-    entrypoint: ["/bin/sh", "-c", "MailHog &>/dev/null"]
+  # Web Interface: http://localhost:1080/mail
+  # Web API: https://github.com/maildev/maildev/blob/master/docs/rest.md
+  mail:
+    image: maildev/maildev:2.1.0@sha256:57e0b96fefb5dfeda8b39fb04c666ee7eef7be899ac8ea0e4d983bb0ea64aaff
+    environment:
+      MAILDEV_BASE_PATHNAME: "/mail"
     ports:
-      - "1080:8025"
+      - "1080:1080"
       - "1025:1025"
 
   acme-account-console:
