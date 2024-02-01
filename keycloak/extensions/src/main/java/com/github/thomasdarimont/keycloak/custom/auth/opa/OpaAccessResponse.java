@@ -14,7 +14,7 @@ public class OpaAccessResponse {
 
     private Map<String, Object> result;
 
-    private Map<String, Object> additionalData = new HashMap<>();
+    private Map<String, Object> additionalData;
 
     public OpaAccessResponse(Map<String, Object> result) {
         this.result = result;
@@ -38,6 +38,9 @@ public class OpaAccessResponse {
 
     @JsonAnySetter
     public void handleUnknownProperty(String key, Object value) {
+        if (additionalData == null) {
+            additionalData = new HashMap<>();
+        }
         this.additionalData.put(key, value);
     }
 }

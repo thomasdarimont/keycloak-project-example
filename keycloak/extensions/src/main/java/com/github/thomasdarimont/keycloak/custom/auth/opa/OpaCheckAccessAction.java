@@ -20,6 +20,8 @@ public class OpaCheckAccessAction implements RequiredActionProvider {
 
     public static final String ID = "acme-opa-check-access";
 
+    public static final String ACTION_ALREADY_EXECUTED_MARKER = ID;
+
     public static final String REALM_ATTRIBUTE_PREFIX = "acme_opa_chk_";
 
     private final OpaClient opaClient;
@@ -32,10 +34,10 @@ public class OpaCheckAccessAction implements RequiredActionProvider {
     public void evaluateTriggers(RequiredActionContext context) {
 
         var authSession = context.getAuthenticationSession();
-        if (authSession.getAuthNote(ID) != null) {
+        if (authSession.getAuthNote(ACTION_ALREADY_EXECUTED_MARKER) != null) {
             return;
         }
-        authSession.setAuthNote(ID, "true");
+        authSession.setAuthNote(ACTION_ALREADY_EXECUTED_MARKER, "true");
 
         authSession.addRequiredAction(ID);
     }

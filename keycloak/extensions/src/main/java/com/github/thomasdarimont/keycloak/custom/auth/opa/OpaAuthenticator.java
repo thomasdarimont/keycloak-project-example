@@ -26,6 +26,7 @@ import java.util.List;
 public class OpaAuthenticator implements Authenticator {
 
     private final KeycloakSession session;
+
     private final OpaClient opaClient;
 
     public OpaAuthenticator(KeycloakSession session, OpaClient opaClient) {
