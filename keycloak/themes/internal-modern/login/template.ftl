@@ -44,9 +44,9 @@
 
     <body class="${properties.kcBodyClass!}">
     <div class="${properties.kcLoginClass!}">
-        <div id="cc-kc-header" class="${properties.kcHeaderClass!}">
-            <div class="flex-container cc-header-container">
-                <div class="cc-main-realm">${kcSanitize(msg("loginTitleHtml",(realm.displayNameHtml!'')))?no_esc}</div>
+        <div id="custom-kc-header" class="${properties.kcHeaderClass!}">
+            <div class="flex-container custom-header-container">
+                <div class="custom-main-realm">${kcSanitize(msg("loginTitleHtml",(realm.displayNameHtml!'')))?no_esc}</div>
             </div>
         </div>
         <div class="${properties.kcFormCardClass!} <#if displayWide>${properties.kcFormCardAccountClass!}</#if>">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                     <#else>
-                        <h1 id="cc-kc-page-title"><#nested "header"></h1>
+                        <h1 id="custom-kc-page-title"><#nested "header"></h1>
                     </#if>
                 <#else>
                     <#if displayRequiredFields>
@@ -102,10 +102,10 @@
                     </#if>
                 </#if>
                 <#if client??>
-                <h1 id="cc-kc-app-name">${advancedMsg(client.name!'')}</h1>
+                <h1 id="custom-kc-app-name">${advancedMsg(client.name!'')}</h1>
                 </#if>
             </header>
-            <div id="cc-kc-content">
+            <div id="custom-kc-content">
                 <div id="kc-content-wrapper">
 
                     <#-- App-initiated actions should not see warning messages about the need to complete the action -->
@@ -148,7 +148,7 @@
 
             <div>
 
-                <hr class="cc-hr">
+                <hr class="custom-hr">
                 <#if realm.internationalizationEnabled  && locale.supported?size gt 1>
                     <div id="kc-locale">
                         <div id="kc-locale-wrapper" class="${properties.kcLocaleWrapperClass!}">
