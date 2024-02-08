@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.userstorage.adhoc;
 
 import com.google.auto.service.AutoService;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
@@ -15,6 +16,7 @@ import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.UserStorageProviderFactory;
 import org.keycloak.storage.UserStorageProviderModel;
 import org.keycloak.storage.user.ImportSynchronization;
+import org.keycloak.storage.user.ImportedUserValidation;
 import org.keycloak.storage.user.SynchronizationResult;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserRegistrationProvider;
@@ -28,11 +30,13 @@ import java.util.UUID;
  * Adhoc User storage that dynamically generates a local user for a lookup to ease load-tests, every password is valid, unless it starts with "invalid".
  * Lookups for usernames that starts with "notfound" will always fail.
  */
+@JBossLog
 public class AdhocUserStorageProvider implements UserStorageProvider, //
         UserLookupProvider,  //
         UserRegistrationProvider, //
         CredentialInputValidator, //
-        ImportSynchronization //
+        ImportSynchronization, //
+        ImportedUserValidation // validate imported users
 {
 
     public static final String ID = "adhoc";
@@ -73,12 +77,16 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
         var userId = UUID.nameUUIDFromBytes(username.getBytes(StandardCharsets.UTF_8)).toString();
         var email = username + "@acme.test";
 
-        jpaUser = jpaUserProvider.addUser(realm, userId, username, true, false);
-        jpaUser.setEmail(email);
-        jpaUser.setFirstName("First " + username);
-        jpaUser.setLastName("Last " + username);
-        jpaUser.setEnabled(true);
-        jpaUser.setFederationLink(model.getId());
+        try {
+            jpaUser = jpaUserProvider.addUser(realm, userId, username, true, false);
+            jpaUser.setEmail(email);
+            jpaUser.setFirstName("First " + username);
+            jpaUser.setLastName("Last " + username);
+            jpaUser.setEnabled(true);
+            jpaUser.setFederationLink(model.getId());
+        } catch (Exception ex) {
+            log.errorf(ex, "Failed to create ad-hoc local user during lookup. username=%s", username);
+        }
 
         return jpaUser;
     }
@@ -113,7 +121,9 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
 
     @Override
     public boolean removeUser(RealmModel realm, UserModel user) {
-        return true;
+
+        var jpaUserProvider = session.getProvider(UserProvider.class);
+        return jpaUserProvider.removeUser(realm, user);
     }
 
     @Override
@@ -124,6 +134,13 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
     @Override
     public SynchronizationResult syncSince(Date lastSync, KeycloakSessionFactory sessionFactory, String realmId, UserStorageProviderModel model) {
         return null;
+    }
+
+    @Override
+    public UserModel validate(RealmModel realm, UserModel user) {
+
+        log.debugf("Validate user. realm=%s userId=%s", realm.getName(), user.getId());
+        return user;
     }
 
     @SuppressWarnings("rawtypes")
