@@ -1,0 +1,24 @@
+{
+  "input" : {
+    "subject" : {
+      "id" : "4c3e26e3-77f4-4228-a20d-9383151b7224",
+      "username" : "tester",
+      "realmRoles" : [ "default-roles-opademo", "offline_access", "uma_authorization", "user" ],
+      "clientRoles" : [ "app1:access", "account:view-profile", "account:manage-account", "account:manage-account-links" ],
+      "attributes" : {
+        "emailVerified" : false,
+        "email" : "tester@local.test"
+      }
+    },
+    "resource" : {
+      "realm" : "opademo",
+      "clientId" : "app1"
+    },
+    "context" : {
+      "attributes" : {
+        "remoteAddress" : "0:0:0:0:0:0:0:1"
+      }
+    },
+    "action" : "access"
+  }
+}

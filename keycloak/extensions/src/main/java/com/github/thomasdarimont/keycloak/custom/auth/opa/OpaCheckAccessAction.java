@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.opa;
 
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import com.google.auto.service.AutoService;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.Config;
 import org.keycloak.authentication.RequiredActionContext;
 import org.keycloak.authentication.RequiredActionFactory;
@@ -10,8 +11,6 @@ import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.services.messages.Messages;
-
-import jakarta.ws.rs.core.Response;
 
 /**
  * Required Action that evaluates an OPA Policy to check if access to target client is allowed for the current user.
@@ -53,21 +52,21 @@ public class OpaCheckAccessAction implements RequiredActionProvider {
 
         var access = opaClient.checkAccess(session, config, realm, user, authSession.getClient(), OpaClient.OPA_ACTION_CHECK_ACCESS);
 
-        if (!access.isAllowed()) {
-            // deny access
-
-            var loginForm = session.getProvider(LoginFormsProvider.class);
-            var hint = access.getHint();
-            if (hint == null) {
-                hint = Messages.ACCESS_DENIED;
-            }
-            loginForm.setError(hint, user.getUsername());
-
-            context.challenge(loginForm.createErrorPage(Response.Status.FORBIDDEN));
+        if (access.isAllowed()) {
+            context.success();
             return;
         }
 
-        context.success();
+        // deny access
+        var loginForm = session.getProvider(LoginFormsProvider.class);
+        var hint = access.getHint();
+        if (hint == null) {
+            hint = Messages.ACCESS_DENIED;
+        }
+        loginForm.setError(hint, user.getUsername());
+
+        context.challenge(loginForm.createErrorPage(Response.Status.FORBIDDEN));
+        return;
 
     }
 

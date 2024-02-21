@@ -11,6 +11,7 @@ services:
       - "--watch"
       - "/policies"
     volumes:
-      - ../../../config/stage/dev/opa:/policies:z
+      - ../../../config/stage/dev/opa/iam:/policies/iam:z
+      - ../../../config/stage/dev/opa/policies/keycloak:/policies/keycloak:z
     ports:
       - "18181:8181"
