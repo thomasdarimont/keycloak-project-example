@@ -61,7 +61,7 @@ public class SelectMfaMethodAuthenticator implements Authenticator {
         LoginFormsProvider form = context.form();
         form.setAttribute("mfaMethods", mfaCredentialTypes);
         Response selectMfaResponse = form.createForm("login-select-mfa-method.ftl");
-        context.challenge(selectMfaResponse);
+        context.forceChallenge(selectMfaResponse);
     }
 
     @Override
