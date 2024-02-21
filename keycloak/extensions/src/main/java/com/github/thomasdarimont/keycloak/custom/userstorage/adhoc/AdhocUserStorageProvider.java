@@ -116,6 +116,11 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
 
     @Override
     public UserModel addUser(RealmModel realm, String username) {
+
+//        var jpaUserProvider = session.getProvider(UserProvider.class);
+//        UserModel userModel = jpaUserProvider.addUser(realm, username);
+//        userModel.setFederationLink(model.getId());
+
         return null;
     }
 
