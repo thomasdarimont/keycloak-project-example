@@ -5,6 +5,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountRe
 import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.filter.ProtectedResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
@@ -107,5 +108,10 @@ public class CustomResource {
         }
 
         return new AdminSettingsResource(session, authResult);
+    }
+
+    @Path("protected")
+    public ProtectedResource protectedResource() {
+        return resourceContext.initResource(new ProtectedResource(session));
     }
 }
