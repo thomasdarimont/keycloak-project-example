@@ -1,0 +1,32 @@
+### Resource Owner Password Credentials Grant Flow with Public Client
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{CLIENT_ID_1}}&username={{USER_USERNAME}}&password={{USER_PASSWORD}}&grant_type=password&scope=profile offline_access
+
+> {%
+    client.global.set("KC_ACCESS_TOKEN", response.body.access_token);
+    client.global.set("KC_REFRESH_TOKEN", response.body.refresh_token);
+%}
+
+####
+
+### Call custom token migration endpoint
+POST {{ISSUER}}/custom-resources/migration/token
+Content-Type: application/json
+Authorization: Bearer {{KC_ACCESS_TOKEN}}
+
+{
+  "target_client_id": "client-2"
+}
+
+> {%
+    client.global.set("KC_ACCESS_TOKEN_NEW", response.body.access_token);
+    client.global.set("KC_REFRESH_TOKEN_NEW", response.body.refresh_token);
+%}
+
+### Obtain new Tokens via RefreshToken
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{CLIENT_ID_2}}&grant_type=refresh_token&refresh_token={{KC_REFRESH_TOKEN_NEW}}

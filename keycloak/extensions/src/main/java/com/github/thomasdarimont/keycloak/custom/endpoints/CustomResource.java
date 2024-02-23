@@ -5,6 +5,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountRe
 import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.migration.TokenMigrationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
@@ -107,5 +108,15 @@ public class CustomResource {
         }
 
         return new AdminSettingsResource(session, authResult);
+    }
+
+    /**
+     * http://localhost:8080/auth/realms/acme-token-migration/custom-resources/migration/token
+     *
+     * @return
+     */
+    @Path("migration/token")
+    public TokenMigrationResource migration() {
+        return new TokenMigrationResource(session, token);
     }
 }
