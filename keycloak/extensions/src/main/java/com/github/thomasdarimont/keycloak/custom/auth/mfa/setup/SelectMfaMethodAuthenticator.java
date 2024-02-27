@@ -9,6 +9,7 @@ import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.authentication.requiredactions.WebAuthnPasswordlessRegisterFactory;
+import org.keycloak.authentication.requiredactions.WebAuthnRegisterFactory;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.forms.login.LoginFormsProvider;
 import org.keycloak.models.AuthenticationExecutionModel;
@@ -36,7 +37,7 @@ import java.util.stream.Stream;
 public class SelectMfaMethodAuthenticator implements Authenticator {
 
     private static final Set<String> DEFAULT_MFA_CREDENTIAL_TYPES = new LinkedHashSet<>(List.of(WebAuthnCredentialModel.TYPE_TWOFACTOR, OTPCredentialModel.TYPE));
-    private static final Map<String, String> DEFAULT_MFA_CREDENTIAL_TYPE_TO_REQUIRED_ACTION_MAP = Map.ofEntries(Map.entry(WebAuthnCredentialModel.TYPE_TWOFACTOR, WebAuthnPasswordlessRegisterFactory.PROVIDER_ID), Map.entry(OTPCredentialModel.TYPE, UserModel.RequiredAction.CONFIGURE_TOTP.name()));
+    private static final Map<String, String> DEFAULT_MFA_CREDENTIAL_TYPE_TO_REQUIRED_ACTION_MAP = Map.ofEntries(Map.entry(WebAuthnCredentialModel.TYPE_TWOFACTOR, WebAuthnRegisterFactory.PROVIDER_ID), Map.entry(OTPCredentialModel.TYPE, UserModel.RequiredAction.CONFIGURE_TOTP.name()));
 
     private static final SelectMfaMethodAuthenticator INSTANCE = new SelectMfaMethodAuthenticator();
     public static final String MFA_CREDENTIAL_TYPES_KEY = "mfaCredentialTypes";
