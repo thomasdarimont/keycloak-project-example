@@ -29,6 +29,7 @@ clients:
       - "phone"
     attributes:
       "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
 
   - clientId: acme-client-cli-app
     protocol: openid-connect
@@ -75,6 +76,7 @@ clients:
       - "phone"
     attributes:
       "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
 
   - clientId: acme-client-legacy-app
     protocol: openid-connect
@@ -153,6 +155,7 @@ clients:
       - "offline_access"
     attributes:
       "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
 
   - clientId: acme-client-desktop-app
     protocol: openid-connect
@@ -174,6 +177,7 @@ clients:
       - "offline_access"
     attributes:
       "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
 
   - clientId: acme-client-idp-broker-oidc
     protocol: openid-connect
