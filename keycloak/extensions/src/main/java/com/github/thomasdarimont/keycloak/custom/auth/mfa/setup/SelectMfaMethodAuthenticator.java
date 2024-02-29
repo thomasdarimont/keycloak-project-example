@@ -124,18 +124,6 @@ public class SelectMfaMethodAuthenticator implements Authenticator {
         return stringToMap((String) config.get(MFA_CREDENTIAL_TYPES_REQUIRED_ACTION_MAP_KEY));
     }
 
-    boolean isMfaCredential(CredentialModel cred) {
-        switch (cred.getType()) {
-            case WebAuthnCredentialModel.TYPE_TWOFACTOR:
-                return true;
-            case OTPCredentialModel.HOTP: // fall-through
-            case OTPCredentialModel.TOTP:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     @Override
     public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
         // NOOP
@@ -143,9 +131,8 @@ public class SelectMfaMethodAuthenticator implements Authenticator {
 
     @Override
     public void close() {
-
+        // NOOP
     }
-
 
     private static String mapToString(Map<String, String> map) {
         var list = new ArrayList<String>();
