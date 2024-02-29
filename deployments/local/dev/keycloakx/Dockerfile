@@ -2,7 +2,6 @@
 ARG KEYCLOAK_VERSION=23.0.7
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 #FROM thomasdarimont/keycloak:21.0.999.1
-ARG OTEL_AGENT_VERSION=1.32.0
 USER root
 
 #RUN echo "Add nashorn javascript engine"
@@ -22,7 +21,11 @@ RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass ch
 #     --output /opt/jboss/keycloak/providers/keycloak-metrics-spi-$AEROGEAR_VERSION.jar
 
 RUN echo "Downloading OpenTelemetry Javaagent and support libs"
+
+ENV OTEL_AGENT_VERSION=1.32.1
+ENV OTEL_TRACE_VERSION=1.35.0
+
 ADD --chown=keycloak:keycloak https://search.maven.org/remotecontent?filepath=io/opentelemetry/javaagent/opentelemetry-javaagent/$OTEL_AGENT_VERSION/opentelemetry-javaagent-$OTEL_AGENT_VERSION.jar /opt/keycloak/opentelemetry-javaagent.jar
-ADD --chown=keycloak:keycloak https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-trace-propagators/$OTEL_AGENT_VERSION/opentelemetry-extension-trace-propagators-$OTEL_AGENT_VERSION.jar /opt/keycloak/providers/opentelemetry-extension-trace-propagators.jar
+ADD --chown=keycloak:keycloak https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-trace-propagators/$OTEL_TRACE_VERSION/opentelemetry-extension-trace-propagators-$OTEL_TRACE_VERSION.jar /opt/keycloak/providers/opentelemetry-extension-trace-propagators.jar
 
 USER keycloak
