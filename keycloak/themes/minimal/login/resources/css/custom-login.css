@@ -1,0 +1,37 @@
+.login-pf body {
+    background: #ffa93b;
+}
+
+.card-pf {
+    border-radius: 20px;
+    border: 2px;
+}
+
+#kc-header-wrapper {
+    text-transform: none;
+}
+
+.login-pf-page .login-pf-header h1 {
+    text-align: left;
+}
+
+body {
+    font-family: Verdana, sans-serif;
+}
+
+.pf-c-button.pf-m-primary {
+    background-color: #faa020;
+}
+
+.custom-form-group {
+    margin-bottom: 30px;
+}
+
+#kc-header-wrapper {
+    background-image: url("../img/logo.svg");
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: auto 60px;
+    padding-top: 100px;
+    margin-top: 30px;
+}
