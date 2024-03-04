@@ -11,8 +11,13 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
+import org.keycloak.services.managers.AppAuthManager;
+import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
+import org.keycloak.services.resources.admin.AdminAuth;
+import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
+import org.keycloak.services.resources.admin.permissions.AdminPermissions;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -51,6 +56,16 @@ public class CustomResourceProvider implements RealmResourceProvider {
         CustomResource customResource = new CustomResource(session, accessToken);
         ResteasyUtil.injectProperties(customResource);
         return customResource;
+    }
+
+    AdminPermissionEvaluator getAuth(KeycloakSession session) {
+        AdminAuth adminAuth = getAdminAuth(session);
+        return AdminPermissions.evaluator(session, session.getContext().getRealm(), adminAuth);
+    }
+
+    private static AdminAuth getAdminAuth(KeycloakSession session) {
+        AuthenticationManager.AuthResult authResult = new AppAuthManager.BearerTokenAuthenticator(session).authenticate();
+        return new AdminAuth(session.getContext().getRealm(), authResult.getToken(), authResult.getUser(), authResult.getClient());
     }
 
 
