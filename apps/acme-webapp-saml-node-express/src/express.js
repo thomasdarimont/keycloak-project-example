@@ -67,6 +67,7 @@ function configureSaml(app, config, LOG) {
                 logoutUrl: config.IDP_ISSUER + "/protocol/saml",
                 identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified",
             },
+            // Sign-in Verify
             function (request, profile, done) {
                 // profile contains user profile data sent from server
                 let user = {
@@ -76,7 +77,25 @@ function configureSaml(app, config, LOG) {
                     email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
                     // e.g. if you added a Group claim
                     group: profile["http://schemas.xmlsoap.org/claims/Group"],
+                    nameID: profile.nameID,
+                    nameIDFormat: profile.nameIDFormat,
                 };
+                return done(null, user);
+            },
+            // Sign-out Verify
+            function (request, profile, done) {
+                // profile contains user profile data sent from server
+                let user = {
+                    username: profile["nameID"],
+                    firstname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"],
+                    lastname: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"],
+                    email: profile["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+                    // e.g. if you added a Group claim
+                    group: profile["http://schemas.xmlsoap.org/claims/Group"],
+                    nameID: profile.nameID,
+                    nameIDFormat: profile.nameIDFormat,
+                };
+
                 return done(null, user);
             }
         );

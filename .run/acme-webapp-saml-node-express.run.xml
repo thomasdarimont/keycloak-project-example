@@ -5,8 +5,11 @@
     <scripts>
       <script value="start" />
     </scripts>
-    <node-interpreter value="project" />
-    <envs />
+    <node-interpreter value="$USER_HOME$/.nvm/versions/node/v21.5.0/bin/node" />
+    <package-manager value="npm" />
+    <envs>
+      <env name="NODE_EXTRA_CA_CERTS" value="$USER_HOME$/.local/share/mkcert/rootCA.pem" />
+    </envs>
     <method v="2" />
   </configuration>
 </component>
