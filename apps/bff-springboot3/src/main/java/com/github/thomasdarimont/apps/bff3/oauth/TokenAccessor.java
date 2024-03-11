@@ -23,12 +23,16 @@ import java.time.Instant;
 @Getter
 @Setter
 @Component
-@RequiredArgsConstructor
 public class TokenAccessor {
 
     private final OAuth2AuthorizedClientService authorizedClientService;
 
     private final TokenRefresher tokenRefresher;
+
+    public TokenAccessor(OAuth2AuthorizedClientService authorizedClientService, TokenRefresher tokenRefresher) {
+        this.authorizedClientService = authorizedClientService;
+        this.tokenRefresher = tokenRefresher;
+    }
 
     private Duration accessTokenExpiresSkew = Duration.ofSeconds(10);
 

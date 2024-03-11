@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,10 +27,13 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class TokenRefresher {
 
     private final OAuth2AuthorizedClientService authorizedClientService;
+
+    public TokenRefresher(OAuth2AuthorizedClientService authorizedClientService) {
+        this.authorizedClientService = authorizedClientService;
+    }
 
     public OAuth2AccessToken refreshTokens(OAuth2AuthorizedClient client) {
 

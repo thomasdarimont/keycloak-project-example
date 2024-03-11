@@ -26,8 +26,8 @@ class UsersResource {
 
     @GetMapping("/me")
     public ResponseEntity<Object> userInfo(Authentication auth) {
-        var userInfo = getUserInfoFromAuthority(auth);
-//        var userInfo2 = getUserInfoFromRemote(auth);
+//        var userInfo = getUserInfoFromAuthority(auth);
+        var userInfo = getUserInfoFromRemote(auth);
         return ResponseEntity.ok(userInfo);
     }
 

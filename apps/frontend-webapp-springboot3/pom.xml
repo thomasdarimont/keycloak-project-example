@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,6 +14,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <thymeleaf-extras-springsecurity6.version>3.1.2.RELEASE</thymeleaf-extras-springsecurity6.version>
     </properties>
     <dependencies>
         <dependency>
@@ -31,7 +32,7 @@
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-            <version>3.1.2.RELEASE</version>
+            <version>${thymeleaf-extras-springsecurity6.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -72,7 +73,6 @@
             <artifactId>momentjs</artifactId>
             <version>2.29.1</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
