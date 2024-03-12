@@ -17,6 +17,7 @@ logging:
       springframework:
         web: info
 
+
 spring:
   thymeleaf:
     cache: false
@@ -38,3 +39,10 @@ spring:
   data:
     redis:
       client-name: "acme-bff"
+  sql:
+    init:
+      schema-locations: classpath:org/springframework/security/oauth2/client/oauth2-client-schema.sql
+  h2:
+    console.enabled: true
+  session:
+    timeout: 30m

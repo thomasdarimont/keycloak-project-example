@@ -50,7 +50,8 @@ public class TokenRefresher {
         requestBody.add("refresh_token", refreshToken.getTokenValue());
 
         var rt = new RestTemplate();
-        var responseEntity = rt.postForEntity(clientRegistration.getProviderDetails().getTokenUri(), new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
+        var tokenUri = clientRegistration.getProviderDetails().getTokenUri();
+        var responseEntity = rt.postForEntity(tokenUri, new HttpEntity<>(requestBody, headers), AccessTokenResponse.class);
         if (!responseEntity.getStatusCode().is2xxSuccessful()) {
             throw new OAuth2AuthenticationException("token refresh failed");
         }
