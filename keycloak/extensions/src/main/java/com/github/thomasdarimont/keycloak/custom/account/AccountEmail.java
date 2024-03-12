@@ -3,6 +3,7 @@ package com.github.thomasdarimont.keycloak.custom.account;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailTemplateProvider;
 import org.keycloak.email.freemarker.beans.ProfileBean;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public class AccountEmail {
 
-    public static void send(EmailTemplateProvider emailTemplateProvider, RealmModel realm, UserModel user, SendEmailTask sendEmailTask) throws EmailException {
+    public static void send(KeycloakSession session, EmailTemplateProvider emailTemplateProvider, RealmModel realm, UserModel user, SendEmailTask sendEmailTask) throws EmailException {
 
         if (emailTemplateProvider == null) {
             throw new EmailException("Missing emailTemplateProvider");
@@ -21,7 +22,7 @@ public class AccountEmail {
         emailTemplateProvider.setUser(user);
 
         Map<String, Object> attributes = new HashMap<>();
-        attributes.put("user", new ProfileBean(user));
+        attributes.put("user", new ProfileBean(user, session));
 
         sendEmailTask.sendEmail(emailTemplateProvider, attributes);
     }

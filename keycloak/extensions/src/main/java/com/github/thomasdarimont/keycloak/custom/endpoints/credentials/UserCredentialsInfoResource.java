@@ -29,7 +29,7 @@ import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.credential.RecoveryAuthnCodesCredentialModel;
 import org.keycloak.representations.AccessToken;
-import org.keycloak.services.resources.Cors;
+import org.keycloak.services.cors.Cors;
 import org.keycloak.util.JsonSerialization;
 
 import java.io.IOException;

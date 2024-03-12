@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.support.KeycloakSessionLookup;
-import com.github.thomasdarimont.keycloak.custom.support.ResteasyUtil;
 import com.google.auto.service.AutoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
@@ -53,9 +52,7 @@ public class CustomResourceProvider implements RealmResourceProvider {
             return null;
         }
 
-        CustomResource customResource = new CustomResource(session, accessToken);
-        ResteasyUtil.injectProperties(customResource);
-        return customResource;
+        return new CustomResource(session, accessToken);
     }
 
     AdminPermissionEvaluator getAuth(KeycloakSession session) {

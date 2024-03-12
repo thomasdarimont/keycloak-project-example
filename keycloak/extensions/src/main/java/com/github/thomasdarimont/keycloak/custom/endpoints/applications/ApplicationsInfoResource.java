@@ -15,7 +15,7 @@ import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.account.ClientRepresentation;
 import org.keycloak.representations.account.ConsentRepresentation;
 import org.keycloak.representations.account.ConsentScopeRepresentation;
-import org.keycloak.services.resources.Cors;
+import org.keycloak.services.cors.Cors;
 import org.keycloak.services.util.ResolveRelative;
 import org.keycloak.theme.Theme;
 

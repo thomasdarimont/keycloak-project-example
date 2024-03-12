@@ -27,13 +27,13 @@ public class AccountActivity {
             var mfaInfo = new MfaInfo(credential.getType(), credentialLabel);
             switch (change) {
                 case ADD:
-                    AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                    AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                         attributes.put("mfaInfo", mfaInfo);
                         emailTemplateProvider.send("acmeMfaAddedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-mfa-added.ftl", attributes);
                     });
                     break;
                 case REMOVE:
-                    AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                    AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                         attributes.put("mfaInfo", mfaInfo);
                         emailTemplateProvider.send("acmeMfaRemovedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-mfa-removed.ftl", attributes);
                     });
@@ -49,7 +49,7 @@ public class AccountActivity {
     public static void onAccountDeletionRequested(KeycloakSession session, RealmModel realm, UserModel user, UriInfo uriInfo) {
         try {
             URI actionTokenUrl = AccountDeletion.createActionToken(session, realm, user, uriInfo);
-            AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+            AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                 attributes.put("actionTokenUrl", actionTokenUrl);
                 emailTemplateProvider.send("acmeAccountDeletionRequestedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-account-deletion-requested.ftl", attributes);
             });
@@ -64,13 +64,13 @@ public class AccountActivity {
 
             switch (change) {
                 case ADD:
-                    AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                    AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                         attributes.put("trustedDeviceInfo", trustedDeviceInfo);
                         emailTemplateProvider.send("acmeTrustedDeviceAddedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-trusted-device-added.ftl", attributes);
                     });
                     break;
                 case REMOVE:
-                    AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                    AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                         attributes.put("trustedDeviceInfo", trustedDeviceInfo);
                         emailTemplateProvider.send("acmeTrustedDeviceRemovedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-trusted-device-removed.ftl", attributes);
                     });
@@ -85,7 +85,7 @@ public class AccountActivity {
 
     public static void onAccountLockedOut(KeycloakSession session, RealmModel realm, UserModel user, UserLoginFailureModel userLoginFailure) {
         try {
-            AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+            AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                 attributes.put("userLoginFailure", userLoginFailure);
                 emailTemplateProvider.send("acmeAccountBlockedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-account-blocked.ftl", attributes);
             });
@@ -96,7 +96,7 @@ public class AccountActivity {
 
     public static void onAccountUpdate(KeycloakSession session, RealmModel realm, UserModel user, AccountChange update) {
         try {
-            AccountEmail.send(session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+            AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
                 attributes.put("update", update);
                 emailTemplateProvider.send("acmeAccountUpdatedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-account-updated.ftl", attributes);
             });

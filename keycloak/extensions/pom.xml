@@ -15,12 +15,10 @@
 
     <properties>
         <cdi-api.version>4.0.1</cdi-api.version>
-        <smallrye-health.version>4.0.2</smallrye-health.version>
+        <smallrye-health.version>4.1.0</smallrye-health.version>
         <microprofile-health-api.version>4.0.1</microprofile-health-api.version>
-        <micrometer.version>1.11.1</micrometer.version>
-<!--        <resteasy.version>4.7.7.Final</resteasy.version>-->
+        <micrometer.version>1.12.2</micrometer.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
-        <slf4j-jboss-logging.version>1.2.1.Final</slf4j-jboss-logging.version>
     </properties>
 
     <dependencies>
@@ -259,7 +257,7 @@
                             <includes>
                                 <include>**/*IntegrationTest.java</include>
                             </includes>
-                            <forkMode>once</forkMode>
+<!--                            <forkMode>once</forkMode>-->
                             <environmentVariables>
                                 <!-- workaround for usupported RYUK on fedora linux-->
                                 <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>

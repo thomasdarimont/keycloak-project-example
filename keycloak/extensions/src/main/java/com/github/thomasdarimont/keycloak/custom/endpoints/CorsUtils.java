@@ -5,9 +5,10 @@ import org.keycloak.http.HttpRequest;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.protocol.oidc.utils.WebOriginsUtils;
-import org.keycloak.services.resources.Cors;
 
 import jakarta.ws.rs.core.Response;
+import org.keycloak.services.cors.Cors;
+
 import java.net.URI;
 import java.util.Set;
 

@@ -1,0 +1,49 @@
+realm: acme-offline-test
+displayName: "Acme Offline"
+
+browserFlow: "Custom Browser"
+
+authenticationFlows:
+  ## Identity First Browser Login Flow
+  - alias: "Custom Browser"
+    description: "This flow implements a custom browser pattern"
+    providerId: basic-flow
+    builtIn: false
+    topLevel: true
+    authenticationExecutions:
+      - authenticator: auth-cookie
+        requirement: ALTERNATIVE
+      - authenticator: identity-provider-redirector
+        requirement: ALTERNATIVE
+      - flowAlias: "Identity Forms"
+        requirement: ALTERNATIVE
+        autheticatorFlow: true
+
+  - alias: "Identity Forms"
+    description: "Sub-Flow to ask user for username an password"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: auth-username-password-form
+        requirement: REQUIRED
+      - flowAlias: "2FA Forms"
+        requirement: CONDITIONAL
+        autheticatorFlow: true
+
+  - alias: "2FA Forms"
+    description: "Sub-Flow to ask user for 2FA"
+    providerId: basic-flow
+    topLevel: false
+    builtIn: false
+    authenticationExecutions:
+      - authenticator: conditional-user-configured
+        requirement: REQUIRED
+      - authenticator: acme-auth-trusted-device
+        requirement: ALTERNATIVE
+      - authenticator: acme-auth-otp-form
+        requirement: ALTERNATIVE
+      - authenticator: acme-email-code-form
+        requirement: ALTERNATIVE
+      - authenticator: auth-recovery-authn-code-form
+        requirement: ALTERNATIVE

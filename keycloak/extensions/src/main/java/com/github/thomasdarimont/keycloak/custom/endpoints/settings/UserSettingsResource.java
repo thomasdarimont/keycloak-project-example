@@ -12,7 +12,7 @@ import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.representations.AccessToken;
-import org.keycloak.services.resources.Cors;
+import org.keycloak.services.cors.Cors;
 
 import java.util.HashMap;
 import java.util.Map;

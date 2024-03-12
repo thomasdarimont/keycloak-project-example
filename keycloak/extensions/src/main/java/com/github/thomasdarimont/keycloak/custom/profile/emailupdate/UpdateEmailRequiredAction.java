@@ -164,7 +164,7 @@ public class UpdateEmailRequiredAction implements RequiredActionProvider {
 
                 Map<String, Object> attributes = new HashMap<>();
                 attributes.put("code", code);
-                attributes.put("user", new ProfileBean(currentUser) {
+                attributes.put("user", new ProfileBean(currentUser, session) {
                     @Override
                     public String getEmail() {
                         return newEmail;
