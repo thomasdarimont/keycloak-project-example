@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.profile.ageinfo;
+package com.github.thomasdarimont.keycloak.custom.oidc.ageinfo;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
