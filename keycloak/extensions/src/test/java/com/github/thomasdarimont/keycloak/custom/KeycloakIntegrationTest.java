@@ -1,7 +1,13 @@
 package com.github.thomasdarimont.keycloak.custom;
 
 import com.github.thomasdarimont.keycloak.custom.KeycloakTestSupport.UserRef;
-import com.github.thomasdarimont.keycloak.custom.profile.ageinfo.AgeInfoMapper;
+import com.github.thomasdarimont.keycloak.custom.oidc.ageinfo.AgeInfoMapper;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.core.Form;
+import jakarta.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assumptions;
@@ -14,14 +20,7 @@ import org.keycloak.admin.client.token.TokenService;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.IDToken;
 import org.testcontainers.containers.output.ToStringConsumer;
-import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.core.Form;
-import jakarta.ws.rs.core.MediaType;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ public class KeycloakIntegrationTest {
         UserRef user22Years = KeycloakTestSupport.createOrUpdateTestUser(acmeRealm, "test-user-age22", TEST_USER_PASSWORD, user -> {
             user.setFirstName("Firstname");
             user.setLastName("Lastname");
-            user.setAttributes(ImmutableMap.of("birthdate", List.of(LocalDate.now().minusYears(22).toString())));
+            user.setAttributes(Map.of("birthdate", List.of(LocalDate.now().minusYears(22).toString())));
         });
 
         TokenService tokenService = KEYCLOAK_ENVIRONMENT.getTokenService();
