@@ -80,7 +80,13 @@ public class AcmeScheduledTaskProvider implements ScheduledTaskProvider {
 
         @Override
         public Map<String, String> getOperationalInfo() {
-            return Map.of("taskName", taskName, "interval", interval.toString());
+
+            String version = getClass().getPackage().getImplementationVersion();
+            if (version == null) {
+                version = "dev-snapshot";
+            }
+
+            return Map.of("taskName", taskName, "interval", interval.toString(), "version", version);
         }
     }
 }
