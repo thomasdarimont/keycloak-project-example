@@ -17,6 +17,7 @@ deployments/local/cluster/run/
 *.pem
 *-key.pem
 
+.vscode
 local.env
 
 module-thorntail.xml
