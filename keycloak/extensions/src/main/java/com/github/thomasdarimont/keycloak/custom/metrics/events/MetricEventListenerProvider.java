@@ -65,27 +65,27 @@ public class MetricEventListenerProvider implements EventListenerProvider {
         @Override
         public void postInit(KeycloakSessionFactory sessionFactory) {
 
-            var metricsEnabled = Configuration.getOptionalBooleanValue(NS_KEYCLOAK_PREFIX.concat("metrics-enabled")).orElse(false);
-            if (!metricsEnabled) {
-                instance = new NoopEventListenerProvider();
-            }
-
-            var keycloakMetrics = new KeycloakMetrics(lookupMeterRegistry(), sessionFactory);
-            keycloakMetrics.registerInstanceMetrics();
-
-            sessionFactory.register(event -> {
-
-                if (event instanceof PostMigrationEvent) {
-                    keycloakMetrics.initialize();
-                } else if (event instanceof RealmModel.RealmRemovedEvent) {
-                    var realmRemoved = (RealmModel.RealmRemovedEvent) event;
-                    keycloakMetrics.removeRealmMetrics(realmRemoved.getRealm());
-                }
-            });
-
-            var metricRecorder = new MetricEventRecorder(keycloakMetrics);
-
-            instance = new MetricEventListenerProvider(metricRecorder);
+//            var metricsEnabled = Configuration.getOptionalBooleanValue(NS_KEYCLOAK_PREFIX.concat("metrics-enabled")).orElse(false);
+//            if (!metricsEnabled) {
+//                instance = new NoopEventListenerProvider();
+//            }
+//
+//            var keycloakMetrics = new KeycloakMetrics(lookupMeterRegistry(), sessionFactory);
+//            keycloakMetrics.registerInstanceMetrics();
+//
+//            sessionFactory.register(event -> {
+//
+//                if (event instanceof PostMigrationEvent) {
+//                    keycloakMetrics.initialize();
+//                } else if (event instanceof RealmModel.RealmRemovedEvent) {
+//                    var realmRemoved = (RealmModel.RealmRemovedEvent) event;
+//                    keycloakMetrics.removeRealmMetrics(realmRemoved.getRealm());
+//                }
+//            });
+//
+//            var metricRecorder = new MetricEventRecorder(keycloakMetrics);
+//
+//            instance = new MetricEventListenerProvider(metricRecorder);
         }
 
         protected MeterRegistry lookupMeterRegistry() {

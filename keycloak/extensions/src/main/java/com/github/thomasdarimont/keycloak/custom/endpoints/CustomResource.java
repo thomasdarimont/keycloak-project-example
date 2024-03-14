@@ -6,6 +6,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsRe
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.TokenMigrationResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.migration.UserImportMigrationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
@@ -116,7 +117,13 @@ public class CustomResource {
      * @return
      */
     @Path("migration/token")
-    public TokenMigrationResource migration() {
+    public TokenMigrationResource tokenMigration() {
         return new TokenMigrationResource(session, token);
     }
+
+    @Path("migration/users")
+    public UserImportMigrationResource userMigration() {
+        return new UserImportMigrationResource(session, token);
+    }
+
 }
