@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
 import org.keycloak.timer.ScheduledTask;
 
@@ -56,7 +57,7 @@ public class AcmeScheduledTaskProvider implements ScheduledTaskProvider {
     }
 
     @AutoService(ScheduledTaskProviderFactory.class)
-    public static class Factory extends ScheduledTaskProviderFactory implements ServerInfoAwareProviderFactory {
+    public static class Factory extends ScheduledTaskProviderFactory implements ServerInfoAwareProviderFactory, EnvironmentDependentProviderFactory {
 
         private Duration interval;
 
@@ -87,6 +88,11 @@ public class AcmeScheduledTaskProvider implements ScheduledTaskProvider {
             }
 
             return Map.of("taskName", taskName, "interval", interval.toString(), "version", version);
+        }
+
+        @Override
+        public boolean isSupported(Config.Scope config) {
+            return Boolean.getBoolean("acme.scheduling.enabled");
         }
     }
 }
