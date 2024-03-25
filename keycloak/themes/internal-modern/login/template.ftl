@@ -30,6 +30,13 @@
                 <link href="${url.resourcesPath}/${style}" rel="stylesheet"/>
             </#list>
         </#if>
+        <script type="importmap">
+            {
+                "imports": {
+                    "alpinejs": "${url.resourcesCommonPath}/node_modules/alpinejs/dist/module.esm.js"
+            }
+        }
+        </script>
         <#if properties.scripts?has_content>
             <#list properties.scripts?split(' ') as script>
                 <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
@@ -39,6 +46,17 @@
             <#list scripts as script>
                 <script src="${script}" type="text/javascript"></script>
             </#list>
+        </#if>
+        <#if authenticationSession??>
+            <script type="module">
+                import { checkCookiesAndSetTimer } from "${url.resourcesPath}/js/authChecker.js";
+
+                checkCookiesAndSetTimer(
+                    "${authenticationSession.authSessionId}",
+                    "${authenticationSession.tabId}",
+                    "${url.ssoLoginInOtherTabsUrl?no_esc}"
+                );
+            </script>
         </#if>
     </head>
 
