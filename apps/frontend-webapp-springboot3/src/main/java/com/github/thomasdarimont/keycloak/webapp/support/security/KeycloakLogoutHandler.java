@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
 @Slf4j
 @Component
 public class KeycloakLogoutHandler implements LogoutHandler {
@@ -32,7 +33,7 @@ public class KeycloakLogoutHandler implements LogoutHandler {
         try {
             response.sendRedirect(logoutUrl);
         } catch (IOException e) {
-            log.warn("Failed to propagate logout", e);
+            e.printStackTrace();
         }
 
     }

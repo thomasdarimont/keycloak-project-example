@@ -1,16 +1,24 @@
 package com.github.thomasdarimont.keycloak.webapp.config;
 
+import com.github.thomasdarimont.keycloak.webapp.support.HttpSessionOAuth2AuthorizedClientService;
 import com.github.thomasdarimont.keycloak.webapp.support.security.KeycloakLogoutHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -23,12 +31,12 @@ class WebSecurityConfig {
     private final KeycloakLogoutHandler keycloakLogoutHandler;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRegistrationRepository, CorsEndpointProperties corsEndpointProperties) throws Exception {
 
         http.authorizeHttpRequests(ahrc -> {
             // declarative route configuration
             // add additional routes
-            ahrc.requestMatchers("/webjars/**", "/resources/**", "/css/**").permitAll();
+            ahrc.requestMatchers("/webjars/**", "/resources/**", "/css/**", "/auth/register").permitAll();
             ahrc.anyRequest().fullyAuthenticated();
         });
 
@@ -55,6 +63,30 @@ class WebSecurityConfig {
         });
 
         return http.build();
+    }
+
+    /**
+     * The explicit declaration of {@link AuthorizationRequestRepository} is only necessary, if dynamic user self-registration is required.
+     * See {@link com.github.thomasdarimont.keycloak.webapp.web.AuthController#register(HttpServletRequest, HttpServletResponse)}.
+     * If this is not needed, this bean can be removed.
+     *
+     * @return
+     */
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientRepository authorizedClientRepository() {
+        return new HttpSessionOAuth2AuthorizedClientRepository();
+    }
+
+    @Bean
+    public OAuth2AuthorizedClientService oAuth2AuthorizedClientService(OAuth2AuthorizedClientRepository clientRegistrationRepository) {
+//        var oauthAuthorizedClientService = new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
+        var oauthAuthorizedClientService = new HttpSessionOAuth2AuthorizedClientService(clientRegistrationRepository);
+        return oauthAuthorizedClientService;
     }
 
     private GrantedAuthoritiesMapper userAuthoritiesMapper() {
