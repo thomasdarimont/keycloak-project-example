@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.auth.mfa.emailcode;
 
 import com.google.auto.service.AutoService;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.authentication.AuthenticationFlowContext;
@@ -23,7 +24,6 @@ import org.keycloak.models.utils.FormMessage;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.services.messages.Messages;
 
-import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +55,10 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
         if (errorMessage != null) {
             form.setErrors(List.of(errorMessage));
         }
+
+        form.setAttribute("codeLength", LENGTH + 1);
+        form.setAttribute("tryAutoSubmit", true);
+        form.setAttribute("codePattern", "\\d{4}-\\d{4}");
 
         Response response = form.createForm("email-code-form.ftl");
 
