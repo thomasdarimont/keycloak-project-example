@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
+import com.github.thomasdarimont.keycloak.custom.support.AuthUtils;
 import com.github.thomasdarimont.keycloak.custom.support.KeycloakSessionLookup;
 import com.google.auto.service.AutoService;
 import lombok.RequiredArgsConstructor;
@@ -56,15 +57,9 @@ public class CustomResourceProvider implements RealmResourceProvider {
     }
 
     AdminPermissionEvaluator getAuth(KeycloakSession session) {
-        AdminAuth adminAuth = getAdminAuth(session);
+        AdminAuth adminAuth = AuthUtils.getAdminAuth(session);
         return AdminPermissions.evaluator(session, session.getContext().getRealm(), adminAuth);
     }
-
-    private static AdminAuth getAdminAuth(KeycloakSession session) {
-        AuthenticationManager.AuthResult authResult = new AppAuthManager.BearerTokenAuthenticator(session).authenticate();
-        return new AdminAuth(session.getContext().getRealm(), authResult.getToken(), authResult.getUser(), authResult.getClient());
-    }
-
 
     @Override
     public void close() {
