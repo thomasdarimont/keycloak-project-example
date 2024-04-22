@@ -48,6 +48,7 @@ class start {
     static final String OPA_OPT = "--opa";
     static final String KEYCLOAK_OPT = "--keycloak=keycloak";
     static final String POSTGRES_OPT = "--database=postgres";
+    static final String NATS_OPT = "--messaging=nats";
 
     static final String ORACLE_OPT = "--database=oracle";
     static final String MSSQL_OPT = "--database=mssql";
@@ -86,6 +87,7 @@ class start {
         var verbose = argList.contains(VERBOSE_OPT);
         var useTracing = argList.contains(TRACING_OPT);
         var dockerHost = argList.stream().filter(s -> s.startsWith(DOCKER_HOST_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst();
+        var useNats = argList.contains(NATS_OPT);
 
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
@@ -222,6 +224,11 @@ class start {
             envFiles.add("deployments/local/dev/keycloak-provisioning.env");
         }
 
+        if (useNats) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-nats.yml");
+        }
+
         if (useTracing) {
             commandLine.add("--file");
             commandLine.add("deployments/local/dev/docker-compose-tracing.yml");
@@ -322,6 +329,7 @@ class start {
                 "which is used for name resolution. This is useful for using WiFi on ICE trains, which use the same network as docker by default. This causes the wifi to not work correctly.");
         System.out.printf("  %s: %s%n", TRACING_OPT, "enables tracing with open-telemetry. Injects the otel agent into Keycloak, starts an otel-collector and jaeger container");
         System.out.printf("  %s: %s%n", PROMETHEUS_OPT, "enables metrics collection to prometheus. Starts a prometheus metrics container");
+        System.out.printf("  %s: %s%n", NATS_OPT, "enables nats message broker");
 
         System.out.printf("%n%s supports the following commands: %n", "start.java");
         System.out.println("");
