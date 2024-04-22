@@ -668,6 +668,16 @@ authenticatorConfig:
       useClientRoles: "true"
       useRealmRoles: "true"
 
+# configure here until https://github.com/keycloak/keycloak/issues/28020 is resolved
+webAuthnPolicyPasswordlessRpEntityName: "keycloak"
+webAuthnPolicyPasswordlessSignatureAlgorithms:
+  - "ES256"
+  - "RS256"
+webAuthnPolicyRpEntityName: "keycloak"
+webAuthnPolicySignatureAlgorithms:
+  - "ES256"
+  - "RS256"
+
 roles:
 # Realm specific roles
   realm:
