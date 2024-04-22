@@ -61,7 +61,7 @@ services:
       - "--https-client-auth=request"
       - "--metrics-enabled=true"
       - "--health-enabled=true"
-      - "--features=preview"
+      - "--features=preview,transient-users"
       - "--cache=local"
       - "--proxy=passthrough"
 #      - "--log-console-output=json"
@@ -104,7 +104,7 @@ services:
       - "127.0.0.1:8787:8787"
     volumes:
       - ../../../keycloak/themes:/opt/keycloak/themes:z
-      - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
+#      - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
       - ../../../keycloak/config/quarkus.properties:/opt/keycloak/conf/quarkus.properties:z
       - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
