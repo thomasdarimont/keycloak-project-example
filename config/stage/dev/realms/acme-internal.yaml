@@ -521,7 +521,8 @@ clients:
   - clientId: acme-webapp-saml-node-express
     name: Acme Web App SAML Node Express
     rootUrl: 'https://apps.acme.test:4723'
-    adminUrl: "/saml"
+    # Replace with relative URL once https://github.com/keycloak/keycloak/issues/28832 is fixed
+    adminUrl: "https://apps.acme.test:4723/saml"
     baseUrl: "/app"
     surrogateAuthRequired: false
     enabled: true
