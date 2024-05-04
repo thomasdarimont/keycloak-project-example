@@ -9,7 +9,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.migration.TokenMigrat
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.UserImportMigrationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
-import com.github.thomasdarimont.keycloak.custom.endpoints.provisioning.BulkUserImportResource;
+//import com.github.thomasdarimont.keycloak.custom.endpoints.provisioning.BulkUserImportResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -127,9 +127,9 @@ public class CustomResource {
         return new UserImportMigrationResource(session, token);
     }
 
-    @Path("admin/userimport")
-    public BulkUserImportResource bulkUserImport() {
-        return new BulkUserImportResource(session);
-    }
+//    @Path("admin/userimport")
+//    public BulkUserImportResource bulkUserImport() {
+//        return new BulkUserImportResource(session);
+//    }
 
 }
