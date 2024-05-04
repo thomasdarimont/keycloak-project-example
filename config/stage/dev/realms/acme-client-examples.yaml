@@ -203,7 +203,7 @@ clients:
     name: "Acme Classical Web App SAML"
     description: "Classical Web App which use SAML for SSO"
     rootUrl: 'https://apps.acme.test:4723'
-    adminUrl: "/saml"
+    adminUrl: "https://apps.acme.test:4723/saml"
     baseUrl: "/"
     surrogateAuthRequired: false
     enabled: true
