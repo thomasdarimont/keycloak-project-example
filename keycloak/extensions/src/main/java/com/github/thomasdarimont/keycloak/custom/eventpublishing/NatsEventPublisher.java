@@ -3,27 +3,67 @@ package com.github.thomasdarimont.keycloak.custom.eventpublishing;
 import io.nats.client.Connection;
 import io.nats.client.Nats;
 import io.nats.client.Options;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.util.JsonSerialization;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-public class NatsEventPublisher {
+@JBossLog
+@RequiredArgsConstructor
+public class NatsEventPublisher implements EventPublisher {
 
-    public void publish(Object event) {
+    private final String url;
 
-        String natsURL = "nats://acme-nats:4222";
+    private final String username;
+
+    private final String password;
+
+    private Connection connection;
+
+    public void publish(String subject, Object event) {
+        try {
+            byte[] messageBytes = JsonSerialization.writeValueAsBytes(event);
+            connection.publish(subject, messageBytes);
+        } catch (IOException e) {
+            log.warn("Could not serialize event", e);
+        }
+    }
+
+    public Map<String, String> getOperationalInfo() {
+        return Map.of("url", url, "nats-username", username, "status", getStatus());
+    }
+
+    public String getStatus() {
+        if (connection == null) {
+            return null;
+        }
+        return connection.getStatus().name();
+    }
+
+    public void init() {
 
         Options options = Options.builder() //
                 .connectionName("keycloak") //
-                .server(natsURL) //
+                .userInfo(username, password) //
+                .server(url) //
                 .build();
 
-        try (Connection nc = Nats.connect(options)) {
-            byte[] messageBytes = JsonSerialization.writeValueAsBytes(event);
-            nc.publish("acme.iam.keycloak.admin", messageBytes);
-        } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+        try {
+            connection = Nats.connect(options);
+        } catch (Exception e) {
+            log.warn("Could not connect to nats server", e);
+        }
+    }
+
+    public void close() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (InterruptedException e) {
+                log.warn("Could not close connection", e);
+            }
         }
     }
 }

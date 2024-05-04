@@ -4,4 +4,6 @@ services:
     ports:
       - "8222:8222"
       - "4222:4222"
-    hostname: acme-nats
+    command: -c /etc/my-server.conf --name acme-nats -p 4222
+    volumes:
+      - ./nats/server.conf:/etc/my-server.conf

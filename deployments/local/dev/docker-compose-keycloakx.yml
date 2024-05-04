@@ -113,7 +113,9 @@ services:
       - ./run/keycloakx/logs:/opt/keycloak/logs:z
       - ./run/keycloakx/perf:/opt/keycloak/perf:z
 # Add keycloak extensions
-      - ../../../keycloak/extensions/target/extensions.jar:/opt/keycloak/providers/extensions.jar:z
+#      - ../../../keycloak/extensions/target/extensions.jar:/opt/keycloak/providers/extensions.jar:z
+      - ../../../keycloak/extensions/target/extensions-jar-with-dependencies.jar:/opt/keycloak/providers/extensions.jar:z
+
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-3.0.0.jar:/opt/keycloak/providers/keycloak-metrics-spi.jar:z
       - ./keycloak-ext/keycloak-restrict-client-auth-23.0.0.jar:/opt/keycloak/providers/keycloak-restrict-client-auth.jar:z
