@@ -26,7 +26,7 @@ class UsersController {
 
         Map<String, Object> data = new HashMap<>();
         data.put("message", "Hello " + username);
-        data.put("backend", "Spring Boot");
+        data.put("backend", "Spring Boot 3");
         data.put("datetime", Instant.now());
         return data;
     }
