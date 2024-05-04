@@ -5,10 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
-import org.apache.http.ssl.TrustStrategy;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -62,7 +63,8 @@ public class OfflineSessionClient {
                     // openid scope required for userinfo!
                     // profile scope allows to read profile info
                     // offline_access scope instructs keycloak to create an offline_session in the KC database
-                    .scope("openid profile offline_access").grantType("password") // for the sake of the demo we use grant_type=password
+                    .scope("openid profile offline_access") //
+                    .grantType("password") // for the sake of the demo we use grant_type=password
                     .username("tester") //
                     .password("test") //
                     .build();
@@ -316,7 +318,11 @@ public class OfflineSessionClient {
         @Override
         public void customize(RestTemplate restTemplate) {
 
-            var httpClient = HttpClients.custom().setSSLSocketFactory(new SSLConnectionSocketFactory(createSslContext())).build();
+            var sslConnectionSocketFactory = SSLConnectionSocketFactoryBuilder.create().setSslContext(createSslContext()).build();
+            var cm = PoolingHttpClientConnectionManagerBuilder.create()
+                    .setSSLSocketFactory(sslConnectionSocketFactory) //
+                    .build();
+            var httpClient = HttpClients.custom().setConnectionManager(cm).build();
 
             var requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);
