@@ -53,7 +53,7 @@ public class NatsEventPublisher implements EventPublisher {
         try {
             connection = Nats.connect(options);
         } catch (Exception e) {
-            log.warn("Could not connect to nats server", e);
+            throw new RuntimeException("Could not connect to nats server", e);
         }
     }
 

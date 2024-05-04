@@ -65,7 +65,12 @@ public class AcmeEventPublisherEventListener implements EventListenerProvider {
         @Override
         public void init(Config.Scope config) {
             /* configure factory */
-            publisher = createNatsPublisher(config);
+            try {
+                publisher = createNatsPublisher(config);
+            } catch (Exception ex) {
+                log.warnf("Could not create nats publisher: %s", ex.getMessage());
+                publisher = new NoopPublisher();
+            }
         }
 
         private NatsEventPublisher createNatsPublisher(Config.Scope config) {
