@@ -23,12 +23,24 @@ public class NatsEventPublisher implements EventPublisher {
     private Connection connection;
 
     public void publish(String subject, Object event) {
+
+        byte[] messageBytes = null;
         try {
-            byte[] messageBytes = JsonSerialization.writeValueAsBytes(event);
-            connection.publish(subject, messageBytes);
+            messageBytes = JsonSerialization.writeValueAsBytes(event);
         } catch (IOException e) {
             log.warn("Could not serialize event", e);
         }
+
+        if (messageBytes == null) {
+            return;
+        }
+
+        try {
+            connection.publish(subject, messageBytes);
+        } catch (Exception e) {
+            log.warn("Could not publish event", e);
+        }
+
     }
 
     public Map<String, String> getOperationalInfo() {
@@ -58,12 +70,14 @@ public class NatsEventPublisher implements EventPublisher {
     }
 
     public void close() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (InterruptedException e) {
-                log.warn("Could not close connection", e);
-            }
+        if (connection == null) {
+            return;
+        }
+
+        try {
+            connection.close();
+        } catch (Exception e) {
+            log.warn("Could not close connection", e);
         }
     }
 }
