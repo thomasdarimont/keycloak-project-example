@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   # MongoDB: https://hub.docker.com/_/mongo/
   acme-graylog-mongo:

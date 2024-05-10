@@ -1,6 +1,0 @@
-version: '3.8'
-services:
-  acme-keycloak:
-    volumes:
-      - ../../../keycloak/extensions/target/extensions.jar:/opt/jboss/keycloak/standalone/deployments/extensions.jar:z
-

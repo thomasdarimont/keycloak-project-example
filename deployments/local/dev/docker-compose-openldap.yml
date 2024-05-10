@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   openldap:
     image: osixia/openldap:1.5.0

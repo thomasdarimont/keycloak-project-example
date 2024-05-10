@@ -29,7 +29,8 @@ public class CustomDemoAdminResource {
     }
 
     /**
-     * http://localhost:8080/auth/realms/acme-token-migration/custom-admin-resources/example
+     * http://localhost:8080/auth/realms/acme-workshop/custom-admin-resources/example
+     *
      * @return
      */
     @Path("/example")

@@ -167,16 +167,16 @@ class start {
             commandLine.add("deployments/local/dev/docker-compose-opa.yml");
         }
 
-        if (EXTENSIONS_OPT_CLASSES.equals(extension)) {
-            commandLine.add("--file");
-            commandLine.add("deployments/local/dev/docker-compose-extensions-classes.yml");
-        } else if (EXTENSIONS_OPT_JAR.equals(extension)) {
-            commandLine.add("--file");
-            commandLine.add("deployments/local/dev/docker-compose-extensions-jar.yml");
-        } else {
-            System.err.printf("Unkown extension include option %s, valid ones are %s and %s%n", extension, EXTENSIONS_OPT_CLASSES, EXTENSIONS_OPT_JAR);
-            System.exit(-1);
-        }
+//        if (EXTENSIONS_OPT_CLASSES.equals(extension)) {
+//            commandLine.add("--file");
+//            commandLine.add("deployments/local/dev/docker-compose-extensions-classes.yml");
+//        } else if (EXTENSIONS_OPT_JAR.equals(extension)) {
+//            commandLine.add("--file");
+//            commandLine.add("deployments/local/dev/docker-compose-extensions-jar.yml");
+//        } else {
+//            System.err.printf("Unkown extension include option %s, valid ones are %s and %s%n", extension, EXTENSIONS_OPT_CLASSES, EXTENSIONS_OPT_JAR);
+//            System.exit(-1);
+//        }
 
         if (usePostgres) {
             commandLine.add("--file");
