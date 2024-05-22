@@ -58,10 +58,32 @@ public class TokenMigrationResource {
         // propagate new target-client in session
         session.getContext().setClient(targetClient);
 
+
+        // create new dedicated user session
+        UserSessionModel newUserSession = session.sessions().createUserSession(null,
+                realm,
+                userSession.getUser(),
+                userSession.getLoginUsername(),
+                session.getContext().getConnection().getRemoteAddr(),
+                "impersonate",
+                false,
+                null,
+                null,
+                UserSessionModel.SessionPersistenceState.PERSISTENT);
+
+        // convert user session to offline user session
+        newUserSession = session.sessions().createOfflineUserSession(newUserSession);
+
+        for(var entry : userSession.getNotes().entrySet()) {
+            // TODO filter notes if necessary
+            newUserSession.setNote(entry.getKey(), entry.getValue());
+        }
+
         // generate new client session
-        AuthenticatedClientSessionModel clientSession = session.sessions().createClientSession(realm, targetClient, userSession);
-        AuthenticatedClientSessionModel offlineClientSession = session.sessions().createOfflineClientSession(clientSession, userSession);
+        AuthenticatedClientSessionModel clientSession = session.sessions().createClientSession(realm, targetClient, newUserSession);
+        AuthenticatedClientSessionModel offlineClientSession = session.sessions().createOfflineClientSession(clientSession, newUserSession);
         offlineClientSession.setNote(OAuth2Constants.SCOPE, sourceClientAuthClientSession.getNote(OAuth2Constants.SCOPE));
+        offlineClientSession.setNote(OAuth2Constants.ISSUER, sourceClientAuthClientSession.getNote(OAuth2Constants.ISSUER));
 
         // generate new access token response (AT+RT) with azp=target-client
         Set<String> clientScopeIds = Set.of();
@@ -71,7 +93,7 @@ public class TokenMigrationResource {
         event.detail("migration", "true");
 
         TokenManager tokenManager = new TokenManager();
-        TokenManager.AccessTokenResponseBuilder responseBuilder = tokenManager.responseBuilder(realm, targetClient, event, this.session, userSession, clientSessionCtx);
+        TokenManager.AccessTokenResponseBuilder responseBuilder = tokenManager.responseBuilder(realm, targetClient, event, this.session, newUserSession, clientSessionCtx);
         responseBuilder.generateAccessToken();
         responseBuilder.getAccessToken().issuer(issuer);
         responseBuilder.getAccessToken().setScope(token.getScope());
