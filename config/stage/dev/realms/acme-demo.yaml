@@ -11,6 +11,35 @@ emailTheme: keycloak
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 
 clients:
+  - clientId: app-minispa
+    protocol: openid-connect
+    name: Acme Account Console
+    description: "Acme Account Console Description"
+    enabled: true
+    publicClient: true
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: false
+    # Show client in account-console
+    alwaysDisplayInConsole: true
+    serviceAccountsEnabled: false
+    #    attributes: { }
+    fullScopeAllowed: true
+    rootUrl: "$(env:APPS_FRONTEND_URL_MINISPA)"
+    baseUrl: "/?realm=acme-demo&show=profile,settings,apps,security,logout,token,idToken,revoke"
+    adminUrl: ""
+    redirectUris:
+      - "/*"
+    webOrigins:
+      - "+"
+    defaultClientScopes:
+      - "email"
+      - "roles"
+      - "profile"
+    optionalClientScopes:
+      - "phone"
+    attributes:
+      "pkce.code.challenge.method": "S256"
+      "post.logout.redirect.uris": "+"
   - id: acme-standard-client-1
     clientId: acme-standard-client
     protocol: openid-connect
@@ -108,7 +137,8 @@ clients:
     serviceAccountsEnabled: false
     fullScopeAllowed: false
     attributes:
-      "use.refresh.tokens": "false"
+      #"use.refresh.tokens": "false"
+      "use.refresh.tokens": "true"
       "oauth2.device.authorization.grant.enabled": "true"
     redirectUris: []
 
