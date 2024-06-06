@@ -116,14 +116,34 @@ function configureRoutes(app, config) {
 
     let ensureAuthenticated = function (req, res, next) {
         if (!req.isAuthenticated()) {
-            res.redirect('/login')
+            // let redirectTo = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+            // res.session.redirectToUrl = req.originalUrl;
+            res.redirect('/login?target=' + encodeURIComponent(req.originalUrl))
             return;
         }
         return next();
     }
 
     app.get('/login',
-        passport.authenticate('saml', {failureRedirect: '/', failureFlash: true}),
+        function (req, res, next) {
+
+            // try to extract desired target location in app
+            let additionalParams = null;
+            if (req.query.target) {
+                let decodedTarget = decodeURIComponent(req.query.target);
+                if (decodedTarget.startsWith("/")) {
+                    additionalParams = {
+                        RelayState: encodeURIComponent(decodedTarget)
+                    };
+                }
+            }
+
+            passport.authenticate('saml', {
+                failureRedirect: '/',
+                failureFlash: true,
+                additionalParams: additionalParams
+            }, null)(req, res, next);
+        },
         function (req, res) {
             res.redirect('/app');
         }
@@ -133,7 +153,7 @@ function configureRoutes(app, config) {
         passport.authenticate('saml', {
             failureRedirect: '/error',
             failureFlash: true
-        }),
+        }, null),
         (req, res) => {
 
             // success redirection to index
@@ -147,6 +167,13 @@ function configureRoutes(app, config) {
             failureFlash: true
         }),
         (req, res) => {
+
+            if (req.body.RelayState) {
+                let decodedTargetUri = decodeURIComponent(req.body.RelayState);
+                if (decodedTargetUri.startsWith("/")) {
+                    return res.redirect(decodedTargetUri);
+                }
+            }
 
             // success redirection to /app
             return res.redirect('/app');
@@ -190,6 +217,16 @@ function configureRoutes(app, config) {
         function (req, res) {
             let user = req.user;
             res.render('pages/app', {
+                user
+            });
+        }
+    );
+
+    app.get('/page1',
+        ensureAuthenticated,
+        function (req, res) {
+            let user = req.user;
+            res.render('pages/page1', {
                 user
             });
         }
