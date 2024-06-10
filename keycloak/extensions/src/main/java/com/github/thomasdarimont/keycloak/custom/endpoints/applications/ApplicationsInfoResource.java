@@ -25,6 +25,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -50,7 +51,7 @@ public class ApplicationsInfoResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(Response.ok()).build();
+        return withCors().add(Response.ok());
     }
 
     @GET
@@ -81,7 +82,7 @@ public class ApplicationsInfoResource {
         var responseBody = new HashMap<String, Object>();
         responseBody.put("clients", credentialInfos);
 
-        return withCors(Response.ok(responseBody)).build();
+        return withCors().add(Response.ok(responseBody));
     }
 
     public List<ClientRepresentation> getApplicationsForUser(RealmModel realm, UserModel user, String clientName) {
@@ -164,9 +165,9 @@ public class ApplicationsInfoResource {
         return new ConsentRepresentation(grantedScopes, model.getCreatedDate(), model.getLastUpdatedDate());
     }
 
-    private Cors withCors(Response.ResponseBuilder responseBuilder) {
+    private Cors withCors() {
         var request = session.getContext().getHttpRequest();
-        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "OPTIONS"), null);
+        return CorsUtils.addCorsHeaders(session, request, Set.of("GET", "OPTIONS"), null);
     }
 
 }

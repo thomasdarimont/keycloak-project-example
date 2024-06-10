@@ -62,7 +62,7 @@ public class UserCredentialsInfoResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(session.getContext().getHttpRequest(), Response.ok()).build();
+        return withCors(session.getContext().getHttpRequest()).add(Response.ok());
     }
 
     @GET
@@ -92,7 +92,7 @@ public class UserCredentialsInfoResource {
         var responseBody = new HashMap<String, Object>();
         responseBody.put("credentialInfos", credentialInfos);
         var request = context.getHttpRequest();
-        return withCors(request, Response.ok(responseBody)).build();
+        return withCors(request).add(Response.ok(responseBody));
     }
 
     @DELETE
@@ -130,7 +130,7 @@ public class UserCredentialsInfoResource {
         var credentials = credentialManager.getStoredCredentialsByTypeStream(credentialType).collect(Collectors.toList());
         if (credentials.isEmpty()) {
             var request = context.getHttpRequest();
-            return withCors(request, Response.status(Response.Status.NOT_FOUND)).build();
+            return withCors(request).add(Response.status(Response.Status.NOT_FOUND));
         }
 
         int removedCredentialCount = 0;
@@ -147,7 +147,7 @@ public class UserCredentialsInfoResource {
         var responseBody = new HashMap<String, Object>();
         responseBody.put("removedCredentialCount", removedCredentialCount);
         var request = context.getHttpRequest();
-        return withCors(request, Response.ok(responseBody)).build();
+        return withCors(request).add(Response.ok(responseBody));
     }
 
     private boolean removeCredentialForUser(RealmModel realm, UserModel user, CredentialModel credentialModel) {
@@ -238,8 +238,8 @@ public class UserCredentialsInfoResource {
         return false;
     }
 
-    private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "DELETE", "OPTIONS"), null);
+    private Cors withCors(HttpRequest request) {
+        return CorsUtils.addCorsHeaders(session, request, Set.of("GET", "DELETE", "OPTIONS"), null);
     }
 
     @Data

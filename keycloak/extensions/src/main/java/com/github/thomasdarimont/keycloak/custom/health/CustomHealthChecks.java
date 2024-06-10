@@ -1,6 +1,8 @@
 package com.github.thomasdarimont.keycloak.custom.health;
 
-import com.github.thomasdarimont.keycloak.custom.support.KeycloakUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.CDI;
 import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
@@ -10,9 +12,6 @@ import org.eclipse.microprofile.health.Readiness;
 import org.keycloak.common.Version;
 
 import javax.annotation.Resource;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
-import jakarta.enterprise.inject.spi.CDI;
 import javax.sql.DataSource;
 import java.lang.management.ManagementFactory;
 import java.sql.Connection;
@@ -88,11 +87,6 @@ public class CustomHealthChecks {
     }
 
     private DataSource getDataSource() {
-
-        if (KeycloakUtil.isRunningOnKeycloak()) {
-            return keycloakDatasource;
-        }
-
         // Manual lookup for datasource via CDI
         return CDI.current().select(DataSource.class).get();
     }

@@ -11,9 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.keycloak.forms.login.freemarker.model.RealmBean;
 import org.keycloak.forms.login.freemarker.model.UrlBean;
+import org.keycloak.http.HttpRequest;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.managers.AuthenticationManager;
@@ -73,9 +73,10 @@ public class AdminSettingsResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response updateAdminSettings(@Context HttpRequest request) throws Exception {
+    public Response updateAdminSettings() throws Exception {
 
-        var formData = request.getDecodedFormParameters();
+        HttpRequest httpRequest = session.getContext().getHttpRequest();
+        var formData = httpRequest.getDecodedFormParameters();
         var action = formData.getFirst("action");
         if (!"save".equals(action)) {
             return adminUi();

@@ -14,6 +14,7 @@ import org.keycloak.events.EventListenerTransaction;
 import org.keycloak.events.admin.AdminEvent;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
+import org.keycloak.models.UserLoginFailureModel;
 
 @JBossLog
 public class AcmeAuditListener implements EventListenerProvider {
@@ -65,6 +66,10 @@ public class AcmeAuditListener implements EventListenerProvider {
                 case REMOVE_TOTP:
                     CredentialUtils.findFirstOtpCredential(user).ifPresent(credential -> //
                             AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
+                    break;
+                case USER_DISABLED_BY_PERMANENT_LOCKOUT:
+                    UserLoginFailureModel userLoginFailure = session.loginFailures().getUserLoginFailure(realm, user.getId());
+                    AccountActivity.onAccountLockedOut(session, realm, user, userLoginFailure);
                     break;
             }
         } catch (Exception ex) {

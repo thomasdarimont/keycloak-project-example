@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.metrics.events;
 
 import com.github.thomasdarimont.keycloak.custom.metrics.KeycloakMetrics;
-import com.github.thomasdarimont.keycloak.custom.support.KeycloakSessionLookup;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -11,6 +10,7 @@ import org.keycloak.events.Details;
 import org.keycloak.events.Event;
 import org.keycloak.events.EventType;
 import org.keycloak.events.admin.AdminEvent;
+import org.keycloak.utils.KeycloakSessionUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -334,7 +334,7 @@ public class MetricEventRecorder {
 
     private String resolveRealmName(String realmId) {
         return realmNameCache.computeIfAbsent(realmId, key -> {
-            var realm = KeycloakSessionLookup.currentSession().realms().getRealm(key);
+            var realm = KeycloakSessionUtil.getKeycloakSession().realms().getRealm(key);
             return realm.getName();
         });
     }

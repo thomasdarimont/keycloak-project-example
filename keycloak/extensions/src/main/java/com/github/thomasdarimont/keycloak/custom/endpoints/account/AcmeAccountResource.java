@@ -35,7 +35,7 @@ public class AcmeAccountResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(session.getContext().getHttpRequest(), Response.ok()).build();
+        return withCors(session.getContext().getHttpRequest()).add(Response.ok());
     }
 
     @DELETE
@@ -65,10 +65,10 @@ public class AcmeAccountResource {
 
         var responseBody = new HashMap<String, Object>();
         var request = context.getHttpRequest();
-        return withCors(request, Response.ok(responseBody)).build();
+        return withCors(request).add(Response.ok(responseBody));
     }
 
-    private Cors withCors(HttpRequest request, Response.ResponseBuilder responseBuilder) {
-        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "OPTIONS", "DELETE"), null);
+    private Cors withCors(HttpRequest request) {
+        return CorsUtils.addCorsHeaders(session, request, Set.of("GET", "OPTIONS", "DELETE"), null);
     }
 }

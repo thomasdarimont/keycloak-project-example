@@ -5,7 +5,6 @@ import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.TrustedDevic
 import com.github.thomasdarimont.keycloak.custom.auth.trusteddevice.action.ManageTrustedDeviceAction;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
-import org.keycloak.common.util.Resteasy;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputValidator;
@@ -14,11 +13,11 @@ import org.keycloak.credential.CredentialProvider;
 import org.keycloak.credential.CredentialProviderFactory;
 import org.keycloak.credential.CredentialTypeMetadata;
 import org.keycloak.credential.CredentialTypeMetadataContext;
-import org.keycloak.http.HttpRequest;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.utils.KeycloakSessionUtil;
 
 @JBossLog
 public class TrustedDeviceCredentialProvider implements CredentialProvider<CredentialModel>, CredentialInputValidator {
@@ -90,7 +89,7 @@ public class TrustedDeviceCredentialProvider implements CredentialProvider<Crede
      */
     private boolean deleteMatchingDeviceCookieIfPresent(RealmModel realm, CredentialModel credentialModel) {
 
-        var httpRequest = Resteasy.getContextData(HttpRequest.class);
+        var httpRequest = KeycloakSessionUtil.getKeycloakSession().getContext().getHttpRequest();
 
         if (httpRequest == null) {
             return false;

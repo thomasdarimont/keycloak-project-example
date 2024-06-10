@@ -60,7 +60,7 @@ public class UserImportMigrationResource {
 
         int batchSize = migrationRequest.batchSize();
         ComponentModel customStorageProviderComponent = realm.getComponentsStream().filter(c -> AcmeUserStorageProvider.ID.equals(c.getProviderId())).toList().get(0);
-        AcmeUserStorageProvider acmeStorageProvider = (AcmeUserStorageProvider) session.getProvider(UserStorageProvider.class, customStorageProviderComponent);
+        AcmeUserStorageProvider acmeStorageProvider = (AcmeUserStorageProvider) session.getComponentProvider(UserStorageProvider.class, customStorageProviderComponent.getProviderId());
 
 //        List<UserModel> federatedUsers = userProvider.searchForUserStream(realm, "*") //
 //                .filter(u -> !StorageId.isLocalStorage(u.getId()) && "bugs".equals(u.getUsername())).toList();

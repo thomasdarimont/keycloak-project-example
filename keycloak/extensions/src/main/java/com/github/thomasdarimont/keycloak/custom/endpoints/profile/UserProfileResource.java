@@ -34,7 +34,7 @@ public class UserProfileResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(Response.ok()).build();
+        return withCors().add(Response.ok());
     }
 
     @GET
@@ -55,7 +55,7 @@ public class UserProfileResource {
         profileData.setFirstName(user.getFirstName());
         profileData.setLastName(user.getLastName());
         profileData.setEmail(user.getEmail());
-        return withCors(Response.ok(profileData)).build();
+        return withCors().add(Response.ok(profileData));
     }
 
     @PUT
@@ -90,11 +90,11 @@ public class UserProfileResource {
         }
         user.setLastName(lastName);
         // email update must be performed via application initiated required action
-        return withCors(Response.ok(newProfileData)).build();
+        return withCors().add(Response.ok(newProfileData));
     }
 
-    private Cors withCors(Response.ResponseBuilder responseBuilder) {
+    private Cors withCors() {
         var request = session.getContext().getHttpRequest();
-        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "PUT", "OPTIONS"), null);
+        return CorsUtils.addCorsHeaders(session, request, Set.of("GET", "PUT", "OPTIONS"), null);
     }
 }

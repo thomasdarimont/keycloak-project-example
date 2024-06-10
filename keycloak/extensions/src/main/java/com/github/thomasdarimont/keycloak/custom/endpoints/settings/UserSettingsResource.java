@@ -37,7 +37,7 @@ public class UserSettingsResource {
 
     @OPTIONS
     public Response getCorsOptions() {
-        return withCors(Response.ok()).build();
+        return withCors().add(Response.ok());
     }
 
     @GET
@@ -62,7 +62,7 @@ public class UserSettingsResource {
         String value2 = user.getFirstAttribute(SETTINGS_KEY2);
         responseBody.put(SETTINGS_KEY2, "true".equals(value2) ? "on" : "");
 
-        return withCors(Response.ok(responseBody)).build();
+        return withCors().add(Response.ok(responseBody));
     }
 
     @PUT
@@ -92,11 +92,11 @@ public class UserSettingsResource {
         }
 
         Map<String, Object> responseBody = new HashMap<>();
-        return withCors(Response.ok(responseBody)).build();
+        return withCors().add(Response.ok(responseBody));
     }
 
-    private Cors withCors(Response.ResponseBuilder responseBuilder) {
+    private Cors withCors() {
         var request = session.getContext().getHttpRequest();
-        return CorsUtils.addCorsHeaders(session, request, responseBuilder, Set.of("GET", "PUT", "OPTIONS"), null);
+        return CorsUtils.addCorsHeaders(session, request, Set.of("GET", "PUT", "OPTIONS"), null);
     }
 }

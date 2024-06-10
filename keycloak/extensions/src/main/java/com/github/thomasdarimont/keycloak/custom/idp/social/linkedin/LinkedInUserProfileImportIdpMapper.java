@@ -11,7 +11,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.keycloak.social.linkedin.LinkedInIdentityProviderFactory;
+import org.keycloak.social.linkedin.LinkedInOIDCIdentityProviderFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.Map;
 @AutoService(IdentityProviderMapper.class)
 public class LinkedInUserProfileImportIdpMapper extends AbstractIdentityProviderMapper {
 
-    private static final String[] COMPATIBLE_PROVIDERS = {LinkedInIdentityProviderFactory.PROVIDER_ID};
+    private static final String[] COMPATIBLE_PROVIDERS = {LinkedInOIDCIdentityProviderFactory.PROVIDER_ID};
 
     @Override
     public String getId() {

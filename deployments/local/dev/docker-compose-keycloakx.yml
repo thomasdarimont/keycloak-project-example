@@ -109,7 +109,7 @@ services:
       - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
       - ../../../keycloak/imex:/opt/keycloak/imex:z
-      - ./run/keycloakx/data:/opt/keycloak/data:z
+      - ./run/keycloakx/data:/opt/keycloak/data25:z
       - ./run/keycloakx/logs:/opt/keycloak/logs:z
       - ./run/keycloakx/perf:/opt/keycloak/perf:z
 # Add keycloak extensions

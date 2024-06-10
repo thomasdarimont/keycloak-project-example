@@ -18,7 +18,6 @@ public class CorsUtils {
 
     public static Cors addCorsHeaders(KeycloakSession session, //
                                       HttpRequest request, //
-                                      Response.ResponseBuilder responseBuilder, //
                                       Set<String> allowedHttpMethods, //
                                       String clientId //
     ) {
@@ -27,7 +26,7 @@ public class CorsUtils {
 
         var allowedOrigins = WebOriginsUtils.resolveValidWebOrigins(session, client);
 
-        var cors = Cors.add(request, responseBuilder);
+        Cors cors = Cors.builder();
 
         var originHeaderValue = request.getHttpHeaders().getHeaderString("origin");
         if (originHeaderValue != null) {

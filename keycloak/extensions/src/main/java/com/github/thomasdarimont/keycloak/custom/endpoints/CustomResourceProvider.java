@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
 import com.github.thomasdarimont.keycloak.custom.support.AuthUtils;
-import com.github.thomasdarimont.keycloak.custom.support.KeycloakSessionLookup;
 import com.google.auto.service.AutoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.jbosslog.JBossLog;
@@ -11,13 +10,12 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
-import org.keycloak.services.managers.AppAuthManager;
-import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.resource.RealmResourceProvider;
 import org.keycloak.services.resource.RealmResourceProviderFactory;
 import org.keycloak.services.resources.admin.AdminAuth;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
 import org.keycloak.services.resources.admin.permissions.AdminPermissions;
+import org.keycloak.utils.KeycloakSessionUtil;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -32,7 +30,7 @@ public class CustomResourceProvider implements RealmResourceProvider {
     @Override
     public Object getResource() {
 
-        KeycloakSession session = KeycloakSessionLookup.currentSession();
+        KeycloakSession session = KeycloakSessionUtil.getKeycloakSession();
 
         AccessToken accessToken = Tokens.getAccessToken(session);
 
