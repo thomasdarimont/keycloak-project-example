@@ -56,7 +56,9 @@ public class KeycloakEnvironment {
 
         keycloak = KeycloakTestSupport.createKeycloakContainer();
         keycloak.withReuse(true);
+        log.info("Starting Keycloak Container");
         keycloak.start();
+        log.info("Keycloak Container started.");
         keycloak.followOutput(new Slf4jLogConsumer(log));
 
         if (runConfigCli) {

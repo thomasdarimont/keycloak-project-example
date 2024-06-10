@@ -22,6 +22,8 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
@@ -59,6 +61,7 @@ public class KeycloakTestSupport {
             keycloakContainer.withContextPath(CONTEXT_PATH);
         }
 
+        keycloakContainer.withProviderLibsFrom(List.of(new File("target/extensions-jar-with-dependencies.jar")));
         return keycloakContainer.withProviderClassesFrom("target/classes");
     }
 
@@ -101,11 +104,11 @@ public class KeycloakTestSupport {
     public static GenericContainer<?> createKeycloakConfigCliContainer(KeycloakContainer keycloakContainer) {
 
         var keycloakConfigCli = new GenericContainer<>(
-                "quay.io/adorsys/keycloak-config-cli:5.12.0-24.0.1"
+                "quay.io/adorsys/keycloak-config-cli:6.0.0"
         );
         keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_ENABLED", "true");
-        keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "30s");
-        keycloakConfigCli.addEnv("IMPORT_FILES_LOCATION", "/config/*");
+        keycloakConfigCli.addEnv("KEYCLOAK_AVAILABILITYCHECK_TIMEOUT", "90s");
+        keycloakConfigCli.addEnv("IMPORT_FILES_LOCATION", "/config/acme-internal.yaml");
         keycloakConfigCli.addEnv("IMPORT_CACHE_ENABLED", "true");
         keycloakConfigCli.addEnv("IMPORT_VAR_SUBSTITUTION_ENABLED", "true");
         keycloakConfigCli.addEnv("KEYCLOAK_USER", keycloakContainer.getAdminUsername());
@@ -120,7 +123,7 @@ public class KeycloakTestSupport {
 
         // TODO make the realm config folder parameterizable
         keycloakConfigCli.addFileSystemBind("../../config/stage/dev/realms", "/config", BindMode.READ_ONLY, SelinuxContext.SHARED);
-        keycloakConfigCli.setWaitStrategy(Wait.forLogMessage(".*keycloak-config-cli running in.*", 1));
+        keycloakConfigCli.setWaitStrategy(Wait.forLogMessage(".*keycloak-config-cli ran in.*", 1));
         keycloakConfigCli.setNetworkMode("host");
         return keycloakConfigCli;
     }
