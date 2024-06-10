@@ -1,0 +1,45 @@
+realm: acme-vci
+enabled: true
+displayName: Acme VCI
+displayNameHtml: Acme VCI
+loginWithEmailAllowed: true
+loginTheme: internal
+resetPasswordAllowed: true
+accountTheme: keycloak.v2
+adminTheme: keycloak
+emailTheme: keycloak
+sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
+
+clients:
+  - clientId: acme-siop-manager
+    protocol: openid-connect
+    name: Acme SIOP Manager
+    description: "Client for registering SIOP Clients"
+    enabled: true
+    publicClient: false
+    standardFlowEnabled: false
+    directAccessGrantsEnabled: false
+    serviceAccountsEnabled: true
+    secret: secret
+    fullScopeAllowed: false
+
+users:
+  - username: tester
+    email: test@local.test
+    firstName: Theo
+    lastName: Tester
+    enabled: true
+    attributes:
+      locale: [ "de" ]
+    credentials:
+      - type: password
+        userLabel: initial
+        value: test
+        temporary: false
+
+  - username: service-account-acme-siop-manager
+    enabled: true
+    serviceAccountClientId: acme-siop-manager
+    clientRoles:
+      realm-management:
+        - create-client
