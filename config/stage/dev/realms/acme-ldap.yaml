@@ -61,6 +61,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -88,6 +89,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -108,6 +110,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:

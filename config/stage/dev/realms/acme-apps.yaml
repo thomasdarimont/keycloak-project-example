@@ -126,6 +126,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "roles"
       - "profile"
@@ -158,6 +159,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
     optionalClientScopes:
       - "phone"

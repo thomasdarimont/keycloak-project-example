@@ -29,6 +29,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "roles"
       - "profile"

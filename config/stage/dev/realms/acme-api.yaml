@@ -87,6 +87,7 @@ clients:
     # this secret would be individual for each customer
     secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
       - "roles"

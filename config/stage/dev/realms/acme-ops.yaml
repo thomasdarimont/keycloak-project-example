@@ -41,6 +41,8 @@ clients:
     secret: acme-ops-grafana-secret
     fullScopeAllowed: false
     defaultClientScopes:
+      - "basic"
+      - "email"
     rootUrl: "https://ops.acme.test:3000/grafana"
     baseUrl: "/"
     adminUrl: ""

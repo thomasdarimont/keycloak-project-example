@@ -23,6 +23,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -41,6 +42,7 @@ clients:
     directAccessGrantsEnabled: true
     serviceAccountsEnabled: false
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -70,6 +72,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -89,6 +92,7 @@ clients:
     serviceAccountsEnabled: false
     secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -126,6 +130,7 @@ clients:
     serviceAccountsEnabled: true
     secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -148,6 +153,7 @@ clients:
       # Claimed URL
       - "https://mobile.acme.test/*"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -170,6 +176,7 @@ clients:
     redirectUris:
       - "http://localhost/*"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -194,6 +201,7 @@ clients:
     webOrigins:
       - "+"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
     optionalClientScopes:
@@ -288,6 +296,7 @@ clients:
     serviceAccountsEnabled: true
     secret: "$(env:ACME_CLIENT_EXAMPLES_CLIENT_SECRET:-secret)"
     defaultClientScopes:
+      - "basic"
       - "email"
       - "profile"
       - "roles"
