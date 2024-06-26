@@ -11,21 +11,6 @@ services:
       - ./keycloak-common.env
       - ./keycloak-http.env
     environment:
-#      KC_DB: "dev-file"
-#      KC_DB_USERNAME: "sa"
-#      KC_DB_PASSWORD: ""
-      KC_HTTP_RELATIVE_PATH: "/auth"
-
-#      KC_METRICS_ENABLED: true
-
-# see https://www.keycloak.org/server/features
-#      KC_FEATURES: impersonation,token-exchange,admin-fine-grained-authz,account-api,scripts,upload-scripts,ciba,client-policies,declarative-user-profile,admin2
-#      KC_FEATURES_DISABLED: impersonation
-
-#      KC_HTTPS_PROTOCOLS: "TLSv1.3,TLSv1.2"
-
-      PROXY_ADDRESS_FORWARDING: "true"
-
     # Enable remote debugging
       DEBUG: "true"
       DEBUG_PORT: "*:8787"
@@ -59,14 +44,19 @@ services:
       - "--http-enabled=true"
       - "--http-port=8080"
       - "--https-client-auth=request"
+      - "--http-relative-path=auth"
+#      - "--http-management-port=9090"
       - "--metrics-enabled=true"
       - "--health-enabled=true"
+      # see https://www.keycloak.org/server/features
       - "--features=preview,transient-users,dynamic-scopes"
       - "--cache=local"
-      - "--proxy=passthrough"
+      - "--proxy-headers=xforwarded"
  #     - "--log-console-output=json"
       - "--log-console-format='%d{HH:mm:ss} %-5p ${TRACING_LOG_FORMAT} [%c{2.}] (%t) %s%e%n'"
       - "--https-protocols=TLSv1.3,TLSv1.2"
+# expose health and metrics via main http interface
+      - "--legacy-observability-interface=true"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
       - "--spi-theme-static-max-age=-1"
@@ -89,6 +79,7 @@ services:
 #      - "--log-level=info,org.hibernate:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug,org.hibernate.type.descriptor.sql.BasicBinder:trace"
+      - "--log-level=info,com.github.thomasdarimont.keycloak.custom.health.CustomHealthChecks:info,com.github.thomasdarimont.keycloak.custom:debug"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
       - "-Dio.netty.http2.maxHeaderListSize=16384"
@@ -99,6 +90,7 @@ services:
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
     ports:
       - "8080:8080"
+ #     - "9090:9090"
       - "8443:8443"
       - "127.0.0.1:8790:8790"
       - "127.0.0.1:8787:8787"
@@ -118,7 +110,14 @@ services:
 
 # Add third-party extensions
 #      - ./keycloak-ext/keycloak-metrics-spi-3.0.0.jar:/opt/keycloak/providers/keycloak-metrics-spi.jar:z
-      - ./keycloak-ext/keycloak-restrict-client-auth-23.0.0.jar:/opt/keycloak/providers/keycloak-restrict-client-auth.jar:z
-      - ./keycloak-ext/keycloak-home-idp-discovery-23.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery.jar:z
-      - ./keycloak-ext/apple-identity-provider-1.9.0.jar:/opt/keycloak/providers/apple-identity-provider.jar:z
+      - ./keycloak-ext/keycloak-restrict-client-auth-25.0.0.jar:/opt/keycloak/providers/keycloak-restrict-client-auth.jar:z
+      - ./keycloak-ext/keycloak-home-idp-discovery-25.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery.jar:z
+      - ./keycloak-ext/apple-identity-provider-1.13.0.jar:/opt/keycloak/providers/apple-identity-provider.jar:z
 #      - ./keycloak-ext/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:/opt/keycloak/providers/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:z
+      - ./keycloakx/health_check.sh:/health_check.sh:z
+
+    healthcheck:
+      test: ["CMD", "./health_check.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
