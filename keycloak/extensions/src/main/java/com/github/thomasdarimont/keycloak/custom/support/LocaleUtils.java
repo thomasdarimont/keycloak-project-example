@@ -17,6 +17,11 @@ public class LocaleUtils {
             return new Locale(realm.getDefaultLocale());
         }
 
+        String kcLocale = request.getUri().getQueryParameters().getFirst("kc_locale");
+        if (kcLocale != null ){
+            return new Locale(kcLocale);
+        }
+
         return request.getHttpHeaders().getAcceptableLanguages().stream().findFirst().orElseGet(() -> new Locale(realm.getDefaultLocale()));
     }
 }
