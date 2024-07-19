@@ -5,6 +5,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountRe
 import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.idp.IdpApplications;
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.TokenMigrationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.UserImportMigrationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessionPropagationResource;
@@ -124,5 +125,10 @@ public class CustomResource {
     @Path("migration/users")
     public UserImportMigrationResource userMigration() {
         return new UserImportMigrationResource(session, token);
+    }
+
+    @Path("idp/applications")
+    public IdpApplications idpApplications() {
+        return new IdpApplications(session);
     }
 }
