@@ -1,6 +1,6 @@
 services:
   acme-opa:
-    image: openpolicyagent/opa:0.60.0
+    image: openpolicyagent/opa:0.67.0
     platform: linux/amd64
     command:
       - run
