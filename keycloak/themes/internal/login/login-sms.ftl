@@ -13,6 +13,8 @@
             }
         </script>
 
+        <p>${msg("smsAuthInstruction")}</p>
+
         <form id="kc-sms-code-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
             <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
@@ -61,7 +63,5 @@
                 </div>
             </div>
         </form>
-    <#elseif section = "info" >
-        ${msg("smsAuthInstruction")}
     </#if>
 </@layout.registrationLayout>

@@ -10,7 +10,7 @@
 
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="robots" content="noindex, nofollow">
 
         <#if properties.meta?has_content>
@@ -19,45 +19,42 @@
             </#list>
         </#if>
         <title>${msg("loginTitle",(realm.displayName!''))}</title>
-        <link rel="icon" href="${url.resourcesPath}/img/favicon.ico"/>
+        <link rel="icon" href="${url.resourcesPath}/img/favicon.ico" />
         <#if properties.stylesCommon?has_content>
             <#list properties.stylesCommon?split(' ') as style>
-                <link href="${url.resourcesCommonPath}/${style}" rel="stylesheet"/>
+                <link href="${url.resourcesCommonPath}/${style}" rel="stylesheet" />
             </#list>
         </#if>
         <#if properties.styles?has_content>
             <#list properties.styles?split(' ') as style>
-                <link href="${url.resourcesPath}/${style}" rel="stylesheet"/>
+                <link href="${url.resourcesPath}/${style}" rel="stylesheet" />
             </#list>
         </#if>
-        <script type="importmap">
-            {
-                "imports": {
-                    "alpinejs": "${url.resourcesCommonPath}/node_modules/alpinejs/dist/module.esm.js"
-            }
-        }
-        </script>
         <#if properties.scripts?has_content>
             <#list properties.scripts?split(' ') as script>
                 <script src="${url.resourcesPath}/${script}" type="text/javascript"></script>
             </#list>
         </#if>
+        <script type="importmap">
+            {
+                "imports": {
+                    "rfc4648": "${url.resourcesCommonPath}/node_modules/rfc4648/lib/rfc4648.js"
+            }
+        }
+        </script>
+        <script src="${url.resourcesPath}/js/menu-button-links.js" type="module"></script>
         <#if scripts??>
             <#list scripts as script>
                 <script src="${script}" type="text/javascript"></script>
             </#list>
         </#if>
-        <#if authenticationSession??>
-            <script type="module">
-                import { checkCookiesAndSetTimer } from "${url.resourcesPath}/js/authChecker.js";
+        <script type="module">
+            import { checkCookiesAndSetTimer } from "${url.resourcesPath}/js/authChecker.js";
 
-                checkCookiesAndSetTimer(
-                    "${authenticationSession.authSessionId}",
-                    "${authenticationSession.tabId}",
-                    "${url.ssoLoginInOtherTabsUrl?no_esc}"
-                );
-            </script>
-        </#if>
+            checkCookiesAndSetTimer(
+                "${url.ssoLoginInOtherTabsUrl?no_esc}"
+            );
+        </script>
     </head>
 
     <body class="${properties.kcBodyClass!}">
@@ -90,32 +87,27 @@
                             </div>
                             <div class="col-md-10">
                                 <#nested "show-username">
-                                <div class="${properties.kcFormGroupClass!}">
-                                    <div id="kc-username">
-                                        <label id="kc-attempted-username">${auth.attemptedUsername}</label>
-                                        <a id="reset-login" href="${url.loginRestartFlowUrl}">
-                                            <div class="kc-login-tooltip">
-                                                <i class="${properties.kcResetFlowIcon!}"></i>
-                                                <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
-                                            </div>
-                                        </a>
-                                    </div>
+                                <div id="kc-username" class="${properties.kcFormGroupClass!}">
+                                    <label id="kc-attempted-username">${auth.attemptedUsername}</label>
+                                    <a id="reset-login" href="${url.loginRestartFlowUrl}" aria-label="${msg("restartLoginTooltip")}">
+                                        <div class="kc-login-tooltip">
+                                            <i class="${properties.kcResetFlowIcon!}"></i>
+                                            <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     <#else>
                         <#nested "show-username">
-                        <div class="${properties.kcFormGroupClass!}">
-                            <div id="kc-username">
-                                <i class="${properties.kcUserIcon!}"></i>
-                                <label id="kc-attempted-username">${auth.attemptedUsername}</label>
-                                <a id="reset-login" href="${url.loginRestartFlowUrl}">
-                                    <div class="kc-login-tooltip">
-                                        <i class="${properties.kcResetFlowIcon!}"></i>
-                                        <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
-                                    </div>
-                                </a>
-                            </div>
+                        <div id="kc-username" class="${properties.kcFormGroupClass!}">
+                            <label id="kc-attempted-username">${auth.attemptedUsername}</label>
+                            <a id="reset-login" href="${url.loginRestartFlowUrl}" aria-label="${msg("restartLoginTooltip")}">
+                                <div class="kc-login-tooltip">
+                                    <i class="${properties.kcResetFlowIcon!}"></i>
+                                    <span class="kc-tooltip-text">${msg("restartLoginTooltip")}</span>
+                                </div>
+                            </a>
                         </div>
                     </#if>
                 </#if>
@@ -129,14 +121,14 @@
                     <#-- App-initiated actions should not see warning messages about the need to complete the action -->
                     <#-- during login.                                                                               -->
                     <#if displayMessage && message?has_content && (message.type != 'warning' || !isAppInitiatedAction??)>
-                        <div class="alert alert-${message.type}">
-                            <#if message.type = 'success'><span
-                                class="${properties.kcFeedbackSuccessIcon!}"></span></#if>
-                            <#if message.type = 'warning'><span
-                                class="${properties.kcFeedbackWarningIcon!}"></span></#if>
-                            <#if message.type = 'error'><span class="${properties.kcFeedbackErrorIcon!}"></span></#if>
-                            <#if message.type = 'info'><span class="${properties.kcFeedbackInfoIcon!}"></span></#if>
-                            <span class="kc-feedback-text">${kcSanitize(message.summary)?no_esc}</span>
+                        <div class="alert-${message.type} ${properties.kcAlertClass!} pf-m-<#if message.type = 'error'>danger<#else>${message.type}</#if>">
+                            <div class="pf-c-alert__icon">
+                                <#if message.type = 'success'><span class="${properties.kcFeedbackSuccessIcon!}"></span></#if>
+                                <#if message.type = 'warning'><span class="${properties.kcFeedbackWarningIcon!}"></span></#if>
+                                <#if message.type = 'error'><span class="${properties.kcFeedbackErrorIcon!}"></span></#if>
+                                <#if message.type = 'info'><span class="${properties.kcFeedbackInfoIcon!}"></span></#if>
+                            </div>
+                            <span class="${properties.kcAlertTitleClass!}">${kcSanitize(message.summary)?no_esc}</span>
                         </div>
                     </#if>
 
@@ -160,7 +152,7 @@
                         </div>
                     </#if>
 
-                    <#nested "idpList">
+                    <#nested "socialProviders">
                 </div>
             </div>
 
