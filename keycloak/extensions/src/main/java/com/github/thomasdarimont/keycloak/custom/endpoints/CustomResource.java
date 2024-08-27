@@ -4,6 +4,7 @@ import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import com.github.thomasdarimont.keycloak.custom.endpoints.account.AcmeAccountResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.branding.BrandingResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.idp.IdpApplications;
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.TokenMigrationResource;
@@ -88,6 +89,15 @@ public class CustomResource {
     @Path("mobile/session-propagation")
     public OfflineSessionPropagationResource sessionPropagation() {
         return new OfflineSessionPropagationResource(session, token);
+    }
+
+    /**
+     * https://id.acme.test:8443/auth/realms/workshop/custom-resources/branding/css
+     * @return
+     */
+    @Path("branding")
+    public BrandingResource branding() {
+        return new BrandingResource(session);
     }
 
     /**

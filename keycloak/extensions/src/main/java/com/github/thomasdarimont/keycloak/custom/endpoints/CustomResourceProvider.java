@@ -20,12 +20,15 @@ import org.keycloak.utils.KeycloakSessionUtil;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+@JBossLog
 @RequiredArgsConstructor
 public class CustomResourceProvider implements RealmResourceProvider {
 
     public static final String ID = "custom-resources";
 
-    private static final Pattern ALLOWED_REALM_NAMES_PATTERN = Pattern.compile(Optional.ofNullable(System.getenv("KEYCLOAK_CUSTOM_ENDPOINT_REALM_PATTERN")).orElse("acme-.*"));
+    private static final Pattern ALLOWED_REALM_NAMES_PATTERN = Pattern.compile(
+            Optional.ofNullable(System.getenv("KEYCLOAK_CUSTOM_ENDPOINT_REALM_PATTERN"))
+                    .orElse("(acme-.*|workshop.*)"));
 
     @Override
     public Object getResource() {
@@ -47,6 +50,7 @@ public class CustomResourceProvider implements RealmResourceProvider {
         }
         boolean allowedRealm = ALLOWED_REALM_NAMES_PATTERN.matcher(realm.getName()).matches();
         if (!allowedRealm) {
+            log.warnf("### Ignoring custom-resource request for unsupported realm name: %s", realm.getName());
             // only expose custom endpoints for allowed realms
             return null;
         }

@@ -1,0 +1,6 @@
+realm: workshop
+enabled: true
+
+# Custom realm attributes
+attributes:
+  "custom.branding.backgroundColor": "orange"

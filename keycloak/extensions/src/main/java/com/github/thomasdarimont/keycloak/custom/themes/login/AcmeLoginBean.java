@@ -1,16 +1,19 @@
 package com.github.thomasdarimont.keycloak.custom.themes.login;
 
+import org.keycloak.authentication.AuthenticationProcessor;
 import org.keycloak.authentication.AuthenticationSelectionOption;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.forms.login.freemarker.model.AuthenticationContextBean;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
+import org.keycloak.models.PasswordPolicy;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AcmeLoginBean {
@@ -57,5 +60,17 @@ public class AcmeLoginBean {
                 .collect(Collectors.toList());
 
         return elegibleOptions;
+    }
+
+    public String getPasswordPolicy() {
+        PasswordPolicy passwordPolicy = session.getContext().getRealm().getPasswordPolicy();
+        if (passwordPolicy == null) {
+            return null;
+        }
+        return passwordPolicy.toString();
+    }
+
+    public String getLastProcessedAction() {
+        return session.getContext().getAuthenticationSession().getAuthNote(AuthenticationProcessor.LAST_PROCESSED_EXECUTION);
     }
 }
