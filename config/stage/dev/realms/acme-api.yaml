@@ -6,10 +6,10 @@ loginWithEmailAllowed: true
 registrationAllowed: true
 registrationEmailAsUsername: true
 #loginTheme: apps
-loginTheme: keycloak
-accountTheme: keycloak.v3
-adminTheme: keycloak
-emailTheme: keycloak
+#loginTheme: keycloak
+#accountTheme: keycloak.v3
+#adminTheme: keycloak
+#emailTheme: keycloak
 internationalizationEnabled: true
 supportedLocales: ["en","de"]
 defaultLocale: "en"

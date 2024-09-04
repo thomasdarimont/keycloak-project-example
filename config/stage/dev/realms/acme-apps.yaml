@@ -7,8 +7,8 @@ registrationAllowed: true
 registrationEmailAsUsername: false
 #loginTheme: apps
 loginTheme: internal-modern
-accountTheme: keycloak
-adminTheme: keycloak
+#accountTheme: keycloak
+#adminTheme: keycloak
 emailTheme: internal-modern
 internationalizationEnabled: true
 supportedLocales: ["en","de"]

@@ -4,9 +4,9 @@ displayName: Acme SAML
 displayNameHtml: Acme SAML
 loginWithEmailAllowed: true
 loginTheme: internal
-accountTheme: keycloak
-adminTheme: keycloak
-emailTheme: keycloak
+#accountTheme: keycloak
+#adminTheme: keycloak
+#emailTheme: keycloak
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 
 components:

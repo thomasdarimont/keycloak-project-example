@@ -9,7 +9,7 @@ defaultLocale: "en"
 resetPasswordAllowed: true
 loginTheme: "internal-modern"
 accountTheme: "internal-modern"
-adminTheme: keycloak
+#adminTheme: keycloak
 emailTheme: "internal-modern"
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"

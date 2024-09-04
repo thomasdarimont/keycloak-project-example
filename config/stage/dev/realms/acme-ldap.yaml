@@ -5,9 +5,9 @@ displayNameHtml: Acme LDAP
 loginWithEmailAllowed: true
 loginTheme: internal
 resetPasswordAllowed: true
-accountTheme: keycloak.v2
-adminTheme: keycloak
-emailTheme: keycloak
+#accountTheme: keycloak.v2
+#adminTheme: keycloak
+#emailTheme: keycloak
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 browserFlow: "Browser Identity First"
 

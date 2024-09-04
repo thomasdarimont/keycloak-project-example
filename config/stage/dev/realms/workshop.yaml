@@ -1,6 +1,8 @@
 realm: workshop
 enabled: true
 
+displayName: "Acme Workshop"
+
 # Custom realm attributes
 attributes:
   "custom.branding.backgroundColor": "orange"

@@ -8,9 +8,9 @@ internationalizationEnabled: true
 supportedLocales: ["en","de"]
 defaultLocale: "en"
 resetPasswordAllowed: true
-accountTheme: keycloak.v2
-adminTheme: keycloak
-emailTheme: keycloak
+#accountTheme: keycloak.v2
+#adminTheme: keycloak
+#emailTheme: keycloak
 sslRequired: $(env:SSL_REQUIRED:-EXTERNAL)
 
 identityProviders:
