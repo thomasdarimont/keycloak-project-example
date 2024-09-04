@@ -7,8 +7,8 @@ export function visitClient(clientId: string) {
 export function loginUser(user: any) {
 
     cy.get('#username').type(user.username)
-    cy.get('input#kc-login').click()
+    cy.get('#kc-login').click()
 
     cy.get('#password').type(user.password)
-    cy.get('input#kc-login').click()
+    cy.get('#kc-login').click()
 }

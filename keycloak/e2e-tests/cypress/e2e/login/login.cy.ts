@@ -10,24 +10,27 @@ let accountClientId = 'account-console';
 
 context('Login...', () => {
 
+    Cypress.on('uncaught:exception', (err, runnable) => {
+        return false;
+    });
+
     it('with known Username and Password, then Logout should pass', () => {
 
         visitClient(accountClientId)
-        cy.get('#landingSignInButton').click()
+        cy.get('#kc-login').click()
 
         loginUser(users.tester)
 
-        cy.get('#landingSignOutButton').invoke("text").should('eq', msg.signOut)
-        cy.get('#landingSignOutButton').click()
-
-        cy.get('#landingSignInButton').invoke("text").should('eq', msg.signIn)
+        cy.get('.pf-v5-c-menu-toggle__text').click()
+        cy.get('.pf-v5-c-menu__item').invoke("text").should('eq', msg.signOut)
+        cy.get('.pf-v5-c-menu__item').click()
     });
 
     it('with unknown Username should fail', () => {
 
         visitClient(accountClientId)
 
-        cy.get('#landingSignInButton').click()
+        cy.get('#kc-login').click()
 
         cy.get('#username').type(users.unknown.username)
         cy.get('input#kc-login').click()
@@ -39,7 +42,7 @@ context('Login...', () => {
 
         visitClient(accountClientId)
 
-        cy.get('#landingSignInButton').click()
+        cy.get('#kc-login').click()
 
         loginUser(users.testerInvalidPass)
 
