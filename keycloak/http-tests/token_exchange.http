@@ -23,6 +23,17 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange&client_id={{CONFIDENT
     client.global.set("XCHD_REFRESH_TOKEN", response.body.refresh_token);
 %}
 
+### Perform (internal-to-internal) token exchange to SAML assertion
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=urn:ietf:params:oauth:grant-type:token-exchange&client_id={{CONFIDENTIAL_CLIENT_CLASSIC_WEB_APP}}&client_secret={{CONFIDENTIAL_CLIENT_CLASSIC_WEB_APP_SECRET}}&subject_token={{KC_ACCESS_TOKEN}}&audience=acme-client-saml-webapp&requested_token_type=urn:ietf:params:oauth:token-type:saml2
+
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN", response.body.access_token);
+    client.global.set("XCHD_REFRESH_TOKEN", response.body.refresh_token);
+%}
+
 
 ### Perform (internal-to-internal) token exchange with scope extension
 POST {{ISSUER}}/protocol/openid-connect/token
