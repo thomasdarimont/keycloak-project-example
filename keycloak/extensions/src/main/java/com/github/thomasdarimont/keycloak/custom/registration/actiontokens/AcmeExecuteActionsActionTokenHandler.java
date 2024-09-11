@@ -19,7 +19,7 @@ public class AcmeExecuteActionsActionTokenHandler extends ExecuteActionsActionTo
     public AuthenticationSessionModel startFreshAuthenticationSession(ExecuteActionsActionToken token, ActionTokenContext<ExecuteActionsActionToken> tokenContext) {
         AuthenticationSessionModel authSession = super.startFreshAuthenticationSession(token, tokenContext);
 
-        boolean remainSingedIn = false; // set to true to remain signed in after auth
+        boolean remainSingedIn = true; // set to true to remain signed in after auth
         boolean remainSignedInAfterExecuteActions = tokenContext.getRealm().getAttribute("acme.remainSignedInAfterExecuteActions", remainSingedIn);
 
         if (remainSignedInAfterExecuteActions) {

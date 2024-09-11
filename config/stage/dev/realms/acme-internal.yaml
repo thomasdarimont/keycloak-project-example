@@ -58,6 +58,9 @@ eventsExpiration: 10368000
 # enabledEventTypes: [ "SEND_RESET_PASSWORD", "UPDATE_CONSENT_ERROR", "GRANT_CONSENT", ... ]
 adminEventsEnabled: false
 adminEventsDetailsEnabled: false
+# Note adminEventsExpired is stored as realm attribute
+#  adminEventsExpiration: 3667
+
 smtpServer:
   replyToDisplayName: "Acme Employee Support"
   port: 1025
