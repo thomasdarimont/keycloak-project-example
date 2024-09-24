@@ -169,7 +169,7 @@ clients:
 
 identityProviders:
   - alias: "idp-acme-internal"
-    displayName: "Acme Employee Login"
+    displayName: "Acme Internal Login"
     providerId: "oidc"
     enabled: true
     updateProfileFirstLoginMode: on
@@ -330,7 +330,7 @@ identityProviders:
     addReadTokenRoleOnCreate: false
     authenticateByDefault: false
     linkOnly: false
-    firstBrokerLoginFlowAlias: "first broker login"
+#    firstBrokerLoginFlowAlias: "first broker login"
     #    postBrokerLoginFlowAlias: "Custom Post Broker Login"
     config:
       guiOrder: "1000"
@@ -467,7 +467,6 @@ authenticationFlows:
         userSetupAllowed: false
         autheticatorFlow: false
 
-
   - alias: "Custom Post Broker Login"
     description: "Custom Post Broker Login with logging"
     providerId: "basic-flow"
@@ -482,3 +481,5 @@ authenticationFlows:
 authenticatorConfig:
   - alias: "acme-debug-auth-post-broker"
     config: {}
+
+# deploy
