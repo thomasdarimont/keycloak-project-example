@@ -49,6 +49,7 @@ services:
       - "--metrics-enabled=true"
       - "--health-enabled=true"
       # see https://www.keycloak.org/server/features
+      # ,declarative-ui
       - "--features=preview,transient-users,dynamic-scopes"
       - "--cache=local"
       - "--proxy-headers=xforwarded"
