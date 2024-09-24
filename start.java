@@ -350,6 +350,8 @@ class start {
     private static int runCommandAndWait(ArrayList<String> commandLine) {
         var pb = new ProcessBuilder(commandLine);
         pb.directory(new File("."));
+        // disable docker compose menu in shell
+        pb.environment().put("COMPOSE_MENU", "false");
         pb.inheritIO();
         try {
             var process = pb.start();
