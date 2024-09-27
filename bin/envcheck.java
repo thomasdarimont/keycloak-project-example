@@ -29,6 +29,22 @@ class envcheck {
             System.out.println("Please install docker compose.");
         }
 
+        /* Check required tools: mkcert */
+        System.out.print("mkcert: ");
+        var pbMkcert = new ProcessBuilder(List.of("mkcert", "-version"));
+        pbMkcert.inheritIO();
+        try {
+            pbMkcert.start();
+            var processMkcert = pbMkcert.start();
+            returnCode += processMkcert.waitFor();
+            if (returnCode > 0) {
+                System.out.println("Please install mkcert.");
+            }
+        } catch (Exception e) {
+            System.out.println("Please install mkcert.");
+        }
+
+
         /*Check directories exist */
         var requiredDirectories = List.of("./keycloak/extensions/target/classes",
                 "./keycloak/imex","./keycloak/themes/apps",

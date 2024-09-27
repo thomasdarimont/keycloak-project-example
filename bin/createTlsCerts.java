@@ -106,8 +106,18 @@ class createTlsCerts {
         var pb = new ProcessBuilder(commandLine);
         pb.directory(new File(targetDir));
         pb.inheritIO();
-        var process = pb.start();
-        var mkCertCommandsReturnCode = process.waitFor();
+        var mkCertCommandsReturnCode = 0;
+        try {
+            var processMkcert = pb.start();
+            mkCertCommandsReturnCode = processMkcert.waitFor();
+            if (mkCertCommandsReturnCode > 0) {
+                System.out.println("Please install mkcert.");
+                System.exit(mkCertCommandsReturnCode);
+            }
+        } catch (Exception e) {
+            System.out.println("Please install mkcert.");
+            System.exit(mkCertCommandsReturnCode);
+        }
 
         /* List created files */
         Files.list(Paths.get(targetDir)).filter(p -> FileSystems.getDefault().getPathMatcher(PEM_FILE_GLOB).matches(p)).forEach(System.out::println);
