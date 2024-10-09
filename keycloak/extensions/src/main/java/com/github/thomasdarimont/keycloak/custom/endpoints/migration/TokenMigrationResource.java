@@ -10,6 +10,7 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.models.AuthenticatedClientSessionModel;
 import org.keycloak.models.ClientModel;
+import org.keycloak.models.ClientScopeModel;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
@@ -86,8 +87,8 @@ public class TokenMigrationResource {
         offlineClientSession.setNote(OAuth2Constants.ISSUER, sourceClientAuthClientSession.getNote(OAuth2Constants.ISSUER));
 
         // generate new access token response (AT+RT) with azp=target-client
-        Set<String> clientScopeIds = Set.of();
-        ClientSessionContext clientSessionCtx = DefaultClientSessionContext.fromClientSessionAndClientScopeIds(offlineClientSession, clientScopeIds, session);
+        Set<ClientScopeModel> clientScope = Set.of();
+        ClientSessionContext clientSessionCtx = DefaultClientSessionContext.fromClientSessionAndClientScopes(offlineClientSession, clientScope, session);
 
         var event = new EventBuilder(realm, session);
         event.detail("migration", "true");

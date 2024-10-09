@@ -70,7 +70,7 @@ public class SessionPropagationActionTokenHandler extends AbstractActionTokenHan
         var rememberMe = token.getRememberMe();
         var userSession = session.sessions().createUserSession(null, realm, authSession.getAuthenticatedUser(), authSession.getAuthenticatedUser().getUsername(), clientConnection.getRemoteAddr(), OIDCLoginProtocol.LOGIN_PROTOCOL, rememberMe, null, null, UserSessionModel.SessionPersistenceState.PERSISTENT);
 
-        AuthenticationManager.setClientScopesInSession(authSession);
+        AuthenticationManager.setClientScopesInSession(session, authSession);
         AuthenticationManager.createLoginCookie(session, realm, userSession.getUser(), userSession, tokenContext.getUriInfo(), clientConnection);
 
         log.infof("Propagated Offline-Session to User-Session. realm=%s userId=%s sourceClientId=%s targetClientId=%s", authSession.getRealm().getName(), authenticatedUser.getId(), token.getSourceClientId(), token.getIssuedFor());

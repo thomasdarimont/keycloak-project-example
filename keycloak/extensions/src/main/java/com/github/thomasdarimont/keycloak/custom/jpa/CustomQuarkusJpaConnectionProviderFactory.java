@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.connections.jpa.JpaConnectionProviderFactory;
 import org.keycloak.models.KeycloakSessionFactory;
-import org.keycloak.quarkus.runtime.storage.legacy.database.QuarkusJpaConnectionProviderFactory;
+import org.keycloak.quarkus.runtime.storage.database.jpa.QuarkusJpaConnectionProviderFactory;
 
 import java.util.HashMap;
 import java.util.Map;
