@@ -42,7 +42,7 @@
         <docker.file>keycloakx/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>25.0.6</keycloak.version>
+        <keycloak.version>26.0.0</keycloak.version>
 
         <!-- Parameterizable Project Versions -->
         <revision>1.0.0</revision>

@@ -71,7 +71,7 @@ public class TokenUtils {
             var userSession = session.sessions().createUserSession(sessionId, realm, clientUser, clientUsername, //
                     remoteAddr, ServiceAccountConstants.CLIENT_AUTH, false, null, null, TRANSIENT);
 
-            AuthenticationManager.setClientScopesInSession(authSession);
+            AuthenticationManager.setClientScopesInSession(session, authSession);
             var clientSessionCtx = TokenManager.attachAuthenticationSession(session, userSession, authSession);
 
             // Notes about client details
@@ -114,7 +114,7 @@ public class TokenUtils {
         ClientConnection connection = context.getConnection();
         UserSessionModel iamUserSession = session.sessions().createUserSession(KeycloakModelUtils.generateId(), realm, userSession.getUser(), userSession.getUser().getUsername(), connection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, TRANSIENT);
 
-        AuthenticationManager.setClientScopesInSession(iamAuthSession);
+        AuthenticationManager.setClientScopesInSession(session, iamAuthSession);
         ClientSessionContext clientSessionCtx = TokenManager.attachAuthenticationSession(session, iamUserSession, iamAuthSession);
 
         // Notes about client details
@@ -154,7 +154,7 @@ public class TokenUtils {
         ClientConnection connection = context.getConnection();
         UserSessionModel iamUserSession = session.sessions().createUserSession(KeycloakModelUtils.generateId(), realm, user, user.getUsername(), connection.getRemoteAddr(), ServiceAccountConstants.CLIENT_AUTH, false, null, null, TRANSIENT);
 
-        AuthenticationManager.setClientScopesInSession(iamAuthSession);
+        AuthenticationManager.setClientScopesInSession(session, iamAuthSession);
         ClientSessionContext clientSessionCtx = TokenManager.attachAuthenticationSession(session, iamUserSession, iamAuthSession);
 
         // Notes about client details

@@ -12,7 +12,6 @@ import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
 import org.keycloak.authentication.authenticators.browser.UsernamePasswordForm;
 import org.keycloak.forms.login.LoginFormsProvider;
-import org.keycloak.forms.login.freemarker.LoginFormsUtil;
 import org.keycloak.forms.login.freemarker.model.IdentityProviderBean;
 import org.keycloak.models.AuthenticationExecutionModel;
 import org.keycloak.models.FederatedIdentityModel;
@@ -54,7 +53,8 @@ public class AcmeDynamicIdpLookupUsernameForm extends UsernamePasswordForm {
     public void authenticate(AuthenticationFlowContext context) {
         if (context.getUser() != null) {
             // We can skip the form when user is re-authenticating. Unless current user has some IDP set, so he can re-authenticate with that IDP
-            List<IdentityProviderModel> identityProviders = LoginFormsUtil.filterIdentityProviders(context.getRealm().getIdentityProvidersStream(), context.getSession(), context);
+            IdentityProviderBean identityProviderBean = new IdentityProviderBean(context.getSession(), context.getRealm(), null, context);
+            List<IdentityProviderBean.IdentityProvider> identityProviders = identityProviderBean.getProviders();
             if (identityProviders.isEmpty()) {
                 context.success();
                 return;
