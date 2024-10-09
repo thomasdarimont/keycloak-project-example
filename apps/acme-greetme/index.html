@@ -22,9 +22,9 @@
 <nav>
     <ul class="menu">
         <li>
-            <button id="loginBtn" onclick="keycloak.login()">Login</button>
-            <button id="registerBtn" onclick="keycloak.register()">Register</button>
-            <button id="manageConsentBtn" onclick="keycloak.login({prompt: 'consent'})">Manage consent</button>
+            <button id="loginBtn" onclick="showLogin()">Login</button>
+            <button id="registerBtn" onclick="showRegister()">Register</button>
+            <button id="manageConsentBtn" onclick="showLogin({prompt: 'consent'})">Manage consent</button>
             <button id="operation1Btn" onclick="performOperation('op1','name')" class="operation">Op 1 (name)</button>
             <button id="operation2Btn" onclick="performOperation('op2','phone')"  class="operation">Op 2 (phone)</button>
             <button id="operation3Btn" onclick="performOperation('op3','phone name')"  class="operation">Op 3 (phone+name)</button>
@@ -52,7 +52,7 @@
     </div>
 </div>
 
-<script defer>
+<script defer type="module">
 
     function $(selector) {
         return document.querySelector(selector);
@@ -76,58 +76,16 @@
 
     document.getElementById("clientInfo").textContent = clientId;
 
-    // dynamically add keycloak.js script
-    let script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = keycloakUrl + "/js/keycloak.js";
-    document.getElementsByTagName('head')[0].appendChild(script);
+    window.showLogin = async function(config) {
+        await keycloak.login(config);
+    }
 
-    window.onload = () => {
+    window.showRegister = async function() {
+        let registerUrl = await keycloak.createRegisterUrl();
+        window.location = registerUrl;
+    }
 
-        let keycloak = new Keycloak({
-            url: keycloakUrl,
-            realm: realm,
-            clientId: clientId,
-        });
-        window.keycloak = keycloak;
-
-        // workaround for changes with oidc logout in Keycloak 18.0.0
-        // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
-        keycloak.createLogoutUrl = function(options) {
-
-            let currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set("scope", keycloak.tokenParsed.scope);
-            let redirectUriWithCurrentScope = currentUrl.toString();
-
-            return keycloak.endpoints.logout()
-                + '?id_token_hint=' + keycloak.idToken
-                + '&post_logout_redirect_uri=' + encodeURIComponent(redirectUriWithCurrentScope);
-        }
-
-
-        let initConfig = {
-            // onLoad: 'login-required', // redirects to login if not login
-            onLoad: 'check-sso', // shows login button of not logged in
-            checkLoginIframe: true,
-            checkLoginIframeInterval: 1,
-            pkceMethod: 'S256',
-            scope: scope
-        };
-
-        let onLoginSuccess = () => {
-            if (keycloak.authenticated) {
-                showGreeting();
-            } else {
-                showWelcome();
-            }
-        };
-
-        keycloak.init(initConfig).then(onLoginSuccess);
-
-        keycloak.onAuthLogout = showWelcome;
-    };
-
-    function showWelcome() {
+    window.showWelcome = function () {
         $("#loginBtn").classList.remove("hidden");
         $("#registerBtn").classList.remove("hidden");
         $("#manageConsentBtn").classList.add("hidden");
@@ -135,7 +93,7 @@
         $("#logoutBtn").classList.add("hidden");
     }
 
-    async function updateUserProfileFromUserInfoEndpoint(userProfile) {
+    window.updateUserProfileFromUserInfoEndpoint = async function (userProfile) {
 
         let userInfoResponse = await fetch(userInfoUrl, {
             timeout: 2000,
@@ -157,7 +115,7 @@
         console.log(userInfo)
     }
 
-    async function showGreeting() {
+    window.showGreeting = async function () {
 
         $("#loginBtn").classList.add("hidden");
         $("#registerBtn").classList.add("hidden");
@@ -185,7 +143,7 @@
         $("#scopeGranted").innerText = keycloak.tokenParsed.scope;
     }
 
-    function getUserProfileFromKeycloakToken() {
+    window.getUserProfileFromKeycloakToken = function () {
         return {
             preferred_username: keycloak.tokenParsed.preferred_username,
             name: keycloak.tokenParsed.name,
@@ -198,7 +156,7 @@
         };
     }
 
-    function performOperation(operationName, requiredScope) {
+    window.performOperation = function (operationName, requiredScope) {
 
         if (!isScopePresent(requiredScope)) {
             redirectForConsent(requiredScope);
@@ -208,7 +166,7 @@
         alert("Perform operation " + operationName);
     }
 
-    function isScopePresent(requiredScope) {
+    window.isScopePresent = function (requiredScope) {
 
         let grantedScopeNames = (keycloak.tokenParsed.scope || "openid").split(" ")
         let requiredScopeNames = requiredScope.split(" ");
@@ -216,7 +174,7 @@
         return requiredScopeNames.every(it => grantedScopeNames.includes(it));
     }
 
-    function redirectForConsent(requiredScope) {
+    window.redirectForConsent = function (requiredScope) {
 
         // need to request additional required scope
         let requestedScope = keycloak.tokenParsed.scope + " " + requiredScope;
@@ -230,6 +188,51 @@
         keycloak.login({scope: requestedScope, redirectUri: redirectUriWithNewScope});
     }
 
+    // dynamically add keycloak.js script
+    try {
+        let jsSrc = "../site/lib/keycloak-js/keycloak.js";
+        const { default: Keycloak } = await import(jsSrc);
+
+        // window.onload = () => {
+
+        let keycloak = new Keycloak({
+            url: keycloakUrl,
+            realm: realm,
+            clientId: clientId
+        });
+        window.keycloak = keycloak;
+
+        // workaround for changes with oidc logout in Keycloak 18.0.0
+        // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
+        keycloak.createLogoutUrl = function (options) {
+            return keycloak.endpoints.logout()
+                + '?id_token_hint=' + keycloak.idToken
+                + '&post_logout_redirect_uri=' + encodeURIComponent(options?.redirectUri || window.location.href);
+        }
+
+        let initConfig = {
+            // onLoad: 'login-required', // redirects to login if not login
+            onLoad: 'check-sso', // shows login and register button if not logged in
+            checkLoginIframe: true,
+            checkLoginIframeInterval: 1,
+            pkceMethod: 'S256',
+            scope: scope
+        };
+
+        let onLoginSuccess = () => {
+            if (keycloak.authenticated) {
+                showGreeting();
+            } else {
+                showWelcome();
+            }
+        };
+
+        keycloak.init(initConfig).then(onLoginSuccess);
+
+        keycloak.onAuthLogout = showWelcome;
+    } catch (error) {
+        console.error('Error loading Keycloak module:', error);
+    }
 </script>
 </body>
 

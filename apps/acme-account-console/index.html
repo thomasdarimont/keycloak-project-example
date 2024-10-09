@@ -122,12 +122,12 @@
 
 <div id="welcome" class="wrapper hidden">
     <div class="menu">
-        <button name="loginBtn" onclick="keycloak.login()">Login</button>
+        <button name="loginBtn" onclick="showLogin()">Login</button>
     </div>
 
     <div class="message-content">
         <div class="message">Please login</div>
-        <button name="registerBtn" onclick="keycloak.register()">Register</button>
+        <button name="registerBtn" onclick="showRegister()">Register</button>
     </div>
 </div>
 
@@ -152,7 +152,7 @@
     <div id="data" class="content"></div>
 </div>
 
-<script defer>
+<script defer type="module">
 
     function $(selector) {
         return document.querySelector(selector);
@@ -249,62 +249,26 @@
 
     $("#clientInfo").textContent = clientId;
 
-    // dynamically add keycloak.js script
-    let script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = keycloakJsSrc || keycloakUrl + "/js/keycloak.js";
-    document.getElementsByTagName('head')[0].appendChild(script);
+    window.showLogin = async function(config) {
+        await keycloak.login(config);
+    }
 
-    window.onload = () => {
+    window.showRegister = async function() {
+        let registerUrl = await keycloak.createRegisterUrl();
+        window.location = registerUrl;
+    }
 
-        let keycloak = new Keycloak({
-            url: keycloakUrl,
-            realm: realm,
-            clientId: clientId
-        });
-        window.keycloak = keycloak;
-
-        // workaround for changes with oidc logout in Keycloak 18.0.0
-        // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
-        keycloak.createLogoutUrl = function (options) {
-            return keycloak.endpoints.logout()
-                + '?id_token_hint=' + keycloak.idToken
-                + '&post_logout_redirect_uri=' + encodeURIComponent(options?.redirectUri || window.location.href);
-        }
-
-        let initConfig = {
-            onLoad: 'login-required', // redirects to login if not login
-            // onLoad: 'check-sso', // shows login and register button if not logged in
-            checkLoginIframe: true,
-            checkLoginIframeInterval: 1,
-            pkceMethod: 'S256',
-            scope: scope
-        };
-
-        let onLoginSuccess = () => {
-            if (keycloak.authenticated) {
-                showProfile();
-            } else {
-                showWelcome();
-            }
-        };
-
-        keycloak.init(initConfig).then(onLoginSuccess);
-
-        keycloak.onAuthLogout = showWelcome;
-    };
-
-    function showWelcome() {
+    window.showWelcome = function () {
         document.getElementById("welcome").classList.remove("hidden");
         document.getElementById("content").classList.add("hidden");
     }
 
-    function getTimeSinceLastAuth() {
+    window.getTimeSinceLastAuth = function () {
         let timeSinceAuthInSeconds = Math.floor((Date.now() - (keycloak.tokenParsed.auth_time * 1000)) / 1000);
         return timeSinceAuthInSeconds;
     }
 
-    function enforceCurrentAuth() {
+    window.enforceCurrentAuth = function () {
 
         let timeSinceAuthSeconds = getTimeSinceLastAuth();
         console.log("time since auth: " + timeSinceAuthSeconds);
@@ -322,7 +286,7 @@
         });
     }
 
-    async function revokeToken() {
+    window.revokeToken = async function () {
 
         const bodyData = new URLSearchParams();
         bodyData.append("token", keycloak.refreshToken);
@@ -342,13 +306,13 @@
         // window.location.reload();
     }
 
-    function switchContext() {
+    window.switchContext = function () {
         keycloak.login({
             action: "acme-context-selection-action"
         });
     }
 
-    async function showSecurity() {
+    window.showSecurity = async function () {
 
         await keycloak.updateToken(5);
 
@@ -502,7 +466,7 @@
         show(securityHtml, "message-content");
     }
 
-    async function showStepUp() {
+    window.showStepUp = async function () {
 
         let stepupHtml = `
             <ul>
@@ -514,7 +478,7 @@
         show(stepupHtml, "message-content");
     }
 
-    function stepUpAuth(mode) {
+    window.stepUpAuth = function (mode) {
 
         if (mode === 'acr') {
             keycloak.login({
@@ -530,7 +494,7 @@
         }
     }
 
-    async function showApps() {
+    window.showApps = async function () {
 
         await keycloak.updateToken(5);
 
@@ -595,14 +559,14 @@
         return new Intl.DateTimeFormat('de-DE', {dateStyle: 'medium', timeStyle: 'short'}).format(new Date(timestamp))
     }
 
-    function changePassword() {
+    window.changePassword = function () {
 
         keycloak.login({
             action: "UPDATE_PASSWORD"
         });
     }
 
-    function changeEmail() {
+    window.changeEmail = function () {
 
         keycloak.login({
             action: "acme-update-email" // use custom update email action
@@ -610,7 +574,7 @@
         });
     }
 
-    function changeMfa(method) {
+    window.changeMfa = function (method) {
 
         let actions = {
             "otp": "CONFIGURE_TOTP",
@@ -631,7 +595,7 @@
         });
     }
 
-    async function removeMfa(credentialType, credentialId) {
+    window.removeMfa = async function (credentialType, credentialId) {
 
         if (!(["otp", "mfa-sms", "acme-trusted-device", "recovery-authn-codes", "mfa-email-code"].includes(credentialType))) {
             return;
@@ -659,7 +623,7 @@
         showSecurity();
     }
 
-    async function showProfile() {
+    window.showProfile = async function () {
 
         await keycloak.updateToken(5);
 
@@ -746,7 +710,7 @@
         show(profileHtml, "message-content");
     }
 
-    async function saveProfile() {
+    window.saveProfile = async function () {
 
         await keycloak.updateToken(5);
 
@@ -795,7 +759,7 @@
         await keycloak.updateToken(5);
     }
 
-    async function showSettings() {
+    window.showSettings = async function () {
 
         await keycloak.updateToken(5);
 
@@ -836,7 +800,7 @@
         show(settingsHtml, "message-content");
     }
 
-    async function saveSettings() {
+    window.saveSettings = async function () {
 
         await keycloak.updateToken(5);
 
@@ -881,7 +845,7 @@
         }
     }
 
-    function sendRequest(url, requestOptions) {
+    window.sendRequest = function (url, requestOptions) {
 
         let requestData = {
             timeout: 2000,
@@ -897,19 +861,19 @@
         return fetch(url, requestData);
     }
 
-    function showToken() {
+    window.showToken = function () {
 
         let data = JSON.stringify(keycloak.tokenParsed, null, '    ');
         show(data, "token-content");
     }
 
-    function showIdToken() {
+    window.showIdToken = function () {
 
         let data = JSON.stringify(keycloak.idTokenParsed, null, '    ');
         show(data, "token-content");
     }
 
-    async function showUserInfo() {
+    window.showUserInfo = async function () {
 
         await keycloak.updateToken(5);
 
@@ -919,7 +883,7 @@
         show(data, "token-content");
     }
 
-    async function requestAccountDeletion() {
+    window.requestAccountDeletion = async function () {
 
         console.log("Requesting account deletion");
 
@@ -948,7 +912,7 @@
         return accountDeletionData;
     }
 
-    async function fetchMeInfoData() {
+    window.fetchMeInfoData = async function () {
 
         console.log("Fetching me info");
 
@@ -972,7 +936,7 @@
         return meData;
     }
 
-    async function showMeInfo() {
+    window.showMeInfo = async function showMeInfo() {
 
         let meData = await fetchMeInfoData();
 
@@ -1002,7 +966,7 @@
         }
     }
 
-    function updateMeBackend() {
+    window.updateMeBackend = function () {
 
         console.log("updated me backend");
         let meBackendElement = $('#meBackend');
@@ -1012,7 +976,7 @@
         showMeInfo();
     }
 
-    function show(data, cssClass) {
+    window.show = function (data, cssClass) {
 
         let contentElement = $('#content');
         contentElement.classList.remove("hidden")
@@ -1025,13 +989,59 @@
 
     // Use the browser's built-in functionality to quickly and safely escape
     // the string
-    function escapeHtml(str) {
+    window.escapeHtml = function (str) {
         if (!str) {
             return "";
         }
         const div = document.createElement('div');
         div.appendChild(document.createTextNode(str));
         return div.innerHTML;
+    }
+
+    // dynamically add keycloak.js script
+    try {
+        let jsSrc = keycloakJsSrc || "../site/lib/keycloak-js/keycloak.js";
+        const { default: Keycloak } = await import(jsSrc);
+
+        // window.onload = () => {
+
+        let keycloak = new Keycloak({
+            url: keycloakUrl,
+            realm: realm,
+            clientId: clientId
+        });
+        window.keycloak = keycloak;
+
+        // workaround for changes with oidc logout in Keycloak 18.0.0
+        // See https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
+        keycloak.createLogoutUrl = function (options) {
+            return keycloak.endpoints.logout()
+                + '?id_token_hint=' + keycloak.idToken
+                + '&post_logout_redirect_uri=' + encodeURIComponent(options?.redirectUri || window.location.href);
+        }
+
+        let initConfig = {
+            onLoad: 'login-required', // redirects to login if not login
+            // onLoad: 'check-sso', // shows login and register button if not logged in
+            checkLoginIframe: true,
+            checkLoginIframeInterval: 1,
+            pkceMethod: 'S256',
+            scope: scope
+        };
+
+        let onLoginSuccess = () => {
+            if (keycloak.authenticated) {
+                showProfile();
+            } else {
+                showWelcome();
+            }
+        };
+
+        keycloak.init(initConfig).then(onLoginSuccess);
+
+        keycloak.onAuthLogout = showWelcome;
+    } catch (error) {
+        console.error('Error loading Keycloak module:', error);
     }
 </script>
 </body>
