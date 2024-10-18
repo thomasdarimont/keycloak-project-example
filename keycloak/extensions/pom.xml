@@ -137,7 +137,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
-            <version>${keycloak.version}</version>
+            <version>${keycloak-admin-client.version}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
