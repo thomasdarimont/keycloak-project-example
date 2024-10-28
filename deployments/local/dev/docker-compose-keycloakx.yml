@@ -84,6 +84,8 @@ services:
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
       - "-Dio.netty.http2.maxHeaderListSize=16384"
+      - "--spi-admin-realm-restapi-extension-custom-admin-resources-users-provisioning-required-realm-role=user-modifier-acme"
+      - "--spi-admin-realm-restapi-extension-custom-admin-resources-users-provisioning-managed-attribute-pattern=(.*)"
     extra_hosts:
       # ${DOCKER_HOST_IP:-172.17.0.1} is host.docker.internal
       - "id.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"

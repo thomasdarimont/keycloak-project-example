@@ -1,5 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.admin;
 
+import com.github.thomasdarimont.keycloak.custom.endpoints.admin.UserProvisioningResource.UserProvisioningConfig;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
@@ -11,7 +12,10 @@ import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluato
 import java.time.Instant;
 import java.util.Map;
 
-public class CustomDemoAdminResource {
+/**
+ * Collection of custom Admin Resource Endpoints
+ */
+public class CustomAdminResource {
 
     private final KeycloakSession session;
 
@@ -21,11 +25,14 @@ public class CustomDemoAdminResource {
 
     private final AdminEventBuilder adminEvent;
 
-    public CustomDemoAdminResource(KeycloakSession session, RealmModel realm, AdminPermissionEvaluator auth, AdminEventBuilder adminEvent) {
+    private final UserProvisioningConfig privisioningConfig;
+
+    public CustomAdminResource(KeycloakSession session, RealmModel realm, AdminPermissionEvaluator auth, AdminEventBuilder adminEvent, UserProvisioningConfig privisioningConfig) {
         this.session = session;
         this.realm = realm;
         this.auth = auth;
         this.adminEvent = adminEvent;
+        this.privisioningConfig = privisioningConfig;
     }
 
     /**
@@ -42,5 +49,15 @@ public class CustomDemoAdminResource {
         }
 
         return Response.ok(Map.of("time", Instant.now())).build();
+    }
+
+    /**
+     * http://localhost:8080/auth/realms/acme-workshop/custom-admin-resources/users
+     *
+     * @return
+     */
+    @Path("/users")
+    public UserProvisioningResource provisioningResource() {
+        return new UserProvisioningResource(session, realm, auth, adminEvent, privisioningConfig);
     }
 }

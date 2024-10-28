@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints;
 
-import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsResource;
-import com.github.thomasdarimont.keycloak.custom.endpoints.admin.CustomDemoAdminResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.admin.CustomAdminResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.admin.UserProvisioningResource.UserProvisioningConfig;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
@@ -13,14 +13,22 @@ import org.keycloak.services.resources.admin.ext.AdminRealmResourceProvider;
 import org.keycloak.services.resources.admin.ext.AdminRealmResourceProviderFactory;
 import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
 
+import java.util.regex.Pattern;
+
 @JBossLog
 public class CustomAdminResourceProvider implements AdminRealmResourceProvider {
 
     public static final String ID = "custom-admin-resources";
 
+    private final UserProvisioningConfig privisioningConfig;
+
+    public CustomAdminResourceProvider(UserProvisioningConfig privisioningConfig) {
+        this.privisioningConfig = privisioningConfig;
+    }
+
     @Override
     public Object getResource(KeycloakSession session, RealmModel realm, AdminPermissionEvaluator auth, AdminEventBuilder adminEvent) {
-        return new CustomDemoAdminResource(session, realm, auth, adminEvent);
+        return new CustomAdminResource(session, realm, auth, adminEvent, privisioningConfig);
     }
 
     @Override
@@ -36,16 +44,20 @@ public class CustomAdminResourceProvider implements AdminRealmResourceProvider {
             return ID;
         }
 
-        private CustomAdminResourceProvider INSTANCE = new CustomAdminResourceProvider();
+        private CustomAdminResourceProvider customAdminResource;
 
         @Override
         public AdminRealmResourceProvider create(KeycloakSession session) {
-            return INSTANCE;
+            return customAdminResource;
         }
 
         @Override
         public void init(Config.Scope config) {
+            String realmRole = config.scope("users", "provisioning").get("required-realm-role");
+            String attributePatternString = config.scope("users", "provisioning").get("managed-attribute-pattern");
 
+            var privisioningConfig = new UserProvisioningConfig(realmRole, Pattern.compile(attributePatternString));
+            customAdminResource = new CustomAdminResourceProvider(privisioningConfig);
         }
 
         @Override
