@@ -7,9 +7,13 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.web.CorsEndpointP
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
@@ -21,8 +25,10 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.util.MultiValueMap;
 
 import java.util.HashSet;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -57,12 +63,33 @@ class WebSecurityConfig {
             o2lc.userInfoEndpoint(customizer -> {
                 customizer.userAuthoritiesMapper(userAuthoritiesMapper());
             });
+
+            // customizeTokenEndpointRequest(o2lc);
         });
         http.logout(lc -> {
             lc.addLogoutHandler(keycloakLogoutHandler);
         });
 
         return http.build();
+    }
+
+    private static void customizeTokenEndpointRequest(OAuth2LoginConfigurer<HttpSecurity> o2lc) {
+        // customize the token endpoint request parameters
+        o2lc.tokenEndpoint(tec -> {
+            DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+            accessTokenResponseClient.setRequestEntityConverter(new OAuth2AuthorizationCodeGrantRequestEntityConverter(){
+                @Override
+                protected MultiValueMap<String, String> createParameters(OAuth2AuthorizationCodeGrantRequest authorizationCodeGrantRequest) {
+
+                    // if used with instance specific backchannel logout url: https://${application.session.host}:4633/webapp/logout
+                    MultiValueMap<String, String> parameters = super.createParameters(authorizationCodeGrantRequest);
+                    parameters.add("client_session_state", "bubu123");
+                    parameters.add("client_session_host", "apps.acme.test");
+                    return parameters;
+                }
+            });
+            tec.accessTokenResponseClient(accessTokenResponseClient);
+        });
     }
 
     /**
