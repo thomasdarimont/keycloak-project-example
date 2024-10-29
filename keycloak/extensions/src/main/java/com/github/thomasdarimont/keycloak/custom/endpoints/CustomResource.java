@@ -6,6 +6,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.admin.AdminSettingsRe
 import com.github.thomasdarimont.keycloak.custom.endpoints.applications.ApplicationsInfoResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.branding.BrandingResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.credentials.UserCredentialsInfoResource;
+import com.github.thomasdarimont.keycloak.custom.endpoints.demo.DemosResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.idp.IdpApplications;
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.TokenMigrationResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.migration.UserImportMigrationResource;
@@ -140,5 +141,10 @@ public class CustomResource {
     @Path("idp/applications")
     public IdpApplications idpApplications() {
         return new IdpApplications(session);
+    }
+
+    @Path("demos")
+    public DemosResource demoResource() {
+        return new DemosResource(session);
     }
 }
