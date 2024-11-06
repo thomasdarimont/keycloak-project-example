@@ -83,20 +83,20 @@ public class JwtClientAuthApp {
 //                log.info("RequestUri: {}", requestUri);
             }
 
-//            { // Signed JWT with Client Secret example
-//                //  generate Signed JWT with client secret
+            { // Signed JWT with Client Secret example
+                //  generate Signed JWT with client secret
 //                String clientSecret = "8FKyMMDOiBp2CIdu4TtssY6HRP5nHRsI";
 //                var clientJwtToken = generateTokenSignedWithClientSecret(clientJwtPayload, clientSecret);
 //                log.info("Client JWT Token: {}", clientJwtToken);
-//
-//                // use Signed JWT with client secret to request token for service
-////                var accessTokenResponse = requestToken(issuer, clientJwtToken);
-////                log.info("AccessToken: {}", accessTokenResponse.get("access_token"));
-//
-//                 // use clientjwt perform PAR request
+
+                // use Signed JWT with client secret to request token for service
+//                var accessTokenResponse = requestToken(issuer, clientJwtToken);
+//                log.info("AccessToken: {}", accessTokenResponse.get("access_token"));
+
+                 // use clientjwt perform PAR request
 //                var requestUri = requestPAR(issuer, clientId, UUID.randomUUID().toString(), "https://www.keycloak.org/app/", "openid profile", clientJwtToken);
 //                log.info("RequestUri: {}", requestUri);
-//            }
+            }
         };
     }
 
