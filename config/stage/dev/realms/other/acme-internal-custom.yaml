@@ -1,7 +1,7 @@
 realm: acme-internal
 #identityProviders:
 #  - alias: "idp-acme-azuread"
-#    displayName: "Acme AzureAD Login"
+#    displayName: "Acme EntraID Login"
 #    providerId: "oidc"
 #    enabled: true
 #    updateProfileFirstLoginMode: on

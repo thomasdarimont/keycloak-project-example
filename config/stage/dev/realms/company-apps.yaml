@@ -75,7 +75,7 @@ identityProviders:
       acmeEmailDomainRegex: "(company\\.com)"
 
   - alias: "idp-acme-azuread"
-    displayName: "Company Partner AzureAD Login"
+    displayName: "Company Partner EntraID Login"
     providerId: "oidc"
     enabled: true
     updateProfileFirstLoginMode: on

@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * EntraID Group Mapper
+ */
 @JBossLog
 @AutoService(IdentityProviderMapper.class)
 public class CustomAzureADGroupMapper extends AbstractClaimMapper {
