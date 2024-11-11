@@ -6,7 +6,7 @@
         displayWide=false
         showAnotherWayIfPresent=true>
     <!DOCTYPE html>
-    <html class="${properties.kcHtmlClass!}">
+    <html class="${properties.kcHtmlClass!}"<#if realm.internationalizationEnabled> lang="${locale.currentLanguageTag}" dir="${(locale.rtl)?then('rtl','ltr')}"</#if>>
 
     <head>
         <meta charset="utf-8">
@@ -38,7 +38,7 @@
         <script type="importmap">
             {
                 "imports": {
-                    "rfc4648": "${url.resourcesCommonPath}/node_modules/rfc4648/lib/rfc4648.js"
+                    "rfc4648": "${url.resourcesCommonPath}/vendor/rfc4648/rfc4648.js"
             }
         }
         </script>
