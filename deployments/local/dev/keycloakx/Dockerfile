@@ -22,10 +22,10 @@ RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass ch
 
 RUN echo "Downloading OpenTelemetry Javaagent and support libs"
 
-ENV OTEL_AGENT_VERSION=1.33.6
-ENV OTEL_TRACE_VERSION=1.42.1
+#ENV OTEL_AGENT_VERSION=1.33.6
+#ENV OTEL_TRACE_VERSION=1.42.1
 
-ADD --chown=keycloak:keycloak https://search.maven.org/remotecontent?filepath=io/opentelemetry/javaagent/opentelemetry-javaagent/$OTEL_AGENT_VERSION/opentelemetry-javaagent-$OTEL_AGENT_VERSION.jar /opt/keycloak/opentelemetry-javaagent.jar
-ADD --chown=keycloak:keycloak https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-trace-propagators/$OTEL_TRACE_VERSION/opentelemetry-extension-trace-propagators-$OTEL_TRACE_VERSION.jar /opt/keycloak/providers/opentelemetry-extension-trace-propagators.jar
+#ADD --chown=keycloak:keycloak https://search.maven.org/remotecontent?filepath=io/opentelemetry/javaagent/opentelemetry-javaagent/$OTEL_AGENT_VERSION/opentelemetry-javaagent-$OTEL_AGENT_VERSION.jar /opt/keycloak/opentelemetry-javaagent.jar
+#ADD --chown=keycloak:keycloak https://repo1.maven.org/maven2/io/opentelemetry/opentelemetry-extension-trace-propagators/$OTEL_TRACE_VERSION/opentelemetry-extension-trace-propagators-$OTEL_TRACE_VERSION.jar /opt/keycloak/providers/opentelemetry-extension-trace-propagators.jar
 
 USER keycloak
