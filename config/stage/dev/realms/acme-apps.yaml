@@ -274,7 +274,7 @@ identityProviders:
     enabled: true
     updateProfileFirstLoginMode: on
     trustEmail: true
-    storeToken: false
+    storeToken: true
     addReadTokenRoleOnCreate: false
     authenticateByDefault: false
     linkOnly: false
