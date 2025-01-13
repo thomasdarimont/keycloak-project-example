@@ -135,7 +135,7 @@ public class ApplicationsInfoResource {
     private ClientRepresentation modelToRepresentation(ClientModel model, List<String> inUseClients, List<String> offlineClients, Map<String, UserConsentModel> consents, Properties messages) {
         ClientRepresentation representation = new ClientRepresentation();
         representation.setClientId(model.getClientId());
-        representation.setClientName(StringPropertyReplacer.replaceProperties(model.getName(), messages));
+        representation.setClientName(StringPropertyReplacer.replaceProperties(model.getName(), messages::getProperty));
         representation.setDescription(model.getDescription());
         representation.setUserConsentRequired(model.isConsentRequired());
         representation.setInUse(inUseClients.contains(model.getClientId()));
@@ -160,7 +160,7 @@ public class ApplicationsInfoResource {
 
     private ConsentRepresentation modelToRepresentation(UserConsentModel model, Properties messages) {
         List<ConsentScopeRepresentation> grantedScopes = model.getGrantedClientScopes().stream()
-                .map(m -> new ConsentScopeRepresentation(m.getId(), m.getName(), StringPropertyReplacer.replaceProperties(m.getConsentScreenText(), messages)))
+                .map(m -> new ConsentScopeRepresentation(m.getId(), m.getName(), StringPropertyReplacer.replaceProperties(m.getConsentScreenText(), messages::getProperty)))
                 .collect(Collectors.toList());
         return new ConsentRepresentation(grantedScopes, model.getCreatedDate(), model.getLastUpdatedDate());
     }
