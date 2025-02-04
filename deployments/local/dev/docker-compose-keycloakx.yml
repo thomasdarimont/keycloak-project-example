@@ -56,7 +56,7 @@ services:
  #     - "--log-console-output=json"
       - "--log-console-format='%d{HH:mm:ss} %-5p ${TRACING_LOG_FORMAT} [%c{2.}] (%t) %s%e%n'"
       - "--https-protocols=TLSv1.3,TLSv1.2"
-# expose health and metrics via main http interface
+# expose health and metrics via main http interface #TODO remove
       - "--legacy-observability-interface=true"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
