@@ -1,4 +1,4 @@
-### Auth Code Flow PAR Request
+### Auth Code Flow Pushed Authorization Request (PAR)
 
 POST {{ISSUER}}/protocol/openid-connect/ext/par/request
 Content-Type: application/x-www-form-urlencoded
