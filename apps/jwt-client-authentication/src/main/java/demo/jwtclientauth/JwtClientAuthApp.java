@@ -58,7 +58,7 @@ public class JwtClientAuthApp {
             var clientId = "acme-service-client-jwt-auth";
             var issuer = "https://id.acme.test:8443/auth/realms/acme-internal";
             var issuedAt = Instant.now();
-            var tokenLifeTime = Duration.ofHours(24);
+            var tokenLifeTime = Duration.ofSeconds(5);
 
             var clientJwtPayload = Map.<String, Object>ofEntries( //
                     Map.entry("iss", clientId), //
