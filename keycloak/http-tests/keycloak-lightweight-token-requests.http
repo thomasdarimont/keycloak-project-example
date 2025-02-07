@@ -1,0 +1,32 @@
+### Obtain tokens via Resource Owner Password Credentials Grant Flow
+@client_id=app-lightweight-token-demo
+@client_secret=GetdqvQnNSLVRNU8QojCmBNfKIPqkfJt
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{client_id}}&client_secret={{client_secret}}&username={{USER_USERNAME}}&password={{USER_PASSWORD}}&grant_type=password&scope=profile+openid
+
+> {%
+client.global.set("KC_ACCESS_TOKEN", response.body.access_token);
+client.global.set("KC_REFRESH_TOKEN", response.body.refresh_token);
+%}
+
+### Obtain User info from User-Info Endpoint
+GET {{ISSUER}}/protocol/openid-connect/userinfo
+Authorization: Bearer {{KC_ACCESS_TOKEN}}
+
+### Obtain Token info from Token Introspection Endpoint
+POST {{ISSUER}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{client_id}}&client_secret={{client_secret}}&token={{KC_ACCESS_TOKEN}}&token_type_hint=access_token
+
+
+### Obtain Token info from Token Introspection Endpoint as JWT
+# Needs "Always use lightweight access token: on" in Advanced Client Settings
+# Needs "Support JWT claim in Introspection Response : on" in Advanced Client Settings
+POST {{ISSUER}}/protocol/openid-connect/token/introspect
+Accept: application/jwt
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{client_id}}&client_secret={{client_secret}}&token={{KC_ACCESS_TOKEN}}&token_type_hint=access_token
