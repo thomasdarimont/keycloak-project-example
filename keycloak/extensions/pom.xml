@@ -39,13 +39,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-ldap-federation</artifactId>
-            <version>${keycloak.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- Required for custom SAML role mapper -->
         <dependency>
             <groupId>org.keycloak</groupId>
