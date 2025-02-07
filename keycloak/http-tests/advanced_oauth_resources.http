@@ -1,0 +1,9 @@
+### Auth Code Flow PAR Request
+
+GET {{ISSUER}}/protocol/openid-connect/auth?response_type=code&client_id=acme-client-spa-app&redirect_uri=https%3A%2F%2Fflowsimulator.pragmaticwebsecurity.com&state=j5aSlzUCiH7kvX37MU9Q&scope=openid%20email&code_challenge=M9eXaGhPVUSVDIig4aUW25qYlpVrM4WvzjH_1x00Ngg&code_challenge_method=S256&prompt=login&resource=acme-client-api-resource-server&resource=acme-client-api-resource-server2
+
+### Exchange PAR Request URI
+
+ GET {{ISSUER}}/protocol/openid-connect/auth?client_id={{TEST_CLIENT4_ID}}&nonce=abc123456&request_uri={{KC_REQUEST_URI}}
+
+
