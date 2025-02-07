@@ -45,12 +45,21 @@
             </#list>
         </#if>
         <script type="module">
-            import { checkCookiesAndSetTimer } from "${url.resourcesPath}/js/authChecker.js";
+            import { startSessionPolling } from "${url.resourcesPath}/js/authChecker.js";
 
-            checkCookiesAndSetTimer(
+            startSessionPolling(
                 "${url.ssoLoginInOtherTabsUrl?no_esc}"
             );
         </script>
+        <#if authenticationSession??>
+            <script type="module">
+                import { checkAuthSession } from "${url.resourcesPath}/js/authChecker.js";
+
+                checkAuthSession(
+                    "${authenticationSession.authSessionIdHash}"
+                );
+            </script>
+        </#if>
     </head>
 
     <body class="${properties.kcBodyClass!}">

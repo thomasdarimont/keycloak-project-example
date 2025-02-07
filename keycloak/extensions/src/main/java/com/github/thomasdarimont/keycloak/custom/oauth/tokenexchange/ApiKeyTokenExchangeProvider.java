@@ -84,7 +84,8 @@ public class ApiKeyTokenExchangeProvider extends DefaultTokenExchangeProvider {
     }
 
     @Override
-    protected Response exchangeClientToOIDCClient(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType, ClientModel targetClient, String audience, String scope) {
+    protected Response exchangeClientToOIDCClient(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType,
+                                                            ClientModel targetClient, String scope) {
         return unsupportedResponse();
     }
 

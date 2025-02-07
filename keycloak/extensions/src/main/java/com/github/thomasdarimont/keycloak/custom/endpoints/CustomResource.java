@@ -14,6 +14,7 @@ import com.github.thomasdarimont.keycloak.custom.endpoints.offline.OfflineSessio
 import com.github.thomasdarimont.keycloak.custom.endpoints.profile.UserProfileResource;
 import com.github.thomasdarimont.keycloak.custom.endpoints.settings.UserSettingsResource;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.OPTIONS;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
@@ -25,6 +26,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.services.ErrorResponseException;
+import org.keycloak.services.cors.Cors;
 import org.keycloak.services.managers.AuthenticationManager;
 
 import java.util.HashMap;
@@ -60,6 +62,11 @@ public class CustomResource {
         payload.put("greeting", new RealmConfig(realm).getString("acme_greeting", "Greetings!"));
 
         return Response.ok(payload).build();
+    }
+
+    @OPTIONS
+    public Response preflight() {
+        return Cors.builder().preflight().add(Response.ok());
     }
 
     @Path("me/settings")
