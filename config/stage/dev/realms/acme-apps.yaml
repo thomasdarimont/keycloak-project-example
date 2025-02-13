@@ -367,12 +367,12 @@ identityProviders:
     config:
       # https://mydomain.okta.com/.well-known/openid-configuration
       guiOrder: "2000"
-      issuer: "https://$(env:ACME_OKTA_DOMAIN:-dummy).okta.com"
-      tokenUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).okta.com/oauth2/v1/token"
-      jwksUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).okta.com/oauth2/v1/keys"
-      userInfoUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).okta.com/oauth2/v1/userinfo"
-      authorizationUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).okta.com/oauth2/v1/authorize"
-      logoutUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).okta.com/oauth2/v1/logout"
+      issuer: "https://$(env:ACME_OKTA_DOMAIN:-dummy).$(env:OKTA_DOMAIN:-okta).com"
+      tokenUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).$(env:OKTA_DOMAIN:-okta).com/oauth2/v1/token"
+      jwksUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).$(env:OKTA_DOMAIN:-okta).com/oauth2/v1/keys"
+      userInfoUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).$(env:OKTA_DOMAIN:-okta).com/oauth2/v1/userinfo"
+      authorizationUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).$(env:OKTA_DOMAIN:-okta).com/oauth2/v1/authorize"
+      logoutUrl: "https://$(env:ACME_OKTA_DOMAIN:-dummy).$(env:OKTA_DOMAIN:-okta).com/oauth2/v1/logout"
       clientId: "$(env:ACME_OKTA_CLIENT_ID:-dummy)"
       clientSecret: "$(env:ACME_OKTA_CLIENT_SECRET:-secret)"
       clientAuthMethod: "client_secret_post"
@@ -482,4 +482,4 @@ authenticatorConfig:
   - alias: "acme-debug-auth-post-broker"
     config: {}
 
-# deploy
+# deploy123
