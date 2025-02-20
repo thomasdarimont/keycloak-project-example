@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "keycloak-js": "^26.0.0"
+    "keycloak-js": "^26.1.2"
   }
 }
