@@ -213,7 +213,7 @@ identityProviders:
     firstBrokerLoginFlowAlias: "first broker login"
     config:
       validateSignature: 'true'
-      hideOnLoginPage: false
+      hideOnLoginPage: true
       guiOrder: "2000"
       # Note this singing certificate must match the 'custom-rsa-generated' in acme-saml.yaml
       signingCertificate: "MIIClzCCAX8CBgF/0OmrYzANBgkqhkiG9w0BAQsFADAPMQ0wCwYDVQQDDARkZW1vMB4XDTIyMDMyODE0MjIyOVoXDTMyMDMyODE0MjQwOVowDzENMAsGA1UEAwwEZGVtbzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMOVGgrZfj96C5zNhlzLi8KWXoqVYq2ZWlH5mykT55FSvwC5m5/Px63VOzxuNWDAyGz8Uq9lUa5ED2D10W/e72AIbEC0w2F9z91cyElitsr/uQoI3snCJjLchXMez50u0J/g/78tfhv1ICo6EhPzupMBWwl+Liw1fiUv54pLPVM1r450fcQxaVX/jZszzZgLrtzbQz73uoUHJ6QJ7N2wz5c+sG3iy9OyVQl+uI0dIs9RFc57UUOURw2lOPgAPErKnckV5gEDQ16C07EvjVzzv1Q6SE2FIVN4F65qSRQ1iXU2uI0rdNTOkju5WNJylsmp8dfJE8HiOwjQ8ArZ/nTAgukCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAcDoujUldX1HiCjPjLrcUaY+LNCSsGWeN7g/lI7z18sxg3VlhsPz2Bg5m4zZCFVcrTPax1PuNqYIxetR9fEP8N+8GHLTnd4KrGvE6rH8xwDDk3GET5QKHnaUDUoxdOND85d65oL20NDIHaNDP+Kw/XIktV30mTKZerkDpxJSC9101RDwVhH3zpr0t4CYTnnR6NTBNkVRfDl19Nia98KpbSJizIw2y0zC8wubJzFnBoWbXv1AXOqTZUR2pyP742YJNA/9NFg4+EDbW/ZJVaajY+UVN8ImCj1T32f78189d3NFoCX81pBkmRv8YfXetZgDcofuKKTkUmFlP55x5S32Vmw=="
@@ -231,6 +231,41 @@ identityProviders:
       postBindingAuthnRequest: 'true'
       syncMode: FORCE
       singleSignOnServiceUrl: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-saml/protocol/saml"
+      wantAuthnRequestsSigned: 'true'
+      addExtensionsElementWithKeyInfo: 'false'
+      principalType: SUBJECT
+
+  - alias: idp-mocksaml
+    displayName: "Mock SAML Login"
+    providerId: saml
+    enabled: true
+    updateProfileFirstLoginMode: 'on'
+    trustEmail: true
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: "first broker login"
+    config:
+      validateSignature: 'true'
+      hideOnLoginPage: false
+      guiOrder: "2100"
+      signingCertificate: "MIIC4jCCAcoCCQC33wnybT5QZDANBgkqhkiG9w0BAQsFADAyMQswCQYDVQQGEwJV\nSzEPMA0GA1UECgwGQm94eUhRMRIwEAYDVQQDDAlNb2NrIFNBTUwwIBcNMjIwMjI4\nMjE0NjM4WhgPMzAyMTA3MDEyMTQ2MzhaMDIxCzAJBgNVBAYTAlVLMQ8wDQYDVQQK\nDAZCb3h5SFExEjAQBgNVBAMMCU1vY2sgU0FNTDCCASIwDQYJKoZIhvcNAQEBBQAD\nggEPADCCAQoCggEBALGfYettMsct1T6tVUwTudNJH5Pnb9GGnkXi9Zw/e6x45DD0\nRuRONbFlJ2T4RjAE/uG+AjXxXQ8o2SZfb9+GgmCHuTJFNgHoZ1nFVXCmb/Hg8Hpd\n4vOAGXndixaReOiq3EH5XvpMjMkJ3+8+9VYMzMZOjkgQtAqO36eAFFfNKX7dTj3V\npwLkvz6/KFCq8OAwY+AUi4eZm5J57D31GzjHwfjH9WTeX0MyndmnNB1qV75qQR3b\n2/W5sGHRv+9AarggJkF+ptUkXoLtVA51wcfYm6hILptpde5FQC8RWY1YrswBWAEZ\nNfyrR4JeSweElNHg4NVOs4TwGjOPwWGqzTfgTlECAwEAATANBgkqhkiG9w0BAQsF\nAAOCAQEAAYRlYflSXAWoZpFfwNiCQVE5d9zZ0DPzNdWhAybXcTyMf0z5mDf6FWBW\n5Gyoi9u3EMEDnzLcJNkwJAAc39Apa4I2/tml+Jy29dk8bTyX6m93ngmCgdLh5Za4\nkhuU3AM3L63g7VexCuO7kwkjh/+LqdcIXsVGO6XDfu2QOs1Xpe9zIzLpwm/RNYeX\nUjbSj5ce/jekpAw7qyVVL4xOyh8AtUW1ek3wIw1MJvEgEPt0d16oshWJpoS1OT8L\nr/22SvYEo3EmSGdTVGgk3x3s+A0qWAqTcyjr7Q4s/GKYRFfomGwz0TZ4Iw1ZN99M\nm0eo2USlSRTVl7QHRTuiuSThHpLKQQ=="
+      idpEntityId: "https://saml.example.com/entityid"
+      postBindingLogout: 'true'
+      nameIDPolicyFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      postBindingResponse: 'true'
+      principalAttribute: "username"
+      metadataDescriptorUrl: "https://mocksaml.com/api/saml/metadata"
+      entityId: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps"
+      backchannelSupported: 'true'
+      signatureAlgorithm: RSA_SHA256
+      xmlSigKeyInfoKeyNameTransformer: KEY_ID
+      loginHint: 'true'
+      authnContextComparisonType: exact
+      postBindingAuthnRequest: 'true'
+      syncMode: FORCE
+      singleSignOnServiceUrl: "https://mocksaml.com/api/saml/sso"
       wantAuthnRequestsSigned: 'true'
       addExtensionsElementWithKeyInfo: 'false'
       principalType: SUBJECT
