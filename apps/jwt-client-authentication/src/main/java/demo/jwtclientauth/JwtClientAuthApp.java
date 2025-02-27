@@ -63,7 +63,7 @@ public class JwtClientAuthApp {
             var clientJwtPayload = Map.<String, Object>ofEntries( //
                     Map.entry("iss", clientId), //
                     Map.entry("sub", clientId), //
-                    Map.entry("aud", issuer), //
+                    Map.entry("aud", issuer + "/protocol/openid-connect/token"), // see: https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
                     Map.entry("iat", issuedAt.getEpochSecond()),  //
                     Map.entry("exp", issuedAt.plus(tokenLifeTime).getEpochSecond()),  //
                     Map.entry("jti", UUID.randomUUID().toString()) //
