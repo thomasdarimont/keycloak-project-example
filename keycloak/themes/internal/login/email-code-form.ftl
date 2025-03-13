@@ -6,9 +6,9 @@
         ${msg('emailCodeFormTitle')}
     <#elseif section = "form">
         <script>
-            function tryCompleteForm(codeLength) {
-                let code = document.querySelector("#emailCode").value;
-                if (code.length === codeLength) {
+            function tryCompleteForm() {
+                let emailCodeInput = document.querySelector("#emailCode");
+                if (emailCodeInput.validity.valid) {
                     document.querySelector("#kc-email-code-login-form").submit();
                 }
             }
@@ -20,7 +20,7 @@
                     <div class="${properties.kcInputWrapperClass!}">
                         <label for="emailCode">${msg('accessCode')}:</label>
                         <input id="emailCode" name="emailCode" type="text" inputmode="numeric" pattern="${codePattern}" autofocus
-                               class="${properties.kcInputClass!}" <#if tryAutoSubmit> oninput="tryCompleteForm(${codeLength})" </#if>
+                               class="${properties.kcInputClass!}" <#if tryAutoSubmit> oninput="tryCompleteForm()" </#if>
                                required autocomplete="one-time-code"/>
                     </div>
                 </div>
