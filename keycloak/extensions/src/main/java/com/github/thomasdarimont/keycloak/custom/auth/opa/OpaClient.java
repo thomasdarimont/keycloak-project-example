@@ -199,6 +199,7 @@ public class OpaClient {
     }
 
     private static List<String> fetchRealmRoles(UserModel user) {
+        // Set<RoleModel> xxx = RoleUtils.getDeepUserRoleMappings(user);
         return RoleUtils.expandCompositeRolesStream(user.getRealmRoleMappingsStream()) //
                 .filter(r -> !r.isClientRole()).map(OpaClient::normalizeRoleName) //
                 .collect(Collectors.toList());
