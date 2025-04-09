@@ -91,6 +91,7 @@ services:
       - "id.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
       - "apps.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
       - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
+      - "account-service:${DOCKER_HOST_IP:-172.17.0.1}"
     ports:
       - "8080:8080"
  #     - "9090:9090"
