@@ -4,7 +4,6 @@ import com.google.auto.service.AutoService;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.connections.jpa.JpaConnectionProviderFactory;
-import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.quarkus.runtime.storage.database.jpa.QuarkusJpaConnectionProviderFactory;
 
 import java.util.HashMap;
@@ -14,27 +13,29 @@ import java.util.Map;
 @AutoService(JpaConnectionProviderFactory.class)
 public class CustomQuarkusJpaConnectionProviderFactory extends QuarkusJpaConnectionProviderFactory {
 
-    @Override
-    protected EntityManagerFactory getEntityManagerFactory() {
-        // apply tuning suggestions from https://github.com/keycloak/keycloak/issues/26162
+    private static final Map<String, String> TUNING_PROPERTIES;
 
-        Map<String, String> tuningProperties = new HashMap<>();
-        tuningProperties.put("hibernate.jdbc.batch_size", "50");
-        tuningProperties.put("hibernate.order_inserts", "true");
-        tuningProperties.put("hibernate.order_updates", "true");
-        tuningProperties.put("hibernate.jdbc.fetch_size", "50");
-        tuningProperties.put("hibernate.query.in_clause_parameter_padding", "true");
-        log.infof("apply custom hibernate tuning properties: %s", tuningProperties);
+    static {
+        log.info("### Using custom Quarkus JPA Connection factory");
 
-        EntityManagerFactory emf = super.getEntityManagerFactory();
-        emf.getProperties().putAll(tuningProperties);
+        Map<String, String> props = new HashMap<>();
+//        props.put("hibernate.generate_statistics", "true");
 
-        return emf;
+        if (!props.isEmpty()) {
+            log.infof("### Apply additional hibernate tuning properties: %s", props);
+        }
+
+        TUNING_PROPERTIES = props;
     }
 
     @Override
-    public void postInit(KeycloakSessionFactory factory) {
-        log.info("### Using custom Quarkus JPA Connection factory");
-        super.postInit(factory);
+    protected EntityManagerFactory getEntityManagerFactory() {
+
+        EntityManagerFactory emf = super.getEntityManagerFactory();
+        if (TUNING_PROPERTIES.isEmpty()) {
+            emf.getProperties().putAll(TUNING_PROPERTIES);
+        }
+
+        return emf;
     }
 }
