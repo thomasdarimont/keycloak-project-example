@@ -80,7 +80,7 @@ services:
 #      - "--log-level=info,org.hibernate:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug,org.hibernate.type.descriptor.sql.BasicBinder:trace"
-      - "--log-level=info,com.github.thomasdarimont.keycloak.custom.health.CustomHealthChecks:info,com.github.thomasdarimont.keycloak.custom:debug,com.arjuna.ats.jta:off,org.keycloak.services.resources.admin.permissions:debug"
+      - "--log-level=info,com.github.thomasdarimont.keycloak.custom.health.CustomHealthChecks:info,com.github.thomasdarimont.keycloak.custom:debug,com.arjuna.ats.jta:off,org.keycloak.services.resources.admin.permissions:debug,org.hibernate.SQL_SLOW:info"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
       - "-Dio.netty.http2.maxHeaderListSize=16384"
@@ -118,6 +118,7 @@ services:
       - ./keycloak-ext/keycloak-restrict-client-auth-25.0.0.jar:/opt/keycloak/providers/keycloak-restrict-client-auth.jar:z
       - ./keycloak-ext/keycloak-home-idp-discovery-25.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery.jar:z
       - ./keycloak-ext/apple-identity-provider-1.13.0.jar:/opt/keycloak/providers/apple-identity-provider.jar:z
+      - ./keycloak-ext/keycloak-benchmark-dataset-999.0.0-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-benchmark-dataset.jar:z
 #      - ./keycloak-ext/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:/opt/keycloak/providers/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:z
       - ./keycloakx/health_check.sh:/health_check.sh:z
 

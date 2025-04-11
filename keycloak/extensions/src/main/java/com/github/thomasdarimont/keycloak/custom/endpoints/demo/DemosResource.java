@@ -1,6 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.endpoints.demo;
 
 import com.github.thomasdarimont.keycloak.custom.oauth.client.OauthClientCredentialsTokenManager;
+import jakarta.persistence.Query;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -8,6 +9,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.models.KeycloakSession;
 
 import java.util.Map;
@@ -44,5 +46,22 @@ public class DemosResource {
         var data = request.asJson(Map.class);
 
         return Response.ok(data).build();
+    }
+
+    /**
+     * http://localhost:8080/auth/realms/acme-internal/custom-resources/demos/slow-query
+     *
+     * @return
+     * @throws Exception
+     */
+    @Path("slow-query")
+    @GET
+    public Response demoSlowQuery() throws Exception {
+
+        var provider = session.getProvider(JpaConnectionProvider.class);
+        Query nativeQuery = provider.getEntityManager().createNativeQuery("SELECT pg_sleep(5)");
+        nativeQuery.getResultList();
+
+        return Response.ok(Map.of("executed", true)).build();
     }
 }
