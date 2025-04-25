@@ -47,6 +47,13 @@ services:
       - "--http-relative-path=auth"
 #      - "--http-management-port=9090"
       - "--metrics-enabled=true"
+# see: https://www.keycloak.org/observability/event-metrics
+      - "--event-metrics-user-enabled=true"
+      - "--event-metrics-user-tags=realm,idp,clientId"
+# see: https://www.keycloak.org/observability/configuration-metrics
+      - "--http-metrics-histograms-enabled=true"
+      - "--cache-metrics-histograms-enabled=false"
+#      - "--http-metrics-slos=5,10,25,50,250,500,1000,2500,5000,10000"
       - "--health-enabled=true"
       # see https://www.keycloak.org/server/features
       # ,declarative-ui
@@ -56,8 +63,6 @@ services:
  #     - "--log-console-output=json"
       - "--log-console-format='%d{HH:mm:ss} %-5p ${TRACING_LOG_FORMAT} [%c{2.}] (%t) %s%e%n'"
       - "--https-protocols=TLSv1.3,TLSv1.2"
-# expose health and metrics via main http interface #TODO remove
-      - "--legacy-observability-interface=true"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
       - "--spi-theme-static-max-age=-1"
@@ -106,7 +111,7 @@ services:
       - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
       - ../../../keycloak/imex:/opt/keycloak/imex:z
-      - ./run/keycloakx/data261:/opt/keycloak/data:z
+      - ./run/keycloakx/data262:/opt/keycloak/data:z
       - ./run/keycloakx/logs:/opt/keycloak/logs:z
       - ./run/keycloakx/perf:/opt/keycloak/perf:z
 # Add keycloak extensions

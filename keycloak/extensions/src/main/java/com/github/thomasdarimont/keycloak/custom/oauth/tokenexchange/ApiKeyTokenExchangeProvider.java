@@ -13,10 +13,10 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.UserCredentialModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
-import org.keycloak.protocol.oidc.DefaultTokenExchangeProvider;
 import org.keycloak.protocol.oidc.TokenExchangeContext;
 import org.keycloak.protocol.oidc.TokenExchangeProvider;
 import org.keycloak.protocol.oidc.TokenExchangeProviderFactory;
+import org.keycloak.protocol.oidc.tokenexchange.V1TokenExchangeProvider;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  */
 @JBossLog
 @RequiredArgsConstructor
-public class ApiKeyTokenExchangeProvider extends DefaultTokenExchangeProvider {
+public class ApiKeyTokenExchangeProvider extends V1TokenExchangeProvider {
 
     public static final String ID = "acme-apikey-token-exchange";
 
@@ -81,17 +81,6 @@ public class ApiKeyTokenExchangeProvider extends DefaultTokenExchangeProvider {
         return Response.ok(tokenResponse) //
                 .type(MediaType.APPLICATION_JSON_TYPE) //
                 .build();
-    }
-
-    @Override
-    protected Response exchangeClientToOIDCClient(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType,
-                                                            ClientModel targetClient, String scope) {
-        return unsupportedResponse();
-    }
-
-    @Override
-    protected Response exchangeClientToSAML2Client(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType, ClientModel targetClient) {
-        return unsupportedResponse();
     }
 
     @Override

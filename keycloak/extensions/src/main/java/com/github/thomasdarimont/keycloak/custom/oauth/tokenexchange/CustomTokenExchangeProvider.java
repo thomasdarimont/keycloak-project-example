@@ -1,27 +1,26 @@
 package com.github.thomasdarimont.keycloak.custom.oauth.tokenexchange;
 
 import com.google.auto.service.AutoService;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.UserSessionModel;
-import org.keycloak.protocol.oidc.DefaultTokenExchangeProvider;
 import org.keycloak.protocol.oidc.TokenExchangeContext;
 import org.keycloak.protocol.oidc.TokenExchangeProvider;
 import org.keycloak.protocol.oidc.TokenExchangeProviderFactory;
+import org.keycloak.protocol.oidc.tokenexchange.V1TokenExchangeProvider;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import java.util.Set;
 
 @JBossLog
-public class CustomTokenExchangeProvider extends DefaultTokenExchangeProvider {
+public class CustomTokenExchangeProvider extends V1TokenExchangeProvider {
 
     public static final String ID = "acme-token-exchange";
 
@@ -31,17 +30,6 @@ public class CustomTokenExchangeProvider extends DefaultTokenExchangeProvider {
 
     @Override
     protected Response exchangeClientToClient(UserModel targetUser, UserSessionModel targetUserSession, AccessToken token, boolean disallowOnHolderOfTokenMismatch) {
-        return unsupportedResponse();
-    }
-
-    @Override
-    protected Response exchangeClientToOIDCClient(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType,
-                                                  ClientModel targetClient, String scope) {
-        return unsupportedResponse();
-    }
-
-    @Override
-    protected Response exchangeClientToSAML2Client(UserModel targetUser, UserSessionModel targetUserSession, String requestedTokenType, ClientModel targetClient) {
         return unsupportedResponse();
     }
 

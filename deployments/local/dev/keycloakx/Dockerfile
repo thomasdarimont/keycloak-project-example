@@ -1,6 +1,16 @@
+ARG KEYCLOAK_VERSION=26.2.1
+
+## Example for adding custom packages (curl) to Keycloak image
+## See: https://www.keycloak.org/server/containers#_installing_additional_rpm_packages
+FROM registry.access.redhat.com/ubi9 AS ubi-micro-build
+RUN mkdir -p /mnt/rootfs
+RUN dnf install --installroot /mnt/rootfs curl --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
+    dnf --installroot /mnt/rootfs clean all && \
+    rpm --root /mnt/rootfs -e --nodeps setup
+
 #see https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=26.1.5
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
+COPY --from=ubi-micro-build /mnt/rootfs /
 #FROM thomasdarimont/keycloak:21.0.999.1
 USER root
 
@@ -20,7 +30,7 @@ RUN keytool -import -cacerts -noprompt -file /etc/x509/tls.crt.pem -storepass ch
 #     --location \
 #     --output /opt/jboss/keycloak/providers/keycloak-metrics-spi-$AEROGEAR_VERSION.jar
 
-RUN echo "Downloading OpenTelemetry Javaagent and support libs"
+# sRUN echo "Downloading OpenTelemetry Javaagent and support libs"
 
 #ENV OTEL_AGENT_VERSION=1.33.6
 #ENV OTEL_TRACE_VERSION=1.42.1
