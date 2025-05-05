@@ -5,8 +5,8 @@ receivers:
         endpoint: acme-otel-collector:4317
 
 exporters:
-  jaeger:
-    endpoint: ops.acme.test:14250
+  otlp:
+    endpoint: ops.acme.test:4317
     tls:
       insecure: true
 
@@ -22,4 +22,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [jaeger]
+      exporters: [otlp]
