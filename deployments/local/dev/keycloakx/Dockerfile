@@ -1,4 +1,4 @@
-ARG KEYCLOAK_VERSION=26.2.2
+ARG KEYCLOAK_VERSION=26.2.3
 
 ## Example for adding custom packages (curl) to Keycloak image
 ## See: https://www.keycloak.org/server/containers#_installing_additional_rpm_packages
