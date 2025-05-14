@@ -58,6 +58,7 @@ services:
       # see https://www.keycloak.org/server/features
       # ,declarative-ui
       - "--features=preview,transient-users,dynamic-scopes"
+#      - "--features-disabled=persistent-user-sessions"
       - "--cache=local"
       - "--proxy-headers=xforwarded"
  #     - "--log-console-output=json"
