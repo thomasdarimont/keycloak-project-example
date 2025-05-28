@@ -57,7 +57,9 @@ services:
       - "--health-enabled=true"
       # see https://www.keycloak.org/server/features
       # ,declarative-ui
-      - "--features=preview,transient-users,dynamic-scopes"
+      - "--features=preview,transient-users,dynamic-scopes,admin-fine-grained-authz,quick-theme,declarative-ui,oid4vc-vci"
+  # disable token-exchange V1
+      - "--features-disabled=token-exchange"
 #      - "--features-disabled=persistent-user-sessions"
       - "--cache=local"
       - "--proxy-headers=xforwarded"
@@ -71,6 +73,7 @@ services:
       - "--spi-events-listener-email-include-events=UPDATE_PASSWORD"
       - "--spi-events-listener-jboss-logging-success-level=info"
       - "--spi-events-listener-jboss-logging-error-level=warn"
+#      - "--spi-oauth2-token-exchange-default=standard"
 # Disable automatic migration
 #      - "--spi-connections-jpa-legacy-migration-strategy=manual"
 #      - "--spi-truststore-file-file=/opt/keycloak/conf/truststore.p12"
@@ -107,7 +110,6 @@ services:
       - "127.0.0.1:8787:8787"
     volumes:
       - ../../../keycloak/themes:/opt/keycloak/themes:z
-#      - ../../../keycloak/config/profile.properties:/opt/keycloak/conf/profile.properties:z
       - ../../../keycloak/config/quarkus.properties:/opt/keycloak/conf/quarkus.properties:z
       - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro

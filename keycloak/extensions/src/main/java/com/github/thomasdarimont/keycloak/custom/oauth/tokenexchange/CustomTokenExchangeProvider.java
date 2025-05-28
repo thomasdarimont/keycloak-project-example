@@ -14,6 +14,7 @@ import org.keycloak.protocol.oidc.TokenExchangeContext;
 import org.keycloak.protocol.oidc.TokenExchangeProvider;
 import org.keycloak.protocol.oidc.TokenExchangeProviderFactory;
 import org.keycloak.protocol.oidc.tokenexchange.V1TokenExchangeProvider;
+import org.keycloak.provider.EnvironmentDependentProviderFactory;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.representations.AccessTokenResponse;
 
@@ -79,7 +80,7 @@ public class CustomTokenExchangeProvider extends V1TokenExchangeProvider {
     }
 
     @AutoService(TokenExchangeProviderFactory.class)
-    public static class Factory implements TokenExchangeProviderFactory {
+    public static class Factory implements TokenExchangeProviderFactory, EnvironmentDependentProviderFactory {
 
         public static final TokenExchangeProvider INSTANCE = new CustomTokenExchangeProvider();
 
@@ -97,7 +98,7 @@ public class CustomTokenExchangeProvider extends V1TokenExchangeProvider {
         public int order() {
             // default order in DefaultTokenExchangeProviderFactory is 0.
             // A higher order ensures we're executed first.
-            return 10;
+            return 20;
         }
 
         @Override
@@ -113,6 +114,12 @@ public class CustomTokenExchangeProvider extends V1TokenExchangeProvider {
         @Override
         public void close() {
             // NOOP
+        }
+
+        @Override
+        public boolean isSupported(Config.Scope config) {
+            // Disable custom token exchange provider for now
+            return false;
         }
     }
 }
