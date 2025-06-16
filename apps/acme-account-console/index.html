@@ -142,6 +142,7 @@
         <button name="securityBtn" onclick="showSecurity()" class="security">Security</button>
         <button name="appsBtn" onclick="showApps()" class="apps">Apps</button>
         <button name="reauthBtn" onclick="enforceCurrentAuth()" class="reauth">ReAuth</button>
+        <button name="refreshBtn" onclick="refreshToken()" class="refresh">Refresh</button>
         <button name="stepupBtn" onclick="showStepUp()" class="stepup">Stepup</button>
         <button name="switchContextBtn" onclick="switchContext()" class="switchContext">Switch Context</button>
         <button name="accountBtn" onclick="keycloak.accountManagement()" class="account">Account</button>
@@ -231,8 +232,8 @@
 
     };
 
-    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext", "revoke", "stepup"];
-    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext", "revoke", "stepup"];
+    const allContextClasses = ["profile", "account", "settings", "meinfo", "token", "idToken", "userinfo", "security", "apps", "reauth", "logout", "deleteAccount", "switchContext", "revoke", "stepup", "refresh"];
+    const contextClassesToHideDefault = ["meinfo", "token", "idToken", "userinfo", "reauth", "account", "deleteAccount", "switchContext", "revoke", "stepup", "refresh"];
     const contextClassesToShowDefault = [...allContextClasses].filter((value, index, arr) => {
         return !contextClassesToHideDefault.includes(value);
     });
@@ -284,6 +285,10 @@
             loginHint: keycloak.tokenParsed.preferred_username,
             maxAge: 12
         });
+    }
+
+    window.refreshToken = async function() {
+        await keycloak.updateToken(-1);
     }
 
     window.revokeToken = async function () {
