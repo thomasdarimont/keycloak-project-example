@@ -1,18 +1,23 @@
 package com.github.thomasdarimont.keycloak.custom.idp.social.linkedin;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.broker.provider.AbstractIdentityProviderMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.IdentityProviderMapper;
+import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.models.IdentityProviderMapperModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.social.linkedin.LinkedInOIDCIdentityProviderFactory;
+import org.keycloak.utils.KeycloakSessionUtil;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +72,7 @@ public class LinkedInUserProfileImportIdpMapper extends AbstractIdentityProvider
         CREATE, UPDATE
     }
 
-    private static void updateUser(RealmModel realm, UserModel user, BrokeredIdentityContext context, Action action) {
+    private void updateUser(RealmModel realm, UserModel user, BrokeredIdentityContext context, Action action) {
 
         Map<String, Object> contextData = context.getContextData();
         if (contextData == null) {
@@ -79,8 +84,11 @@ public class LinkedInUserProfileImportIdpMapper extends AbstractIdentityProvider
             return;
         }
         try {
-            String profilePictureUrl = userInfo.get("picture").asText();
-            user.setSingleAttribute("picture", profilePictureUrl);
+            JsonNode pictureEl = userInfo.get("picture");
+            if (pictureEl != null) {
+                String profilePictureUrl = pictureEl.asText();
+                user.setSingleAttribute("picture", profilePictureUrl);
+            }
         } catch (Exception ex) {
             log.warnf("Could not extract user profile picture from linkedin profile data. realm=%s userId=%s error=%s", realm.getName(), user.getId(), ex.getMessage());
         }
