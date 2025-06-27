@@ -85,3 +85,8 @@ grant_type=urn:ietf:params:oauth:grant-type:token-exchange
 &subject_token={{EXTERNAL_ACCESS_TOKEN}}
 &requested_token_type=urn:ietf:params:oauth:token-type:access_token
 #&subject_token_type=urn:ietf:params:oauth:token-type:jwt
+
+### Obtain Stored Token from IdP
+# see https://wjw465150.gitbooks.io/keycloak-documentation/content/server_admin/topics/identity-broker/tokens.html
+GET {{ISSUER}}/broker/idp-acme-azuread/token
+Authorization: Bearer xxx
