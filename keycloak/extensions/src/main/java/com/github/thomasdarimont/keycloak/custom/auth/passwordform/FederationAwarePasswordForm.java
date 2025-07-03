@@ -16,6 +16,10 @@ import org.keycloak.models.UserModel;
  */
 public class FederationAwarePasswordForm extends PasswordForm {
 
+    public FederationAwarePasswordForm(KeycloakSession session) {
+        super(session);
+    }
+
     @Override
     public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
 
@@ -32,11 +36,9 @@ public class FederationAwarePasswordForm extends PasswordForm {
     @AutoService(AuthenticatorFactory.class)
     public static class Factory extends PasswordFormFactory {
 
-        private static final FederationAwarePasswordForm INSTANCE = new FederationAwarePasswordForm();
-
         @Override
         public Authenticator create(KeycloakSession session) {
-            return INSTANCE;
+            return new FederationAwarePasswordForm(session);
         }
 
         @Override

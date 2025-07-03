@@ -14,7 +14,7 @@ import org.keycloak.models.UserProvider;
 import org.keycloak.models.cache.UserCache;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.services.resources.admin.AdminEventBuilder;
-import org.keycloak.services.resources.admin.permissions.AdminPermissionEvaluator;
+import org.keycloak.services.resources.admin.fgap.AdminPermissionEvaluator;
 
 import java.time.Instant;
 import java.util.ArrayList;
