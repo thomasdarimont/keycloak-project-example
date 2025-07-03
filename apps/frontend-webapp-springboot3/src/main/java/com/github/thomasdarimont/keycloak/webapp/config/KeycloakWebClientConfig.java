@@ -31,7 +31,8 @@ class KeycloakWebClientConfig {
 
         var clientRegistration = clientRegistrations.findByRegistrationId("keycloak");
 
-        ClientHttpRequestInterceptor oauthInterceptor = new OAuth2ClientInterceptor(authorizedClientManager, clientRegistration);
+        var oauthInterceptor = new OAuth2ClientInterceptor(authorizedClientManager, clientRegistration);
+
         return RestClient.builder() //
                 .requestInterceptor(oauthInterceptor) //
                 .defaultHeaders(headers -> {

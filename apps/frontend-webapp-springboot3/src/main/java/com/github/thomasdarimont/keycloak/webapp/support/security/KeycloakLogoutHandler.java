@@ -33,7 +33,7 @@ public class KeycloakLogoutHandler implements LogoutHandler {
         try {
             response.sendRedirect(logoutUrl);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Could not send redirect to logoutUrl", e);
         }
 
     }

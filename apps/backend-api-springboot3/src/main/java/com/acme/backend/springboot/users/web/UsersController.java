@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
