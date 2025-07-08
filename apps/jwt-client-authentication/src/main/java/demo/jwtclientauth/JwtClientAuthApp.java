@@ -71,7 +71,10 @@ public class JwtClientAuthApp {
 
             { // Signed JWT example
                 //  generate Signed JWT
-                var clientJwtToken = generateTokenSignedWithPrivateKey(clientJwtPayload);
+                var clientJwtToken = generateTokenSignedWithPrivateKey(clientJwtPayload, //
+                        "apps/jwt-client-authentication/client_cert.pem", //
+                        "apps/jwt-client-authentication/client_key.pem" //
+                );
                 log.info("Client JWT Token: {}", clientJwtToken);
 
                 // use clientjwt to request token for service
@@ -86,7 +89,8 @@ public class JwtClientAuthApp {
             { // Signed JWT with Client Secret example
                 //  generate Signed JWT with client secret
 //                String clientSecret = "8FKyMMDOiBp2CIdu4TtssY6HRP5nHRsI";
-//                var clientJwtToken = generateTokenSignedWithClientSecret(clientJwtPayload, clientSecret);
+//                var clientJwtToken = generateTokenSignedWithClientSecret(clientJwtPayload, clientSecret,
+//                "apps/jwt-client-authentication/client_cert.pem");
 //                log.info("Client JWT Token: {}", clientJwtToken);
 
                 // use Signed JWT with client secret to request token for service
@@ -140,19 +144,20 @@ public class JwtClientAuthApp {
         return String.valueOf(parResponse.get("request_uri"));
     }
 
-    private String generateTokenSignedWithPrivateKey(Map<String, Object> clientJwtPayload) {
+    private String generateTokenSignedWithPrivateKey(Map<String, Object> clientJwtPayload, String certLocation, String keyLocation) {
 
         try {
             // x5t header
             log.info("Payload: {}", new ObjectMapper().writeValueAsString(clientJwtPayload));
 
-            var cert = parseCertificate("apps/jwt-client-authentication/client_cert.pem");
-            var privateKey = readPrivateKeyFile("apps/jwt-client-authentication/client_key.pem");
+            var cert = parseCertificate(certLocation);
+            var privateKey = readPrivateKeyFile(keyLocation);
             var base64URL = createKeyThumbprint(cert, "SHA-1");
 
             var jwsObject = new JWSObject(new JWSHeader
                     .Builder(JWSAlgorithm.RS256)
                     .type(JOSEObjectType.JWT)
+                    .keyID("mykey")
                     .x509CertThumbprint(base64URL) // SHA-1
                     .build(), new Payload(clientJwtPayload));
 
@@ -166,9 +171,9 @@ public class JwtClientAuthApp {
         }
     }
 
-    private String generateTokenSignedWithClientSecret(Map<String, Object> clientJwtPayload, String clientSecret) {
+    private String generateTokenSignedWithClientSecret(Map<String, Object> clientJwtPayload, String clientSecret, String certLocation) {
 
-        var cert = parseCertificate("apps/jwt-client-authentication/client_cert.pem");
+        var cert = parseCertificate(certLocation);
         var base64URL = createKeyThumbprint(cert, "SHA-1");
 
         var jwsObject = new JWSObject(new JWSHeader
