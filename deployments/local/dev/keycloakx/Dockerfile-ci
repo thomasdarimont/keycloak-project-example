@@ -1,5 +1,5 @@
 #see https://www.keycloak.org/server/containers
-ARG KEYCLOAK_VERSION=26.3.0
+ARG KEYCLOAK_VERSION=26.3.1
 FROM quay.io/keycloak/keycloak:$KEYCLOAK_VERSION
 USER root
 

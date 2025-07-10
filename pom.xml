@@ -42,8 +42,8 @@
         <docker.file>keycloakx/Dockerfile.plain</docker.file>
 
         <!-- Keycloak -->
-        <keycloak.version>26.3.0</keycloak.version>
-        <keycloak-admin-client.version>26.0.5</keycloak-admin-client.version>
+        <keycloak.version>26.3.1</keycloak.version>
+        <keycloak-admin-client.version>26.0.6</keycloak-admin-client.version>
 
         <!-- Parameterizable Project Versions -->
         <revision>1.0.0</revision>
