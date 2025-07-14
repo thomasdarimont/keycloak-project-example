@@ -17,101 +17,103 @@
   -->
 
 <infinispan
-        xmlns="urn:infinispan:config:13.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="urn:infinispan:config:13.0 https://www.infinispan.org/schemas/infinispan-config-13.0.xsd">
+    xmlns="urn:infinispan:config:14.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:infinispan:config:14.0 https://www.infinispan.org/schemas/infinispan-config-14.0.xsd">
 
     <cache-container name="keycloak">
-        <transport lock-timeout="60000"/>
+        <transport lock-timeout="60000" />
         <local-cache name="realms">
             <encoding>
-                <key media-type="application/x-java-object"/>
-                <value media-type="application/x-java-object"/>
+                <key media-type="application/x-java-object" />
+                <value media-type="application/x-java-object" />
             </encoding>
-            <memory max-count="10000"/>
+            <memory max-count="10000" />
         </local-cache>
         <local-cache name="users">
             <encoding>
-                <key media-type="application/x-java-object"/>
-                <value media-type="application/x-java-object"/>
+                <key media-type="application/x-java-object" />
+                <value media-type="application/x-java-object" />
             </encoding>
-            <memory max-count="10000"/>
+            <memory max-count="10000" />
         </local-cache>
         <distributed-cache name="sessions" owners="2">
-            <expiration/>
+            <expiration />
             <persistence>
-                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:13.0" dialect="POSTGRES">
+                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:14.0"
+                    dialect="POSTGRES">
                     <connection-pool
-                            connection-url="jdbc:postgresql://acme-keycloak-db:5432/keycloak?ApplicationName=keycloak-ispn"
-                            username="keycloak"
-                            password="keycloak"
-                            driver="org.postgresql.Driver"/>
+                        connection-url="jdbc:postgresql://acme-keycloak-db:5432/keycloak?ApplicationName=keycloak-ispn"
+                        username="keycloak"
+                        password="keycloak"
+                        driver="org.postgresql.Driver" />
                     <string-keyed-table create-on-start="true" prefix="ispn">
-                        <id-column name="id" type="VARCHAR(255)"/>
-                        <data-column name="data" type="bytea"/>
-                        <timestamp-column name="ts" type="BIGINT"/>
-                        <segment-column name="seg" type="INT"/>
+                        <id-column name="id" type="VARCHAR(255)" />
+                        <data-column name="data" type="bytea" />
+                        <timestamp-column name="ts" type="BIGINT" />
+                        <segment-column name="seg" type="INT" />
                     </string-keyed-table>
                 </string-keyed-jdbc-store>
             </persistence>
         </distributed-cache>
 
         <distributed-cache name="clientSessions" owners="2">
-            <expiration/>
+            <expiration />
             <persistence>
-                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:13.0" dialect="POSTGRES">
+                <string-keyed-jdbc-store xmlns="urn:infinispan:config:store:jdbc:14.0"
+                    dialect="POSTGRES">
                     <connection-pool
-                            connection-url="jdbc:postgresql://acme-keycloak-db:5432/keycloak?ApplicationName=keycloak-ispn"
-                            username="keycloak"
-                            password="keycloak"
-                            driver="org.postgresql.Driver"/>
+                        connection-url="jdbc:postgresql://acme-keycloak-db:5432/keycloak?ApplicationName=keycloak-ispn"
+                        username="keycloak"
+                        password="keycloak"
+                        driver="org.postgresql.Driver" />
                     <string-keyed-table create-on-start="true" prefix="ispn">
-                        <id-column name="id" type="VARCHAR(255)"/>
-                        <data-column name="data" type="bytea"/>
-                        <timestamp-column name="ts" type="BIGINT"/>
-                        <segment-column name="seg" type="INT"/>
+                        <id-column name="id" type="VARCHAR(255)" />
+                        <data-column name="data" type="bytea" />
+                        <timestamp-column name="ts" type="BIGINT" />
+                        <segment-column name="seg" type="INT" />
                     </string-keyed-table>
                 </string-keyed-jdbc-store>
             </persistence>
         </distributed-cache>
 
         <distributed-cache name="authenticationSessions" owners="2">
-            <expiration/>
+            <expiration />
         </distributed-cache>
         <distributed-cache name="offlineSessions" owners="2">
-            <expiration/>
+            <expiration />
         </distributed-cache>
         <distributed-cache name="offlineClientSessions" owners="2">
-            <expiration lifespan="-1"/>
+            <expiration lifespan="-1" />
         </distributed-cache>
         <distributed-cache name="loginFailures" owners="2">
-            <expiration lifespan="-1"/>
+            <expiration lifespan="-1" />
         </distributed-cache>
         <local-cache name="authorization">
             <encoding>
-                <key media-type="application/x-java-object"/>
-                <value media-type="application/x-java-object"/>
+                <key media-type="application/x-java-object" />
+                <value media-type="application/x-java-object" />
             </encoding>
-            <memory max-count="10000"/>
+            <memory max-count="10000" />
         </local-cache>
         <replicated-cache name="work">
-            <expiration lifespan="-1"/>
+            <expiration lifespan="-1" />
         </replicated-cache>
         <local-cache name="keys">
             <encoding>
-                <key media-type="application/x-java-object"/>
-                <value media-type="application/x-java-object"/>
+                <key media-type="application/x-java-object" />
+                <value media-type="application/x-java-object" />
             </encoding>
-            <expiration max-idle="3600000"/>
-            <memory max-count="1000"/>
+            <expiration max-idle="3600000" />
+            <memory max-count="1000" />
         </local-cache>
         <distributed-cache name="actionTokens" owners="2">
             <encoding>
-                <key media-type="application/x-java-object"/>
-                <value media-type="application/x-java-object"/>
+                <key media-type="application/x-java-object" />
+                <value media-type="application/x-java-object" />
             </encoding>
-            <expiration max-idle="-1" lifespan="-1" interval="300000"/>
-            <memory max-count="-1"/>
+            <expiration max-idle="-1" lifespan="-1" interval="300000" />
+            <memory max-count="-1" />
         </distributed-cache>
     </cache-container>
 </infinispan>
