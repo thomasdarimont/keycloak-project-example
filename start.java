@@ -88,6 +88,7 @@ class start {
         var useTracing = argList.contains(TRACING_OPT);
         var dockerHost = argList.stream().filter(s -> s.startsWith(DOCKER_HOST_OPT)).map(s -> s.substring(s.indexOf("=") + 1)).findFirst();
         var useNats = argList.contains(NATS_OPT);
+        var useSaml = true;
 
         var showHelp = argList.contains(HELP_CMD);
         if (showHelp) {
@@ -251,6 +252,11 @@ class start {
                 }
             }
             envFiles.add("deployments/local/dev/keycloak-tracing.env");
+        }
+
+        if (useSaml) {
+            commandLine.add("--file");
+            commandLine.add("deployments/local/dev/docker-compose-simplesaml.yml");
         }
 
         if (Files.exists(Path.of("local.env"))) {

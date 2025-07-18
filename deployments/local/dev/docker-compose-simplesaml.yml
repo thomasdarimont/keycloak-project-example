@@ -1,0 +1,20 @@
+services:
+# see: https://hub.docker.com/r/kenchan0130/simplesamlphp
+  saml-idp:
+    build:
+      context: "simplesaml/idp"
+      dockerfile: "./Dockerfile"
+    ports:
+      - "18380:8080"
+    environment:
+      # adapt URLs for different realm if necessary
+      SIMPLESAMLPHP_SP_ENTITY_ID: https://id.acme.test:8443/auth/realms/acme-apps
+      SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://id.acme.test:8443/auth/realms/acme-apps/broker/idp-simplesaml/endpoint
+      SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE: https://id.acme.test:8443/auth/realms/acme-apps/broker/idp-simplesaml/endpoint
+      SIMPLESAMLPHP_IDP_ADMIN_PASSWORD: admin
+      SIMPLESAMLPHP_IDP_SESSION_DURATION_SECONDS: 600
+    extra_hosts:
+      # ${DOCKER_HOST_IP:-172.17.0.1} is host.docker.internal
+      - "id.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
+    volumes:
+      - ./simplesaml/idp/authsources.php:/var/www/simplesamlphp/config/authsources.php:z

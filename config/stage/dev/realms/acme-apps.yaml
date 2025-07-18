@@ -270,6 +270,44 @@ identityProviders:
       addExtensionsElementWithKeyInfo: 'false'
       principalType: SUBJECT
 
+  - alias: idp-simplesaml
+    displayName: "Simple SAML Login"
+    providerId: saml
+    enabled: true
+    updateProfileFirstLoginMode: 'on'
+    trustEmail: true
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: "first broker login"
+    config:
+      # TODO fixme
+      validateSignature: 'false'
+      hideOnLoginPage: false
+      guiOrder: "2200"
+      # signingCertificate: "MIICmj....qGw=="
+      # encryptionPublicKey: "MIICmj....qHqGw=="
+      idpEntityId: "http://samlidp.acme.test:18380/simplesaml/saml2/idp/metadata.php"
+      postBindingLogout: 'true'
+      nameIDPolicyFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      postBindingResponse: 'true'
+      principalAttribute: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+      principalType: ATTRIBUTE
+      metadataDescriptorUrl: "http://samlidp.acme.test:18380/simplesaml/saml2/idp/metadata.php"
+      entityId: "$(env:KEYCLOAK_FRONTEND_URL)/realms/acme-apps"
+      backchannelSupported: 'true'
+      signatureAlgorithm: RSA_SHA256
+      xmlSigKeyInfoKeyNameTransformer: KEY_ID
+      loginHint: 'true'
+      authnContextComparisonType: exact
+      postBindingAuthnRequest: 'true'
+      syncMode: FORCE
+      singleSignOnServiceUrl: "http://samlidp.acme.test:18380/simplesaml/saml2/idp/SSOService.php"
+      singleLogoutServiceUrl: "http://samlidp.acme.test:18380/simplesaml/saml2/idp/SingleLogoutService.php"
+      wantAuthnRequestsSigned: 'true'
+      addExtensionsElementWithKeyInfo: 'false'
+
   - alias: "idp-acme-ldap"
     displayName: "Acme LDAP Login"
     providerId: "oidc"
@@ -469,6 +507,28 @@ identityProviderMappers:
     identityProviderMapper: "acme-idp-mapper-linkedin-user-importer"
     config:
       syncMode: "FORCE"
+
+  - name: simplesaml-email-importer
+    identityProviderAlias: idp-simplesaml
+    identityProviderMapper: saml-user-attribute-idp-mapper
+    config:
+      syncMode: FORCE
+      user.attribute: email
+      attribute.name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+  - name: simplesaml-firstname-importer
+    identityProviderAlias: idp-simplesaml
+    identityProviderMapper: saml-user-attribute-idp-mapper
+    config:
+      syncMode: FORCE
+      user.attribute: firstName
+      attribute.name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname"
+  - name: simplesaml-lastname-importer
+    identityProviderAlias: idp-simplesaml
+    identityProviderMapper: saml-user-attribute-idp-mapper
+    config:
+      syncMode: FORCE
+      user.attribute: lastName
+      attribute.name: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname"
 
 authenticationFlows:
   ## Custom User Registration Flow
