@@ -66,6 +66,8 @@ services:
  #     - "--log-console-output=json"
       - "--log-console-format='%d{HH:mm:ss} %-5p ${TRACING_LOG_FORMAT} [%c{2.}] (%t) %s%e%n'"
       - "--https-protocols=TLSv1.3,TLSv1.2"
+      - "--db-debug-jpql=true"
+      - "--db-log-slow-queries-threshold=5000"
       - "--spi-theme-cache-themes=false"
       - "--spi-theme-cache-templates=false"
       - "--spi-theme-static-max-age=-1"
