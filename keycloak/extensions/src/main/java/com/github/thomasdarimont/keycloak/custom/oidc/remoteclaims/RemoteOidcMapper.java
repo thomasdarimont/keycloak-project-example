@@ -117,7 +117,7 @@ public class RemoteOidcMapper extends AbstractOIDCProtocolMapper implements OIDC
 
     @Override
     public String getDisplayType() {
-        return "Demo Remote Mapper";
+        return "Acme: Remote Mapper";
     }
 
     @Override
