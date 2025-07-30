@@ -99,11 +99,13 @@ services:
       - "--spi-admin-realm-restapi-extension-custom-admin-resources-users-provisioning-managed-attribute-pattern=(.*)"
     extra_hosts:
       # ${DOCKER_HOST_IP:-172.17.0.1} is host.docker.internal
-      - "id.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
-      - "apps.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
-      - "ops.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
-      - "account-service:${DOCKER_HOST_IP:-172.17.0.1}"
-      - "samlidp.acme.test:${DOCKER_HOST_IP:-172.17.0.1}"
+      # the special host-gateway value resolves to the internal IP address of the host.
+      # see: https://docs.docker.com/reference/cli/docker/container/run/#add-host
+      - "id.acme.test:host-gateway"
+      - "apps.acme.test:host-gateway"
+      - "ops.acme.test:host-gateway"
+      - "account-service:host-gateway"
+      - "samlidp.acme.test:host-gateway"
     ports:
       - "8080:8080"
  #     - "9090:9090"
