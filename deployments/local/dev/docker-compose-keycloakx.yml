@@ -91,7 +91,7 @@ services:
 #      - "--log-level=info,org.hibernate:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug"
 #      - "--log-level=info,org.hibernate.SQL:debug,org.hibernate.type.descriptor.sql.BasicBinder:trace"
-      - "--log-level=info,com.github.thomasdarimont.keycloak.custom.health.CustomHealthChecks:info,com.github.thomasdarimont.keycloak.custom:debug,com.arjuna.ats.jta:off,org.keycloak.services.resources.admin.permissions:debug,org.hibernate.SQL_SLOW:info"
+      - "--log-level=info,org.hibernate.SQL_SLOW:info,com.github.thomasdarimont.keycloak.custom.health.CustomHealthChecks:info,com.github.thomasdarimont.keycloak.custom:debug,com.arjuna.ats.jta:off,org.keycloak.services.resources.admin.permissions:debug,org.hibernate.SQL_SLOW:info"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
       - "-Dio.netty.http2.maxHeaderListSize=16384"
