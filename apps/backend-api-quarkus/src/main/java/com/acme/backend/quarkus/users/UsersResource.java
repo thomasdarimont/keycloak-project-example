@@ -1,10 +1,6 @@
 package com.acme.backend.quarkus.users;
 
 import io.quarkus.security.Authenticated;
-import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.jboss.logging.Logger;
-import org.jboss.resteasy.spi.HttpRequest;
-
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -15,9 +11,12 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriInfo;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jboss.logging.Logger;
+import org.jboss.resteasy.spi.HttpRequest;
+
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Path("/api/users")
@@ -74,8 +73,7 @@ public class UsersResource {
         );
 
         var acmeData = new HashMap<String, Object>();
-        acmeData.put("roles", List.of(clientId + "_user"));
-        acmeData.put("foo", "bar");
+        acmeData.put("hello", "world");
 
         return Map.of("acme", acmeData);
     }
