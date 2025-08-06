@@ -33,7 +33,7 @@ services:
 
       # JAVA_TOOL_OPTIONS="" jcmd 1 JFR.start duration=1m settings=profile name=debug filename=/opt/keycloak/perf/debug.jfr
       # JAVA_TOOL_OPTIONS="" jcmd 1 JFR.dump name=debug filename=/opt/keycloak/perf/debug.jfr
-      JAVA_TOOL_OPTIONS: "-XX:FlightRecorderOptions=stackdepth=256 -XX:+FlightRecorder -XX:StartFlightRecording=duration=200s,filename=/opt/keycloak/perf/debug.jfr,name=debug"
+      JAVA_TOOL_OPTIONS: "-XX:+PrintCommandLineFlags -XX:FlightRecorderOptions=stackdepth=256 -XX:+FlightRecorder -XX:StartFlightRecording=duration=200s,filename=/opt/keycloak/perf/debug.jfr,name=debug"
     mem_limit: 2048m
     mem_reservation: 2048m
     cpus: 4
@@ -94,9 +94,9 @@ services:
       - "--log-level=info,org.hibernate.SQL_SLOW:info,com.github.thomasdarimont.keycloak.custom.health.CustomHealthChecks:info,com.github.thomasdarimont.keycloak.custom:debug,com.arjuna.ats.jta:off,org.keycloak.services.resources.admin.permissions:debug,org.hibernate.SQL_SLOW:info"
 #      - "--verbose"
     #      - "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog"
-      - "-Dio.netty.http2.maxHeaderListSize=16384"
       - "--spi-admin-realm-restapi-extension-custom-admin-resources-users-provisioning-required-realm-role=user-modifier-acme"
       - "--spi-admin-realm-restapi-extension-custom-admin-resources-users-provisioning-managed-attribute-pattern=(.*)"
+      - "-Dio.netty.http2.maxHeaderListSize=16384"
     extra_hosts:
       # ${DOCKER_HOST_IP:-172.17.0.1} is host.docker.internal
       # the special host-gateway value resolves to the internal IP address of the host.
