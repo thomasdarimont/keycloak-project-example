@@ -71,7 +71,7 @@ class realmImex {
         commandLine.add("--file");
         commandLine.add("/opt/keycloak/imex/" + realmName + "-realm.json");
         commandLine.add("--users");
-        commandLine.add("skip");
+        commandLine.add("same_file");
         commandLine.add("--realm");
         commandLine.add(realmName);
         if (additionalOptions != null && !"".equals(additionalOptions.trim())) {
