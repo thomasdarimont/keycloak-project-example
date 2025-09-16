@@ -28,7 +28,7 @@ public class CustomResourceProvider implements RealmResourceProvider {
 
     private static final Pattern ALLOWED_REALM_NAMES_PATTERN = Pattern.compile(
             Optional.ofNullable(System.getenv("KEYCLOAK_CUSTOM_ENDPOINT_REALM_PATTERN"))
-                    .orElse("(acme-.*|workshop.*)"));
+                    .orElse("(acme-.*|workshop.*|company.*)"));
 
     @Override
     public Object getResource() {
