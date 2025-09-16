@@ -315,6 +315,9 @@
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
+                    <excludes>
+                        <exclude>**/custom/endpoints/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
