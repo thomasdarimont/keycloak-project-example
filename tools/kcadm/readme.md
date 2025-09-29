@@ -9,7 +9,7 @@ Although it is possible to use a `kcadm.sh` from a local Keycloak installation, 
 ## Setup command
 To use `kcadm.sh` from the Keycloak docker image, we define the alias `kcadm`: 
 ```
-alias kcadm="docker run --net=host -i --user=1000:1000 --rm -v $(echo $HOME)/.acme/.keycloak:/opt/keycloak/.keycloak:z --entrypoint /opt/keycloak/bin/kcadm.sh quay.io/keycloak/keycloak:26.3.4"
+alias kcadm="docker run --net=host -i --user=1000:1000 --rm -v $(echo $HOME)/.acme/.keycloak:/opt/keycloak/.keycloak:z --entrypoint /opt/keycloak/bin/kcadm.sh quay.io/keycloak/keycloak:26.3.5"
 ```
 ## Setup environment 
 variables for clean commands
