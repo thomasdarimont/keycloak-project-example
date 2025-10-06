@@ -53,9 +53,19 @@ public class CustomAdminResourceProvider implements AdminRealmResourceProvider {
 
         @Override
         public void init(Config.Scope config) {
-            String realmRole = config.scope("users", "provisioning").get("required-realm-role");
-            String attributePatternString = config.scope("users", "provisioning").get("managed-attribute-pattern");
-
+            Config.Scope scope = config.scope("users", "provisioning");
+            String realmRole = "user-modifier-acme";
+            String attributePatternString = "(.*)";
+            if (scope != null) {
+                String customRealmRole = scope.get("required-realm-role");
+                if (customRealmRole != null) {
+                    realmRole = customRealmRole;
+                }
+                String customAttributePatternString = scope.get("managed-attribute-pattern");
+                if (customAttributePatternString != null) {
+                    attributePatternString = customAttributePatternString;
+                }
+            }
             var privisioningConfig = new UserProvisioningConfig(realmRole, Pattern.compile(attributePatternString));
             customAdminResource = new CustomAdminResourceProvider(privisioningConfig);
         }
