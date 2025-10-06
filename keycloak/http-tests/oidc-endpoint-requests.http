@@ -2,7 +2,12 @@
 POST {{ISSUER}}/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{CONFIDENTIAL_CLIENT_LEGACY_APP}}&client_secret={{CONFIDENTIAL_CLIENT_LEGACY_APP_SECRET}}&username={{USER_USERNAME}}&password={{USER_PASSWORD}}&grant_type=password&scope=profile+openid
+client_id = {{CONFIDENTIAL_CLIENT_LEGACY_APP}} &
+client_secret = {{CONFIDENTIAL_CLIENT_LEGACY_APP_SECRET}} &
+username = {{USER_USERNAME}} &
+password = {{USER_PASSWORD}} &
+grant_type = password &
+scope = profile+openid
 
 > {%
 client.global.set("KC_ACCESS_TOKEN", response.body.access_token);
@@ -17,4 +22,7 @@ Authorization: Bearer {{KC_ACCESS_TOKEN}}
 POST {{ISSUER}}/protocol/openid-connect/token/introspect
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{CONFIDENTIAL_CLIENT_LEGACY_APP}}&client_secret={{CONFIDENTIAL_CLIENT_LEGACY_APP_SECRET}}&token={{KC_ACCESS_TOKEN}}&token_type_hint=access_token
+client_id = {{CONFIDENTIAL_CLIENT_LEGACY_APP}} &
+client_secret = {{CONFIDENTIAL_CLIENT_LEGACY_APP_SECRET}} &
+token = {{KC_ACCESS_TOKEN}} &
+token_type_hint = access_token
