@@ -1,0 +1,119 @@
+### Obtain App Token
+# via Resource Owner Password Credentials Grant Flow for the sake of example
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{ACME_APP_CLIENT_ID}} &
+client_secret = {{ACME_APP_CLIENT_SECRET}} &
+username = {{USER_USERNAME}} &
+password = {{USER_PASSWORD}} &
+grant_type = password &
+scope = openid+profile
+
+> {%
+    client.global.set("INITIAL_ACCESS_TOKEN", response.body.access_token);
+    client.global.set("INITIAL_REFRESH_TOKEN", response.body.refresh_token);
+%}
+
+#### Access User Info
+GET {{ISSUER}}/protocol/openid-connect/userinfo
+Authorization: Bearer {{INITIAL_ACCESS_TOKEN}}
+
+### Perform Token-exchange for acme-api-1
+# INITIAL_CLIENT (acme-app) -> REQUESTER_CLIENT (acme-api-gateway) -> acme-api-1, acme-api-2
+# Perform (internal-to-internal) token exchange with audience extension
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+subject_token = {{INITIAL_ACCESS_TOKEN}} &
+audience = {{ACME_API_1_CLIENT_ID}} &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token
+
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN_1", response.body.access_token);
+%}
+
+#### Call Token Introspection with Token 1
+POST {{ISSUER}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+token = {{XCHD_ACCESS_TOKEN_1}} &
+token_type_hint = access_token
+
+### Perform Token-exchange for acme-api-2
+# INITIAL_CLIENT (acme-app) -> REQUESTER_CLIENT (acme-api-gateway) -> acme-api-1, acme-api-2
+# Perform (internal-to-internal) token exchange with audience extension
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+subject_token = {{INITIAL_ACCESS_TOKEN}} &
+audience = {{ACME_API_2_CLIENT_ID}} &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token
+
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN_2", response.body.access_token);
+%}
+
+### Perform Token-exchange for acme-api-1 + acme-api-2
+# INITIAL_CLIENT (acme-app) -> REQUESTER_CLIENT (acme-api-gateway) -> acme-api-1, acme-api-2
+# Perform (internal-to-internal) token exchange with audience extension
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+subject_token = {{INITIAL_ACCESS_TOKEN}} &
+audience = {{ACME_API_1_CLIENT_ID}} &
+audience = {{ACME_API_2_CLIENT_ID}} &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token
+
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN_1_2", response.body.access_token);
+%}
+
+### Perform Token-exchange for acme-api-1 + acme-api-2 + scope domain1
+# INITIAL_CLIENT (acme-app) -> REQUESTER_CLIENT (acme-api-gateway) -> acme-api-1, acme-api-2
+# Perform (internal-to-internal) token exchange with audience extension
+POST {{ISSUER}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+subject_token = {{INITIAL_ACCESS_TOKEN}} &
+scope = profile+acme+domain1 &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token
+
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN_1_2_3_4", response.body.access_token);
+%}
+
+### Revoke Access token
+POST {{ISSUER}}/protocol/openid-connect/revoke
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+token={{XCHD_ACCESS_TOKEN_1}}
+
+#### Call Token Introspection with Token 1
+POST {{ISSUER}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{ACME_API_GATEWAY_CLIENT_ID}} &
+client_secret = {{ACME_API_GATEWAY_CLIENT_SECRET}} &
+token = {{XCHD_ACCESS_TOKEN_1}} &
+token_type_hint = access_token
