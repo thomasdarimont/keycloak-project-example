@@ -19,6 +19,28 @@ scope = openid+profile
 GET {{ISSUER}}/protocol/openid-connect/userinfo
 Authorization: Bearer {{INITIAL_ACCESS_TOKEN}}
 
+
+#### Call Token Introspection with Initial App Access Token
+POST {{ISSUER}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{ACME_APP_CLIENT_ID}} &
+client_secret = {{ACME_APP_CLIENT_SECRET}} &
+token = {{INITIAL_ACCESS_TOKEN}} &
+token_type_hint = access_token
+
+
+#### Call Token Introspection with Initial App Access Token with JWT generation
+POST {{ISSUER}}/protocol/openid-connect/token/introspect
+Content-Type: application/x-www-form-urlencoded
+Accept: application/jwt
+
+client_id = {{ACME_APP_CLIENT_ID}} &
+client_secret = {{ACME_APP_CLIENT_SECRET}} &
+token = {{INITIAL_ACCESS_TOKEN}} &
+token_type_hint = access_token
+
+
 ### Perform Token-exchange for acme-api-1
 # INITIAL_CLIENT (acme-app) -> REQUESTER_CLIENT (acme-api-gateway) -> acme-api-1, acme-api-2
 # Perform (internal-to-internal) token exchange with audience extension
