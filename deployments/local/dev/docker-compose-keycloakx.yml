@@ -12,8 +12,7 @@ services:
       - ./keycloak-http.env
     environment:
     # Enable remote debugging
-      DEBUG: "true"
-      DEBUG_PORT: "*:8787"
+      KC_DEBUG: "true"
       # DEBUG_SUSPEND: "y"
 
       JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -Djava.net.preferIPv4Stack=true -Djava.security.egd=file:/dev/urandom"
@@ -119,7 +118,7 @@ services:
       - ../../../keycloak/config/openid-config.json:/opt/keycloak/conf/openid-config.json:z
       - ../../../keycloak/config/jmxremote.password:/opt/keycloak/conf/jmxremote.password:ro
       - ../../../keycloak/imex:/opt/keycloak/imex:z
-      - ./run/keycloakx/data263:/opt/keycloak/data:z
+      - ./run/keycloakx/data264:/opt/keycloak/data:z
       - ./run/keycloakx/logs:/opt/keycloak/logs:z
       - ./run/keycloakx/perf:/opt/keycloak/perf:z
 # Add keycloak extensions
