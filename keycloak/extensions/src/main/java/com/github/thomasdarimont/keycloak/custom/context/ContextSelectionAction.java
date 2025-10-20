@@ -47,12 +47,6 @@ public class ContextSelectionAction implements RequiredActionProvider {
     }
 
     @Override
-    public int getMaxAuthAge() {
-        // don't require reauth to switch contexts within a day
-        return 60 * 60 * 24;
-    }
-
-    @Override
     public void evaluateTriggers(RequiredActionContext context) {
 
         var authSession = context.getAuthenticationSession();

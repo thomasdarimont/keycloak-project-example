@@ -43,7 +43,7 @@ public class DynamicIdpAuthenticator implements Authenticator {
 
         var realm = context.getRealm();
         var session = context.getSession();
-        var idps = realm.getIdentityProvidersStream().map(IdentityProviderModel::getAlias).collect(Collectors.toSet());
+        var idps = session.identityProviders().getAllStream().map(IdentityProviderModel::getAlias).collect(Collectors.toSet());
         var identityProviderLinks = session.users().getFederatedIdentitiesStream(realm, user) //
                 .filter(identity -> idps.contains(identity.getIdentityProvider())) //
                 .toList();
@@ -53,8 +53,8 @@ public class DynamicIdpAuthenticator implements Authenticator {
             return;
         }
 
-        var primaryIdpLink = identityProviderLinks.get(0);
-        var idp = realm.getIdentityProviderByAlias(primaryIdpLink.getIdentityProvider());
+        var primaryIdpLink = identityProviderLinks.getFirst();
+        var idp = session.identityProviders().getByIdOrAlias(primaryIdpLink.getIdentityProvider());
 
         var authSession = context.getAuthenticationSession();
         var clientSessionCode = new ClientSessionCode<>(session, realm, authSession);

@@ -93,14 +93,13 @@ public class IdpApplications {
         LoginBean loginBean = new LoginBean(new MultivaluedHashMap<>(Map.of("username", user.getUsername())));
         ApplicationsBean applicationsBean = new ApplicationsBean(realm, session, clientFilter);
         UrlBean urlBean = new UrlBean(realm, loginTheme, context.getUri().getBaseUri(), null);
-        Response formResponse = session.getProvider(LoginFormsProvider.class) //
+
+        return session.getProvider(LoginFormsProvider.class) //
                 .setAttribute("realm", realmBean) //
                 .setAttribute("user", loginBean) //
                 .setAttribute("application", applicationsBean) //
                 .setAttribute("url", urlBean) //
                 .createForm("login-applications.ftl");
-
-        return formResponse;
     }
 
     /**
@@ -114,7 +113,7 @@ public class IdpApplications {
 
         // adapted from org.keycloak.authentication.authenticators.browser.IdentityProviderAuthenticator.redirect
         RealmModel realm = context.getRealm();
-        Optional<IdentityProviderModel> idp = realm.getIdentityProvidersStream() //
+        Optional<IdentityProviderModel> idp = session.identityProviders().getAllStream() //
                 .filter(IdentityProviderModel::isEnabled) //
                 .filter(identityProvider -> Objects.equals(providerId, identityProvider.getAlias())) //
                 .findFirst();
@@ -126,7 +125,7 @@ public class IdpApplications {
 
         String clientId = "idp-initiated";
         ClientModel idpInitiatedClient = realm.getClientByClientId(clientId);
-        String redirectUri = Urls.realmBase(session.getContext().getUri().getBaseUri()).path("{realm}/custom-resources/idp/applications").build(realm.getName()).toString();;
+        String redirectUri = Urls.realmBase(session.getContext().getUri().getBaseUri()).path("{realm}/custom-resources/idp/applications").build(realm.getName()).toString();
 
         AuthenticationSessionModel authSession = context.getAuthenticationSession();
         if (authSession == null) {
@@ -162,7 +161,7 @@ public class IdpApplications {
         private final Predicate<ClientModel> clientFilter;
 
         public List<ApplicationInfo> getApplications() {
-            List<ApplicationInfo> applications = session.clients().getClientsStream(realm) //
+            return session.clients().getClientsStream(realm) //
                     .filter(clientFilter == null ? c -> true : clientFilter) //
                     .map(client -> {
                         String clientId = client.getClientId();
@@ -176,7 +175,6 @@ public class IdpApplications {
                         String clientRedirectUri = Urls.realmBase(session.getContext().getUri().getBaseUri()).path(RealmsResource.class, "getRedirect").build(realm.getName(), clientId).toString();
                         return new ApplicationInfo(clientId, name, description, icon, clientRedirectUri);
                     }).toList();
-            return applications;
         }
 
         @Data

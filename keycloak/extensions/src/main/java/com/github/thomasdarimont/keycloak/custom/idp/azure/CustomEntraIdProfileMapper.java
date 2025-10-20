@@ -9,14 +9,14 @@ import org.keycloak.broker.oidc.OIDCIdentityProviderFactory;
 import org.keycloak.broker.oidc.mappers.AbstractClaimMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.IdentityProviderMapper;
-import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttpRequest;
 import org.keycloak.models.IdentityProviderMapperModel;
 import org.keycloak.models.IdentityProviderSyncMode;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.provider.ProviderConfigProperty;
-import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.JsonWebToken;
 
 import java.util.ArrayList;
@@ -158,9 +158,9 @@ public class CustomEntraIdProfileMapper extends AbstractClaimMapper {
     private GraphApiData fetchProfileFromMsGraphApi(KeycloakSession session, String aadAccessToken) {
 
         GraphApiData graphApiData = null;
-        SimpleHttp groupsListingRequest = queryMsGraphApi(session, aadAccessToken, "/beta/me/profile/");
+        var groupsListingRequest = queryMsGraphApi(session, aadAccessToken, "/beta/me/profile/");
 
-        try (SimpleHttp.Response response = groupsListingRequest.asResponse()) {
+        try (var response = groupsListingRequest.asResponse()) {
 
             if (response.getStatus() == 200) {
                 graphApiData = response.asJson(GraphApiData.class);
@@ -174,9 +174,9 @@ public class CustomEntraIdProfileMapper extends AbstractClaimMapper {
         return graphApiData;
     }
 
-    private SimpleHttp queryMsGraphApi(KeycloakSession session, String aadAccessToken, String requestPath) {
+    private SimpleHttpRequest queryMsGraphApi(KeycloakSession session, String aadAccessToken, String requestPath) {
         var url = "https://graph.microsoft.com" + requestPath;
-        var request = SimpleHttp.doGet(url, session);
+        var request = SimpleHttp.create(session).doGet(url);
         request.auth(aadAccessToken);
         return request;
     }

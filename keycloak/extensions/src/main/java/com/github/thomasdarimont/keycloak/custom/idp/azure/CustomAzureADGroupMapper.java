@@ -11,7 +11,8 @@ import org.keycloak.broker.oidc.OIDCIdentityProviderFactory;
 import org.keycloak.broker.oidc.mappers.AbstractClaimMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.IdentityProviderMapper;
-import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttpRequest;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.IdentityProviderMapperModel;
 import org.keycloak.models.IdentityProviderSyncMode;
@@ -22,14 +23,12 @@ import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.JsonWebToken;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * EntraID Group Mapper
@@ -140,7 +139,7 @@ public class CustomAzureADGroupMapper extends AbstractClaimMapper {
         List<AADGroupInfo> aadAssignedGroups = aadGroupList.getEntries().stream().filter(g -> {
             String groupId = g.getId();
             return assignedGroupIds.contains(groupId);
-        }).collect(Collectors.toList());
+        }).toList();
 
         for (AADGroupInfo aadGroup : aadAssignedGroups) {
 
@@ -178,11 +177,8 @@ public class CustomAzureADGroupMapper extends AbstractClaimMapper {
     private AADGroupList fetchGroupListFromMsGraphApi(KeycloakSession session, String aadAccessToken) {
 
         AADGroupList aadGroupList = null;
-        SimpleHttp groupsListingRequest = queryMsGraphApi(session, aadAccessToken, "/groups");
-
-        SimpleHttp.Response response = null;
-        try {
-            response = groupsListingRequest.asResponse();
+        SimpleHttpRequest groupsListingRequest = queryMsGraphApi(session, aadAccessToken, "/groups");
+        try (var response = groupsListingRequest.asResponse()) {
 
             if (response.getStatus() == 200) {
                 aadGroupList = response.asJson(AADGroupList.class);
@@ -191,22 +187,15 @@ public class CustomAzureADGroupMapper extends AbstractClaimMapper {
             }
         } catch (Exception ex) {
             log.warnf(ex, "Failed to fetch groups via MS Graph API");
-        } finally {
-            if (response != null) {
-                try {
-                    response.close();
-                } catch (IOException e) {
-                    log.errorf(e, "Failed to close response");
-                }
-            }
         }
 
         return aadGroupList;
     }
 
-    private SimpleHttp queryMsGraphApi(KeycloakSession session, String aadAccessToken, String requestPath) {
+    private SimpleHttpRequest queryMsGraphApi(KeycloakSession session, String aadAccessToken, String requestPath) {
         var url = "https://graph.microsoft.com/v1.0" + requestPath;
-        var request = SimpleHttp.doGet(url, session);
+
+        var request = SimpleHttp.create(session).doGet(url);
         request.auth(aadAccessToken);
         return request;
     }

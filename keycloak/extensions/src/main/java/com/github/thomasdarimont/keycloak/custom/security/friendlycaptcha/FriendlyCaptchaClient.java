@@ -1,7 +1,7 @@
 package com.github.thomasdarimont.keycloak.custom.security.friendlycaptcha;
 
 import lombok.extern.jbosslog.JBossLog;
-import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttp;
 import org.keycloak.models.KeycloakSession;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class FriendlyCaptchaClient {
         requestBody.put("sitekey", config.getSiteKey());
         requestBody.put("secret", config.getSecret());
 
-        var post = SimpleHttp.doPost(config.getUrl(), session);
+        var post = SimpleHttp.create(session).doPost(config.getUrl());
         post.json(requestBody);
         try (var response = post.asResponse()) {
             var responseBody = response.asJson(Map.class);

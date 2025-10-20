@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.http.HttpStatus;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttp;
 import org.keycloak.connections.httpclient.HttpClientProvider;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.SingleUseObjectProvider;
@@ -63,7 +63,7 @@ public class OauthClientCredentialsTokenManager {
         AccessTokenResponse accessTokenResponse = fetchToken(session, tokenKey);
         String accessToken = accessTokenResponse.getToken();
 
-        if (useCache) {
+        if (useCache && cache != null) {
             // store token
             long expiresInSeconds = accessTokenResponse.getExpiresIn();
 
@@ -98,7 +98,7 @@ public class OauthClientCredentialsTokenManager {
             keycloakSession = createKeycloakSessionProxy(session);
         }
 
-        SimpleHttp request = SimpleHttp.doPost(tokenUrl, keycloakSession);
+        var request = SimpleHttp.create(session).doPost(tokenUrl);
         request.param(OAuth2Constants.CLIENT_ID, clientId);
         request.param(OAuth2Constants.GRANT_TYPE, OAuth2Constants.CLIENT_CREDENTIALS);
 
@@ -119,8 +119,7 @@ public class OauthClientCredentialsTokenManager {
         // TODO wrap this around a retry with exponatial backoff in case of HTTP Status 429 / 503 / etc.
         {
             AccessTokenResponse accessTokenResponse = null;
-            try {
-                SimpleHttp.Response response = request.asResponse();
+            try (var response = request.asResponse()){
                 if (response.getStatus() != HttpStatus.SC_OK) {
                     throw new RuntimeException("Token retrieval failed: Bad status. status=" + response.getStatus() + " tokenKey=" + tokenKey);
                 }
@@ -137,17 +136,16 @@ public class OauthClientCredentialsTokenManager {
     private KeycloakSession createKeycloakSessionProxy(KeycloakSession target) {
 
         ClassLoader cl = getClass().getClassLoader();
-        Class[] ifaces = {KeycloakSession.class};
+        Class<?>[] ifaces = {KeycloakSession.class};
         InvocationHandler handler = (Object proxy, Method method, Object[] args) -> {
 
             if ("getProvider".equals(method.getName()) && args.length == 1 && HttpClientProvider.class.equals(args[0])) {
-                HttpClientProvider customHttpClientProvider = target.getProvider(HttpClientProvider.class, customHttpClientProviderId);
-                return customHttpClientProvider;
+                return target.getProvider(HttpClientProvider.class, customHttpClientProviderId);
             }
 
             return method.invoke(target, args);
         };
         Object sessionProxy = Proxy.newProxyInstance(cl, ifaces, handler);
-        return KeycloakSession.class.cast(sessionProxy);
+        return (KeycloakSession) sessionProxy;
     }
 }

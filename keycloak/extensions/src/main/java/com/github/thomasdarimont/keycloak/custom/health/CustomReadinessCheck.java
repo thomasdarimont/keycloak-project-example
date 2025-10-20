@@ -5,8 +5,6 @@ import lombok.extern.jbosslog.JBossLog;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.Readiness;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,14 +22,14 @@ public class CustomReadinessCheck implements HealthCheck {
 
     static {
         log.info("Adding CustomReadinessCheck for SIG TERM");
-        SignalHandler signalHandler = sig -> {
-            log.infof("Detected SIG %s, marking this instance as unavailable", sig.getName());
-            STOPPED.set(true);
-        };
-        try {
-            Signal.handle(new Signal("TERM"), signalHandler);
-        } catch (Exception e) {
-            log.warnf("Failed to register signal handler: ", e.getMessage());
-        }
+//        SignalHandler signalHandler = sig -> {
+//            log.infof("Detected SIG %s, marking this instance as unavailable", sig.getName());
+//            STOPPED.set(true);
+//        };
+//        try {
+//            Signal.handle(new Signal("TERM"), signalHandler);
+//        } catch (Exception e) {
+//            log.warnf("Failed to register signal handler: ", e.getMessage());
+//        }
     }
 }

@@ -4,7 +4,8 @@ import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
 import com.github.thomasdarimont.keycloak.custom.config.ConfigAccessor;
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import lombok.extern.jbosslog.JBossLog;
-import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttp;
+import org.keycloak.http.simple.SimpleHttpRequest;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
@@ -79,10 +80,10 @@ public class OpaClient {
         }
 
         var authzUrl = config.getString(OPA_AUTHZ_URL, DEFAULT_OPA_AUTHZ_URL);
-        var http = SimpleHttp.doPost(authzUrl, session);
-        http.json(Map.of("input", accessRequest));
+        var request = SimpleHttp.create(session).doPost(authzUrl);
+        request.json(Map.of("input", accessRequest));
 
-        var accessResponse = fetchResponse(http);
+        var accessResponse = fetchResponse(request);
 
         try {
             log.infof("Received OPA authorization response. realm=%s user=%s client=%s\n%s", //
@@ -122,14 +123,10 @@ public class OpaClient {
 
     private Map<String, Object> extractContextAttributes(KeycloakSession session, UserModel user, ConfigAccessor config) {
         var contextAttributes = extractAttributes(user, config, OPA_CONTEXT_ATTRIBUTES, (u, attr) -> {
-            Object value;
-            switch (attr) {
-                case "remoteAddress":
-                    value = session.getContext().getConnection().getRemoteAddr();
-                    break;
-                default:
-                    value = null;
-            }
+            Object value = switch (attr) {
+                case "remoteAddress" -> session.getContext().getConnection().getRemoteAddr();
+                default -> null;
+            };
 
             return value;
         }, u -> null);
@@ -225,9 +222,9 @@ public class OpaClient {
         return Map.of("id", user.getId(), "email", user.getEmail());
     }
 
-    private static OpaAccessResponse fetchResponse(SimpleHttp http) {
+    private static OpaAccessResponse fetchResponse(SimpleHttpRequest reuqest) {
         try {
-            try (var response = http.asResponse()) {
+            try (var response = reuqest.asResponse()) {
                 return response.asJson(OpaAccessResponse.class);
             }
         } catch (IOException e) {
