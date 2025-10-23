@@ -68,6 +68,7 @@
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <versions-maven-plugin.version>2.19.1</versions-maven-plugin.version>
     </properties>
 
     <build>
@@ -92,5 +93,18 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <allowIncrementalUpdates>true</allowIncrementalUpdates>
+                    <allowMinorUpdates>false</allowMinorUpdates>
+                    <allowMinorUpdates>false</allowMinorUpdates>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>
