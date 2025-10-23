@@ -5,22 +5,14 @@
     <#elseif section = "header">
         ${msg('emailCodeFormTitle')}
     <#elseif section = "form">
-        <script>
-            function tryCompleteForm() {
-                let emailCodeInput = document.querySelector("#emailCode");
-                if (emailCodeInput.validity.valid) {
-                    document.querySelector("#kc-email-code-login-form").submit();
-                }
-            }
-        </script>
         <p>${msg('emailCodeFormCta')}</p>
-        <form id="kc-email-code-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post">
+        <form id="kc-email-code-login-form" class="${properties.kcFormClass!}" action="${url.loginAction}" method="post" onsubmit="login.disabled=true; return true;">
             <div class="${properties.kcFormGroupClass!}">
                 <div>
                     <div class="${properties.kcInputWrapperClass!}">
                         <label for="emailCode">${msg('accessCode')}:</label>
                         <input id="emailCode" name="emailCode" type="text" inputmode="numeric" pattern="${codePattern}" autofocus
-                               class="${properties.kcInputClass!}" <#if tryAutoSubmit> oninput="tryCompleteForm()" </#if>
+                               class="${properties.kcInputClass!}" <#if tryAutoSubmit> </#if>
                                required autocomplete="one-time-code"/>
                     </div>
                 </div>
@@ -36,7 +28,7 @@
 
                 <div id="kc-form-buttons" class="${properties.kcFormButtonsClass!}">
                     <input class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
-                           type="submit" value="${msg("doSubmit")}"/>
+                           type="submit" value="${msg("doSubmit")}" name="login"/>
 
                     <input name="resend"
                            class="${properties.kcButtonClass!} ${properties.kcButtonPrimaryClass!} ${properties.kcButtonLargeClass!}"
