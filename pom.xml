@@ -59,7 +59,7 @@
 
         <!-- Tooling -->
         <auto-service.version>1.1.1</auto-service.version>
-        <lombok.version>1.18.38</lombok.version>
+        <lombok.version>1.18.42</lombok.version>
         <docker-maven-plugin.version>0.43.4</docker-maven-plugin.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
