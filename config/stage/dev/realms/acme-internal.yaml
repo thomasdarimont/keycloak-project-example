@@ -654,6 +654,10 @@ authenticationFlows:
     topLevel: false
     builtIn: false
     authenticationExecutions:
+# Only execute 2FA flow if no passkey was used
+      - authenticator: conditional-credential
+        requirement: REQUIRED
+        authenticatorConfig: "no-passkey"
       - authenticator: conditional-user-configured
         requirement: REQUIRED
       - authenticator: acme-auth-trusted-device
@@ -669,6 +673,9 @@ authenticationFlows:
         requirement: ALTERNATIVE
 
 authenticatorConfig:
+  - alias: "no-passkey"
+    config:
+      credentials: "webauthn-passwordless"
   - alias: "acme-sms-auth-default"
     config:
       phoneNumberPattern: "\\+49.*"

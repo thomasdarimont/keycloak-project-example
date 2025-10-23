@@ -13,6 +13,7 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserLoginFailureModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
+import org.keycloak.models.credential.WebAuthnCredentialModel;
 
 import java.net.URI;
 import java.util.List;
@@ -113,10 +114,47 @@ public class AccountActivity {
         }
 
         var label = credential.getUserLabel();
-        if (label == null || !label.isEmpty()) {
+        if (label == null || label.isEmpty()) {
             return "";
         }
 
         return credential.getUserLabel();
+    }
+
+    public static void onCredentialChange(KeycloakSession session, RealmModel realm, UserModel user, CredentialModel credential, MfaChange change) {
+        log.debugf("credential change %s", change);
+
+        if (WebAuthnCredentialModel.TYPE_PASSWORDLESS.equals(credential.getType())) {
+            onUserPasskeyChanged(session, realm, user, credential, change);
+            return;
+        }
+
+        // TODO delegate to onUserMfaChanged
+    }
+
+    public static void onUserPasskeyChanged(KeycloakSession session, RealmModel realm, UserModel user, CredentialModel credential, MfaChange change) {
+
+        try {
+            var credentialLabel = getCredentialLabel(credential);
+            var mfaInfo = new MfaInfo(credential.getType(), credentialLabel);
+            switch (change) {
+                case ADD:
+                    AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                        attributes.put("passkeyInfo", mfaInfo);
+                        emailTemplateProvider.send("acmePasskeyAddedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-passkey-added.ftl", attributes);
+                    });
+                    break;
+                case REMOVE:
+                    AccountEmail.send(session, session.getProvider(EmailTemplateProvider.class), realm, user, (emailTemplateProvider, attributes) -> {
+                        attributes.put("passkeyInfo", mfaInfo);
+                        emailTemplateProvider.send("acmePasskeyRemovedSubject", List.of(RealmUtils.getDisplayName(realm)), "acme-passkey-removed.ftl", attributes);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        } catch (EmailException e) {
+            log.errorf(e, "Failed to send email for new user passkey change: %s.", change);
+        }
     }
 }

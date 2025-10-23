@@ -1,4 +1,5 @@
 <#import "template.ftl" as layout>
+<#import "passkeys.ftl" as passkeys>
 <@layout.registrationLayout displayMessage=!messagesPerField.existsError('username') displayInfo=(realm.password && realm.registrationAllowed && !registrationDisabled??); section>
     <#if section = "header">
         ${msg("loginAccountTitle")}
@@ -25,7 +26,9 @@
                                        aria-invalid="<#if messagesPerField.existsError('username')>true</#if>"
                                        class="${properties.kcInputClass!}" name="username"
                                        value="${(login.username!'')}"
-                                       type="text" autofocus autocomplete="off"/>
+                                       type="text" autofocus
+                                       autocomplete="${(enableWebAuthnConditionalUI?has_content)?then('username webauthn', 'username')}"
+                                       dir="ltr"/>
 
                                 <#if messagesPerField.existsError('username')>
                                     <span id="input-error-username" class="${properties.kcInputErrorMessageClass!}" aria-live="polite">
@@ -62,6 +65,8 @@
                 </#if>
             </div>
         </div>
+
+        <@passkeys.conditionalUIData />
 
             <#if realm.password && social.providers??>
                 <div id="kc-social-providers" class="${properties.kcFormSocialAccountSectionClass!}">

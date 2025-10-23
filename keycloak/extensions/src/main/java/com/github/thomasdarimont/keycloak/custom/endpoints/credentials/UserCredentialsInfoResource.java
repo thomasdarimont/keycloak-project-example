@@ -28,6 +28,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.models.credential.RecoveryAuthnCodesCredentialModel;
+import org.keycloak.models.credential.WebAuthnCredentialModel;
 import org.keycloak.representations.AccessToken;
 import org.keycloak.services.cors.Cors;
 import org.keycloak.util.JsonSerialization;
@@ -47,10 +48,10 @@ import static jakarta.ws.rs.core.Response.Status.UNAUTHORIZED;
 public class UserCredentialsInfoResource {
 
     private static final Set<String> RELEVANT_CREDENTIAL_TYPES = Set.of(PasswordCredentialModel.TYPE, SmsCredentialModel.TYPE, OTPCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE,
-            RecoveryAuthnCodesCredentialModel.TYPE, EmailCodeCredentialModel.TYPE);
+            RecoveryAuthnCodesCredentialModel.TYPE, EmailCodeCredentialModel.TYPE, WebAuthnCredentialModel.TYPE_PASSWORDLESS);
 
     private static final Set<String> REMOVABLE_CREDENTIAL_TYPES = Set.of(SmsCredentialModel.TYPE, TrustedDeviceCredentialModel.TYPE, OTPCredentialModel.TYPE,
-            RecoveryAuthnCodesCredentialModel.TYPE, EmailCodeCredentialModel.TYPE);
+            RecoveryAuthnCodesCredentialModel.TYPE, EmailCodeCredentialModel.TYPE, WebAuthnCredentialModel.TYPE_PASSWORDLESS);
 
     private final KeycloakSession session;
     private final AccessToken token;
@@ -127,7 +128,7 @@ public class UserCredentialsInfoResource {
         // TODO check token.getAuth_time()
 
         var credentialManager = user.credentialManager();
-        var credentials = credentialManager.getStoredCredentialsByTypeStream(credentialType).collect(Collectors.toList());
+        var credentials = credentialManager.getStoredCredentialsByTypeStream(credentialType).toList();
         if (credentials.isEmpty()) {
             var request = context.getHttpRequest();
             return withCors(request).add(Response.status(Response.Status.NOT_FOUND));
@@ -140,7 +141,12 @@ public class UserCredentialsInfoResource {
             }
             if (removeCredentialForUser(realm, user, credential)) {
                 removedCredentialCount++;
-                AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE);
+
+                if (WebAuthnCredentialModel.TYPE_PASSWORDLESS.equals(credential.getType())) {
+                    AccountActivity.onUserPasskeyChanged(session, realm, user, credential, MfaChange.REMOVE);
+                } else {
+                    AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE);
+                }
             }
         }
 
@@ -164,7 +170,7 @@ public class UserCredentialsInfoResource {
     private Map<String, List<CredentialInfo>> loadCredentialInfosForUser(RealmModel realm, UserModel user) {
 
         var credentialManager = user.credentialManager();
-        var credentials = credentialManager.getStoredCredentialsStream().collect(Collectors.toList());
+        var credentials = credentialManager.getStoredCredentialsStream().toList();
 
         var credentialData = new HashMap<String, List<CredentialInfo>>();
         for (var credential : credentials) {

@@ -67,6 +67,16 @@ public class AcmeAuditListener implements EventListenerProvider {
                     CredentialUtils.findFirstOtpCredential(user).ifPresent(credential -> //
                             AccountActivity.onUserMfaChanged(session, realm, user, credential, MfaChange.REMOVE));
                     break;
+                case REMOVE_CREDENTIAL:
+                    CredentialUtils.findFirstCredentialOfType(user, event.getDetails().get("credential_type")).ifPresent(
+                            credential -> AccountActivity.onCredentialChange(session, realm, user, credential, MfaChange.REMOVE)
+                    );
+                    break;
+                case UPDATE_CREDENTIAL:
+                    CredentialUtils.findFirstCredentialOfType(user, event.getDetails().get("credential_type")).ifPresent(
+                            credential -> AccountActivity.onCredentialChange(session, realm, user, credential, MfaChange.ADD)
+                    );
+                    break;
                 case USER_DISABLED_BY_PERMANENT_LOCKOUT:
                     UserLoginFailureModel userLoginFailure = session.loginFailures().getUserLoginFailure(realm, user.getId());
                     AccountActivity.onAccountLockedOut(session, realm, user, userLoginFailure);

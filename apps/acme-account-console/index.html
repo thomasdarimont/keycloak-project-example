@@ -344,6 +344,7 @@
         let emailCodeInfo = credentialsData.credentialInfos['mfa-email-code'];
         let trustedDeviceInfo = credentialsData.credentialInfos['acme-trusted-device'];
         let recoveryCodeInfo = credentialsData.credentialInfos['recovery-authn-codes'];
+        let passkeyInfo = credentialsData.credentialInfos['webauthn-passwordless'];
 
         let otpAuthHtml = "";
         if (otpInfo) {
@@ -354,8 +355,8 @@
                     <td>MFA OTP</td>
                     <td>${!!optInfoItem ? escapeHtml(optInfoItem.credentialLabel) : ''}</td>
                     <td>${!!optInfoItem ? formatDate(optInfoItem.createdAt) : '-'}</td>
-                    <td>${!!optInfoItem ? '<a href="#" onclick="removeMfa(\'otp\',\'' + optInfoItem.credentialId + '\');return false">Remove</a>' : ''}</td>
-                    <td><a href="#" onclick="changeMfa('otp');return false">Add another</a></td>
+                    <td>${!!optInfoItem ? '<a href="#" onclick="removeCredential(\'otp\',\'' + optInfoItem.credentialId + '\');return false">Remove</a>' : ''}</td>
+                    <td><a href="#" onclick="changeCredential('otp');return false">Add another</a></td>
                 </tr>`;
             }
         } else {
@@ -365,7 +366,7 @@
                     <td>MFA OTP</td>
                     <td></td>
                     <td>-</td>
-                    <td><a href="#" onclick="changeMfa('otp');return false">Add</a></td>
+                    <td><a href="#" onclick="changeCredential('otp');return false">Add</a></td>
                     <td></td>
                 </tr>`;
         }
@@ -378,7 +379,7 @@
                     <td>MFA E-Mail Code</td>
                     <td></td>
                     <td>${!!emailCodeInfo[0] ? formatDate(emailCodeInfo[0].createdAt) : '-'}</td>
-                    <td>${!!emailCodeInfo[0] ? '<a href="#" onclick="removeMfa(\'mfa-email-code\',\'' + emailCodeInfo[0].credentialId + '\');return false">Remove</a>' : ''}</td>
+                    <td>${!!emailCodeInfo[0] ? '<a href="#" onclick="removeCredential(\'mfa-email-code\',\'' + emailCodeInfo[0].credentialId + '\');return false">Remove</a>' : ''}</td>
                     <td></td>
                 </tr>`;
         } else {
@@ -388,7 +389,7 @@
                     <td>MFA E-mail Code</td>
                     <td></td>
                     <td>-</td>
-                    <td><a href="#" onclick="changeMfa('mfa-email-code');return false">Add</a></td>
+                    <td><a href="#" onclick="changeCredential('mfa-email-code');return false">Add</a></td>
                     <td></td>
                 </tr>`;
         }
@@ -410,8 +411,8 @@
                     <td>Trusted Device</td>
                     <td>${trustedDeviceLabel + ' ' + currentDeviceMarker}</td>
                     <td>${formatDate(trustedDeviceInfoItem.createdAt)}</td>
-                    <td><a href="#" onclick="changeMfa('acme-trusted-device');return false">Add</a></td>
-                    <td><a href="#" onclick="removeMfa('acme-trusted-device','${trustedDeviceInfoItem.credentialId}');return false">Remove</a></td>
+                    <td><a href="#" onclick="changeCredential('acme-trusted-device');return false">Add</a></td>
+                    <td><a href="#" onclick="removeCredential('acme-trusted-device','${trustedDeviceInfoItem.credentialId}');return false">Remove</a></td>
                 </tr>`;
             }
         } else {
@@ -421,7 +422,7 @@
                     <td>Trusted Device</td>
                     <td></td>
                     <td>-</td>
-                    <td><a href="#" onclick="changeMfa('acme-trusted-device');return false">Add</a></td>
+                    <td><a href="#" onclick="changeCredential('acme-trusted-device');return false">Add</a></td>
                     <td></td>
                 </tr>`;
         }
@@ -445,12 +446,20 @@
                 <td></td>
             </tr>
             <tr>
+                <td>${!!passkeyInfo ? "&check;" : ""}</td>
+                <td>Passkey</td>
+                <td>${!!passkeyInfo ? escapeHtml(passkeyInfo[0].credentialLabel) : ''}</td>
+                <td>${!!passkeyInfo ? formatDate(passkeyInfo[0].createdAt) : '-'}</td>
+                <td><a href="#" onclick="changeCredential('webauthn-passwordless');return false">Update</a></td>
+                <td>${!!passkeyInfo ? '<a href="#" onclick="removeCredential(\'webauthn-passwordless\');return false">Remove</a>' : ''}</td>
+            </tr>
+            <tr>
                 <td>${!!smsInfo ? "&check;" : ""}</td>
                 <td>MFA SMS</td>
                 <td>${!!smsInfo ? escapeHtml(smsInfo[0].credentialLabel) : ''}</td>
                 <td>${!!smsInfo ? formatDate(smsInfo[0].createdAt) : '-'}</td>
-                <td><a href="#" onclick="changeMfa('mfa-sms');return false">Update</a></td>
-                <td>${!!smsInfo ? '<a href="#" onclick="removeMfa(\'mfa-sms\');return false">Remove</a>' : ''}</td>
+                <td><a href="#" onclick="changeCredential('mfa-sms');return false">Update</a></td>
+                <td>${!!smsInfo ? '<a href="#" onclick="removeCredential(\'mfa-sms\');return false">Remove</a>' : ''}</td>
             </tr>
             ${trustedDeviceAuthHtml}
             <tr>
@@ -458,8 +467,8 @@
                  <td>Recovery Code</td>
                  <td>${!!recoveryCodeInfo ? escapeHtml(recoveryCodeInfo[0].credentialLabel) + `(${recoveryCodeInfo[0].metadata['remainingCodes']})` : ''}</td>
                  <td>${!!recoveryCodeInfo ? formatDate(recoveryCodeInfo[0].createdAt) : '-'}</td>
-                 <td><a href="#" onclick="changeMfa('recovery-authn-codes');return false">Update</a></td>
-                 <td>${!!recoveryCodeInfo ? '<a href="#" onclick="removeMfa(\'recovery-authn-codes\');return false">Remove</a>' : ''}</td>
+                 <td><a href="#" onclick="changeCredential('recovery-authn-codes');return false">Update</a></td>
+                 <td>${!!recoveryCodeInfo ? '<a href="#" onclick="removeCredential(\'recovery-authn-codes\');return false">Remove</a>' : ''}</td>
             </tr>
 
             ${emailCodeAuthHtml}
@@ -579,7 +588,7 @@
         });
     }
 
-    window.changeMfa = function (method) {
+    window.changeCredential = function (method) {
 
         let actions = {
             "otp": "CONFIGURE_TOTP",
@@ -587,6 +596,7 @@
             "acme-trusted-device": "acme-manage-trusted-device",
             "recovery-authn-codes": "CONFIGURE_RECOVERY_AUTHN_CODES",
             "mfa-email-code": "acme-register-email-code",
+            "webauthn-passwordless": "webauthn-register-passwordless",
         }
 
         let action = actions[method];
@@ -600,9 +610,9 @@
         });
     }
 
-    window.removeMfa = async function (credentialType, credentialId) {
+    window.removeCredential = async function (credentialType, credentialId) {
 
-        if (!(["otp", "mfa-sms", "acme-trusted-device", "recovery-authn-codes", "mfa-email-code"].includes(credentialType))) {
+        if (!(["otp", "mfa-sms", "acme-trusted-device", "recovery-authn-codes", "mfa-email-code", "webauthn-passwordless"].includes(credentialType))) {
             return;
         }
 
