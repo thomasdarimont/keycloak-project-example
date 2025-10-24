@@ -105,6 +105,7 @@ services:
       - "ops.acme.test:host-gateway"
       - "account-service:host-gateway"
       - "samlidp.acme.test:host-gateway"
+      - "authzen.openid.test:host-gateway"
     ports:
       - "8080:8080"
  #     - "9090:9090"

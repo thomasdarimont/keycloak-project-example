@@ -1,6 +1,5 @@
-package com.github.thomasdarimont.keycloak.custom.auth.opa;
+package com.github.thomasdarimont.keycloak.custom.auth.authzen;
 
-import com.github.thomasdarimont.keycloak.custom.auth.authzen.AuthZen;
 import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
 import com.github.thomasdarimont.keycloak.custom.config.ConfigAccessor;
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
@@ -28,48 +27,44 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @JBossLog
-public class OpaClient {
+public class AuthzenClient {
 
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
-    public static final String OPA_ACTION_LOGIN = "login";
+    public static final String DEFAULT_AUTHZ_URL = "http://acme-opa:8181/v1/data/iam/keycloak/allow";
 
-    public static final String OPA_ACTION_CHECK_ACCESS = "check_access";
+    public static final String ACTION = "action";
 
-    public static final String DEFAULT_OPA_AUTHZ_URL = "http://acme-opa:8181/v1/data/iam/keycloak/allow";
+    public static final String DESCRIPTION = "description";
 
-    public static final String OPA_ACTION = "action";
+    public static final String RESOURCE_TYPE = "resource_type";
 
-    public static final String OPA_DESCRIPTION = "description";
+    public static final String RESOURCE_CLAIM_NAME = "resource_claim_name";
 
-    public static final String OPA_RESOURCE_TYPE = "resource_type";
+    public static final String USE_REALM_ROLES = "useRealmRoles";
 
-    public static final String OPA_RESOURCE_CLAIM_NAME = "resource_claim_name";
+    public static final String USE_CLIENT_ROLES = "useClientRoles";
 
-    public static final String OPA_USE_REALM_ROLES = "useRealmRoles";
+    public static final String USER_ATTRIBUTES = "userAttributes";
 
-    public static final String OPA_USE_CLIENT_ROLES = "useClientRoles";
+    public static final String CONTEXT_ATTRIBUTES = "contextAttributes";
 
-    public static final String OPA_USER_ATTRIBUTES = "userAttributes";
+    public static final String REALM_ATTRIBUTES = "realmAttributes";
 
-    public static final String OPA_CONTEXT_ATTRIBUTES = "contextAttributes";
+    public static final String CLIENT_ATTRIBUTES = "clientAttributes";
 
-    public static final String OPA_REALM_ATTRIBUTES = "realmAttributes";
+    public static final String REQUEST_HEADERS = "requestHeaders";
 
-    public static final String OPA_CLIENT_ATTRIBUTES = "clientAttributes";
+    public static final String USE_GROUPS = "useGroups";
 
-    public static final String OPA_REQUEST_HEADERS = "requestHeaders";
+    public static final String AUTHZ_URL = "authzUrl";
 
-    public static final String OPA_USE_GROUPS = "useGroups";
-
-    public static final String OPA_AUTHZ_URL = "authzUrl";
-
-    public OpaAccessResponse checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName) {
+    public AuthZen.Decision checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName) {
         var resource = createResource(config, realm, client);
         return checkAccess(session, config, realm, user, client, actionName, resource);
     }
 
-    public OpaAccessResponse checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName, AuthZen.Resource resource) {
+    public AuthZen.Decision checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName, AuthZen.Resource resource) {
 
         var subject = createSubject(config, user, client);
         var accessContext = createAccessContext(session, config, user);
@@ -77,33 +72,33 @@ public class OpaClient {
         var accessRequest = new AuthZen.AccessRequest(subject, resource, accessContext, action);
 
         try {
-            log.infof("Sending OPA check access request. realm=%s user=%s client=%s actionName=%s resource=%s\n%s", //
+            log.infof("Sending Authzen request. realm=%s user=%s client=%s actionName=%s resource=%s\n%s", //
                     realm.getName(), user.getUsername(), client.getClientId(), actionName, resource, JsonSerialization.writeValueAsPrettyString(accessRequest));
         } catch (IOException ioe) {
-            log.warn("Failed to prepare check access request", ioe);
+            log.warn("Failed to prepare Authzen request", ioe);
         }
 
-        var authzUrl = config.getString(OPA_AUTHZ_URL, DEFAULT_OPA_AUTHZ_URL);
+        var authzUrl = config.getString(AUTHZ_URL, DEFAULT_AUTHZ_URL);
         var request = SimpleHttp.create(session).doPost(authzUrl);
-        request.json(Map.of("input", accessRequest));
+        request.json(accessRequest);
 
         var accessResponse = fetchResponse(request);
 
         try {
-            log.infof("Received OPA authorization response. realm=%s user=%s client=%s\n%s", //
+            log.infof("Received Authzen response. realm=%s user=%s client=%s\n%s", //
                     realm.getName(), user.getUsername(), client.getClientId(), JsonSerialization.writeValueAsPrettyString(accessResponse));
         } catch (IOException ioe) {
-            log.warn("Failed to process received check access response", ioe);
+            log.warn("Failed to process Authzen response", ioe);
         }
         return accessResponse;
     }
 
     protected AuthZen.Subject createSubject(ConfigAccessor config, UserModel user, ClientModel client) {
         var username = user.getUsername();
-        var realmRoles = config.getBoolean(OPA_USE_REALM_ROLES, true) ? fetchRealmRoles(user) : null;
-        var clientRoles = config.getBoolean(OPA_USE_CLIENT_ROLES, true) ? fetchClientRoles(user, client) : null;
-        var userAttributes = config.isConfigured(OPA_USER_ATTRIBUTES, true) ? extractUserAttributes(user, config) : null;
-        var groups = config.getBoolean(OPA_USE_GROUPS, true) ? fetchGroupNames(user) : null;
+        var realmRoles = config.getBoolean(USE_REALM_ROLES, true) ? fetchRealmRoles(user) : null;
+        var clientRoles = config.getBoolean(USE_CLIENT_ROLES, true) ? fetchClientRoles(user, client) : null;
+        var userAttributes = config.isConfigured(USER_ATTRIBUTES, true) ? extractUserAttributes(user, config) : null;
+        var groups = config.getBoolean(USE_GROUPS, true) ? fetchGroupNames(user) : null;
 
         var properties = new HashMap<String, Object>();
         properties.put("realmRoles", realmRoles);
@@ -114,8 +109,8 @@ public class OpaClient {
     }
 
     protected AuthZen.Resource createResource(ConfigAccessor config, RealmModel realm, ClientModel client) {
-        var realmAttributes = config.isConfigured(OPA_REALM_ATTRIBUTES, false) ? extractRealmAttributes(realm, config) : null;
-        var clientAttributes = config.isConfigured(OPA_CLIENT_ATTRIBUTES, false) ? extractClientAttributes(client, config) : null;
+        var realmAttributes = config.isConfigured(REALM_ATTRIBUTES, false) ? extractRealmAttributes(realm, config) : null;
+        var clientAttributes = config.isConfigured(CLIENT_ATTRIBUTES, false) ? extractClientAttributes(client, config) : null;
         var properties = new HashMap<String, Object>();
         properties.put("realmAttributes", realmAttributes);
         properties.put("clientAttributes", clientAttributes);
@@ -124,8 +119,8 @@ public class OpaClient {
     }
 
     protected Map<String, Object> createAccessContext(KeycloakSession session, ConfigAccessor config, UserModel user) {
-        var contextAttributes = config.isConfigured(OPA_CONTEXT_ATTRIBUTES, false) ? extractContextAttributes(session, user, config) : null;
-        var headers = config.isConfigured(OPA_REQUEST_HEADERS, false) ? extractRequestHeaders(session, config) : null;
+        var contextAttributes = config.isConfigured(CONTEXT_ATTRIBUTES, false) ? extractContextAttributes(session, user, config) : null;
+        var headers = config.isConfigured(REQUEST_HEADERS, false) ? extractRequestHeaders(session, config) : null;
         Map<String, Object> accessContext = new HashMap<>();
         accessContext.put("contextAttributes", contextAttributes);
         accessContext.put("headers", headers);
@@ -134,7 +129,7 @@ public class OpaClient {
 
     protected Map<String, Object> extractRequestHeaders(KeycloakSession session, ConfigAccessor config) {
 
-        var headerNames = config.getValue(OPA_REQUEST_HEADERS);
+        var headerNames = config.getValue(REQUEST_HEADERS);
         if (headerNames == null || headerNames.isBlank()) {
             return null;
         }
@@ -154,7 +149,7 @@ public class OpaClient {
     }
 
     protected Map<String, Object> extractContextAttributes(KeycloakSession session, UserModel user, ConfigAccessor config) {
-        var contextAttributes = extractAttributes(user, config, OPA_CONTEXT_ATTRIBUTES, (u, attr) -> {
+        var contextAttributes = extractAttributes(user, config, CONTEXT_ATTRIBUTES, (u, attr) -> {
             Object value = switch (attr) {
                 case "remoteAddress" -> session.getContext().getConnection().getRemoteAddr();
                 default -> null;
@@ -187,7 +182,7 @@ public class OpaClient {
 
     protected Map<String, Object> extractUserAttributes(UserModel user, ConfigAccessor config) {
 
-        var userAttributes = extractAttributes(user, config, OPA_USER_ATTRIBUTES, (u, attr) -> {
+        var userAttributes = extractAttributes(user, config, USER_ATTRIBUTES, (u, attr) -> {
             Object value = switch (attr) {
                 case "id" -> user.getId();
                 case "email" -> user.getEmail();
@@ -206,12 +201,12 @@ public class OpaClient {
 
     protected Map<String, Object> extractClientAttributes(ClientModel client, ConfigAccessor config) {
         var clientConfig = new ClientConfig(client);
-        return extractAttributes(client, config, OPA_CLIENT_ATTRIBUTES, (c, attr) -> clientConfig.getValue(attr), c -> null);
+        return extractAttributes(client, config, CLIENT_ATTRIBUTES, (c, attr) -> clientConfig.getValue(attr), c -> null);
     }
 
     protected Map<String, Object> extractRealmAttributes(RealmModel realm, ConfigAccessor config) {
         var realmConfig = new RealmConfig(realm);
-        return extractAttributes(realm, config, OPA_REALM_ATTRIBUTES, (r, attr) -> realmConfig.getValue(attr), r -> null);
+        return extractAttributes(realm, config, REALM_ATTRIBUTES, (r, attr) -> realmConfig.getValue(attr), r -> null);
     }
 
     protected List<String> fetchGroupNames(UserModel user) {
@@ -254,16 +249,16 @@ public class OpaClient {
         return Map.of("id", user.getId(), "email", user.getEmail());
     }
 
-    protected OpaAccessResponse fetchResponse(SimpleHttpRequest request) {
+    protected AuthZen.Decision fetchResponse(SimpleHttpRequest request) {
         try {
             log.debugf("Fetching url=%s", request.getUrl());
 
             try (var response = request.asResponse()) {
-                return response.asJson(OpaAccessResponse.class);
+                return response.asJson(AuthZen.Decision.class);
             }
         } catch (IOException e) {
-            log.error("OPA access request failed", e);
-            return new OpaAccessResponse(new AuthZen.Decision(false, Map.of("hint", Messages.ACCESS_DENIED)));
+            log.error("Authzen access request failed", e);
+            return new AuthZen.Decision(false, Map.of("hint", Messages.ACCESS_DENIED));
         }
     }
 

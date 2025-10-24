@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.opa;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.thomasdarimont.keycloak.custom.auth.authzen.AuthZen;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -46,4 +47,5 @@ public class OpaAccessResponse {
         }
         this.additionalData.put(key, value);
     }
+
 }

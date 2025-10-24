@@ -1,4 +1,4 @@
-package com.github.thomasdarimont.keycloak.custom.auth.opa;
+package com.github.thomasdarimont.keycloak.custom.auth.authzen;
 
 import java.util.Map;
 
