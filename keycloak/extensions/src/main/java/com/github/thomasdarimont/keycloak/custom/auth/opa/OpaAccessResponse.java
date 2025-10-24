@@ -12,24 +12,27 @@ import java.util.Map;
 @NoArgsConstructor
 public class OpaAccessResponse {
 
-    private Map<String, Object> result;
+    private AuthZen.Decision result;
 
     private Map<String, Object> additionalData;
 
-    public OpaAccessResponse(Map<String, Object> result) {
+    public OpaAccessResponse(AuthZen.Decision result) {
         this.result = result;
     }
 
     @JsonIgnore
     public boolean isAllowed() {
-        return result != null && Boolean.parseBoolean(String.valueOf(result.get("allow")));
+        return result != null && result.decision();
     }
 
     public String getHint() {
         if (result == null) {
             return null;
         }
-        Object hint = result.get("hint");
+        if (result.context() == null) {
+            return null;
+        }
+        Object hint = result.context().get("hint");
         if (!(hint instanceof String)) {
             return null;
         }

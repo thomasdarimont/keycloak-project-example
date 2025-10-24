@@ -87,10 +87,7 @@ public class OpaAuthenticator implements Authenticator {
     @AutoService(AuthenticatorFactory.class)
     public static class OpaAuthenticatorFactory implements AuthenticatorFactory {
 
-
-        private OpaClient opaClient;
-
-        private static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
+        protected static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
 
         static {
             var list = ProviderConfigurationBuilder.create() //
@@ -162,6 +159,8 @@ public class OpaAuthenticator implements Authenticator {
 
             CONFIG_PROPERTIES = Collections.unmodifiableList(list);
         }
+
+        protected OpaClient opaClient;
 
         public String getId() {
             return "acme-opa-authenticator";

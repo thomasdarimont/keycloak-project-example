@@ -1,10 +1,12 @@
 services:
   acme-opa:
-    image: openpolicyagent/opa:0.67.0
+    image: openpolicyagent/opa:1.9.0
     platform: linux/amd64
     command:
       - run
       - --server
+      - --addr
+      - :8181
       - --set
       - "decision_logs.console=true"
       # Watch for changes in policy folder
