@@ -168,8 +168,7 @@ public class AuthzenClaimMapper extends AbstractOIDCProtocolMapper implements OI
         String resourceType = mappingModel.getConfig().get(AuthzenClient.RESOURCE_TYPE);
         var resource = new AuthZen.Resource(resourceType);
         var client = authSession.getClient();
-        AuthzenClient authZenClient = new AuthzenClient();
-
+        var authZenClient = new AuthzenClient();
 
         var accessResponse = authZenClient.checkAccess(keycloakSession, config, realm, user, client, action, resource);
 

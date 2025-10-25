@@ -5,8 +5,8 @@ import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
 import com.github.thomasdarimont.keycloak.custom.config.ConfigAccessor;
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import lombok.extern.jbosslog.JBossLog;
-import org.keycloak.http.simple.SimpleHttp;
-import org.keycloak.http.simple.SimpleHttpRequest;
+import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
@@ -84,7 +84,7 @@ public class OpaClient {
         }
 
         var authzUrl = config.getString(OPA_AUTHZ_URL, DEFAULT_OPA_AUTHZ_URL);
-        var request = SimpleHttp.create(session).doPost(authzUrl);
+        var request = SimpleHttp.doPost(authzUrl, session);
         request.json(Map.of("input", accessRequest));
 
         var accessResponse = fetchResponse(request);
@@ -106,10 +106,18 @@ public class OpaClient {
         var groups = config.getBoolean(OPA_USE_GROUPS, true) ? fetchGroupNames(user) : null;
 
         var properties = new HashMap<String, Object>();
-        properties.put("realmRoles", realmRoles);
-        properties.put("clientRoles", clientRoles);
-        properties.put("userAttributes", userAttributes);
-        properties.put("groups", groups);
+        if (CollectionUtil.isNotEmpty(realmRoles)) {
+            properties.put("realmRoles", realmRoles);
+        }
+        if (CollectionUtil.isNotEmpty(clientRoles)) {
+            properties.put("clientRoles", clientRoles);
+        }
+        if (userAttributes != null && !userAttributes.isEmpty()) {
+            properties.put("userAttributes", userAttributes);
+        }
+        if (CollectionUtil.isNotEmpty(groups)) {
+            properties.put("groups", groups);
+        }
         return new AuthZen.Subject("user", username, properties);
     }
 
@@ -254,7 +262,7 @@ public class OpaClient {
         return Map.of("id", user.getId(), "email", user.getEmail());
     }
 
-    protected OpaAccessResponse fetchResponse(SimpleHttpRequest request) {
+    protected OpaAccessResponse fetchResponse(SimpleHttp request) {
         try {
             log.debugf("Fetching url=%s", request.getUrl());
 

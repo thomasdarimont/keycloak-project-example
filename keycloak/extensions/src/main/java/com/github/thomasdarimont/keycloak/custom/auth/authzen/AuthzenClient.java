@@ -4,8 +4,8 @@ import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
 import com.github.thomasdarimont.keycloak.custom.config.ConfigAccessor;
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import lombok.extern.jbosslog.JBossLog;
-import org.keycloak.http.simple.SimpleHttp;
-import org.keycloak.http.simple.SimpleHttpRequest;
+import org.keycloak.broker.provider.util.SimpleHttp;
+import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.models.ClientModel;
 import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
@@ -79,7 +79,7 @@ public class AuthzenClient {
         }
 
         var authzUrl = config.getString(AUTHZ_URL, DEFAULT_AUTHZ_URL);
-        var request = SimpleHttp.create(session).doPost(authzUrl);
+        var request = SimpleHttp.doPost(authzUrl, session);
         request.json(accessRequest);
 
         var accessResponse = fetchResponse(request);
@@ -101,10 +101,18 @@ public class AuthzenClient {
         var groups = config.getBoolean(USE_GROUPS, true) ? fetchGroupNames(user) : null;
 
         var properties = new HashMap<String, Object>();
-        properties.put("realmRoles", realmRoles);
-        properties.put("clientRoles", clientRoles);
-        properties.put("userAttributes", userAttributes);
-        properties.put("groups", groups);
+        if (CollectionUtil.isNotEmpty(realmRoles)) {
+            properties.put("realmRoles", realmRoles);
+        }
+        if (CollectionUtil.isNotEmpty(clientRoles)) {
+            properties.put("clientRoles", clientRoles);
+        }
+        if (userAttributes != null && !userAttributes.isEmpty()) {
+            properties.put("userAttributes", userAttributes);
+        }
+        if (CollectionUtil.isNotEmpty(groups)) {
+            properties.put("groups", groups);
+        }
         return new AuthZen.Subject("user", username, properties);
     }
 
@@ -249,7 +257,7 @@ public class AuthzenClient {
         return Map.of("id", user.getId(), "email", user.getEmail());
     }
 
-    protected AuthZen.Decision fetchResponse(SimpleHttpRequest request) {
+    protected AuthZen.Decision fetchResponse(SimpleHttp request) {
         try {
             log.debugf("Fetching url=%s", request.getUrl());
 

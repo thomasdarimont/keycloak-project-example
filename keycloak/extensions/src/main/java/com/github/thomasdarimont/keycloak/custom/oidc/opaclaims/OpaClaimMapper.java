@@ -1,7 +1,6 @@
 package com.github.thomasdarimont.keycloak.custom.oidc.opaclaims;
 
 import com.github.thomasdarimont.keycloak.custom.auth.authzen.AuthZen;
-import com.github.thomasdarimont.keycloak.custom.auth.authzen.AuthzenClient;
 import com.github.thomasdarimont.keycloak.custom.auth.opa.OpaClient;
 import com.github.thomasdarimont.keycloak.custom.config.MapConfig;
 import com.google.auto.service.AutoService;
