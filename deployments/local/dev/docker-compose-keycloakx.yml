@@ -13,6 +13,7 @@ services:
     environment:
     # Enable remote debugging
       KC_DEBUG: "true"
+      KC_DEBUG_PORT: "*:8787"
       # DEBUG_SUSPEND: "y"
 
       JAVA_OPTS: "-XX:MaxRAMPercentage=80 -XX:+UseG1GC -Djava.net.preferIPv4Stack=true -Djava.security.egd=file:/dev/urandom"
