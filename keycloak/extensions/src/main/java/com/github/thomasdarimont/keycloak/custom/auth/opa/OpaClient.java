@@ -74,7 +74,7 @@ public class OpaClient {
         var subject = createSubject(config, user, client);
         var accessContext = createAccessContext(session, config, user);
         var action = new AuthZen.Action(actionName);
-        var accessRequest = new AuthZen.AccessRequest(subject, resource, accessContext, action);
+        var accessRequest = new AuthZen.AccessRequest(subject, action, resource, accessContext);
 
         try {
             log.infof("Sending OPA check access request. realm=%s user=%s client=%s actionName=%s resource=%s\n%s", //
@@ -271,7 +271,7 @@ public class OpaClient {
             }
         } catch (IOException e) {
             log.error("OPA access request failed", e);
-            return new OpaAccessResponse(new AuthZen.Decision(false, Map.of("hint", Messages.ACCESS_DENIED)));
+            return new OpaAccessResponse(new AuthZen.AccessResponse(false, Map.of("hint", Messages.ACCESS_DENIED)));
         }
     }
 

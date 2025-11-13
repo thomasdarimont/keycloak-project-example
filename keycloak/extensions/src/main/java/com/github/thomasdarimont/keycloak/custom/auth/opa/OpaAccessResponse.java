@@ -13,11 +13,11 @@ import java.util.Map;
 @NoArgsConstructor
 public class OpaAccessResponse {
 
-    private AuthZen.Decision result;
+    private AuthZen.AccessResponse result;
 
     private Map<String, Object> additionalData;
 
-    public OpaAccessResponse(AuthZen.Decision result) {
+    public OpaAccessResponse(AuthZen.AccessResponse result) {
         this.result = result;
     }
 

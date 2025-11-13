@@ -6,6 +6,7 @@ import com.github.thomasdarimont.keycloak.custom.auth.opa.OpaClient;
 import com.github.thomasdarimont.keycloak.custom.config.MapConfig;
 import com.google.auto.service.AutoService;
 import lombok.extern.jbosslog.JBossLog;
+import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.models.ClientSessionContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.ProtocolMapperModel;
@@ -22,12 +23,13 @@ import org.keycloak.provider.ProviderConfigurationBuilder;
 import org.keycloak.representations.IDToken;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @JBossLog
 @AutoService(ProtocolMapper.class)
 public class AuthzenClaimMapper extends AbstractOIDCProtocolMapper implements OIDCAccessTokenMapper, OIDCIDTokenMapper, UserInfoTokenMapper {
-
 
     private static final List<ProviderConfigProperty> CONFIG_PROPERTIES;
 
@@ -36,9 +38,17 @@ public class AuthzenClaimMapper extends AbstractOIDCProtocolMapper implements OI
 
                 .property().name(AuthzenClient.AUTHZ_URL) //
                 .type(ProviderConfigProperty.STRING_TYPE) //
-                .label("Authz Server Policy URL") //
+                .label("Authzen Policy URL") //
                 .defaultValue(OpaClient.DEFAULT_OPA_AUTHZ_URL) //
-                .helpText("URL of OPA Authz Server Policy Resource") //
+                .helpText("URL of Authzen Policy URL") //
+                .add() //
+
+                .property().name(AuthzenClient.AUTHZ_TYPE) //
+                .type(ProviderConfigProperty.LIST_TYPE) //
+                .label("Authzen call type") //
+                .options(AuthzenClient.AUTHZ_TYPE_ACCESS, AuthzenClient.AUTHZ_TYPE_SEARCH)
+                .defaultValue(AuthzenClient.AUTHZ_TYPE_ACCESS) //
+                .helpText("Type of the Authzen API call") //
                 .add() //
 
                 .property().name(AuthzenClient.USER_ATTRIBUTES) //
@@ -125,6 +135,13 @@ public class AuthzenClaimMapper extends AbstractOIDCProtocolMapper implements OI
                 .helpText("If enabled, group information will be sent with authz requests.") //
                 .add() //
 
+                .property().name(AuthzenClient.USE_USER_ATTRIBUTES) //
+                .type(ProviderConfigProperty.BOOLEAN_TYPE) //
+                .label("Use user attributes") //
+                .defaultValue("true") //
+                .helpText("If enabled, user attribute information will be sent with authz requests based on the selection of user attributes.") //
+                .add() //
+
                 .build();
 
         OIDCAttributeMapperHelper.addAttributeConfig(list, UserPropertyMapper.class);
@@ -144,7 +161,7 @@ public class AuthzenClaimMapper extends AbstractOIDCProtocolMapper implements OI
 
     @Override
     public String getHelpText() {
-        return "Executes an Authzen Policy to obtain claims to add to the Token";
+        return "Uses the Authzen Search API to obtain claims to add to the Token";
     }
 
     @Override
@@ -170,17 +187,54 @@ public class AuthzenClaimMapper extends AbstractOIDCProtocolMapper implements OI
         var client = authSession.getClient();
         var authZenClient = new AuthzenClient();
 
-        var accessResponse = authZenClient.checkAccess(keycloakSession, config, realm, user, client, action, resource);
-
-        if (accessResponse == null) {
-            return;
+        String authzenType = mappingModel.getConfig().get(AuthzenClient.AUTHZ_TYPE);
+        switch (authzenType) {
+            case AuthzenClient.AUTHZ_TYPE_ACCESS -> {
+                var accessResponse = authZenClient.checkAccess(keycloakSession, config, realm, user, client, action, resource);
+                if (accessResponse == null) {
+                    return;
+                }
+                copyAccessResultToClaim(token, config, accessResponse);
+            }
+            case AuthzenClient.AUTHZ_TYPE_SEARCH -> {
+                var searchResponse = authZenClient.search(keycloakSession, config, realm, user, client, action, resource);
+                if (searchResponse == null || CollectionUtil.isEmpty(searchResponse.results())) {
+                    return;
+                }
+                copySearchResultToClaim(token, config, searchResponse);
+            }
+            case null -> {
+                // NOOP
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + authzenType);
         }
 
+    }
+
+    protected void copyAccessResultToClaim(IDToken token, MapConfig config, AuthZen.AccessResponse accessResponse) {
+        // TODO implement me
+    }
+
+    protected void copySearchResultToClaim(IDToken token, MapConfig config, AuthZen.SearchResponse searchResponse) {
         String targetClaimName = config.getString("claim.name");
         String sourceClaimName = config.getString(AuthzenClient.RESOURCE_CLAIM_NAME);
 
-        if (accessResponse.decision()) {
-            token.setOtherClaims(targetClaimName, accessResponse.context().get(sourceClaimName));
+        List<AuthZen.Resource> results = searchResponse.results();
+        Set<Object> values = new LinkedHashSet<>(results.size());
+        for (AuthZen.Resource result : results) {
+
+            if ("id".equals(sourceClaimName)) {
+                values.add(result.id());
+            } else if ("type".equals(sourceClaimName)) {
+                values.add(result.type());
+            } else {
+                if (result.properties() != null) {
+                    Object value = result.properties().get(sourceClaimName);
+                    values.add(value);
+                }
+            }
         }
+
+        token.setOtherClaims(targetClaimName, values);
     }
 }

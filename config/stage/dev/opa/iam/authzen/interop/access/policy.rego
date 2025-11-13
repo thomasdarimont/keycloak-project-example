@@ -8,7 +8,7 @@ default decision := {
 }
 
 decision := result if {
-	ids := [r.id | r := data.iam.authzen.interop.access.records[_]; can_access(r)]
+	ids := [r.id | r := data.iam.authzen.interop.records[_]; can_access(r)]
 	result := {
 		"decision": count(ids) > 0,
 		"context": {"record": ids},

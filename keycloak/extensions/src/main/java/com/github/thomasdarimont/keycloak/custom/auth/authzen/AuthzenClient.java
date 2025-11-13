@@ -2,6 +2,7 @@ package com.github.thomasdarimont.keycloak.custom.auth.authzen;
 
 import com.github.thomasdarimont.keycloak.custom.config.ClientConfig;
 import com.github.thomasdarimont.keycloak.custom.config.ConfigAccessor;
+import com.github.thomasdarimont.keycloak.custom.config.MapConfig;
 import com.github.thomasdarimont.keycloak.custom.config.RealmConfig;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.broker.provider.util.SimpleHttp;
@@ -13,7 +14,6 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.utils.RoleUtils;
-import org.keycloak.services.messages.Messages;
 import org.keycloak.util.JsonSerialization;
 
 import java.io.IOException;
@@ -45,6 +45,8 @@ public class AuthzenClient {
 
     public static final String USE_CLIENT_ROLES = "useClientRoles";
 
+    public static final String USE_USER_ATTRIBUTES = "useUserAttributes";
+
     public static final String USER_ATTRIBUTES = "userAttributes";
 
     public static final String CONTEXT_ATTRIBUTES = "contextAttributes";
@@ -59,17 +61,23 @@ public class AuthzenClient {
 
     public static final String AUTHZ_URL = "authzUrl";
 
-    public AuthZen.Decision checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName) {
+    public static final String AUTHZ_TYPE = "authz_type";
+
+    public static final String AUTHZ_TYPE_ACCESS = "access";
+
+    public static final String AUTHZ_TYPE_SEARCH = "search";
+
+    public AuthZen.AccessResponse checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName) {
         var resource = createResource(config, realm, client);
         return checkAccess(session, config, realm, user, client, actionName, resource);
     }
 
-    public AuthZen.Decision checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName, AuthZen.Resource resource) {
+    public AuthZen.AccessResponse checkAccess(KeycloakSession session, ConfigAccessor config, RealmModel realm, UserModel user, ClientModel client, String actionName, AuthZen.Resource resource) {
 
         var subject = createSubject(config, user, client);
         var accessContext = createAccessContext(session, config, user);
         var action = new AuthZen.Action(actionName);
-        var accessRequest = new AuthZen.AccessRequest(subject, resource, accessContext, action);
+        var accessRequest = new AuthZen.AccessRequest(subject, action, resource, accessContext);
 
         try {
             log.infof("Sending Authzen request. realm=%s user=%s client=%s actionName=%s resource=%s\n%s", //
@@ -82,22 +90,57 @@ public class AuthzenClient {
         var request = SimpleHttp.doPost(authzUrl, session);
         request.json(accessRequest);
 
-        var accessResponse = fetchResponse(request);
-
         try {
+            var accessResponse = fetchResponse(request, AuthZen.AccessResponse.class);
             log.infof("Received Authzen response. realm=%s user=%s client=%s\n%s", //
                     realm.getName(), user.getUsername(), client.getClientId(), JsonSerialization.writeValueAsPrettyString(accessResponse));
+            return accessResponse;
         } catch (IOException ioe) {
             log.warn("Failed to process Authzen response", ioe);
         }
-        return accessResponse;
+        return null;
+    }
+
+
+    public AuthZen.SearchResponse search(KeycloakSession session, MapConfig config, RealmModel realm, UserModel user, ClientModel client, String actionName, AuthZen.Resource resource) {
+        var subject = createSubject(config, user, client);
+        var accessContext = createAccessContext(session, config, user);
+        var action = new AuthZen.Action(actionName);
+        var accessRequest = new AuthZen.AccessRequest(subject, action, resource, accessContext);
+
+        try {
+            log.infof("Sending Authzen search request. realm=%s user=%s client=%s actionName=%s resource=%s\n%s", //
+                    realm.getName(), user.getUsername(), client.getClientId(), actionName, resource, JsonSerialization.writeValueAsPrettyString(accessRequest));
+        } catch (IOException ioe) {
+            log.warn("Failed to prepare Authzen search request", ioe);
+        }
+
+        var authzUrl = config.getString(AUTHZ_URL, DEFAULT_AUTHZ_URL);
+        var request = SimpleHttp.doPost(authzUrl, session);
+        request.json(accessRequest);
+
+        try {
+            var searchResponse = fetchResponse(request, AuthZen.SearchResponse.class);
+            log.infof("Received Authzen search response. realm=%s user=%s client=%s\n%s", //
+                    realm.getName(), user.getUsername(), client.getClientId(), JsonSerialization.writeValueAsPrettyString(searchResponse));
+            return searchResponse;
+        } catch (IOException ioe) {
+            log.warn("Failed to process Authzen search response", ioe);
+        }
+
+        return null;
     }
 
     protected AuthZen.Subject createSubject(ConfigAccessor config, UserModel user, ClientModel client) {
         var username = user.getUsername();
         var realmRoles = config.getBoolean(USE_REALM_ROLES, true) ? fetchRealmRoles(user) : null;
         var clientRoles = config.getBoolean(USE_CLIENT_ROLES, true) ? fetchClientRoles(user, client) : null;
-        var userAttributes = config.isConfigured(USER_ATTRIBUTES, true) ? extractUserAttributes(user, config) : null;
+        Map<String, Object> userAttributes;
+        if (config.getBoolean(USE_USER_ATTRIBUTES, true)) {
+            userAttributes = config.isConfigured(USER_ATTRIBUTES, true) ? extractUserAttributes(user, config) : null;
+        } else {
+            userAttributes = null;
+        }
         var groups = config.getBoolean(USE_GROUPS, true) ? fetchGroupNames(user) : null;
 
         var properties = new HashMap<String, Object>();
@@ -112,6 +155,9 @@ public class AuthzenClient {
         }
         if (CollectionUtil.isNotEmpty(groups)) {
             properties.put("groups", groups);
+        }
+        if (properties.isEmpty()) {
+            properties = null;
         }
         return new AuthZen.Subject("user", username, properties);
     }
@@ -130,9 +176,19 @@ public class AuthzenClient {
         var contextAttributes = config.isConfigured(CONTEXT_ATTRIBUTES, false) ? extractContextAttributes(session, user, config) : null;
         var headers = config.isConfigured(REQUEST_HEADERS, false) ? extractRequestHeaders(session, config) : null;
         Map<String, Object> accessContext = new HashMap<>();
-        accessContext.put("contextAttributes", contextAttributes);
-        accessContext.put("headers", headers);
-        return accessContext;
+        if (contextAttributes != null && !contextAttributes.isEmpty()) {
+            accessContext.put("contextAttributes", contextAttributes);
+        }
+
+        if (headers != null && !headers.isEmpty()) {
+            accessContext.put("headers", headers);
+        }
+
+        if (!accessContext.isEmpty()) {
+            return accessContext;
+        }
+
+        return null;
     }
 
     protected Map<String, Object> extractRequestHeaders(KeycloakSession session, ConfigAccessor config) {
@@ -257,17 +313,16 @@ public class AuthzenClient {
         return Map.of("id", user.getId(), "email", user.getEmail());
     }
 
-    protected AuthZen.Decision fetchResponse(SimpleHttp request) {
+    protected <T> T fetchResponse(SimpleHttp request, Class<T> responseType) throws IOException {
         try {
             log.debugf("Fetching url=%s", request.getUrl());
 
             try (var response = request.asResponse()) {
-                return response.asJson(AuthZen.Decision.class);
+                return response.asJson(responseType);
             }
         } catch (IOException e) {
-            log.error("Authzen access request failed", e);
-            return new AuthZen.Decision(false, Map.of("hint", Messages.ACCESS_DENIED));
+            log.error("Authzen request failed", e);
+            throw e;
         }
     }
-
 }
