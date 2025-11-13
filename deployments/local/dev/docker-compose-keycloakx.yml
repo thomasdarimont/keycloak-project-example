@@ -132,7 +132,7 @@ services:
       - ./keycloak-ext/keycloak-restrict-client-auth-25.0.0.jar:/opt/keycloak/providers/keycloak-restrict-client-auth.jar:z
       - ./keycloak-ext/keycloak-home-idp-discovery-25.0.0.jar:/opt/keycloak/providers/keycloak-home-idp-discovery.jar:z
       - ./keycloak-ext/apple-identity-provider-1.13.0.jar:/opt/keycloak/providers/apple-identity-provider.jar:z
-      - ./keycloak-ext/keycloak-benchmark-dataset-999.0.0-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-benchmark-dataset.jar:z
+      - ./keycloak-ext/keycloak-benchmark-dataset-0.7.jar:/opt/keycloak/providers/keycloak-benchmark-dataset.jar:z
 #      - ./keycloak-ext/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:/opt/keycloak/providers/flyweight-user-storage-provider-extension-1.0.0.0-SNAPSHOT.jar:z
       - ./keycloakx/health_check.sh:/health_check.sh:z
 
