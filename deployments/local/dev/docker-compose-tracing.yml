@@ -31,3 +31,4 @@ services:
       # -Dcom.sun.management.jmxremote.authenticate=true -Dcom.sun.management.jmxremote.password.file=/opt/keycloak/conf/jmxremote.password
 #      JAVA_TOOL_OPTIONS: '-javaagent:/opt/keycloak/opentelemetry-javaagent.jar -Dotel.javaagent.debug=false -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8790 -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -XX:FlightRecorderOptions=stackdepth=256'
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://ops.acme.test:4317'
+      KC_LOG_CONSOLE_FORMAT: "%d{HH:mm:ss} %-5p ${TRACING_LOG_FORMAT} [%c{2.}] (%t) %s%e%n"
