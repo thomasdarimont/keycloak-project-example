@@ -163,6 +163,12 @@ public class AdhocUserStorageProvider implements UserStorageProvider, //
         }
 
         @Override
+        public UserStorageProvider create(KeycloakSession session) {
+            // incorrectly callend when session.getComponentProvider(...) is used.
+            return UserStorageProviderFactory.super.create(session);
+        }
+
+        @Override
         public AdhocUserStorageProvider create(KeycloakSession session, ComponentModel model) {
             return new AdhocUserStorageProvider(session, model);
         }

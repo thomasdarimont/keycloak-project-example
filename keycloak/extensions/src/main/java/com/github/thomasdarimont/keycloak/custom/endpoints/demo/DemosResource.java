@@ -11,11 +11,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.common.util.Time;
+import org.keycloak.component.ComponentModel;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
+import org.keycloak.storage.UserStorageProvider;
 
 import java.util.Map;
 import java.util.UUID;
@@ -107,5 +109,19 @@ public class DemosResource {
         CredentialModel storedCredential = acmeUser.credentialManager().createStoredCredential(acmeModel);
 
         return Response.ok(Map.of("username", username, "userId", userId)).build();
+    }
+
+    @Path("component-provider-lookup")
+    @GET
+    public Response componentProviderLookupExample() throws Exception {
+        KeycloakContext context = session.getContext();
+
+        ComponentModel componentModel = context.getRealm().getComponentsStream(context.getRealm().getId(), UserStorageProvider.class.getName()).findFirst().orElse(null);
+        String componentId = componentModel.getId();
+//        String componentId = "8c309ce1-08cd-4fce-8b29-884d65603cbb";
+//        UserStorageProvider storageProvider = session.getComponentProvider(UserStorageProvider.class, componentId);
+        session.getProvider(UserStorageProvider.class, componentModel);
+
+        return Response.ok(Map.of("componentId", componentId)).build();
     }
 }

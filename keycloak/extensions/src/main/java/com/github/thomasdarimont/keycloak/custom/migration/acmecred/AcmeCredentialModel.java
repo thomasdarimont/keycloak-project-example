@@ -27,7 +27,9 @@ public class AcmeCredentialModel extends CredentialModel {
             PasswordCredentialData credentialData = isBlank(credentialModel.getCredentialData())
                     ? null
                     : JsonSerialization.readValue(credentialModel.getCredentialData(), PasswordCredentialData.class);
-            PasswordSecretData secretData = isBlank(credentialModel.getSecretData()) ? null : JsonSerialization.readValue(credentialModel.getSecretData(), PasswordSecretData.class);
+            PasswordSecretData secretData = isBlank(credentialModel.getSecretData())
+                    ? null
+                    : JsonSerialization.readValue(credentialModel.getSecretData(), PasswordSecretData.class);
             AcmeCredentialModel acmeCredentialModel = new AcmeCredentialModel(credentialData, secretData);
             acmeCredentialModel.setCreatedDate(credentialModel.getCreatedDate());
             acmeCredentialModel.setCredentialData(credentialModel.getCredentialData());
