@@ -24,6 +24,7 @@
         <module>apps/bff-springboot</module>
         <module>apps/bff-springboot3</module>
         <module>apps/jwt-client-authentication</module>
+        <module>apps/java-opa-embedded</module>
     </modules>
 
     <organization>
