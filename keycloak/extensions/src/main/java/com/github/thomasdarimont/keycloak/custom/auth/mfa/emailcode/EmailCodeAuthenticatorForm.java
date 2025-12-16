@@ -9,7 +9,9 @@ import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.AuthenticationFlowException;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
+import org.keycloak.authentication.CredentialValidator;
 import org.keycloak.common.util.SecretGenerator;
+import org.keycloak.credential.CredentialProvider;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailTemplateProvider;
 import org.keycloak.events.Errors;
@@ -29,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 @JBossLog
-public class EmailCodeAuthenticatorForm implements Authenticator {
+public class EmailCodeAuthenticatorForm implements Authenticator, CredentialValidator<EmailCodeCredentialProvider> {
 
     static final String ID = "acme-email-code-form";
 
@@ -175,6 +177,12 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
         }
     }
 
+    @Override
+    public EmailCodeCredentialProvider getCredentialProvider(KeycloakSession session) {
+        // needed to access CredentialTypeMetadata for selecting authenticator options
+        return (EmailCodeCredentialProvider)session.getProvider(CredentialProvider.class, EmailCodeCredentialProvider.ID);
+    }
+
     @AutoService(AuthenticatorFactory.class)
     public static class Factory implements AuthenticatorFactory {
 
@@ -185,7 +193,7 @@ public class EmailCodeAuthenticatorForm implements Authenticator {
 
         @Override
         public String getReferenceCategory() {
-            return null;
+            return EmailCodeCredentialModel.TYPE;
         }
 
         @Override

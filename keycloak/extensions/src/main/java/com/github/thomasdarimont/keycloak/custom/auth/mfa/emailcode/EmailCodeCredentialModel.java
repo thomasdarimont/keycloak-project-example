@@ -8,5 +8,6 @@ public class EmailCodeCredentialModel extends CredentialModel {
 
     public EmailCodeCredentialModel() {
         setType(TYPE);
+        setUserLabel("Email OTP");
     }
 }
