@@ -57,9 +57,13 @@ services:
       - "--health-enabled=true"
       # see https://www.keycloak.org/server/features
       # ,declarative-ui
+
+# Token Exchange V1
+#      - "--features=preview,transient-users,dynamic-scopes,admin-fine-grained-authz:v1,quick-theme,declarative-ui,oid4vc-vci"
+# Token Exchange V2
       - "--features=preview,transient-users,dynamic-scopes,admin-fine-grained-authz,quick-theme,declarative-ui,oid4vc-vci"
-  # disable token-exchange V1
       - "--features-disabled=token-exchange"
+
 #      - "--features-disabled=persistent-user-sessions"
       - "--cache=local"
       - "--proxy-headers=xforwarded"
