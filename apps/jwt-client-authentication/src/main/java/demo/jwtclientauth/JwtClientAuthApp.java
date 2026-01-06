@@ -42,6 +42,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
+/**
+ * Example for client authentication via private_key_jwt https://oauth.net/private-key-jwt/
+ */
 @Slf4j
 @SpringBootApplication
 public class JwtClientAuthApp {
@@ -71,7 +74,7 @@ public class JwtClientAuthApp {
 
             { // Signed JWT example
                 //  generate Signed JWT
-                var clientJwtToken = generateTokenSignedWithPrivateKey(clientJwtPayload, //
+                var clientJwtToken = generateClientAssertionSignedWithPrivateKey(clientJwtPayload, //
                         "apps/jwt-client-authentication/client_cert.pem", //
                         "apps/jwt-client-authentication/client_key.pem" //
                 );
@@ -104,7 +107,7 @@ public class JwtClientAuthApp {
         };
     }
 
-    private Map<String, Object> requestToken(String issuer, String clientJwtToken) {
+    private Map<String, Object> requestToken(String issuer, String clientAssertion) {
 
         var rt = new RestTemplate();
         var headers = new HttpHeaders();
@@ -113,7 +116,7 @@ public class JwtClientAuthApp {
         var requestBody = new LinkedMultiValueMap<String, String>();
         requestBody.add("grant_type", "client_credentials");
         requestBody.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
-        requestBody.add("client_assertion", clientJwtToken);
+        requestBody.add("client_assertion", clientAssertion);
 
         var tokenUrl = issuer + "/protocol/openid-connect/token";
         var responseEntity = rt.postForEntity(tokenUrl, new HttpEntity<>(requestBody, headers), Map.class);
@@ -144,7 +147,7 @@ public class JwtClientAuthApp {
         return String.valueOf(parResponse.get("request_uri"));
     }
 
-    private String generateTokenSignedWithPrivateKey(Map<String, Object> clientJwtPayload, String certLocation, String keyLocation) {
+    private String generateClientAssertionSignedWithPrivateKey(Map<String, Object> clientJwtPayload, String certLocation, String keyLocation) {
 
         try {
             // x5t header
@@ -157,21 +160,22 @@ public class JwtClientAuthApp {
             var jwsObject = new JWSObject(new JWSHeader
                     .Builder(JWSAlgorithm.RS256)
                     .type(JOSEObjectType.JWT)
-                    .keyID("mykey")
-                    .x509CertThumbprint(base64URL) // SHA-1
+//                    .keyID("mykey") // explicit kid
+                    // .x509CertThumbprint(base64URL) // SHA-1
+                    .x509CertSHA256Thumbprint(base64URL) // SHA256
                     .build(), new Payload(clientJwtPayload));
 
             var signer = new RSASSASigner(privateKey);
             jwsObject.sign(signer);
 
-            var clientJwtToken = jwsObject.serialize();
-            return clientJwtToken;
+            var clientAssertion = jwsObject.serialize();
+            return clientAssertion;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private String generateTokenSignedWithClientSecret(Map<String, Object> clientJwtPayload, String clientSecret, String certLocation) {
+    private String generateClientAssertionSignedWithClientSecret(Map<String, Object> clientJwtPayload, String clientSecret, String certLocation) {
 
         var cert = parseCertificate(certLocation);
         var base64URL = createKeyThumbprint(cert, "SHA-1");
@@ -179,7 +183,8 @@ public class JwtClientAuthApp {
         var jwsObject = new JWSObject(new JWSHeader
                 .Builder(JWSAlgorithm.HS256)
                 .type(JOSEObjectType.JWT)
-                .x509CertThumbprint(base64URL) // SHA-1
+                // .x509CertThumbprint(base64URL) // SHA-1
+                .x509CertSHA256Thumbprint(base64URL) // SHA256
                 .build(), new Payload(clientJwtPayload));
 
         try {
@@ -189,8 +194,8 @@ public class JwtClientAuthApp {
             throw new RuntimeException(e);
         }
 
-        var clientJwtToken = jwsObject.serialize();
-        return clientJwtToken;
+        var clientAssertion = jwsObject.serialize();
+        return clientAssertion;
     }
 
     private String generateClientSignedJwtToken(String clientId, String issuer, Instant issuedAt, Duration tokenLifeTime, Function<Map<String, Object>, String> jwtGenerator) throws JsonProcessingException, JOSEException {
