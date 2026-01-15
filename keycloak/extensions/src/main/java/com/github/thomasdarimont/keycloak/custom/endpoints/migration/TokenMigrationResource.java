@@ -88,7 +88,7 @@ public class TokenMigrationResource {
 
         // generate new access token response (AT+RT) with azp=target-client
         Set<ClientScopeModel> clientScope = Set.of();
-        ClientSessionContext clientSessionCtx = DefaultClientSessionContext.fromClientSessionAndClientScopes(offlineClientSession, clientScope, session);
+        ClientSessionContext clientSessionCtx = DefaultClientSessionContext.fromClientSessionAndClientScopes(offlineClientSession, clientScope, null, session);
 
         var event = new EventBuilder(realm, session);
         event.detail("migration", "true");

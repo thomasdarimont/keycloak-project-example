@@ -423,7 +423,7 @@ clients:
     #    attributes: { }
     fullScopeAllowed: false
     rootUrl: "https://www.keycloak.org/app"
-    baseUrl: "/#url=https://id.acme.test:8443/auth&realm=acme-internal&client=app-keycloak-website"
+    baseUrl: "/?url=https://id.acme.test:8443/auth&realm=acme-internal&client=app-keycloak-website"
     adminUrl: ""
     redirectUris:
       - "/*"
