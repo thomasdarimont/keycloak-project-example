@@ -1,0 +1,50 @@
+### Obtain tokens via Resource Owner Password Credentials Grant Flow
+POST {{ISSUER_A}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{INITIAL_CLIENT_ID}} &
+client_secret = {{INITIAL_CLIENT_SECRET}} &
+username = {{USER_USERNAME}} &
+password = {{USER_PASSWORD}} &
+grant_type = password &
+scope = profile+openid
+
+> {%
+    client.global.set("KC_INITIAL_ACCESS_TOKEN", response.body.access_token);
+    client.global.set("KC_INITIAL_REFRESH_TOKEN", response.body.refresh_token);
+%}
+
+### Perform (internal-to-internal) token exchange with audience extension
+# INITIAL_CLIENT -> REQUESTER_CLIENT (API-GATEWAY) -> TARGET_CLIENT
+POST {{ISSUER_A}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = urn:ietf:params:oauth:grant-type:token-exchange &
+client_id = {{REQUESTER_CLIENT_ID}} &
+client_secret = {{REQUESTER_CLIENT_SECRET}} &
+subject_token = {{KC_INITIAL_ACCESS_TOKEN}} &
+audience = {{ISSUER_B}} &
+requested_token_type = urn:ietf:params:oauth:token-type:access_token &
+subject_token_type = urn:ietf:params:oauth:token-type:access_token
+
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN_A", response.body.access_token);
+    client.global.set("XCHD_REFRESH_TOKEN_A", response.body.refresh_token);
+%}
+
+
+
+### Perform JWT Authorization Grant in Domain B
+#
+POST {{ISSUER_B}}/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = {{CLIENT_ID_B}} &
+client_secret = {{CLIENT_SECRET_B}} &
+grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer &
+assertion={{XCHD_ACCESS_TOKEN_A}}
+> {%
+    client.global.set("XCHD_ACCESS_TOKEN_B", response.body.access_token);
+    client.global.set("XCHD_REFRESH_TOKEN_B", response.body.refresh_token);
+%}
+
