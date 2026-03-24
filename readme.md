@@ -399,11 +399,3 @@ Instead of running the Keycloak Config CLI script yourself, you can register it 
 - Only select: `Synchronize files after execution.`
 
 The extensions can now be redeployed by running `Tools -> External Tools -> kc-deploy-config`
-
-## Scan Image for Vulnerabilities
-
-We use [aquasec/trivy](https://github.com/aquasecurity/trivy) to scan the generated docker image for vulnerabilities.
-
-```
-java bin/scanImage.java --image-name=acme/acme-keycloak:latest
-```
