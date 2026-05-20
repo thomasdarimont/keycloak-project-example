@@ -1,3 +1,7 @@
+// @ts-check
+/**
+ * @import {Acr, KeycloakAccountOptions, KeycloakAdapter, KeycloakConfig, KeycloakError, KeycloakFlow, KeycloakInitOptions, KeycloakLoginOptions, KeycloakLogoutOptions, KeycloakPkceMethod, KeycloakProfile, KeycloakRegisterOptions, KeycloakResourceAccess, KeycloakResponseMode, KeycloakResponseType, KeycloakRoles, KeycloakTokenParsed, OpenIdProviderMetadata} from "./keycloak.ts"
+ */
 /*
  * Copyright 2016 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
@@ -14,1860 +18,2175 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function Keycloak (config) {
-    if (!(this instanceof Keycloak)) {
-        throw new Error("The 'Keycloak' constructor must be invoked with 'new'.")
-    }
 
+const CONTENT_TYPE_JSON = 'application/json'
+
+/**
+ * @typedef {Object} Endpoints
+ * @property {() => string} authorize
+ * @property {() => string} token
+ * @property {() => string} logout
+ * @property {() => string} checkSessionIframe
+ * @property {() => string=} thirdPartyCookiesIframe
+ * @property {() => string} register
+ * @property {() => string} userinfo
+ */
+
+/**
+ * @typedef {Object} LoginIframe
+ * @property {boolean} enable
+ * @property {((error: Error | null, value?: boolean) => void)[]} callbackList
+ * @property {number} interval
+ * @property {HTMLIFrameElement=} iframe
+ * @property {string=} iframeOrigin
+ */
+
+export default class Keycloak {
+  /** @type {Pick<PromiseWithResolvers<boolean>, 'resolve' | 'reject'>[]} */
+  #refreshQueue = []
+  /** @type {KeycloakAdapter} */
+  #adapter
+  /** @type {boolean} */
+  #useNonce = true
+  /** @type {CallbackStorage} */
+  #callbackStorage
+  #logInfo = this.#createLogger(console.info)
+  #logWarn = this.#createLogger(console.warn)
+  /** @type {LoginIframe} */
+  #loginIframe = {
+    enable: true,
+    callbackList: [],
+    interval: 5
+  }
+
+  /** @type {KeycloakConfig} config */
+  #config
+  didInitialize = false
+  authenticated = false
+  loginRequired = false
+  /** @type {KeycloakResponseMode} */
+  responseMode = 'fragment'
+  /** @type {KeycloakResponseType} */
+  responseType = 'code'
+  /** @type {KeycloakFlow} */
+  flow = 'standard'
+  /** @type {number?} */
+  timeSkew = null
+  /** @type {string=} */
+  redirectUri
+  /** @type {string=} */
+  silentCheckSsoRedirectUri
+  /** @type {boolean} */
+  silentCheckSsoFallback = true
+  /** @type {KeycloakPkceMethod} */
+  pkceMethod = 'S256'
+  enableLogging = false
+  /** @type {'GET' | 'POST'} */
+  logoutMethod = 'GET'
+  /** @type {string=} */
+  scope
+  messageReceiveTimeout = 10000
+  /** @type {string=} */
+  idToken
+  /** @type {KeycloakTokenParsed=} */
+  idTokenParsed
+  /** @type {string=} */
+  token
+  /** @type {KeycloakTokenParsed=} */
+  tokenParsed
+  /** @type {string=} */
+  refreshToken
+  /** @type {KeycloakTokenParsed=} */
+  refreshTokenParsed
+  /** @type {string=} */
+  clientId
+  /** @type {string=} */
+  sessionId
+  /** @type {string=} */
+  subject
+  /** @type {string=} */
+  authServerUrl
+  /** @type {string=} */
+  realm
+  /** @type {KeycloakRoles=} */
+  realmAccess
+  /** @type {KeycloakResourceAccess=} */
+  resourceAccess
+  /** @type {KeycloakProfile=} */
+  profile
+  /** @type {{}=} */
+  userInfo
+  /** @type {Endpoints} */
+  endpoints
+  /** @type {number=} */
+  tokenTimeoutHandle
+  /** @type {() => void=} */
+  onAuthSuccess
+  /** @type {(errorData?: KeycloakError) => void=} */
+  onAuthError
+  /** @type {() => void=} */
+  onAuthRefreshSuccess
+  /** @type {() => void=} */
+  onAuthRefreshError
+  /** @type {() => void=} */
+  onTokenExpired
+  /** @type {() => void=} */
+  onAuthLogout
+  /** @type {(authenticated: boolean) => void=} */
+  onReady
+  /** @type {(status: 'success' | 'cancelled' | 'error', action: string) => void=} */
+  onActionUpdate
+
+  /**
+   * @param {KeycloakConfig} config
+   */
+  constructor (config) {
     if (typeof config !== 'string' && !isObject(config)) {
-        throw new Error("The 'Keycloak' constructor must be provided with a configuration object, or a URL to a JSON configuration file.");
+      throw new Error("The 'Keycloak' constructor must be provided with a configuration object, or a URL to a JSON configuration file.")
     }
 
     if (isObject(config)) {
-        const requiredProperties = 'oidcProvider' in config
-            ? ['clientId']
-            : ['url', 'realm', 'clientId'];
+      const requiredProperties = 'oidcProvider' in config
+        ? ['clientId']
+        : ['url', 'realm', 'clientId']
 
-        for (const property of requiredProperties) {
-            if (!config[property]) {
-                throw new Error(`The configuration object is missing the required '${property}' property.`);
-            }
+      for (const property of requiredProperties) {
+        if (!(property in config)) {
+          throw new Error(`The configuration object is missing the required '${property}' property.`)
         }
+      }
     }
-
-    var kc = this;
-    var adapter;
-    var refreshQueue = [];
-    var callbackStorage;
-
-    var loginIframe = {
-        enable: true,
-        callbackList: [],
-        interval: 5
-    };
-
-    kc.didInitialize = false;
-
-    var useNonce = true;
-    var logInfo = createLogger(console.info);
-    var logWarn = createLogger(console.warn);
 
     if (!globalThis.isSecureContext) {
-        logWarn(
-            "[KEYCLOAK] Keycloak JS must be used in a 'secure context' to function properly as it relies on browser APIs that are otherwise not available.\n" +
-            "Continuing to run your application insecurely will lead to unexpected behavior and breakage.\n\n" +
-            "For more information see: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts"
-        );
+      this.#logWarn(
+        "[KEYCLOAK] Keycloak JS must be used in a 'secure context' to function properly as it relies on browser APIs that are otherwise not available.\n" +
+                'Continuing to run your application insecurely will lead to unexpected behavior and breakage.\n\n' +
+                'For more information see: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts'
+      )
     }
 
-    kc.init = function (initOptions = {}) {
-        if (kc.didInitialize) {
-            throw new Error("A 'Keycloak' instance can only be initialized once.");
+    this.#config = config
+  }
+
+  /**
+   * @param {KeycloakInitOptions} initOptions
+   * @returns {Promise<boolean>}
+   */
+  init = async (initOptions = {}) => {
+    if (this.didInitialize) {
+      throw new Error("A 'Keycloak' instance can only be initialized once.")
+    }
+
+    this.didInitialize = true
+    this.#callbackStorage = createCallbackStorage()
+
+    const adapters = ['default', 'cordova', 'cordova-native']
+
+    if (typeof initOptions.adapter === 'string' && adapters.includes(initOptions.adapter)) {
+      this.#adapter = this.#loadAdapter(initOptions.adapter)
+    } else if (typeof initOptions.adapter === 'object') {
+      this.#adapter = initOptions.adapter
+    } else if ('Cordova' in window || 'cordova' in window) {
+      this.#adapter = this.#loadAdapter('cordova')
+    } else {
+      this.#adapter = this.#loadAdapter('default')
+    }
+
+    if (typeof initOptions.useNonce !== 'undefined') {
+      this.#useNonce = initOptions.useNonce
+    }
+
+    if (typeof initOptions.checkLoginIframe !== 'undefined') {
+      this.#loginIframe.enable = initOptions.checkLoginIframe
+    }
+
+    if (initOptions.checkLoginIframeInterval) {
+      this.#loginIframe.interval = initOptions.checkLoginIframeInterval
+    }
+
+    if (initOptions.onLoad === 'login-required') {
+      this.loginRequired = true
+    }
+
+    if (initOptions.responseMode) {
+      if (initOptions.responseMode === 'query' || initOptions.responseMode === 'fragment') {
+        this.responseMode = initOptions.responseMode
+      } else {
+        throw new Error('Invalid value for responseMode')
+      }
+    }
+
+    if (initOptions.flow) {
+      switch (initOptions.flow) {
+        case 'standard':
+          this.responseType = 'code'
+          break
+        case 'implicit':
+          this.responseType = 'id_token token'
+          break
+        case 'hybrid':
+          this.responseType = 'code id_token token'
+          break
+        default:
+          throw new Error('Invalid value for flow')
+      }
+      this.flow = initOptions.flow
+    }
+
+    if (typeof initOptions.timeSkew === 'number') {
+      this.timeSkew = initOptions.timeSkew
+    }
+
+    if (initOptions.redirectUri) {
+      this.redirectUri = initOptions.redirectUri
+    }
+
+    if (initOptions.silentCheckSsoRedirectUri) {
+      this.silentCheckSsoRedirectUri = initOptions.silentCheckSsoRedirectUri
+    }
+
+    if (typeof initOptions.silentCheckSsoFallback === 'boolean') {
+      this.silentCheckSsoFallback = initOptions.silentCheckSsoFallback
+    }
+
+    if (typeof initOptions.pkceMethod !== 'undefined') {
+      if (initOptions.pkceMethod !== 'S256' && initOptions.pkceMethod !== false) {
+        throw new TypeError(`Invalid value for pkceMethod', expected 'S256' or false but got ${initOptions.pkceMethod}.`)
+      }
+
+      this.pkceMethod = initOptions.pkceMethod
+    }
+
+    if (typeof initOptions.enableLogging === 'boolean') {
+      this.enableLogging = initOptions.enableLogging
+    }
+
+    if (initOptions.logoutMethod === 'POST') {
+      this.logoutMethod = 'POST'
+    }
+
+    if (typeof initOptions.scope === 'string') {
+      this.scope = initOptions.scope
+    }
+
+    if (typeof initOptions.messageReceiveTimeout === 'number' && initOptions.messageReceiveTimeout > 0) {
+      this.messageReceiveTimeout = initOptions.messageReceiveTimeout
+    }
+
+    await this.#loadConfig()
+    await this.#check3pCookiesSupported()
+    await this.#processInit(initOptions)
+
+    this.onReady?.(this.authenticated)
+
+    return this.authenticated
+  }
+
+  /**
+   * @param {"default" | "cordova" | "cordova-native"} type
+   * @returns {KeycloakAdapter}
+   */
+  #loadAdapter (type) {
+    if (type === 'default') {
+      return this.#loadDefaultAdapter()
+    }
+
+    if (type === 'cordova') {
+      this.#loginIframe.enable = false
+      return this.#loadCordovaAdapter()
+    }
+
+    if (type === 'cordova-native') {
+      this.#loginIframe.enable = false
+      return this.#loadCordovaNativeAdapter()
+    }
+
+    throw new Error('invalid adapter type: ' + type)
+  }
+
+  /**
+   * @returns {KeycloakAdapter}
+   */
+  #loadDefaultAdapter () {
+    /** @type {KeycloakAdapter['redirectUri']}{} */
+    const redirectUri = (options) => {
+      return options?.redirectUri || this.redirectUri || globalThis.location.href
+    }
+
+    return {
+      login: async (options) => {
+        window.location.assign(await this.createLoginUrl(options))
+        return await new Promise(() => {})
+      },
+
+      logout: async (options) => {
+        const logoutMethod = options?.logoutMethod ?? this.logoutMethod
+
+        if (logoutMethod === 'GET') {
+          window.location.replace(this.createLogoutUrl(options))
+          return
         }
 
-        kc.didInitialize = true;
+        // Create form to send POST request.
+        const form = document.createElement('form')
 
-        kc.authenticated = false;
+        form.setAttribute('method', 'POST')
+        form.setAttribute('action', this.createLogoutUrl(options))
+        form.style.display = 'none'
 
-        callbackStorage = createCallbackStorage();
-        var adapters = ['default', 'cordova', 'cordova-native'];
+        // Add data to form as hidden input fields.
+        const data = {
+          id_token_hint: this.idToken,
+          client_id: this.clientId,
+          post_logout_redirect_uri: redirectUri(options)
+        }
 
-        if (adapters.indexOf(initOptions.adapter) > -1) {
-            adapter = loadAdapter(initOptions.adapter);
-        } else if (typeof initOptions.adapter === "object") {
-            adapter = initOptions.adapter;
+        for (const [name, value] of Object.entries(data)) {
+          const input = document.createElement('input')
+
+          input.setAttribute('type', 'hidden')
+          input.setAttribute('name', name)
+          input.setAttribute('value', /** @type {string} */ (value))
+
+          form.appendChild(input)
+        }
+
+        // Append form to page and submit it to perform logout and redirect.
+        document.body.appendChild(form)
+        form.submit()
+      },
+
+      register: async (options) => {
+        window.location.assign(await this.createRegisterUrl(options))
+        return await new Promise(() => {})
+      },
+
+      accountManagement: async () => {
+        const accountUrl = this.createAccountUrl()
+        if (typeof accountUrl !== 'undefined') {
+          window.location.href = accountUrl
         } else {
-            if (window.Cordova || window.cordova) {
-                adapter = loadAdapter('cordova');
-            } else {
-                adapter = loadAdapter();
-            }
+          throw new Error('Not supported by the OIDC server')
         }
+        return await new Promise(() => {})
+      },
 
-        if (typeof initOptions.useNonce !== 'undefined') {
-            useNonce = initOptions.useNonce;
-        }
+      redirectUri
+    }
+  }
 
-        if (typeof initOptions.checkLoginIframe !== 'undefined') {
-            loginIframe.enable = initOptions.checkLoginIframe;
-        }
-
-        if (initOptions.checkLoginIframeInterval) {
-            loginIframe.interval = initOptions.checkLoginIframeInterval;
-        }
-
-        if (initOptions.onLoad === 'login-required') {
-            kc.loginRequired = true;
-        }
-
-        if (initOptions.responseMode) {
-            if (initOptions.responseMode === 'query' || initOptions.responseMode === 'fragment') {
-                kc.responseMode = initOptions.responseMode;
-            } else {
-                throw 'Invalid value for responseMode';
-            }
-        }
-
-        if (initOptions.flow) {
-            switch (initOptions.flow) {
-                case 'standard':
-                    kc.responseType = 'code';
-                    break;
-                case 'implicit':
-                    kc.responseType = 'id_token token';
-                    break;
-                case 'hybrid':
-                    kc.responseType = 'code id_token token';
-                    break;
-                default:
-                    throw 'Invalid value for flow';
-            }
-            kc.flow = initOptions.flow;
-        }
-
-        if (initOptions.timeSkew != null) {
-            kc.timeSkew = initOptions.timeSkew;
-        }
-
-        if(initOptions.redirectUri) {
-            kc.redirectUri = initOptions.redirectUri;
-        }
-
-        if (initOptions.silentCheckSsoRedirectUri) {
-            kc.silentCheckSsoRedirectUri = initOptions.silentCheckSsoRedirectUri;
-        }
-
-        if (typeof initOptions.silentCheckSsoFallback === 'boolean') {
-            kc.silentCheckSsoFallback = initOptions.silentCheckSsoFallback;
-        } else {
-            kc.silentCheckSsoFallback = true;
-        }
-
-        if (typeof initOptions.pkceMethod !== "undefined") {
-            if (initOptions.pkceMethod !== "S256" && initOptions.pkceMethod !== false) {
-                throw new TypeError(`Invalid value for pkceMethod', expected 'S256' or false but got ${initOptions.pkceMethod}.`);
-            }
-
-            kc.pkceMethod = initOptions.pkceMethod;
-        } else {
-            kc.pkceMethod = "S256";
-        }
-
-        if (typeof initOptions.enableLogging === 'boolean') {
-            kc.enableLogging = initOptions.enableLogging;
-        } else {
-            kc.enableLogging = false;
-        }
-
-        if (initOptions.logoutMethod === 'POST') {
-            kc.logoutMethod = 'POST';
-        } else {
-            kc.logoutMethod = 'GET';
-        }
-
-        if (typeof initOptions.scope === 'string') {
-            kc.scope = initOptions.scope;
-        }
-
-        if (typeof initOptions.acrValues === 'string') {
-            kc.acrValues = initOptions.acrValues;
-        }
-
-        if (typeof initOptions.messageReceiveTimeout === 'number' && initOptions.messageReceiveTimeout > 0) {
-            kc.messageReceiveTimeout = initOptions.messageReceiveTimeout;
-        } else {
-            kc.messageReceiveTimeout = 10000;
-        }
-
-        if (!kc.responseMode) {
-            kc.responseMode = 'fragment';
-        }
-        if (!kc.responseType) {
-            kc.responseType = 'code';
-            kc.flow = 'standard';
-        }
-
-        var promise = createPromise();
-
-        var initPromise = createPromise();
-        initPromise.promise.then(function() {
-            kc.onReady && kc.onReady(kc.authenticated);
-            promise.setSuccess(kc.authenticated);
-        }).catch(function(error) {
-            promise.setError(error);
-        });
-
-        var configPromise = loadConfig();
-
-        function onLoad() {
-            var doLogin = function(prompt) {
-                if (!prompt) {
-                    options.prompt = 'none';
-                }
-
-                if (initOptions.locale) {
-                    options.locale = initOptions.locale;
-                }
-                kc.login(options).then(function () {
-                    initPromise.setSuccess();
-                }).catch(function (error) {
-                    initPromise.setError(error);
-                });
-            }
-
-            var checkSsoSilently = async function() {
-                var ifrm = document.createElement("iframe");
-                var src = await kc.createLoginUrl({prompt: 'none', redirectUri: kc.silentCheckSsoRedirectUri});
-                ifrm.setAttribute("src", src);
-                ifrm.setAttribute("sandbox", "allow-storage-access-by-user-activation allow-scripts allow-same-origin");
-                ifrm.setAttribute("title", "keycloak-silent-check-sso");
-                ifrm.style.display = "none";
-                document.body.appendChild(ifrm);
-
-                var messageCallback = function(event) {
-                    if (event.origin !== window.location.origin || ifrm.contentWindow !== event.source) {
-                        return;
-                    }
-
-                    var oauth = parseCallback(event.data);
-                    processCallback(oauth, initPromise);
-
-                    document.body.removeChild(ifrm);
-                    window.removeEventListener("message", messageCallback);
-                };
-
-                window.addEventListener("message", messageCallback);
-            };
-
-            var options = {};
-            switch (initOptions.onLoad) {
-                case 'check-sso':
-                    if (loginIframe.enable) {
-                        setupCheckLoginIframe().then(function() {
-                            checkLoginIframe().then(function (unchanged) {
-                                if (!unchanged) {
-                                    kc.silentCheckSsoRedirectUri ? checkSsoSilently() : doLogin(false);
-                                } else {
-                                    initPromise.setSuccess();
-                                }
-                            }).catch(function (error) {
-                                initPromise.setError(error);
-                            });
-                        });
-                    } else {
-                        kc.silentCheckSsoRedirectUri ? checkSsoSilently() : doLogin(false);
-                    }
-                    break;
-                case 'login-required':
-                    doLogin(true);
-                    break;
-                default:
-                    throw 'Invalid value for onLoad';
-            }
-        }
-
-        function processInit() {
-            var callback = parseCallback(window.location.href);
-
-            if (callback) {
-                window.history.replaceState(window.history.state, null, callback.newUrl);
-            }
-
-            if (callback && callback.valid) {
-                return setupCheckLoginIframe().then(function() {
-                    processCallback(callback, initPromise);
-                }).catch(function (error) {
-                    initPromise.setError(error);
-                });
-            }
-
-            if (initOptions.token && initOptions.refreshToken) {
-                setToken(initOptions.token, initOptions.refreshToken, initOptions.idToken);
-
-                if (loginIframe.enable) {
-                    setupCheckLoginIframe().then(function() {
-                        checkLoginIframe().then(function (unchanged) {
-                            if (unchanged) {
-                                kc.onAuthSuccess && kc.onAuthSuccess();
-                                initPromise.setSuccess();
-                                scheduleCheckIframe();
-                            } else {
-                                initPromise.setSuccess();
-                            }
-                        }).catch(function (error) {
-                            initPromise.setError(error);
-                        });
-                    });
-                } else {
-                    kc.updateToken(-1).then(function() {
-                        kc.onAuthSuccess && kc.onAuthSuccess();
-                        initPromise.setSuccess();
-                    }).catch(function(error) {
-                        kc.onAuthError && kc.onAuthError();
-                        if (initOptions.onLoad) {
-                            onLoad();
-                        } else {
-                            initPromise.setError(error);
-                        }
-                    });
-                }
-            } else if (initOptions.onLoad) {
-                onLoad();
-            } else {
-                initPromise.setSuccess();
-            }
-        }
-
-        configPromise.then(function () {
-            check3pCookiesSupported()
-                .then(processInit)
-                .catch(function (error) {
-                    promise.setError(error);
-                });
-        });
-        configPromise.catch(function (error) {
-            promise.setError(error);
-        });
-
-        return promise.promise;
+  /**
+   * @returns {KeycloakAdapter}
+   */
+  #loadCordovaAdapter () {
+    /**
+     * @param {string} loginUrl
+     * @param {string} target
+     * @param {string} options
+     * @returns {WindowProxy | null}
+     */
+    const cordovaOpenWindowWrapper = (loginUrl, target, options) => {
+      if (window.cordova && window.cordova.InAppBrowser) {
+        // Use inappbrowser for IOS and Android if available
+        return window.cordova.InAppBrowser.open(loginUrl, target, options)
+      } else {
+        return window.open(loginUrl, target, options)
+      }
     }
 
-    kc.login = function (options) {
-        return adapter.login(options);
+    const shallowCloneCordovaOptions = (userOptions) => {
+      if (userOptions && userOptions.cordovaOptions) {
+        return Object.keys(userOptions.cordovaOptions).reduce((options, optionName) => {
+          options[optionName] = userOptions.cordovaOptions[optionName]
+          return options
+        }, {})
+      } else {
+        return {}
+      }
     }
 
-    function generateRandomData(len) {
-        if (typeof crypto === "undefined" || typeof crypto.getRandomValues === "undefined") {
-            throw new Error("Web Crypto API is not available.");
-        }
-
-        return crypto.getRandomValues(new Uint8Array(len));
+    const formatCordovaOptions = (cordovaOptions) => {
+      return Object.keys(cordovaOptions).reduce((options, optionName) => {
+        options.push(optionName + '=' + cordovaOptions[optionName])
+        return options
+      }, []).join(',')
     }
 
-    function generateCodeVerifier(len) {
-        return generateRandomString(len, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789');
+    const createCordovaOptions = (userOptions) => {
+      const cordovaOptions = shallowCloneCordovaOptions(userOptions)
+      cordovaOptions.location = 'no'
+      if (userOptions && userOptions.prompt === 'none') {
+        cordovaOptions.hidden = 'yes'
+      }
+      return formatCordovaOptions(cordovaOptions)
     }
 
-    function generateRandomString(len, alphabet){
-        var randomData = generateRandomData(len);
-        var chars = new Array(len);
-        for (var i = 0; i < len; i++) {
-            chars[i] = alphabet.charCodeAt(randomData[i] % alphabet.length);
-        }
-        return String.fromCharCode.apply(null, chars);
+    const getCordovaRedirectUri = () => {
+      return this.redirectUri || 'http://localhost'
     }
 
-    async function generatePkceChallenge(pkceMethod, codeVerifier) {
-        if (pkceMethod !== "S256") {
-            throw new TypeError(`Invalid value for 'pkceMethod', expected 'S256' but got '${pkceMethod}'.`);
-        }
+    return {
+      login: async (options) => {
+        const cordovaOptions = createCordovaOptions(options)
+        const loginUrl = await this.createLoginUrl(options)
+        const ref = cordovaOpenWindowWrapper(loginUrl, '_blank', cordovaOptions)
+        let completed = false
+        let closed = false
 
-        // hash codeVerifier, then encode as url-safe base64 without padding
-        const hashBytes = new Uint8Array(await sha256Digest(codeVerifier));
-        const encodedHash = bytesToBase64(hashBytes)
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/\=/g, '');
-
-        return encodedHash;
-    }
-
-    function buildClaimsParameter(requestedAcr){
-        var claims = {
-            id_token: {
-                acr: requestedAcr
-            }
-        }
-        return JSON.stringify(claims);
-    }
-
-    kc.createLoginUrl = async function(options) {
-        var state = createUUID();
-        var nonce = createUUID();
-
-        var redirectUri = adapter.redirectUri(options);
-
-        var callbackState = {
-            state: state,
-            nonce: nonce,
-            redirectUri: encodeURIComponent(redirectUri),
-            loginOptions: options
+        function closeBrowser () {
+          closed = true
+          ref.close()
         };
 
-        if (options && options.prompt) {
-            callbackState.prompt = options.prompt;
-        }
+        return await new Promise((resolve, reject) => {
+          ref.addEventListener('loadstart', async (event) => {
+            if (event.url.indexOf(getCordovaRedirectUri()) === 0) {
+              const callback = this.#parseCallback(event.url)
+              completed = true
+              closeBrowser()
 
-        var baseUrl;
-        if (options && options.action == 'register') {
-            baseUrl = kc.endpoints.register();
-        } else {
-            baseUrl = kc.endpoints.authorize();
-        }
-
-        var scope = options && options.scope || kc.scope;
-        if (!scope) {
-            // if scope is not set, default to "openid"
-            scope = "openid";
-        } else if (scope.indexOf("openid") === -1) {
-            // if openid scope is missing, prefix the given scopes with it
-            scope = "openid " + scope;
-        }
-
-        var url = baseUrl
-            + '?client_id=' + encodeURIComponent(kc.clientId)
-            + '&redirect_uri=' + encodeURIComponent(redirectUri)
-            + '&state=' + encodeURIComponent(state)
-            + '&response_mode=' + encodeURIComponent(kc.responseMode)
-            + '&response_type=' + encodeURIComponent(kc.responseType)
-            + '&scope=' + encodeURIComponent(scope);
-        if (useNonce) {
-            url = url + '&nonce=' + encodeURIComponent(nonce);
-        }
-
-        if (options && options.prompt) {
-            url += '&prompt=' + encodeURIComponent(options.prompt);
-        }
-
-        if (options && typeof options.maxAge === 'number') {
-            url += '&max_age=' + encodeURIComponent(options.maxAge);
-        }
-
-        if (options && options.loginHint) {
-            url += '&login_hint=' + encodeURIComponent(options.loginHint);
-        }
-
-        if (options && options.idpHint) {
-            url += '&kc_idp_hint=' + encodeURIComponent(options.idpHint);
-        }
-
-        if (options && options.action && options.action != 'register') {
-            url += '&kc_action=' + encodeURIComponent(options.action);
-        }
-
-        if (options && options.locale) {
-            url += '&ui_locales=' + encodeURIComponent(options.locale);
-        }
-
-        if (options && options.acr) {
-            var claimsParameter = buildClaimsParameter(options.acr);
-            url += '&claims=' + encodeURIComponent(claimsParameter);
-        }
-
-        if ((options && options.acrValues) || kc.acrValues) {
-            url += '&acr_values=' + encodeURIComponent(options.acrValues || kc.acrValues);
-        }
-
-        if (kc.pkceMethod) {
-            try {
-                const codeVerifier = generateCodeVerifier(96);
-                const pkceChallenge = await generatePkceChallenge(kc.pkceMethod, codeVerifier);
-
-                callbackState.pkceCodeVerifier = codeVerifier;
-
-                url += '&code_challenge=' + pkceChallenge;
-                url += '&code_challenge_method=' + kc.pkceMethod;
-            } catch (error) {
-                throw new Error("Failed to generate PKCE challenge.", { cause: error });
+              try {
+                await this.#processCallback(callback)
+                resolve()
+              } catch (error) {
+                reject(error)
+              }
             }
-        }
+          })
 
-        callbackStorage.add(callbackState);
+          ref.addEventListener('loaderror', async (event) => {
+            if (!completed) {
+              if (event.url.indexOf(getCordovaRedirectUri()) === 0) {
+                const callback = this.#parseCallback(event.url)
+                completed = true
+                closeBrowser()
 
-        return url;
-    }
-
-    kc.logout = function(options) {
-        return adapter.logout(options);
-    }
-
-    kc.createLogoutUrl = function(options) {
-
-        const logoutMethod = options?.logoutMethod ?? kc.logoutMethod;
-        if (logoutMethod === 'POST') {
-            return kc.endpoints.logout();
-        }
-
-        var url = kc.endpoints.logout()
-            + '?client_id=' + encodeURIComponent(kc.clientId)
-            + '&post_logout_redirect_uri=' + encodeURIComponent(adapter.redirectUri(options, false));
-
-        if (kc.idToken) {
-            url += '&id_token_hint=' + encodeURIComponent(kc.idToken);
-        }
-
-        return url;
-    }
-
-    kc.register = function (options) {
-        return adapter.register(options);
-    }
-
-    kc.createRegisterUrl = async function(options) {
-        if (!options) {
-            options = {};
-        }
-        options.action = 'register';
-        return await kc.createLoginUrl(options);
-    }
-
-    kc.createAccountUrl = function(options) {
-        var realm = getRealmUrl();
-        var url = undefined;
-        if (typeof realm !== 'undefined') {
-            url = realm
-            + '/account'
-            + '?referrer=' + encodeURIComponent(kc.clientId)
-            + '&referrer_uri=' + encodeURIComponent(adapter.redirectUri(options));
-        }
-        return url;
-    }
-
-    kc.accountManagement = function() {
-        return adapter.accountManagement();
-    }
-
-    kc.hasRealmRole = function (role) {
-        var access = kc.realmAccess;
-        return !!access && access.roles.indexOf(role) >= 0;
-    }
-
-    kc.hasResourceRole = function(role, resource) {
-        if (!kc.resourceAccess) {
-            return false;
-        }
-
-        var access = kc.resourceAccess[resource || kc.clientId];
-        return !!access && access.roles.indexOf(role) >= 0;
-    }
-
-    kc.loadUserProfile = function() {
-        var url = getRealmUrl() + '/account';
-        var req = new XMLHttpRequest();
-        req.open('GET', url, true);
-        req.setRequestHeader('Accept', 'application/json');
-        req.setRequestHeader('Authorization', 'bearer ' + kc.token);
-
-        var promise = createPromise();
-
-        req.onreadystatechange = function () {
-            if (req.readyState == 4) {
-                if (req.status == 200) {
-                    kc.profile = JSON.parse(req.responseText);
-                    promise.setSuccess(kc.profile);
-                } else {
-                    promise.setError();
+                try {
+                  await this.#processCallback(callback)
+                  resolve()
+                } catch (error) {
+                  reject(error)
                 }
+              } else {
+                reject(new Error('Unable to process login.'))
+                closeBrowser()
+              }
             }
-        }
+          })
 
-        req.send();
-
-        return promise.promise;
-    }
-
-    kc.loadUserInfo = function() {
-        var url = kc.endpoints.userinfo();
-        var req = new XMLHttpRequest();
-        req.open('GET', url, true);
-        req.setRequestHeader('Accept', 'application/json');
-        req.setRequestHeader('Authorization', 'bearer ' + kc.token);
-
-        var promise = createPromise();
-
-        req.onreadystatechange = function () {
-            if (req.readyState == 4) {
-                if (req.status == 200) {
-                    kc.userInfo = JSON.parse(req.responseText);
-                    promise.setSuccess(kc.userInfo);
-                } else {
-                    promise.setError();
-                }
+          ref.addEventListener('exit', function (event) {
+            if (!closed) {
+              reject(new Error('User closed the login window.'))
             }
-        }
+          })
+        })
+      },
 
-        req.send();
+      logout: async (options) => {
+        const logoutUrl = this.createLogoutUrl(options)
+        const ref = cordovaOpenWindowWrapper(logoutUrl, '_blank', 'location=no,hidden=yes,clearcache=yes')
+        let error = false
 
-        return promise.promise;
-    }
+        ref.addEventListener('loadstart', (event) => {
+          if (event.url.indexOf(getCordovaRedirectUri()) === 0) {
+            ref.close()
+          }
+        })
 
-    kc.isTokenExpired = function(minValidity) {
-        if (!kc.tokenParsed || (!kc.refreshToken && kc.flow != 'implicit' )) {
-            throw 'Not authenticated';
-        }
+        ref.addEventListener('loaderror', (event) => {
+          if (event.url.indexOf(getCordovaRedirectUri()) === 0) {
+            ref.close()
+          } else {
+            error = true
+            ref.close()
+          }
+        })
 
-        if (kc.timeSkew == null) {
-            logInfo('[KEYCLOAK] Unable to determine if token is expired as timeskew is not set');
-            return true;
-        }
-
-        var expiresIn = kc.tokenParsed['exp'] - Math.ceil(new Date().getTime() / 1000) + kc.timeSkew;
-        if (minValidity) {
-            if (isNaN(minValidity)) {
-                throw 'Invalid minValidity';
-            }
-            expiresIn -= minValidity;
-        }
-        return expiresIn < 0;
-    }
-
-    kc.updateToken = function(minValidity) {
-        var promise = createPromise();
-
-        if (!kc.refreshToken) {
-            promise.setError();
-            return promise.promise;
-        }
-
-        minValidity = minValidity || 5;
-
-        var exec = function() {
-            var refreshToken = false;
-            if (minValidity == -1) {
-                refreshToken = true;
-                logInfo('[KEYCLOAK] Refreshing token: forced refresh');
-            } else if (!kc.tokenParsed || kc.isTokenExpired(minValidity)) {
-                refreshToken = true;
-                logInfo('[KEYCLOAK] Refreshing token: token expired');
-            }
-
-            if (!refreshToken) {
-                promise.setSuccess(false);
+        await new Promise((resolve, reject) => {
+          ref.addEventListener('exit', () => {
+            if (error) {
+              reject(new Error('User closed the login window.'))
             } else {
-                var params = 'grant_type=refresh_token&' + 'refresh_token=' + kc.refreshToken;
-                var url = kc.endpoints.token();
-
-                refreshQueue.push(promise);
-
-                if (refreshQueue.length == 1) {
-                    var req = new XMLHttpRequest();
-                    req.open('POST', url, true);
-                    req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                    req.withCredentials = true;
-
-                    params += '&client_id=' + encodeURIComponent(kc.clientId);
-
-                    var timeLocal = new Date().getTime();
-
-                    req.onreadystatechange = function () {
-                        if (req.readyState == 4) {
-                            if (req.status == 200) {
-                                logInfo('[KEYCLOAK] Token refreshed');
-
-                                timeLocal = (timeLocal + new Date().getTime()) / 2;
-
-                                var tokenResponse = JSON.parse(req.responseText);
-
-                                setToken(tokenResponse['access_token'], tokenResponse['refresh_token'], tokenResponse['id_token'], timeLocal);
-
-                                kc.onAuthRefreshSuccess && kc.onAuthRefreshSuccess();
-                                for (var p = refreshQueue.pop(); p != null; p = refreshQueue.pop()) {
-                                    p.setSuccess(true);
-                                }
-                            } else {
-                                logWarn('[KEYCLOAK] Failed to refresh token');
-
-                                if (req.status == 400) {
-                                    kc.clearToken();
-                                }
-
-                                kc.onAuthRefreshError && kc.onAuthRefreshError();
-                                for (var p = refreshQueue.pop(); p != null; p = refreshQueue.pop()) {
-                                    p.setError("Failed to refresh token: An unexpected HTTP error occurred while attempting to refresh the token.");
-                                }
-                            }
-                        }
-                    };
-
-                    req.send(params);
-                }
+              this.clearToken()
+              resolve()
             }
-        }
+          })
+        })
+      },
 
-        if (loginIframe.enable) {
-            var iframePromise = checkLoginIframe();
-            iframePromise.then(function() {
-                exec();
-            }).catch(function(error) {
-                promise.setError(error);
-            });
+      register: async (options) => {
+        const registerUrl = await this.createRegisterUrl()
+        const cordovaOptions = createCordovaOptions(options)
+        const ref = cordovaOpenWindowWrapper(registerUrl, '_blank', cordovaOptions)
+
+        /** @type {Promise<void>} */
+        const promise = new Promise((resolve, reject) => {
+          ref.addEventListener('loadstart', async (event) => {
+            if (event.url.indexOf(getCordovaRedirectUri()) === 0) {
+              ref.close()
+              const oauth = this.#parseCallback(event.url)
+
+              try {
+                await this.#processCallback(oauth)
+                resolve()
+              } catch (error) {
+                reject(error)
+              }
+            }
+          })
+        })
+
+        await promise
+      },
+
+      accountManagement: async () => {
+        const accountUrl = this.createAccountUrl()
+        if (typeof accountUrl !== 'undefined') {
+          const ref = cordovaOpenWindowWrapper(accountUrl, '_blank', 'location=no')
+          ref.addEventListener('loadstart', function (event) {
+            if (event.url.indexOf(getCordovaRedirectUri()) === 0) {
+              ref.close()
+            }
+          })
         } else {
-            exec();
+          throw new Error('Not supported by the OIDC server')
         }
+      },
 
-        return promise.promise;
+      redirectUri: () => {
+        return getCordovaRedirectUri()
+      }
     }
-
-    kc.clearToken = function() {
-        if (kc.token) {
-            setToken(null, null, null);
-            kc.onAuthLogout && kc.onAuthLogout();
-            if (kc.loginRequired) {
-                kc.login();
-            }
-        }
-    }
-
-    function getRealmUrl() {
-        if (typeof kc.authServerUrl !== 'undefined') {
-            if (kc.authServerUrl.charAt(kc.authServerUrl.length - 1) == '/') {
-                return kc.authServerUrl + 'realms/' + encodeURIComponent(kc.realm);
-            } else {
-                return kc.authServerUrl + '/realms/' + encodeURIComponent(kc.realm);
-            }
-        } else {
-            return undefined;
-        }
-    }
-
-    function getOrigin() {
-        if (!window.location.origin) {
-            return window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-        } else {
-            return window.location.origin;
-        }
-    }
-
-    function processCallback(oauth, promise) {
-        var code = oauth.code;
-        var error = oauth.error;
-        var prompt = oauth.prompt;
-
-        var timeLocal = new Date().getTime();
-
-        if (oauth['kc_action_status']) {
-            kc.onActionUpdate && kc.onActionUpdate(oauth['kc_action_status'], oauth['kc_action']);
-        }
-
-        if (error) {
-            if (prompt != 'none') {
-                if (oauth.error_description && oauth.error_description === "authentication_expired") {
-                    kc.login(oauth.loginOptions);
-                } else {
-                    var errorData = { error: error, error_description: oauth.error_description };
-                    kc.onAuthError && kc.onAuthError(errorData);
-                    promise && promise.setError(errorData);
-                }
-            } else {
-                promise && promise.setSuccess();
-            }
-            return;
-        } else if ((kc.flow != 'standard') && (oauth.access_token || oauth.id_token)) {
-            authSuccess(oauth.access_token, null, oauth.id_token, true);
-        }
-
-        if ((kc.flow != 'implicit') && code) {
-            var params = 'code=' + code + '&grant_type=authorization_code';
-            var url = kc.endpoints.token();
-
-            var req = new XMLHttpRequest();
-            req.open('POST', url, true);
-            req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-
-            params += '&client_id=' + encodeURIComponent(kc.clientId);
-            params += '&redirect_uri=' + oauth.redirectUri;
-
-            if (oauth.pkceCodeVerifier) {
-                params += '&code_verifier=' + oauth.pkceCodeVerifier;
-            }
-
-            req.withCredentials = true;
-
-            req.onreadystatechange = function() {
-                if (req.readyState == 4) {
-                    if (req.status == 200) {
-
-                        var tokenResponse = JSON.parse(req.responseText);
-                        authSuccess(tokenResponse['access_token'], tokenResponse['refresh_token'], tokenResponse['id_token'], kc.flow === 'standard');
-                        scheduleCheckIframe();
-                    } else {
-                        kc.onAuthError && kc.onAuthError();
-                        promise && promise.setError();
-                    }
-                }
-            };
-
-            req.send(params);
-        }
-
-        function authSuccess(accessToken, refreshToken, idToken, fulfillPromise) {
-            timeLocal = (timeLocal + new Date().getTime()) / 2;
-
-            setToken(accessToken, refreshToken, idToken, timeLocal);
-
-            if (useNonce && (kc.idTokenParsed && kc.idTokenParsed.nonce != oauth.storedNonce)) {
-                logInfo('[KEYCLOAK] Invalid nonce, clearing token');
-                kc.clearToken();
-                promise && promise.setError();
-            } else {
-                if (fulfillPromise) {
-                    kc.onAuthSuccess && kc.onAuthSuccess();
-                    promise && promise.setSuccess();
-                }
-            }
-        }
-
-    }
-
-    function loadConfig() {
-        var promise = createPromise();
-        var configUrl;
-
-        if (typeof config === 'string') {
-            configUrl = config;
-        }
-
-        function setupOidcEndoints(oidcConfiguration) {
-            if (! oidcConfiguration) {
-                kc.endpoints = {
-                    authorize: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/auth';
-                    },
-                    token: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/token';
-                    },
-                    logout: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/logout';
-                    },
-                    checkSessionIframe: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/login-status-iframe.html';
-                    },
-                    thirdPartyCookiesIframe: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/3p-cookies/step1.html';
-                    },
-                    register: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/registrations';
-                    },
-                    userinfo: function() {
-                        return getRealmUrl() + '/protocol/openid-connect/userinfo';
-                    }
-                };
-            } else {
-                kc.endpoints = {
-                    authorize: function() {
-                        return oidcConfiguration.authorization_endpoint;
-                    },
-                    token: function() {
-                        return oidcConfiguration.token_endpoint;
-                    },
-                    logout: function() {
-                        if (!oidcConfiguration.end_session_endpoint) {
-                            throw "Not supported by the OIDC server";
-                        }
-                        return oidcConfiguration.end_session_endpoint;
-                    },
-                    checkSessionIframe: function() {
-                        if (!oidcConfiguration.check_session_iframe) {
-                            throw "Not supported by the OIDC server";
-                        }
-                        return oidcConfiguration.check_session_iframe;
-                    },
-                    register: function() {
-                        throw 'Redirection to "Register user" page not supported in standard OIDC mode';
-                    },
-                    userinfo: function() {
-                        if (!oidcConfiguration.userinfo_endpoint) {
-                            throw "Not supported by the OIDC server";
-                        }
-                        return oidcConfiguration.userinfo_endpoint;
-                    }
-                }
-            }
-        }
-
-        if (configUrl) {
-            var req = new XMLHttpRequest();
-            req.open('GET', configUrl, true);
-            req.setRequestHeader('Accept', 'application/json');
-
-            req.onreadystatechange = function () {
-                if (req.readyState == 4) {
-                    if (req.status == 200 || fileLoaded(req)) {
-                        var config = JSON.parse(req.responseText);
-
-                        kc.authServerUrl = config['auth-server-url'];
-                        kc.realm = config['realm'];
-                        kc.clientId = config['resource'];
-                        setupOidcEndoints(null);
-                        promise.setSuccess();
-                    } else {
-                        promise.setError();
-                    }
-                }
-            };
-
-            req.send();
-        } else {
-            kc.clientId = config.clientId;
-
-            var oidcProvider = config['oidcProvider'];
-            if (!oidcProvider) {
-                kc.authServerUrl = config.url;
-                kc.realm = config.realm;
-                setupOidcEndoints(null);
-                promise.setSuccess();
-            } else {
-                if (typeof oidcProvider === 'string') {
-                    var oidcProviderConfigUrl;
-                    if (oidcProvider.charAt(oidcProvider.length - 1) == '/') {
-                        oidcProviderConfigUrl = oidcProvider + '.well-known/openid-configuration';
-                    } else {
-                        oidcProviderConfigUrl = oidcProvider + '/.well-known/openid-configuration';
-                    }
-                    var req = new XMLHttpRequest();
-                    req.open('GET', oidcProviderConfigUrl, true);
-                    req.setRequestHeader('Accept', 'application/json');
-
-                    req.onreadystatechange = function () {
-                        if (req.readyState == 4) {
-                            if (req.status == 200 || fileLoaded(req)) {
-                                var oidcProviderConfig = JSON.parse(req.responseText);
-                                setupOidcEndoints(oidcProviderConfig);
-                                promise.setSuccess();
-                            } else {
-                                promise.setError();
-                            }
-                        }
-                    };
-
-                    req.send();
-                } else {
-                    setupOidcEndoints(oidcProvider);
-                    promise.setSuccess();
-                }
-            }
-        }
-
-        return promise.promise;
-    }
-
-    function fileLoaded(xhr) {
-        return xhr.status == 0 && xhr.responseText && xhr.responseURL.startsWith('file:');
-    }
-
-    function setToken(token, refreshToken, idToken, timeLocal) {
-        if (kc.tokenTimeoutHandle) {
-            clearTimeout(kc.tokenTimeoutHandle);
-            kc.tokenTimeoutHandle = null;
-        }
-
-        if (refreshToken) {
-            kc.refreshToken = refreshToken;
-            kc.refreshTokenParsed = decodeToken(refreshToken);
-        } else {
-            delete kc.refreshToken;
-            delete kc.refreshTokenParsed;
-        }
-
-        if (idToken) {
-            kc.idToken = idToken;
-            kc.idTokenParsed = decodeToken(idToken);
-        } else {
-            delete kc.idToken;
-            delete kc.idTokenParsed;
-        }
-
-        if (token) {
-            kc.token = token;
-            kc.tokenParsed = decodeToken(token);
-            kc.sessionId = kc.tokenParsed.sid;
-            kc.authenticated = true;
-            kc.subject = kc.tokenParsed.sub;
-            kc.realmAccess = kc.tokenParsed.realm_access;
-            kc.resourceAccess = kc.tokenParsed.resource_access;
-
-            if (timeLocal) {
-                kc.timeSkew = Math.floor(timeLocal / 1000) - kc.tokenParsed.iat;
-            }
-
-            if (kc.timeSkew != null) {
-                logInfo('[KEYCLOAK] Estimated time difference between browser and server is ' + kc.timeSkew + ' seconds');
-
-                if (kc.onTokenExpired) {
-                    var expiresIn = (kc.tokenParsed['exp'] - (new Date().getTime() / 1000) + kc.timeSkew) * 1000;
-                    logInfo('[KEYCLOAK] Token expires in ' + Math.round(expiresIn / 1000) + ' s');
-                    if (expiresIn <= 0) {
-                        kc.onTokenExpired();
-                    } else {
-                        kc.tokenTimeoutHandle = setTimeout(kc.onTokenExpired, expiresIn);
-                    }
-                }
-            }
-        } else {
-            delete kc.token;
-            delete kc.tokenParsed;
-            delete kc.subject;
-            delete kc.realmAccess;
-            delete kc.resourceAccess;
-
-            kc.authenticated = false;
-        }
-    }
-
-    function createUUID() {
-        if (typeof crypto === "undefined" || typeof crypto.randomUUID === "undefined") {
-            throw new Error("Web Crypto API is not available.");
-        }
-
-        return crypto.randomUUID();
-    }
-
-    function parseCallback(url) {
-        var oauth = parseCallbackUrl(url);
-        if (!oauth) {
-            return;
-        }
-
-        var oauthState = callbackStorage.get(oauth.state);
-
-        if (oauthState) {
-            oauth.valid = true;
-            oauth.redirectUri = oauthState.redirectUri;
-            oauth.storedNonce = oauthState.nonce;
-            oauth.prompt = oauthState.prompt;
-            oauth.pkceCodeVerifier = oauthState.pkceCodeVerifier;
-            oauth.loginOptions = oauthState.loginOptions;
-        }
-
-        return oauth;
-    }
-
-    function parseCallbackUrl(url) {
-        var supportedParams;
-        switch (kc.flow) {
-            case 'standard':
-                supportedParams = ['code', 'state', 'session_state', 'kc_action_status', 'kc_action', 'iss'];
-                break;
-            case 'implicit':
-                supportedParams = ['access_token', 'token_type', 'id_token', 'state', 'session_state', 'expires_in', 'kc_action_status', 'kc_action', 'iss'];
-                break;
-            case 'hybrid':
-                supportedParams = ['access_token', 'token_type', 'id_token', 'code', 'state', 'session_state', 'expires_in', 'kc_action_status', 'kc_action', 'iss'];
-                break;
-        }
-
-        supportedParams.push('error');
-        supportedParams.push('error_description');
-        supportedParams.push('error_uri');
-
-        var queryIndex = url.indexOf('?');
-        var fragmentIndex = url.indexOf('#');
-
-        var newUrl;
-        var parsed;
-
-        if (kc.responseMode === 'query' && queryIndex !== -1) {
-            newUrl = url.substring(0, queryIndex);
-            parsed = parseCallbackParams(url.substring(queryIndex + 1, fragmentIndex !== -1 ? fragmentIndex : url.length), supportedParams);
-            if (parsed.paramsString !== '') {
-                newUrl += '?' + parsed.paramsString;
-            }
-            if (fragmentIndex !== -1) {
-                newUrl += url.substring(fragmentIndex);
-            }
-        } else if (kc.responseMode === 'fragment' && fragmentIndex !== -1) {
-            newUrl = url.substring(0, fragmentIndex);
-            parsed = parseCallbackParams(url.substring(fragmentIndex + 1), supportedParams);
-            if (parsed.paramsString !== '') {
-                newUrl += '#' + parsed.paramsString;
-            }
-        }
-
-        if (parsed && parsed.oauthParams) {
-            if (kc.flow === 'standard' || kc.flow === 'hybrid') {
-                if ((parsed.oauthParams.code || parsed.oauthParams.error) && parsed.oauthParams.state) {
-                    parsed.oauthParams.newUrl = newUrl;
-                    return parsed.oauthParams;
-                }
-            } else if (kc.flow === 'implicit') {
-                if ((parsed.oauthParams.access_token || parsed.oauthParams.error) && parsed.oauthParams.state) {
-                    parsed.oauthParams.newUrl = newUrl;
-                    return parsed.oauthParams;
-                }
-            }
-        }
-    }
-
-    function parseCallbackParams(paramsString, supportedParams) {
-        var p = paramsString.split('&');
-        var result = {
-            paramsString: '',
-            oauthParams: {}
-        }
-        for (var i = 0; i < p.length; i++) {
-            var split = p[i].indexOf("=");
-            var key = p[i].slice(0, split);
-            if (supportedParams.indexOf(key) !== -1) {
-                result.oauthParams[key] = p[i].slice(split + 1);
-            } else {
-                if (result.paramsString !== '') {
-                    result.paramsString += '&';
-                }
-                result.paramsString += p[i];
-            }
-        }
-        return result;
-    }
-
-    function createPromise() {
-        // Need to create a native Promise which also preserves the
-        // interface of the custom promise type previously used by the API
-        var p = {
-            setSuccess: function(result) {
-                p.resolve(result);
-            },
-
-            setError: function(result) {
-                p.reject(result);
-            }
-        };
-        p.promise = new Promise(function(resolve, reject) {
-            p.resolve = resolve;
-            p.reject = reject;
-        });
-
-        return p;
-    }
-
-    // Function to extend existing native Promise with timeout
-    function applyTimeoutToPromise(promise, timeout, errorMessage) {
-        var timeoutHandle = null;
-        var timeoutPromise = new Promise(function (resolve, reject) {
-            timeoutHandle = setTimeout(function () {
-                reject({ "error": errorMessage || "Promise is not settled within timeout of " + timeout + "ms" });
-            }, timeout);
-        });
-
-        return Promise.race([promise, timeoutPromise]).finally(function () {
-            clearTimeout(timeoutHandle);
-        });
-    }
-
-    function setupCheckLoginIframe() {
-        var promise = createPromise();
-
-        if (!loginIframe.enable) {
-            promise.setSuccess();
-            return promise.promise;
-        }
-
-        if (loginIframe.iframe) {
-            promise.setSuccess();
-            return promise.promise;
-        }
-
-        var iframe = document.createElement('iframe');
-        loginIframe.iframe = iframe;
-
-        iframe.onload = function() {
-            var authUrl = kc.endpoints.authorize();
-            if (authUrl.charAt(0) === '/') {
-                loginIframe.iframeOrigin = getOrigin();
-            } else {
-                loginIframe.iframeOrigin = authUrl.substring(0, authUrl.indexOf('/', 8));
-            }
-            promise.setSuccess();
-        }
-
-        var src = kc.endpoints.checkSessionIframe();
-        iframe.setAttribute('src', src );
-        iframe.setAttribute('sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin');
-        iframe.setAttribute('title', 'keycloak-session-iframe' );
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-
-        var messageCallback = function(event) {
-            if ((event.origin !== loginIframe.iframeOrigin) || (loginIframe.iframe.contentWindow !== event.source)) {
-                return;
-            }
-
-            if (!(event.data == 'unchanged' || event.data == 'changed' || event.data == 'error')) {
-                return;
-            }
-
-
-            if (event.data != 'unchanged') {
-                kc.clearToken();
-            }
-
-            var callbacks = loginIframe.callbackList.splice(0, loginIframe.callbackList.length);
-
-            for (var i = callbacks.length - 1; i >= 0; --i) {
-                var promise = callbacks[i];
-                if (event.data == 'error') {
-                    promise.setError();
-                } else {
-                    promise.setSuccess(event.data == 'unchanged');
-                }
-            }
-        };
-
-        window.addEventListener('message', messageCallback, false);
-
-        return promise.promise;
-    }
-
-    function scheduleCheckIframe() {
-        if (loginIframe.enable) {
-            if (kc.token) {
-                setTimeout(function() {
-                    checkLoginIframe().then(function(unchanged) {
-                        if (unchanged) {
-                            scheduleCheckIframe();
-                        }
-                    });
-                }, loginIframe.interval * 1000);
-            }
-        }
-    }
-
-    function checkLoginIframe() {
-        var promise = createPromise();
-
-        if (loginIframe.iframe && loginIframe.iframeOrigin ) {
-            var msg = kc.clientId + ' ' + (kc.sessionId ? kc.sessionId : '');
-            loginIframe.callbackList.push(promise);
-            var origin = loginIframe.iframeOrigin;
-            if (loginIframe.callbackList.length == 1) {
-                loginIframe.iframe.contentWindow.postMessage(msg, origin);
-            }
-        } else {
-            promise.setSuccess();
-        }
-
-        return promise.promise;
-    }
-
-    function check3pCookiesSupported() {
-        var promise = createPromise();
-
-        if ((loginIframe.enable || kc.silentCheckSsoRedirectUri) && typeof kc.endpoints.thirdPartyCookiesIframe === 'function') {
-            var iframe = document.createElement('iframe');
-            iframe.setAttribute('src', kc.endpoints.thirdPartyCookiesIframe());
-            iframe.setAttribute('sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin');
-            iframe.setAttribute('title', 'keycloak-3p-check-iframe' );
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-
-            var messageCallback = function(event) {
-                if (iframe.contentWindow !== event.source) {
-                    return;
-                }
-
-                if (event.data !== "supported" && event.data !== "unsupported") {
-                    return;
-                } else if (event.data === "unsupported") {
-                    logWarn(
-                        "[KEYCLOAK] Your browser is blocking access to 3rd-party cookies, this means:\n\n" +
-                        " - It is not possible to retrieve tokens without redirecting to the Keycloak server (a.k.a. no support for silent authentication).\n" +
-                        " - It is not possible to automatically detect changes to the session status (such as the user logging out in another tab).\n\n" +
-                        "For more information see: https://www.keycloak.org/securing-apps/javascript-adapter#_modern_browsers"
-                    );
-
-                    loginIframe.enable = false;
-                    if (kc.silentCheckSsoFallback) {
-                        kc.silentCheckSsoRedirectUri = false;
-                    }
-                }
-
-                document.body.removeChild(iframe);
-                window.removeEventListener("message", messageCallback);
-                promise.setSuccess();
-            };
-
-            window.addEventListener('message', messageCallback, false);
-        } else {
-            promise.setSuccess();
-        }
-
-        return applyTimeoutToPromise(promise.promise, kc.messageReceiveTimeout, "Timeout when waiting for 3rd party check iframe message.");
-    }
-
-    function loadAdapter(type) {
-        if (!type || type == 'default') {
-            return {
-                login: async function(options) {
-                    window.location.assign(await kc.createLoginUrl(options));
-                    return createPromise().promise;
-                },
-
-                logout: async function(options) {
-
-                    const logoutMethod = options?.logoutMethod ?? kc.logoutMethod;
-                    if (logoutMethod === "GET") {
-                        window.location.replace(kc.createLogoutUrl(options));
-                        return;
-                    }
-
-                    // Create form to send POST request.
-                    const form = document.createElement("form");
-
-                    form.setAttribute("method", "POST");
-                    form.setAttribute("action", kc.createLogoutUrl(options));
-                    form.style.display = "none";
-
-                    // Add data to form as hidden input fields.
-                    const data = {
-                        id_token_hint: kc.idToken,
-                        client_id: kc.clientId,
-                        post_logout_redirect_uri: adapter.redirectUri(options, false)
-                    };
-
-                    for (const [name, value] of Object.entries(data)) {
-                        const input = document.createElement("input");
-
-                        input.setAttribute("type", "hidden");
-                        input.setAttribute("name", name);
-                        input.setAttribute("value", value);
-
-                        form.appendChild(input);
-                    }
-
-                    // Append form to page and submit it to perform logout and redirect.
-                    document.body.appendChild(form);
-                    form.submit();
-                },
-
-                register: async function(options) {
-                    window.location.assign(await kc.createRegisterUrl(options));
-                    return createPromise().promise;
-                },
-
-                accountManagement : function() {
-                    var accountUrl = kc.createAccountUrl();
-                    if (typeof accountUrl !== 'undefined') {
-                        window.location.href = accountUrl;
-                    } else {
-                        throw "Not supported by the OIDC server";
-                    }
-                    return createPromise().promise;
-                },
-
-                redirectUri: function(options, encodeHash) {
-                    if (arguments.length == 1) {
-                        encodeHash = true;
-                    }
-
-                    if (options && options.redirectUri) {
-                        return options.redirectUri;
-                    } else if (kc.redirectUri) {
-                        return kc.redirectUri;
-                    } else {
-                        return location.href;
-                    }
-                }
-            };
-        }
-
-        if (type == 'cordova') {
-            loginIframe.enable = false;
-            var cordovaOpenWindowWrapper = function(loginUrl, target, options) {
-                if (window.cordova && window.cordova.InAppBrowser) {
-                    // Use inappbrowser for IOS and Android if available
-                    return window.cordova.InAppBrowser.open(loginUrl, target, options);
-                } else {
-                    return window.open(loginUrl, target, options);
-                }
-            };
-
-            var shallowCloneCordovaOptions = function (userOptions) {
-                if (userOptions && userOptions.cordovaOptions) {
-                    return Object.keys(userOptions.cordovaOptions).reduce(function (options, optionName) {
-                        options[optionName] = userOptions.cordovaOptions[optionName];
-                        return options;
-                    }, {});
-                } else {
-                    return {};
-                }
-            };
-
-            var formatCordovaOptions = function (cordovaOptions) {
-                return Object.keys(cordovaOptions).reduce(function (options, optionName) {
-                    options.push(optionName+"="+cordovaOptions[optionName]);
-                    return options;
-                }, []).join(",");
-            };
-
-            var createCordovaOptions = function (userOptions) {
-                var cordovaOptions = shallowCloneCordovaOptions(userOptions);
-                cordovaOptions.location = 'no';
-                if (userOptions && userOptions.prompt == 'none') {
-                    cordovaOptions.hidden = 'yes';
-                }
-                return formatCordovaOptions(cordovaOptions);
-            };
-
-            var getCordovaRedirectUri = function() {
-                return kc.redirectUri || 'http://localhost';
-            }
-
-            return {
-                login: async function(options) {
-                    var promise = createPromise();
-
-                    var cordovaOptions = createCordovaOptions(options);
-                    var loginUrl = await kc.createLoginUrl(options);
-                    var ref = cordovaOpenWindowWrapper(loginUrl, '_blank', cordovaOptions);
-                    var completed = false;
-
-                    var closed = false;
-                    var closeBrowser = function() {
-                        closed = true;
-                        ref.close();
-                    };
-
-                    ref.addEventListener('loadstart', function(event) {
-                        if (event.url.indexOf(getCordovaRedirectUri()) == 0) {
-                            var callback = parseCallback(event.url);
-                            processCallback(callback, promise);
-                            closeBrowser();
-                            completed = true;
-                        }
-                    });
-
-                    ref.addEventListener('loaderror', function(event) {
-                        if (!completed) {
-                            if (event.url.indexOf(getCordovaRedirectUri()) == 0) {
-                                var callback = parseCallback(event.url);
-                                processCallback(callback, promise);
-                                closeBrowser();
-                                completed = true;
-                            } else {
-                                promise.setError();
-                                closeBrowser();
-                            }
-                        }
-                    });
-
-                    ref.addEventListener('exit', function(event) {
-                        if (!closed) {
-                            promise.setError({
-                                reason: "closed_by_user"
-                            });
-                        }
-                    });
-
-                    return promise.promise;
-                },
-
-                logout: function(options) {
-                    var promise = createPromise();
-
-                    var logoutUrl = kc.createLogoutUrl(options);
-                    var ref = cordovaOpenWindowWrapper(logoutUrl, '_blank', 'location=no,hidden=yes,clearcache=yes');
-
-                    var error;
-
-                    ref.addEventListener('loadstart', function(event) {
-                        if (event.url.indexOf(getCordovaRedirectUri()) == 0) {
-                            ref.close();
-                        }
-                    });
-
-                    ref.addEventListener('loaderror', function(event) {
-                        if (event.url.indexOf(getCordovaRedirectUri()) == 0) {
-                            ref.close();
-                        } else {
-                            error = true;
-                            ref.close();
-                        }
-                    });
-
-                    ref.addEventListener('exit', function(event) {
-                        if (error) {
-                            promise.setError();
-                        } else {
-                            kc.clearToken();
-                            promise.setSuccess();
-                        }
-                    });
-
-                    return promise.promise;
-                },
-
-                register : async function(options) {
-                    var promise = createPromise();
-                    var registerUrl = await kc.createRegisterUrl();
-                    var cordovaOptions = createCordovaOptions(options);
-                    var ref = cordovaOpenWindowWrapper(registerUrl, '_blank', cordovaOptions);
-                    ref.addEventListener('loadstart', function(event) {
-                        if (event.url.indexOf(getCordovaRedirectUri()) == 0) {
-                            ref.close();
-                            var oauth = parseCallback(event.url);
-                            processCallback(oauth, promise);
-                        }
-                    });
-                    return promise.promise;
-                },
-
-                accountManagement : function() {
-                    var accountUrl = kc.createAccountUrl();
-                    if (typeof accountUrl !== 'undefined') {
-                        var ref = cordovaOpenWindowWrapper(accountUrl, '_blank', 'location=no');
-                        ref.addEventListener('loadstart', function(event) {
-                            if (event.url.indexOf(getCordovaRedirectUri()) == 0) {
-                                ref.close();
-                            }
-                        });
-                    } else {
-                        throw "Not supported by the OIDC server";
-                    }
-                },
-
-                redirectUri: function(options) {
-                    return getCordovaRedirectUri();
-                }
-            }
-        }
-
-        if (type == 'cordova-native') {
-            loginIframe.enable = false;
-
-            return {
-                login: async function(options) {
-                    var promise = createPromise();
-                    var loginUrl = await kc.createLoginUrl(options);
-
-                    universalLinks.subscribe('keycloak', function(event) {
-                        universalLinks.unsubscribe('keycloak');
-                        window.cordova.plugins.browsertab.close();
-                        var oauth = parseCallback(event.url);
-                        processCallback(oauth, promise);
-                    });
-
-                    window.cordova.plugins.browsertab.openUrl(loginUrl);
-                    return promise.promise;
-                },
-
-                logout: function(options) {
-                    var promise = createPromise();
-                    var logoutUrl = kc.createLogoutUrl(options);
-
-                    universalLinks.subscribe('keycloak', function(event) {
-                        universalLinks.unsubscribe('keycloak');
-                        window.cordova.plugins.browsertab.close();
-                        kc.clearToken();
-                        promise.setSuccess();
-                    });
-
-                    window.cordova.plugins.browsertab.openUrl(logoutUrl);
-                    return promise.promise;
-                },
-
-                register : async function(options) {
-                    var promise = createPromise();
-                    var registerUrl = await kc.createRegisterUrl(options);
-                    universalLinks.subscribe('keycloak' , function(event) {
-                        universalLinks.unsubscribe('keycloak');
-                        window.cordova.plugins.browsertab.close();
-                        var oauth = parseCallback(event.url);
-                        processCallback(oauth, promise);
-                    });
-                    window.cordova.plugins.browsertab.openUrl(registerUrl);
-                    return promise.promise;
-
-                },
-
-                accountManagement : function() {
-                    var accountUrl = kc.createAccountUrl();
-                    if (typeof accountUrl !== 'undefined') {
-                        window.cordova.plugins.browsertab.openUrl(accountUrl);
-                    } else {
-                        throw "Not supported by the OIDC server";
-                    }
-                },
-
-                redirectUri: function(options) {
-                    if (options && options.redirectUri) {
-                        return options.redirectUri;
-                    } else if (kc.redirectUri) {
-                        return kc.redirectUri;
-                    } else {
-                        return "http://localhost";
-                    }
-                }
-            }
-        }
-
-        throw 'invalid adapter type: ' + type;
-    }
-
-    const STORAGE_KEY_PREFIX = 'kc-callback-';
-
-    var LocalStorage = function() {
-        if (!(this instanceof LocalStorage)) {
-            return new LocalStorage();
-        }
-
-        localStorage.setItem('kc-test', 'test');
-        localStorage.removeItem('kc-test');
-
-        var cs = this;
-
-        /**
-         * Clears all values from local storage that are no longer valid.
-         */
-        function clearInvalidValues() {
-            const currentTime = Date.now();
-
-            for (const [key, value] of getStoredEntries()) {
-                // Attempt to parse the expiry time from the value.
-                const expiry = parseExpiry(value);
-
-                // Discard the value if it is malformed or expired.
-                if (expiry === null || expiry < currentTime) {
-                    localStorage.removeItem(key);
-                }
-            }
-        }
-
-        /**
-         * Clears all known values from local storage.
-         */
-        function clearAllValues() {
-            for (const [key] of getStoredEntries()) {
-                localStorage.removeItem(key);
-            }
-        }
-
-        /**
-         * Gets all entries stored in local storage that are known to be managed by this class.
-         * @returns {Array<[string, unknown]>} An array of key-value pairs.
-         */
-        function getStoredEntries() {
-            return Object.entries(localStorage).filter(([key]) => key.startsWith(STORAGE_KEY_PREFIX));
-        }
-
-        /**
-         * Parses the expiry time from a value stored in local storage.
-         * @param {unknown} value
-         * @returns {number | null} The expiry time in milliseconds, or `null` if the value is malformed.
-         */
-        function parseExpiry(value) {
-            let parsedValue;
-
-            // Attempt to parse the value as JSON.
-            try {
-                parsedValue = JSON.parse(value);
-            } catch (error) {
-                return null;
-            }
-
-            // Attempt to extract the 'expires' property.
-            if (isObject(parsedValue) && 'expires' in parsedValue && typeof parsedValue.expires === 'number') {
-                return parsedValue.expires;
-            }
-
-            return null;
-        }
-
-        cs.get = function(state) {
-            if (!state) {
-                return;
-            }
-
-            var key = STORAGE_KEY_PREFIX + state;
-            var value = localStorage.getItem(key);
-            if (value) {
-                localStorage.removeItem(key);
-                value = JSON.parse(value);
-            }
-
-            clearInvalidValues();
-            return value;
-        };
-
-        cs.add = function(state) {
-            clearInvalidValues();
-
-            const key = STORAGE_KEY_PREFIX + state.state;
-            const value = JSON.stringify({
-                ...state,
-                // Set the expiry time to 1 hour from now.
-                expires: Date.now() + (60 * 60 * 1000)
-            });
+  }
+
+  /**
+   * @returns {KeycloakAdapter}
+   */
+  #loadCordovaNativeAdapter () {
+    /* global universalLinks */
+    return {
+      login: async (options) => {
+        const loginUrl = await this.createLoginUrl(options)
+
+        await new Promise((resolve, reject) => {
+          universalLinks.subscribe('keycloak', async (event) => {
+            universalLinks.unsubscribe('keycloak')
+            window.cordova.plugins.browsertab.close()
+            const oauth = this.#parseCallback(event.url)
 
             try {
-                localStorage.setItem(key, value);
+              await this.#processCallback(oauth)
+              resolve()
             } catch (error) {
-                // If the storage is full, clear all known values and try again.
-                clearAllValues();
-                localStorage.setItem(key, value);
+              reject(error)
             }
-        };
-    };
+          })
 
-    var CookieStorage = function() {
-        if (!(this instanceof CookieStorage)) {
-            return new CookieStorage();
+          window.cordova.plugins.browsertab.openUrl(loginUrl)
+        })
+      },
+
+      logout: async (options) => {
+        const logoutUrl = this.createLogoutUrl(options)
+
+        await new Promise((resolve) => {
+          universalLinks.subscribe('keycloak', () => {
+            universalLinks.unsubscribe('keycloak')
+            window.cordova.plugins.browsertab.close()
+            this.clearToken()
+            resolve()
+          })
+
+          window.cordova.plugins.browsertab.openUrl(logoutUrl)
+        })
+      },
+
+      register: async (options) => {
+        const registerUrl = await this.createRegisterUrl(options)
+
+        await new Promise((resolve, reject) => {
+          universalLinks.subscribe('keycloak', async (event) => {
+            universalLinks.unsubscribe('keycloak')
+            window.cordova.plugins.browsertab.close()
+            const oauth = this.#parseCallback(event.url)
+            try {
+              await this.#processCallback(oauth)
+              resolve()
+            } catch (error) {
+              reject(error)
+            }
+          })
+
+          window.cordova.plugins.browsertab.openUrl(registerUrl)
+        })
+      },
+
+      accountManagement: async () => {
+        const accountUrl = this.createAccountUrl()
+        if (typeof accountUrl !== 'undefined') {
+          window.cordova.plugins.browsertab.openUrl(accountUrl)
+        } else {
+          throw new Error('Not supported by the OIDC server')
+        }
+      },
+
+      redirectUri: (options) => {
+        if (options && options.redirectUri) {
+          return options.redirectUri
+        } else if (this.redirectUri) {
+          return this.redirectUri
+        } else {
+          return 'http://localhost'
+        }
+      }
+    }
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  async #loadConfig () {
+    if (typeof this.#config === 'string') {
+      const jsonConfig = await fetchJsonConfig(this.#config)
+      this.authServerUrl = jsonConfig['auth-server-url']
+      this.realm = jsonConfig.realm
+      this.clientId = jsonConfig.resource
+      this.#setupEndpoints()
+    } else {
+      this.clientId = this.#config.clientId
+
+      if ('oidcProvider' in this.#config) {
+        await this.#loadOidcConfig(this.#config.oidcProvider)
+      } else {
+        this.authServerUrl = this.#config.url
+        this.realm = this.#config.realm
+        this.#setupEndpoints()
+      }
+    }
+  }
+
+  /**
+   * @returns {void}
+   */
+  #setupEndpoints () {
+    this.endpoints = {
+      authorize: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/auth'
+      },
+      token: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/token'
+      },
+      logout: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/logout'
+      },
+      checkSessionIframe: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/login-status-iframe.html'
+      },
+      thirdPartyCookiesIframe: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/3p-cookies/step1.html'
+      },
+      register: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/registrations'
+      },
+      userinfo: () => {
+        return this.#getRealmUrl() + '/protocol/openid-connect/userinfo'
+      }
+    }
+  }
+
+  /**
+   * @param {string | OpenIdProviderMetadata} oidcProvider
+   * @returns {Promise<void>}
+   */
+  async #loadOidcConfig (oidcProvider) {
+    if (typeof oidcProvider === 'string') {
+      const url = `${stripTrailingSlash(oidcProvider)}/.well-known/openid-configuration`
+      const openIdConfig = await fetchOpenIdConfig(url)
+      this.#setupOidcEndpoints(openIdConfig)
+    } else {
+      this.#setupOidcEndpoints(oidcProvider)
+    }
+  }
+
+  /**
+   * @param {OpenIdProviderMetadata} config
+   * @returns {void}
+   */
+  #setupOidcEndpoints (config) {
+    this.endpoints = {
+      authorize () {
+        return config.authorization_endpoint
+      },
+      token () {
+        return config.token_endpoint
+      },
+      logout () {
+        if (!config.end_session_endpoint) {
+          throw new Error('Not supported by the OIDC server')
+        }
+        return config.end_session_endpoint
+      },
+      checkSessionIframe () {
+        if (!config.check_session_iframe) {
+          throw new Error('Not supported by the OIDC server')
+        }
+        return config.check_session_iframe
+      },
+      register () {
+        throw new Error('Redirection to "Register user" page not supported in standard OIDC mode')
+      },
+      userinfo () {
+        if (!config.userinfo_endpoint) {
+          throw new Error('Not supported by the OIDC server')
+        }
+        return config.userinfo_endpoint
+      }
+    }
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  async #check3pCookiesSupported () {
+    if ((!this.#loginIframe.enable && !this.silentCheckSsoRedirectUri) || typeof this.endpoints.thirdPartyCookiesIframe !== 'function') {
+      return
+    }
+
+    const iframe = document.createElement('iframe')
+    iframe.setAttribute('src', this.endpoints.thirdPartyCookiesIframe())
+    iframe.setAttribute('sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin')
+    iframe.setAttribute('title', 'keycloak-3p-check-iframe')
+    iframe.style.display = 'none'
+    document.body.appendChild(iframe)
+
+    /** @type {Promise<void>} */
+    const promise = new Promise((resolve) => {
+      /**
+       * @param {MessageEvent} event
+       */
+      const messageCallback = (event) => {
+        if (iframe.contentWindow !== event.source) {
+          return
         }
 
-        var cs = this;
+        if (event.data !== 'supported' && event.data !== 'unsupported') {
+          return
+        } else if (event.data === 'unsupported') {
+          this.#logWarn(
+            '[KEYCLOAK] Your browser is blocking access to 3rd-party cookies, this means:\n\n' +
+                        ' - It is not possible to retrieve tokens without redirecting to the Keycloak server (a.k.a. no support for silent authentication).\n' +
+                        ' - It is not possible to automatically detect changes to the session status (such as the user logging out in another tab).\n\n' +
+                        'For more information see: https://www.keycloak.org/securing-apps/javascript-adapter#_modern_browsers'
+          )
 
-        cs.get = function(state) {
-            if (!state) {
-                return;
-            }
-
-            var value = getCookie(STORAGE_KEY_PREFIX + state);
-            setCookie(STORAGE_KEY_PREFIX + state, '', cookieExpiration(-100));
-            if (value) {
-                return JSON.parse(value);
-            }
-        };
-
-        cs.add = function(state) {
-            setCookie(STORAGE_KEY_PREFIX + state.state, JSON.stringify(state), cookieExpiration(60));
-        };
-
-        cs.removeItem = function(key) {
-            setCookie(key, '', cookieExpiration(-100));
-        };
-
-        var cookieExpiration = function (minutes) {
-            var exp = new Date();
-            exp.setTime(exp.getTime() + (minutes*60*1000));
-            return exp;
-        };
-
-        var getCookie = function (key) {
-            var name = key + '=';
-            var ca = document.cookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return '';
-        };
-
-        var setCookie = function (key, value, expirationDate) {
-            var cookie = key + '=' + value + '; '
-                + 'expires=' + expirationDate.toUTCString() + '; ';
-            document.cookie = cookie;
+          this.#loginIframe.enable = false
+          if (this.silentCheckSsoFallback) {
+            this.silentCheckSsoRedirectUri = undefined
+          }
         }
-    };
 
-    function createCallbackStorage() {
+        document.body.removeChild(iframe)
+        window.removeEventListener('message', messageCallback)
+        resolve()
+      }
+
+      window.addEventListener('message', messageCallback, false)
+    })
+
+    return await applyTimeoutToPromise(promise, this.messageReceiveTimeout, 'Timeout when waiting for 3rd party check iframe message.')
+  }
+
+  /**
+   * @param {KeycloakInitOptions} initOptions
+   * @returns {Promise<void>}
+   */
+  async #processInit (initOptions) {
+    const callback = this.#parseCallback(window.location.href)
+
+    if (callback?.newUrl) {
+      window.history.replaceState(window.history.state, '', callback.newUrl)
+    }
+
+    if (callback && callback.valid) {
+      await this.#setupCheckLoginIframe()
+      await this.#processCallback(callback)
+      return
+    }
+
+    /** @param {boolean} prompt */
+    const doLogin = async (prompt) => {
+      /** @type {KeycloakLoginOptions} */
+      const options = {}
+
+      if (!prompt) {
+        options.prompt = 'none'
+      }
+
+      if (initOptions.locale) {
+        options.locale = initOptions.locale
+      }
+
+      await this.login(options)
+    }
+
+    const onLoad = async () => {
+      switch (initOptions.onLoad) {
+        case 'check-sso':
+          if (this.#loginIframe.enable) {
+            await this.#setupCheckLoginIframe()
+            const unchanged = await this.#checkLoginIframe()
+
+            if (!unchanged) {
+              this.silentCheckSsoRedirectUri ? await this.#checkSsoSilently() : await doLogin(false)
+            }
+          } else {
+            this.silentCheckSsoRedirectUri ? await this.#checkSsoSilently() : await doLogin(false)
+          }
+          break
+        case 'login-required':
+          await doLogin(true)
+          break
+        default:
+          throw new Error('Invalid value for onLoad')
+      }
+    }
+
+    if (initOptions.token && initOptions.refreshToken) {
+      this.#setToken(initOptions.token, initOptions.refreshToken, initOptions.idToken)
+
+      if (this.#loginIframe.enable) {
+        await this.#setupCheckLoginIframe()
+        const unchanged = await this.#checkLoginIframe()
+
+        if (unchanged) {
+          this.onAuthSuccess?.()
+          this.#scheduleCheckIframe()
+        }
+      } else {
         try {
-            return new LocalStorage();
-        } catch (err) {
+          await this.updateToken(-1)
+          this.onAuthSuccess?.()
+        } catch (error) {
+          this.onAuthError?.()
+          if (initOptions.onLoad) {
+            await onLoad()
+          } else {
+            throw error
+          }
+        }
+      }
+    } else if (initOptions.onLoad) {
+      await onLoad()
+    }
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  async #setupCheckLoginIframe () {
+    if (!this.#loginIframe.enable || this.#loginIframe.iframe) {
+      return
+    }
+
+    const iframe = document.createElement('iframe')
+    this.#loginIframe.iframe = iframe
+    iframe.setAttribute('src', this.endpoints.checkSessionIframe())
+    iframe.setAttribute('sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin')
+    iframe.setAttribute('title', 'keycloak-session-iframe')
+    iframe.style.display = 'none'
+    document.body.appendChild(iframe)
+
+    /**
+     * @param {MessageEvent} event
+     */
+    const messageCallback = (event) => {
+      if (event.origin !== this.#loginIframe.iframeOrigin || this.#loginIframe.iframe?.contentWindow !== event.source) {
+        return
+      }
+
+      if (!(event.data === 'unchanged' || event.data === 'changed' || event.data === 'error')) {
+        return
+      }
+
+      if (event.data !== 'unchanged') {
+        this.clearToken()
+      }
+
+      const callbacks = this.#loginIframe.callbackList
+      this.#loginIframe.callbackList = []
+
+      for (const callback of callbacks.reverse()) {
+        if (event.data === 'error') {
+          callback(new Error('Error while checking login iframe'))
+        } else {
+          callback(null, event.data === 'unchanged')
+        }
+      }
+    }
+
+    window.addEventListener('message', messageCallback, false)
+
+    /** @type {Promise<void>} */
+    const promise = new Promise((resolve) => {
+      iframe.addEventListener('load', () => {
+        const authUrl = this.endpoints.authorize()
+        if (authUrl.startsWith('/')) {
+          this.#loginIframe.iframeOrigin = globalThis.location.origin
+        } else {
+          this.#loginIframe.iframeOrigin = new URL(authUrl).origin
+        }
+        resolve()
+      })
+    })
+
+    await promise
+  }
+
+  /**
+   * @returns {Promise<boolean | undefined>}
+   */
+  async #checkLoginIframe () {
+    if (!this.#loginIframe.iframe || !this.#loginIframe.iframeOrigin) {
+      return
+    }
+
+    const message = `${this.clientId} ${(this.sessionId ? this.sessionId : '')}`
+    const origin = this.#loginIframe.iframeOrigin
+
+    /** @type {Promise<boolean>} */
+    const promise = new Promise((resolve, reject) => {
+      /** @type {(error: Error | null, value?: boolean) => void} */
+      const callback = (error, result) => error ? reject(error) : resolve(/** @type {boolean} */ (result))
+
+      this.#loginIframe.callbackList.push(callback)
+
+      if (this.#loginIframe.callbackList.length === 1) {
+        this.#loginIframe.iframe?.contentWindow?.postMessage(message, origin)
+      }
+    })
+
+    return await promise
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  async #checkSsoSilently () {
+    const iframe = document.createElement('iframe')
+    const src = await this.createLoginUrl({ prompt: 'none', redirectUri: this.silentCheckSsoRedirectUri })
+    iframe.setAttribute('src', src)
+    iframe.setAttribute('sandbox', 'allow-storage-access-by-user-activation allow-scripts allow-same-origin')
+    iframe.setAttribute('title', 'keycloak-silent-check-sso')
+    iframe.style.display = 'none'
+    document.body.appendChild(iframe)
+
+    return await new Promise((resolve, reject) => {
+      /**
+       * @param {MessageEvent} event
+       */
+      const messageCallback = async (event) => {
+        if (event.origin !== window.location.origin || iframe.contentWindow !== event.source) {
+          return
         }
 
-        return new CookieStorage();
+        const oauth = this.#parseCallback(event.data)
+
+        try {
+          await this.#processCallback(oauth)
+          resolve()
+        } catch (error) {
+          reject(error)
+        }
+
+        document.body.removeChild(iframe)
+        window.removeEventListener('message', messageCallback)
+      }
+
+      window.addEventListener('message', messageCallback)
+    })
+  };
+
+  /**
+   * @param {string} url
+   */
+  #parseCallback (url) {
+    const oauth = this.#parseCallbackUrl(url)
+    if (!oauth) {
+      return
     }
 
-    function createLogger(fn) {
-        return function() {
-            if (kc.enableLogging) {
-                fn.apply(console, Array.prototype.slice.call(arguments));
-            }
-        };
+    const oauthState = this.#callbackStorage.get(oauth.state)
+
+    if (oauthState) {
+      oauth.valid = true
+      oauth.redirectUri = oauthState.redirectUri
+      oauth.storedNonce = oauthState.nonce
+      oauth.prompt = oauthState.prompt
+      oauth.pkceCodeVerifier = oauthState.pkceCodeVerifier
+      oauth.loginOptions = oauthState.loginOptions
     }
+
+    return oauth
+  }
+
+  /**
+   * @param {string} urlString
+   */
+  #parseCallbackUrl (urlString) {
+    let supportedParams = []
+    switch (this.flow) {
+      case 'standard':
+        supportedParams = ['code', 'state', 'session_state', 'kc_action_status', 'kc_action', 'iss']
+        break
+      case 'implicit':
+        supportedParams = ['access_token', 'token_type', 'id_token', 'state', 'session_state', 'expires_in', 'kc_action_status', 'kc_action', 'iss']
+        break
+      case 'hybrid':
+        supportedParams = ['access_token', 'token_type', 'id_token', 'code', 'state', 'session_state', 'expires_in', 'kc_action_status', 'kc_action', 'iss']
+        break
+    }
+
+    supportedParams.push('error')
+    supportedParams.push('error_description')
+    supportedParams.push('error_uri')
+
+    const url = new URL(urlString)
+    let newUrl = ''
+    let parsed
+
+    if (this.responseMode === 'query' && url.searchParams.size > 0) {
+      parsed = this.#parseCallbackParams(url.search, supportedParams)
+      url.search = parsed.paramsString
+      newUrl = url.toString()
+    } else if (this.responseMode === 'fragment' && url.hash.length > 0) {
+      parsed = this.#parseCallbackParams(url.hash.substring(1), supportedParams)
+      url.hash = parsed.paramsString
+      newUrl = url.toString()
+    }
+
+    if (parsed?.oauthParams) {
+      if (this.flow === 'standard' || this.flow === 'hybrid') {
+        if ((parsed.oauthParams.code || parsed.oauthParams.error) && parsed.oauthParams.state) {
+          parsed.oauthParams.newUrl = newUrl
+          return parsed.oauthParams
+        }
+      } else if (this.flow === 'implicit') {
+        if ((parsed.oauthParams.access_token || parsed.oauthParams.error) && parsed.oauthParams.state) {
+          parsed.oauthParams.newUrl = newUrl
+          return parsed.oauthParams
+        }
+      }
+    }
+  }
+
+  /**
+   * @typedef {Object} ParsedCallbackParams
+   * @property {string} paramsString
+   * @property {Record<string, string | undefined>} oauthParams
+   */
+
+  /**
+   * @param {string} paramsString
+   * @param {string[]} supportedParams
+   * @returns {ParsedCallbackParams}
+   */
+  #parseCallbackParams (paramsString, supportedParams) {
+    const params = paramsString.split('&')
+    /** @type {Record<string, string>} */
+    const oauthParams = {}
+    let result = ''
+
+    for (const param of params.reverse()) {
+      const entry = new URLSearchParams(param).entries().next().value
+
+      if (!entry) {
+        result = '&' + result
+        continue
+      }
+
+      const [key, value] = entry
+
+      if (supportedParams.includes(key) && !(key in oauthParams)) {
+        oauthParams[key] = value
+      } else {
+        result = result.length === 0 ? param : param + '&' + result
+      }
+    }
+
+    return {
+      paramsString: result,
+      oauthParams
+    }
+  }
+
+  async #processCallback (oauth) {
+    const { code, error, prompt } = oauth
+    let timeLocal = new Date().getTime()
+
+    /**
+     * @param {string} accessToken
+     * @param {string=} refreshToken
+     * @param {string=} idToken
+     */
+    const authSuccess = (accessToken, refreshToken, idToken) => {
+      timeLocal = (timeLocal + new Date().getTime()) / 2
+
+      this.#setToken(accessToken, refreshToken, idToken, timeLocal)
+
+      if (this.#useNonce && (this.idTokenParsed && this.idTokenParsed.nonce !== oauth.storedNonce)) {
+        this.#logInfo('[KEYCLOAK] Invalid nonce, clearing token')
+        this.clearToken()
+        throw new Error('Invalid nonce.')
+      }
+    }
+
+    if (oauth.kc_action_status) {
+      this.onActionUpdate && this.onActionUpdate(oauth.kc_action_status, oauth.kc_action)
+    }
+
+    if (error) {
+      if (prompt !== 'none') {
+        if (oauth.error_description && oauth.error_description === 'authentication_expired') {
+          await this.login(oauth.loginOptions)
+        } else {
+          const errorData = { error, error_description: oauth.error_description }
+          this.onAuthError?.(errorData)
+          throw errorData
+        }
+      }
+      return
+    } else if ((this.flow !== 'standard') && (oauth.access_token || oauth.id_token)) {
+      authSuccess(oauth.access_token, undefined, oauth.id_token)
+      this.onAuthSuccess?.()
+    }
+
+    if ((this.flow !== 'implicit') && code) {
+      try {
+        const response = await fetchAccessToken(this.endpoints.token(), code, /** @type {string} */ (this.clientId), oauth.redirectUri, oauth.pkceCodeVerifier)
+        authSuccess(response.access_token, response.refresh_token, response.id_token)
+
+        if (this.flow === 'standard') {
+          this.onAuthSuccess?.()
+        }
+
+        this.#scheduleCheckIframe()
+      } catch (error) {
+        this.onAuthError?.()
+        throw error
+      }
+    }
+  }
+
+  async #scheduleCheckIframe () {
+    if (this.#loginIframe.enable && this.token) {
+      await waitForTimeout(this.#loginIframe.interval * 1000)
+      const unchanged = await this.#checkLoginIframe()
+
+      if (unchanged) {
+        await this.#scheduleCheckIframe()
+      }
+    }
+  }
+
+  /**
+   * @param {KeycloakLoginOptions} [options]
+   * @returns {Promise<void>}
+   */
+  login = (options) => {
+    return this.#adapter.login(options)
+  }
+
+  /**
+   * @param {KeycloakLoginOptions} [options]
+   * @returns {Promise<string>}
+   */
+  createLoginUrl = async (options) => {
+    const state = createUUID()
+    const nonce = createUUID()
+    const redirectUri = this.#adapter.redirectUri(options)
+    /** @type {CallbackState} */
+    const callbackState = {
+      state,
+      nonce,
+      redirectUri,
+      loginOptions: options
+    }
+
+    if (options?.prompt) {
+      callbackState.prompt = options.prompt
+    }
+
+    const url = options?.action === 'register'
+      ? this.endpoints.register()
+      : this.endpoints.authorize()
+
+    let scope = options?.scope || this.scope
+    const scopeValues = scope ? scope.split(' ') : []
+
+    // Ensure the 'openid' scope is always included.
+    if (!scopeValues.includes('openid')) {
+      scopeValues.unshift('openid')
+    }
+
+    scope = scopeValues.join(' ')
+
+    const params = new URLSearchParams([
+      ['client_id', /** @type {string} */ (this.clientId)],
+      ['redirect_uri', redirectUri],
+      ['state', state],
+      ['response_mode', this.responseMode],
+      ['response_type', this.responseType],
+      ['scope', scope]
+    ])
+
+    if (this.#useNonce) {
+      params.append('nonce', nonce)
+    }
+
+    if (options?.prompt) {
+      params.append('prompt', options.prompt)
+    }
+
+    if (typeof options?.maxAge === 'number') {
+      params.append('max_age', options.maxAge.toString())
+    }
+
+    if (options?.loginHint) {
+      params.append('login_hint', options.loginHint)
+    }
+
+    if (options?.idpHint) {
+      params.append('kc_idp_hint', options.idpHint)
+    }
+
+    if (options?.action && options.action !== 'register') {
+      params.append('kc_action', options.action)
+    }
+
+    if (options?.locale) {
+      params.append('ui_locales', options.locale)
+    }
+
+    if (options?.acr) {
+      params.append('claims', buildClaimsParameter(options.acr))
+    }
+
+    if (options?.acrValues) {
+      params.append('acr_values', options.acrValues)
+    }
+
+    if (this.pkceMethod) {
+      try {
+        const codeVerifier = generateCodeVerifier(96)
+        const pkceChallenge = await generatePkceChallenge(this.pkceMethod, codeVerifier)
+
+        callbackState.pkceCodeVerifier = codeVerifier
+
+        params.append('code_challenge', pkceChallenge)
+        params.append('code_challenge_method', this.pkceMethod)
+      } catch (error) {
+        throw new Error('Failed to generate PKCE challenge.', { cause: error })
+      }
+    }
+
+    this.#callbackStorage.add(callbackState)
+
+    return `${url}?${params.toString()}`
+  }
+
+  /**
+   * @param {KeycloakLogoutOptions} [options]
+   * @returns {Promise<void>}
+   */
+  logout = (options) => {
+    return this.#adapter.logout(options)
+  }
+
+  /**
+   * @param {KeycloakLogoutOptions} [options]
+   * @returns {string}
+   */
+  createLogoutUrl = (options) => {
+    const logoutMethod = options?.logoutMethod ?? this.logoutMethod
+    const url = this.endpoints.logout()
+
+    if (logoutMethod === 'POST') {
+      return url
+    }
+
+    const params = new URLSearchParams([
+      ['client_id', /** @type {string} */ (this.clientId)],
+      ['post_logout_redirect_uri', this.#adapter.redirectUri(options)]
+    ])
+
+    if (this.idToken) {
+      params.append('id_token_hint', this.idToken)
+    }
+
+    return `${url}?${params.toString()}`
+  }
+
+  /**
+   * @param {KeycloakRegisterOptions} [options]
+   * @returns {Promise<void>}
+   */
+  register = (options) => {
+    return this.#adapter.register(options)
+  }
+
+  /**
+   * @param {KeycloakRegisterOptions} [options]
+   * @returns {Promise<string>}
+   */
+  createRegisterUrl = (options) => {
+    return this.createLoginUrl({ ...options, action: 'register' })
+  }
+
+  /**
+   * @param {KeycloakAccountOptions} [options]
+   * @returns {string}
+   */
+  createAccountUrl = (options) => {
+    const url = this.#getRealmUrl()
+
+    if (!url) {
+      throw new Error('Unable to create account URL, make sure the adapter is not configured using a generic OIDC provider.')
+    }
+
+    const params = new URLSearchParams([
+      ['referrer', /** @type {string} */ (this.clientId)],
+      ['referrer_uri', this.#adapter.redirectUri(options)]
+    ])
+
+    return `${url}/account?${params.toString()}`
+  }
+
+  /**
+   * @returns {Promise<void>}
+   */
+  accountManagement = () => {
+    return this.#adapter.accountManagement()
+  }
+
+  /**
+   * @param {string} role
+   * @returns {boolean}
+   */
+  hasRealmRole = (role) => {
+    const access = this.realmAccess
+    return !!access && access.roles.indexOf(role) >= 0
+  }
+
+  /**
+   * @param {string} role
+   * @param {string} [resource]
+   * @returns {boolean}
+   */
+  hasResourceRole = (role, resource) => {
+    if (!this.resourceAccess) {
+      return false
+    }
+
+    const access = this.resourceAccess[resource || /** @type {string} */ (this.clientId)]
+    return !!access && access.roles.indexOf(role) >= 0
+  }
+
+  /**
+   * @returns {Promise<KeycloakProfile>}
+   */
+  loadUserProfile = async () => {
+    const realmUrl = this.#getRealmUrl()
+
+    if (!realmUrl) {
+      throw new Error('Unable to load user profile, make sure the adapter is not configured using a generic OIDC provider.')
+    }
+
+    const url = `${realmUrl}/account`
+    /** @type {KeycloakProfile} */
+    const profile = await fetchJSON(url, {
+      headers: [buildAuthorizationHeader(this.token)]
+    })
+
+    return (this.profile = profile)
+  }
+
+  /**
+   * @returns {Promise<{}>}
+   */
+  loadUserInfo = async () => {
+    const url = this.endpoints.userinfo()
+    /** @type {{}} */
+    const userInfo = await fetchJSON(url, {
+      headers: [buildAuthorizationHeader(this.token)]
+    })
+
+    return (this.userInfo = userInfo)
+  }
+
+  /**
+   * @param {number} [minValidity]
+   * @returns {boolean}
+   */
+  isTokenExpired = (minValidity) => {
+    if (!this.tokenParsed || (!this.refreshToken && this.flow !== 'implicit')) {
+      throw new Error('Not authenticated')
+    }
+
+    if (this.timeSkew == null) {
+      this.#logInfo('[KEYCLOAK] Unable to determine if token is expired as timeskew is not set')
+      return true
+    }
+
+    if (typeof this.tokenParsed.exp !== 'number') {
+      return false
+    }
+
+    let expiresIn = this.tokenParsed.exp - Math.ceil(new Date().getTime() / 1000) + this.timeSkew
+    if (minValidity) {
+      if (isNaN(minValidity)) {
+        throw new Error('Invalid minValidity')
+      }
+      expiresIn -= minValidity
+    }
+    return expiresIn < 0
+  }
+
+  /**
+   * @param {number} minValidity
+   * @returns {Promise<boolean>}
+   */
+  updateToken = async (minValidity) => {
+    if (!this.refreshToken) {
+      throw new Error('Unable to update token, no refresh token available.')
+    }
+
+    minValidity = minValidity || 5
+
+    if (this.#loginIframe.enable) {
+      await this.#checkLoginIframe()
+    }
+
+    let refreshToken = false
+
+    if (minValidity === -1) {
+      refreshToken = true
+      this.#logInfo('[KEYCLOAK] Refreshing token: forced refresh')
+    } else if (!this.tokenParsed || this.isTokenExpired(minValidity)) {
+      refreshToken = true
+      this.#logInfo('[KEYCLOAK] Refreshing token: token expired')
+    }
+
+    if (!refreshToken) {
+      return false
+    }
+
+    /** @type {PromiseWithResolvers<boolean>} */
+    const { promise, resolve, reject } = Promise.withResolvers()
+
+    this.#refreshQueue.push({ resolve, reject })
+
+    if (this.#refreshQueue.length === 1) {
+      const url = this.endpoints.token()
+      let timeLocal = new Date().getTime()
+
+      try {
+        const response = await fetchRefreshToken(url, this.refreshToken, /** @type {string} */ (this.clientId))
+        this.#logInfo('[KEYCLOAK] Token refreshed')
+
+        timeLocal = (timeLocal + new Date().getTime()) / 2
+
+        this.#setToken(response.access_token, response.refresh_token, response.id_token, timeLocal)
+
+        this.onAuthRefreshSuccess?.()
+        for (let p = this.#refreshQueue.pop(); p != null; p = this.#refreshQueue.pop()) {
+          p.resolve(true)
+        }
+      } catch (error) {
+        this.#logWarn('[KEYCLOAK] Failed to refresh token')
+
+        if (error instanceof NetworkError && error.response.status === 400) {
+          this.clearToken()
+        }
+
+        this.onAuthRefreshError?.()
+        for (let p = this.#refreshQueue.pop(); p != null; p = this.#refreshQueue.pop()) {
+          p.reject(error)
+        }
+      }
+    }
+
+    return await promise
+  }
+
+  clearToken = () => {
+    if (this.token) {
+      this.#setToken()
+      this.onAuthLogout?.()
+      if (this.loginRequired) {
+        this.login()
+      }
+    }
+  }
+
+  /**
+   * @param {string} [token]
+   * @param {string} [refreshToken]
+   * @param {string} [idToken]
+   * @param {number} [timeLocal]
+   */
+  #setToken (token, refreshToken, idToken, timeLocal) {
+    if (this.tokenTimeoutHandle) {
+      clearTimeout(this.tokenTimeoutHandle)
+      this.tokenTimeoutHandle = undefined
+    }
+
+    if (refreshToken) {
+      this.refreshToken = refreshToken
+      this.refreshTokenParsed = decodeToken(refreshToken)
+    } else {
+      delete this.refreshToken
+      delete this.refreshTokenParsed
+    }
+
+    if (idToken) {
+      this.idToken = idToken
+      this.idTokenParsed = decodeToken(idToken)
+    } else {
+      delete this.idToken
+      delete this.idTokenParsed
+    }
+
+    if (token) {
+      this.token = token
+      this.tokenParsed = decodeToken(token)
+      this.sessionId = this.tokenParsed.sid
+      this.authenticated = true
+      this.subject = this.tokenParsed.sub
+      this.realmAccess = this.tokenParsed.realm_access
+      this.resourceAccess = this.tokenParsed.resource_access
+
+      if (timeLocal) {
+        this.timeSkew = Math.floor(timeLocal / 1000) - this.tokenParsed.iat
+      }
+
+      if (this.timeSkew !== null) {
+        this.#logInfo('[KEYCLOAK] Estimated time difference between browser and server is ' + this.timeSkew + ' seconds')
+
+        if (this.onTokenExpired) {
+          const expiresIn = (this.tokenParsed.exp - (new Date().getTime() / 1000) + this.timeSkew) * 1000
+          this.#logInfo('[KEYCLOAK] Token expires in ' + Math.round(expiresIn / 1000) + ' s')
+          if (expiresIn <= 0) {
+            this.onTokenExpired()
+          } else {
+            this.tokenTimeoutHandle = window.setTimeout(this.onTokenExpired, expiresIn)
+          }
+        }
+      }
+    } else {
+      delete this.token
+      delete this.tokenParsed
+      delete this.subject
+      delete this.realmAccess
+      delete this.resourceAccess
+
+      this.authenticated = false
+    }
+  }
+
+  /**
+   * @returns {string=}
+   */
+  #getRealmUrl () {
+    if (typeof this.authServerUrl === 'undefined') {
+      return
+    }
+
+    return `${stripTrailingSlash(this.authServerUrl)}/realms/${encodeURIComponent(/** @type {string} */ (this.realm))}`
+  }
+
+  /**
+   * @param {Function} fn
+   * @returns {(message: string) => void}
+   */
+  #createLogger (fn) {
+    return (message) => {
+      if (this.enableLogging) {
+        fn.call(console, message)
+      }
+    }
+  }
 }
 
-export default Keycloak;
+/**
+ * @returns {string}
+ */
+function createUUID () {
+  if (typeof crypto === 'undefined' || typeof crypto.randomUUID === 'undefined') {
+    throw new Error('Web Crypto API is not available.')
+  }
+
+  return crypto.randomUUID()
+}
 
 /**
- * @param {ArrayBuffer} bytes
+ * @param {Acr} requestedAcr
+ * @returns {string}
+ */
+function buildClaimsParameter (requestedAcr) {
+  return JSON.stringify({
+    id_token: {
+      acr: requestedAcr
+    }
+  })
+}
+
+/**
+ * @param {number} len
+ * @returns {string}
+ */
+function generateCodeVerifier (len) {
+  return generateRandomString(len, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')
+}
+
+/**
+ * @param {string} pkceMethod
+ * @param {string} codeVerifier
+ * @returns {Promise<string>}
+ */
+async function generatePkceChallenge (pkceMethod, codeVerifier) {
+  if (pkceMethod !== 'S256') {
+    throw new TypeError(`Invalid value for 'pkceMethod', expected 'S256' but got '${pkceMethod}'.`)
+  }
+
+  // hash codeVerifier, then encode as url-safe base64 without padding
+  const hashBytes = new Uint8Array(await sha256Digest(codeVerifier))
+  const encodedHash = bytesToBase64(hashBytes)
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=/g, '')
+
+  return encodedHash
+}
+
+/**
+ * @param {number} len
+ * @param {string} alphabet
+ * @returns {string}
+ */
+function generateRandomString (len, alphabet) {
+  const randomData = generateRandomData(len)
+  const chars = new Array(len)
+  for (let i = 0; i < len; i++) {
+    chars[i] = alphabet.charCodeAt(randomData[i] % alphabet.length)
+  }
+  return String.fromCharCode.apply(null, chars)
+}
+
+/**
+ * @param {number} len
+ * @returns {Uint8Array<ArrayBuffer>}
+ */
+function generateRandomData (len) {
+  if (typeof crypto === 'undefined' || typeof crypto.getRandomValues === 'undefined') {
+    throw new Error('Web Crypto API is not available.')
+  }
+
+  return crypto.getRandomValues(new Uint8Array(len))
+}
+
+/**
+ * Function to extend existing native Promise with timeout
+ *
+ * @template T
+ * @param {Promise<T>} promise
+ * @param {number} timeout
+ * @param {string} errorMessage
+ * @returns {Promise<T>}
+ */
+function applyTimeoutToPromise (promise, timeout, errorMessage) {
+  /** @type {number} */
+  let timeoutHandle
+  const timeoutPromise = new Promise(function (resolve, reject) {
+    timeoutHandle = window.setTimeout(function () {
+      reject(new Error(errorMessage || 'Promise is not settled within timeout of ' + timeout + 'ms'))
+    }, timeout)
+  })
+
+  return Promise.race([promise, timeoutPromise]).finally(function () {
+    clearTimeout(timeoutHandle)
+  })
+}
+
+/**
+ * @returns {CallbackStorage}
+ */
+function createCallbackStorage () {
+  try {
+    return new LocalStorage()
+  } catch (err) {
+    return new CookieStorage()
+  }
+}
+
+const STORAGE_KEY_PREFIX = 'kc-callback-'
+
+/**
+ * @typedef {Object} CallbackState
+ * @property {string} state
+ * @property {string} nonce
+ * @property {string} redirectUri
+ * @property {KeycloakLoginOptions} [loginOptions]
+ * @property {KeycloakLoginOptions['prompt']} [prompt]
+ * @property {string} [pkceCodeVerifier]
+ */
+
+/**
+ * @typedef {Object} CallbackStorage
+ * @property {(state?: string) => CallbackState | null} get
+ * @property {(state: CallbackState) => void} add
+ */
+
+/**
+ * @implements {CallbackStorage}
+ */
+class LocalStorage {
+  constructor () {
+    globalThis.localStorage.setItem('kc-test', 'test')
+    globalThis.localStorage.removeItem('kc-test')
+  }
+
+  /**
+   * @param {string} [state]
+   * @returns {CallbackState | null}
+   */
+  get (state) {
+    if (!state) {
+      return null
+    }
+
+    this.#clearInvalidValues()
+
+    const key = STORAGE_KEY_PREFIX + state
+    const value = globalThis.localStorage.getItem(key)
+
+    if (value) {
+      globalThis.localStorage.removeItem(key)
+      return JSON.parse(value)
+    }
+
+    return null
+  };
+
+  /**
+   * @param {CallbackState} state
+   */
+  add (state) {
+    this.#clearInvalidValues()
+
+    const key = STORAGE_KEY_PREFIX + state.state
+    const value = JSON.stringify({
+      ...state,
+      // Set the expiry time to 1 hour from now.
+      expires: Date.now() + (60 * 60 * 1000)
+    })
+
+    try {
+      globalThis.localStorage.setItem(key, value)
+    } catch (error) {
+      // If the storage is full, clear all known values and try again.
+      this.#clearAllValues()
+      globalThis.localStorage.setItem(key, value)
+    }
+  };
+
+  /**
+   * Clears all values from local storage that are no longer valid.
+   */
+  #clearInvalidValues () {
+    const currentTime = Date.now()
+
+    for (const [key, value] of this.#getStoredEntries()) {
+      // Attempt to parse the expiry time from the value.
+      const expiry = this.#parseExpiry(value)
+
+      // Discard the value if it is malformed or expired.
+      if (expiry === null || expiry < currentTime) {
+        globalThis.localStorage.removeItem(key)
+      }
+    }
+  }
+
+  /**
+   * Clears all known values from local storage.
+   */
+  #clearAllValues () {
+    for (const [key] of this.#getStoredEntries()) {
+      globalThis.localStorage.removeItem(key)
+    }
+  }
+
+  /**
+   * Gets all entries stored in local storage that are known to be managed by this class.
+   * @returns {[string, string][]} An array of key-value pairs.
+   */
+  #getStoredEntries () {
+    return Object.entries(globalThis.localStorage).filter(([key]) => key.startsWith(STORAGE_KEY_PREFIX))
+  }
+
+  /**
+   * Parses the expiry time from a value stored in local storage.
+   * @param {string} value
+   * @returns {number | null} The expiry time in milliseconds, or `null` if the value is malformed.
+   */
+  #parseExpiry (value) {
+    let parsedValue
+
+    // Attempt to parse the value as JSON.
+    try {
+      parsedValue = JSON.parse(value)
+    } catch (error) {
+      return null
+    }
+
+    // Attempt to extract the 'expires' property.
+    if (isObject(parsedValue) && 'expires' in parsedValue && typeof parsedValue.expires === 'number') {
+      return parsedValue.expires
+    }
+
+    return null
+  }
+}
+
+/**
+ * @implements {CallbackStorage}
+ */
+class CookieStorage {
+  /**
+   * @param {string} [state]
+   * @returns {CallbackState | null}
+   */
+  get (state) {
+    if (!state) {
+      return null
+    }
+
+    const value = this.#getCookie(STORAGE_KEY_PREFIX + state)
+    this.#setCookie(STORAGE_KEY_PREFIX + state, '', this.#cookieExpiration(-100))
+    if (value) {
+      return JSON.parse(value)
+    }
+
+    return null
+  }
+
+  /**
+   * @param {CallbackState} state
+   */
+  add (state) {
+    this.#setCookie(STORAGE_KEY_PREFIX + state.state, JSON.stringify(state), this.#cookieExpiration(60))
+  }
+
+  /**
+   * @param {string} key
+   * @returns
+   */
+  #getCookie (key) {
+    const name = key + '='
+    const ca = document.cookie.split(';')
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i]
+      while (c.charAt(0) === ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) === 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+    return ''
+  }
+
+  /**
+   * @param {string} key
+   * @param {string} value
+   * @param {Date} expirationDate
+   */
+  #setCookie (key, value, expirationDate) {
+    const cookie = key + '=' + value + '; ' +
+            'expires=' + expirationDate.toUTCString() + '; '
+    document.cookie = cookie
+  }
+
+  /**
+   * @param {number} minutes
+   * @returns {Date}
+   */
+  #cookieExpiration (minutes) {
+    const exp = new Date()
+    exp.setTime(exp.getTime() + (minutes * 60 * 1000))
+    return exp
+  }
+}
+
+/**
+ * @param {Uint8Array<ArrayBuffer>} bytes
  * @see https://developer.mozilla.org/en-US/docs/Glossary/Base64#the_unicode_problem
  */
-function bytesToBase64(bytes) {
-    const binString = String.fromCodePoint(...bytes);
-    return btoa(binString);
+function bytesToBase64 (bytes) {
+  const binString = String.fromCodePoint(...bytes)
+  return btoa(binString)
 }
 
 /**
  * @param {string} message
  * @see https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest#basic_example
  */
-async function sha256Digest(message) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(message);
+async function sha256Digest (message) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(message)
 
-    if (typeof crypto === "undefined" || typeof crypto.subtle === "undefined") {
-        throw new Error("Web Crypto API is not available.");
-    }
+  if (typeof crypto === 'undefined' || typeof crypto.subtle === 'undefined') {
+    throw new Error('Web Crypto API is not available.')
+  }
 
-    return await crypto.subtle.digest("SHA-256", data);
+  return await crypto.subtle.digest('SHA-256', data)
 }
 
 /**
  * @param {string} token
+ * @returns {KeycloakTokenParsed}
  */
-function decodeToken(token) {
-    const [header, payload] = token.split(".");
+function decodeToken (token) {
+  const [, payload] = token.split('.')
 
-    if (typeof payload !== "string") {
-        throw new Error("Unable to decode token, payload not found.");
-    }
+  if (typeof payload !== 'string') {
+    throw new Error('Unable to decode token, payload not found.')
+  }
 
-    let decoded;
+  let decoded
 
-    try {
-        decoded = base64UrlDecode(payload);
-    } catch (error) {
-        throw new Error("Unable to decode token, payload is not a valid Base64URL value.", { cause: error });
-    }
+  try {
+    decoded = base64UrlDecode(payload)
+  } catch (error) {
+    throw new Error('Unable to decode token, payload is not a valid Base64URL value.', { cause: error })
+  }
 
-    try {
-        return JSON.parse(decoded);
-    } catch (error) {
-        throw new Error("Unable to decode token, payload is not a valid JSON value.", { cause: error });
-    }
+  try {
+    return JSON.parse(decoded)
+  } catch (error) {
+    throw new Error('Unable to decode token, payload is not a valid JSON value.', { cause: error })
+  }
 }
 
 /**
  * @param {string} input
  */
-function base64UrlDecode(input) {
-    let output = input
-        .replaceAll("-", "+")
-        .replaceAll("_", "/");
+function base64UrlDecode (input) {
+  let output = input
+    .replaceAll('-', '+')
+    .replaceAll('_', '/')
 
-    switch (output.length % 4) {
-        case 0:
-            break;
-        case 2:
-            output += "==";
-            break;
-        case 3:
-            output += "=";
-            break;
-        default:
-            throw new Error("Input is not of the correct length.");
-    }
+  switch (output.length % 4) {
+    case 0:
+      break
+    case 2:
+      output += '=='
+      break
+    case 3:
+      output += '='
+      break
+    default:
+      throw new Error('Input is not of the correct length.')
+  }
 
-    try {
-        return b64DecodeUnicode(output);
-    } catch (error) {
-        return atob(output);
-    }
+  try {
+    return b64DecodeUnicode(output)
+  } catch (error) {
+    return atob(output)
+  }
 }
 
 /**
  * @param {string} input
  */
-function b64DecodeUnicode(input) {
-    return decodeURIComponent(atob(input).replace(/(.)/g, (m, p) => {
-        let code = p.charCodeAt(0).toString(16).toUpperCase();
+function b64DecodeUnicode (input) {
+  return decodeURIComponent(atob(input).replace(/(.)/g, (m, p) => {
+    let code = p.charCodeAt(0).toString(16).toUpperCase()
 
-        if (code.length < 2) {
-            code = "0" + code;
-        }
+    if (code.length < 2) {
+      code = '0' + code
+    }
 
-        return "%" + code;
-    }));
+    return '%' + code
+  }))
 }
 
 /**
  * Check if the input is an object that can be operated on.
  * @param {unknown} input
  */
-function isObject(input) {
-    return typeof input === 'object' && input !== null;
+function isObject (input) {
+  return typeof input === 'object' && input !== null
 }
+
+/**
+ * @typedef {Object} JsonConfig The JSON version of the adapter configuration.
+ * @property {string} auth-server-url The URL of the authentication server.
+ * @property {string} realm The name of the realm.
+ * @property {string} resource The name of the resource, usually the client ID.
+ */
+
+/**
+ * Fetch the adapter configuration from the given URL.
+ * @param {string} url
+ * @returns {Promise<JsonConfig>}
+ */
+async function fetchJsonConfig (url) {
+  return await fetchJSON(url)
+}
+
+/**
+ * Fetch the OpenID configuration from the given URL.
+ * @param {string} url
+ * @returns {Promise<OpenIdProviderMetadata>}
+ */
+async function fetchOpenIdConfig (url) {
+  return await fetchJSON(url)
+}
+
+/**
+ * @typedef {Object} AccessTokenResponse The successful token response from the authorization server, based on the {@link https://datatracker.ietf.org/doc/html/rfc6749#section-5.1 OAuth 2.0 Authorization Framework specification}.
+ * @property {string} access_token The access token issued by the authorization server.
+ * @property {string} token_type The type of the token issued by the authorization server.
+ * @property {number} [expires_in] The lifetime in seconds of the access token.
+ * @property {string} [refresh_token] The refresh token issued by the authorization server.
+ * @property {string} [id_token] The ID token issued by the authorization server, if requested.
+ * @property {string} [scope] The scope of the access token.
+ */
+
+/**
+ * Fetch the access token from the given URL.
+ * @param {string} url
+ * @param {string} code
+ * @param {string} clientId
+ * @param {string} redirectUri
+ * @param {string} [pkceCodeVerifier]
+ * @returns {Promise<AccessTokenResponse>}
+ */
+async function fetchAccessToken (url, code, clientId, redirectUri, pkceCodeVerifier) {
+  const body = new URLSearchParams([
+    ['code', code],
+    ['grant_type', 'authorization_code'],
+    ['client_id', clientId],
+    ['redirect_uri', redirectUri]
+  ])
+
+  if (pkceCodeVerifier) {
+    body.append('code_verifier', pkceCodeVerifier)
+  }
+
+  return await fetchJSON(url, {
+    method: 'POST',
+    credentials: 'include',
+    body
+  })
+}
+
+/**
+ * Fetch the refresh token from the given URL.
+ * @param {string} url
+ * @param {string} refreshToken
+ * @param {string} clientId
+ * @returns {Promise<AccessTokenResponse>}
+ */
+async function fetchRefreshToken (url, refreshToken, clientId) {
+  const body = new URLSearchParams([
+    ['grant_type', 'refresh_token'],
+    ['refresh_token', refreshToken],
+    ['client_id', clientId]
+  ])
+
+  return await fetchJSON(url, {
+    method: 'POST',
+    credentials: 'include',
+    body
+  })
+}
+
+/**
+ * @template [T=unknown]
+ * @param {string} url
+ * @param {RequestInit} init
+ * @returns {Promise<T>}
+ */
+async function fetchJSON (url, init = {}) {
+  const headers = new Headers(init.headers)
+  headers.set('Accept', CONTENT_TYPE_JSON)
+
+  const response = await fetchWithErrorHandling(url, {
+    ...init,
+    headers
+  })
+
+  return await response.json()
+}
+
+/**
+ * @param {string} url
+ * @param {RequestInit} [init]
+ * @returns {Promise<Response>}
+ */
+async function fetchWithErrorHandling (url, init) {
+  const response = await fetch(url, init)
+
+  if (!response.ok) {
+    throw new NetworkError('Server responded with an invalid status.', { response })
+  }
+
+  return response
+}
+
+/**
+ * @param {string} [token]
+ * @returns {[string, string]}
+ */
+function buildAuthorizationHeader (token) {
+  if (!token) {
+    throw new Error('Unable to build authorization header, token is not set, make sure the user is authenticated.')
+  }
+
+  return ['Authorization', `bearer ${token}`]
+}
+
+/**
+ * @param {string} url
+ * @returns {string}
+ */
+function stripTrailingSlash (url) {
+  return url.endsWith('/') ? url.slice(0, -1) : url
+}
+
+/**
+ * @typedef {Object} NetworkErrorOptionsProperties
+ * @property {Response} response
+ * @typedef {ErrorOptions & NetworkErrorOptionsProperties} NetworkErrorOptions
+ */
+
+export class NetworkError extends Error {
+  /** @type {Response} */
+  response
+
+  /**
+   * @param {string} message
+   * @param {NetworkErrorOptions} options
+   */
+  constructor (message, options) {
+    super(message, options)
+    this.response = options.response
+  }
+}
+
+/**
+ * @param {number} delay
+ * @returns {Promise<void>}
+ */
+const waitForTimeout = (delay) => new Promise((resolve) => setTimeout(resolve, delay))

@@ -16,229 +16,229 @@
  *
  */
 
-var KeycloakAuthorization = function (keycloak, options) {
-    var _instance = this;
-    this.rpt = null;
+const KeycloakAuthorization = function (keycloak, options) {
+  const _instance = this
+  this.rpt = null
 
-    // Only here for backwards compatibility, as the configuration is now loaded on demand.
-    // See:
-    // - https://github.com/keycloak/keycloak/pull/6619
-    // - https://issues.redhat.com/browse/KEYCLOAK-10894
-    // TODO: Remove both `ready` property and `init` method in a future version
-    Object.defineProperty(this, 'ready', {
-        get() {
-            console.warn("The 'ready' property is deprecated and will be removed in a future version. Initialization now happens automatically, using this property is no longer required.");
-            return Promise.resolve();
-        },
-    });
-    
-    this.init = () => {
-        console.warn("The 'init()' method is deprecated and will be removed in a future version. Initialization now happens automatically, calling this method is no longer required.");
-    };
+  // Only here for backwards compatibility, as the configuration is now loaded on demand.
+  // See:
+  // - https://github.com/keycloak/keycloak/pull/6619
+  // - https://issues.redhat.com/browse/KEYCLOAK-10894
+  // TODO: Remove both `ready` property and `init` method in a future version
+  Object.defineProperty(this, 'ready', {
+    get () {
+      console.warn("The 'ready' property is deprecated and will be removed in a future version. Initialization now happens automatically, using this property is no longer required.")
+      return Promise.resolve()
+    }
+  })
 
-    /** @type {Promise<unknown> | undefined} */
-    let configPromise;
+  this.init = () => {
+    console.warn("The 'init()' method is deprecated and will be removed in a future version. Initialization now happens automatically, calling this method is no longer required.")
+  }
 
-    /**
-     * Initializes the configuration or re-uses the existing one if present.
-     * @returns {Promise<void>} A promise that resolves when the configuration is loaded.
-     */
-    async function initializeConfigIfNeeded() {
-        if (_instance.config) {
-            return _instance.config;
-        }
+  /** @type {Promise<unknown> | undefined} */
+  let configPromise
 
-        if (configPromise) {
-            return await configPromise;
-        }
-
-        if (!keycloak.didInitialize) {
-            throw new Error('The Keycloak instance has not been initialized yet.');
-        }
-        
-        configPromise = loadConfig(keycloak.authServerUrl, keycloak.realm);
-        _instance.config = await configPromise;
+  /**
+   * Initializes the configuration or re-uses the existing one if present.
+   * @returns {Promise<void>} A promise that resolves when the configuration is loaded.
+   */
+  async function initializeConfigIfNeeded () {
+    if (_instance.config) {
+      return _instance.config
     }
 
-    /**
-     * This method enables client applications to better integrate with resource servers protected by a Keycloak
-     * policy enforcer using UMA protocol.
-     *
-     * The authorization request must be provided with a ticket.
-     */
-    this.authorize = function (authorizationRequest) {
-        this.then = async function (onGrant, onDeny, onError) {
-            try {
-                await initializeConfigIfNeeded();
-            } catch (error) {
-                handleError(error, onError);
-                return;
+    if (configPromise) {
+      return await configPromise
+    }
+
+    if (!keycloak.didInitialize) {
+      throw new Error('The Keycloak instance has not been initialized yet.')
+    }
+
+    configPromise = loadConfig(keycloak.authServerUrl, keycloak.realm)
+    _instance.config = await configPromise
+  }
+
+  /**
+   * This method enables client applications to better integrate with resource servers protected by a Keycloak
+   * policy enforcer using UMA protocol.
+   *
+   * The authorization request must be provided with a ticket.
+   */
+  this.authorize = function (authorizationRequest) {
+    this.then = async function (onGrant, onDeny, onError) {
+      try {
+        await initializeConfigIfNeeded()
+      } catch (error) {
+        handleError(error, onError)
+        return
+      }
+
+      if (authorizationRequest && authorizationRequest.ticket) {
+        const request = new globalThis.XMLHttpRequest()
+
+        request.open('POST', _instance.config.token_endpoint, true)
+        request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+        request.setRequestHeader('Authorization', 'Bearer ' + keycloak.token)
+
+        request.onreadystatechange = function () {
+          if (request.readyState === 4) {
+            const status = request.status
+
+            if (status >= 200 && status < 300) {
+              const rpt = JSON.parse(request.responseText).access_token
+              _instance.rpt = rpt
+              onGrant(rpt)
+            } else if (status === 403) {
+              if (onDeny) {
+                onDeny()
+              } else {
+                console.error('Authorization request was denied by the server.')
+              }
+            } else {
+              if (onError) {
+                onError()
+              } else {
+                console.error('Could not obtain authorization data from server.')
+              }
             }
+          }
+        }
 
-            if (authorizationRequest && authorizationRequest.ticket) {
-                var request = new XMLHttpRequest();
+        let params = 'grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&client_id=' + keycloak.clientId + '&ticket=' + authorizationRequest.ticket
 
-                request.open('POST', _instance.config.token_endpoint, true);
-                request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                request.setRequestHeader('Authorization', 'Bearer ' + keycloak.token);
+        if (authorizationRequest.submitRequest !== undefined) {
+          params += '&submit_request=' + authorizationRequest.submitRequest
+        }
 
-                request.onreadystatechange = function () {
-                    if (request.readyState == 4) {
-                        var status = request.status;
+        const metadata = authorizationRequest.metadata
 
-                        if (status >= 200 && status < 300) {
-                            var rpt = JSON.parse(request.responseText).access_token;
-                            _instance.rpt = rpt;
-                            onGrant(rpt);
-                        } else if (status == 403) {
-                            if (onDeny) {
-                                onDeny();
-                            } else {
-                                console.error('Authorization request was denied by the server.');
-                            }
-                        } else {
-                            if (onError) {
-                                onError();
-                            } else {
-                                console.error('Could not obtain authorization data from server.');
-                            }
-                        }
-                    }
-                };
+        if (metadata) {
+          if (metadata.responseIncludeResourceName) {
+            params += '&response_include_resource_name=' + metadata.responseIncludeResourceName
+          }
+          if (metadata.responsePermissionsLimit) {
+            params += '&response_permissions_limit=' + metadata.responsePermissionsLimit
+          }
+        }
 
-                var params = "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&client_id=" + keycloak.clientId + "&ticket=" + authorizationRequest.ticket;
+        if (_instance.rpt && (authorizationRequest.incrementalAuthorization === undefined || authorizationRequest.incrementalAuthorization)) {
+          params += '&rpt=' + _instance.rpt
+        }
 
-                if (authorizationRequest.submitRequest != undefined) {
-                    params += "&submit_request=" + authorizationRequest.submitRequest;
-                }
+        request.send(params)
+      }
+    }
 
-                var metadata = authorizationRequest.metadata;
+    return this
+  }
 
-                if (metadata) {
-                    if (metadata.responseIncludeResourceName) {
-                        params += "&response_include_resource_name=" + metadata.responseIncludeResourceName;
-                    }
-                    if (metadata.responsePermissionsLimit) {
-                        params += "&response_permissions_limit=" + metadata.responsePermissionsLimit;
-                    }
-                }
+  /**
+   * Obtains all entitlements from a Keycloak Server based on a given resourceServerId.
+   */
+  this.entitlement = function (resourceServerId, authorizationRequest) {
+    this.then = async function (onGrant, onDeny, onError) {
+      try {
+        await initializeConfigIfNeeded()
+      } catch (error) {
+        handleError(error, onError)
+        return
+      }
 
-                if (_instance.rpt && (authorizationRequest.incrementalAuthorization == undefined || authorizationRequest.incrementalAuthorization)) {
-                    params += "&rpt=" + _instance.rpt;
-                }
+      const request = new globalThis.XMLHttpRequest()
 
-                request.send(params);
+      request.open('POST', _instance.config.token_endpoint, true)
+      request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+      request.setRequestHeader('Authorization', 'Bearer ' + keycloak.token)
+
+      request.onreadystatechange = function () {
+        if (request.readyState === 4) {
+          const status = request.status
+
+          if (status >= 200 && status < 300) {
+            const rpt = JSON.parse(request.responseText).access_token
+            _instance.rpt = rpt
+            onGrant(rpt)
+          } else if (status === 403) {
+            if (onDeny) {
+              onDeny()
+            } else {
+              console.error('Authorization request was denied by the server.')
             }
-        };
-
-        return this;
-    };
-
-    /**
-     * Obtains all entitlements from a Keycloak Server based on a given resourceServerId.
-     */
-    this.entitlement = function (resourceServerId, authorizationRequest) {
-        this.then = async function (onGrant, onDeny, onError) {
-            try {
-                await initializeConfigIfNeeded();
-            } catch (error) {
-                handleError(error, onError);
-                return;
+          } else {
+            if (onError) {
+              onError()
+            } else {
+              console.error('Could not obtain authorization data from server.')
             }
+          }
+        }
+      }
 
-            var request = new XMLHttpRequest();
+      if (!authorizationRequest) {
+        authorizationRequest = {}
+      }
 
-            request.open('POST', _instance.config.token_endpoint, true);
-            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            request.setRequestHeader('Authorization', 'Bearer ' + keycloak.token);
+      let params = 'grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&client_id=' + keycloak.clientId
 
-            request.onreadystatechange = function () {
-                if (request.readyState == 4) {
-                    var status = request.status;
+      if (authorizationRequest.claimToken) {
+        params += '&claim_token=' + authorizationRequest.claimToken
 
-                    if (status >= 200 && status < 300) {
-                        var rpt = JSON.parse(request.responseText).access_token;
-                        _instance.rpt = rpt;
-                        onGrant(rpt);
-                    } else if (status == 403) {
-                        if (onDeny) {
-                            onDeny();
-                        } else {
-                            console.error('Authorization request was denied by the server.');
-                        }
-                    } else {
-                        if (onError) {
-                            onError();
-                        } else {
-                            console.error('Could not obtain authorization data from server.');
-                        }
-                    }
-                }
-            };
+        if (authorizationRequest.claimTokenFormat) {
+          params += '&claim_token_format=' + authorizationRequest.claimTokenFormat
+        }
+      }
 
-            if (!authorizationRequest) {
-                authorizationRequest = {};
+      params += '&audience=' + resourceServerId
+
+      let permissions = authorizationRequest.permissions
+
+      if (!permissions) {
+        permissions = []
+      }
+
+      for (let i = 0; i < permissions.length; i++) {
+        const resource = permissions[i]
+        let permission = resource.id
+
+        if (resource.scopes && resource.scopes.length > 0) {
+          permission += '#'
+          for (let j = 0; j < resource.scopes.length; j++) {
+            const scope = resource.scopes[j]
+            if (permission.indexOf('#') !== permission.length - 1) {
+              permission += ','
             }
+            permission += scope
+          }
+        }
 
-            var params = "grant_type=urn:ietf:params:oauth:grant-type:uma-ticket&client_id=" + keycloak.clientId;
+        params += '&permission=' + permission
+      }
 
-            if (authorizationRequest.claimToken) {
-                params += "&claim_token=" + authorizationRequest.claimToken;
+      const metadata = authorizationRequest.metadata
 
-                if (authorizationRequest.claimTokenFormat) {
-                    params += "&claim_token_format=" + authorizationRequest.claimTokenFormat;
-                }
-            }
+      if (metadata) {
+        if (metadata.responseIncludeResourceName) {
+          params += '&response_include_resource_name=' + metadata.responseIncludeResourceName
+        }
+        if (metadata.responsePermissionsLimit) {
+          params += '&response_permissions_limit=' + metadata.responsePermissionsLimit
+        }
+      }
 
-            params += "&audience=" + resourceServerId;
+      if (_instance.rpt) {
+        params += '&rpt=' + _instance.rpt
+      }
 
-            var permissions = authorizationRequest.permissions;
+      request.send(params)
+    }
 
-            if (!permissions) {
-                permissions = [];
-            }
+    return this
+  }
 
-            for (var i = 0; i < permissions.length; i++) {
-                var resource = permissions[i];
-                var permission = resource.id;
-
-                if (resource.scopes && resource.scopes.length > 0) {
-                    permission += "#";
-                    for (var j = 0; j < resource.scopes.length; j++) {
-                        var scope = resource.scopes[j];
-                        if (permission.indexOf('#') != permission.length - 1) {
-                            permission += ",";
-                        }
-                        permission += scope;
-                    }
-                }
-
-                params += "&permission=" + permission;
-            }
-
-            var metadata = authorizationRequest.metadata;
-
-            if (metadata) {
-                if (metadata.responseIncludeResourceName) {
-                    params += "&response_include_resource_name=" + metadata.responseIncludeResourceName;
-                }
-                if (metadata.responsePermissionsLimit) {
-                    params += "&response_permissions_limit=" + metadata.responsePermissionsLimit;
-                }
-            }
-
-            if (_instance.rpt) {
-                params += "&rpt=" + _instance.rpt;
-            }
-
-            request.send(params);
-        };
-
-        return this;
-    };
-
-    return this;
-};
+  return this
+}
 
 /**
  * Obtains the configuration from the server.
@@ -246,14 +246,14 @@ var KeycloakAuthorization = function (keycloak, options) {
  * @param {string} realm The realm name.
  * @returns {Promise<unknown>} A promise that resolves when the configuration is loaded.
  */
-async function loadConfig(serverUrl, realm) {
-    const url = `${serverUrl}/realms/${encodeURIComponent(realm)}/.well-known/uma2-configuration`;
+async function loadConfig (serverUrl, realm) {
+  const url = `${serverUrl}/realms/${encodeURIComponent(realm)}/.well-known/uma2-configuration`
 
-    try {
-        return await fetchJSON(url);
-    } catch (error) {
-        throw new Error('Could not obtain configuration from server.', { cause: error });
-    }
+  try {
+    return await fetchJSON(url)
+  } catch (error) {
+    throw new Error('Could not obtain configuration from server.', { cause: error })
+  }
 }
 
 /**
@@ -261,36 +261,36 @@ async function loadConfig(serverUrl, realm) {
  * @param {string} url The URL to fetch the data from.
  * @returns {Promise<unknown>} A promise that resolves when the data is loaded.
  */
-async function fetchJSON(url) {
-    let response;
+async function fetchJSON (url) {
+  let response
 
-    try {
-        response = await fetch(url);
-    } catch (error) {
-        throw new Error('Server did not respond.', { cause: error });
-    }
+  try {
+    response = await fetch(url)
+  } catch (error) {
+    throw new Error('Server did not respond.', { cause: error })
+  }
 
-    if (!response.ok) {
-        throw new Error('Server responded with an invalid status.');
-    }
+  if (!response.ok) {
+    throw new Error('Server responded with an invalid status.')
+  }
 
-    try {
-        return await response.json();
-    } catch (error) {
-        throw new Error('Server responded with invalid JSON.', { cause: error });
-    }
+  try {
+    return await response.json()
+  } catch (error) {
+    throw new Error('Server responded with invalid JSON.', { cause: error })
+  }
 }
 
 /**
- * @param {unknown} error 
- * @param {((error: unknown) => void) | undefined} handler 
+ * @param {unknown} error
+ * @param {((error: unknown) => void) | undefined} handler
  */
-function handleError(error, handler) {
-    if (handler) {
-        handler(error);
-    } else {
-        console.error(message, error);
-    }
+function handleError (error, handler) {
+  if (handler) {
+    handler(error)
+  } else {
+    console.error(error)
+  }
 }
 
-export default KeycloakAuthorization;
+export default KeycloakAuthorization
