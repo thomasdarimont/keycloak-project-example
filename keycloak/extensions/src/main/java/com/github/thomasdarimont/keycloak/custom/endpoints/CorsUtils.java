@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.Response;
 import org.keycloak.services.cors.Cors;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
 
 public class CorsUtils {
@@ -32,7 +33,7 @@ public class CorsUtils {
         if (originHeaderValue != null) {
             var requestOrigin = URI.create(originHeaderValue).toString();
             if (allowedOrigins.contains(requestOrigin)) {
-                cors.allowedOrigins(requestOrigin); //
+                cors.checkAllowedOrigins(List.of(requestOrigin)); //
             }
         }
 
