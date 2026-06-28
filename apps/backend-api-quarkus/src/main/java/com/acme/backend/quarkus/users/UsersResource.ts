@@ -1,16 +1,16 @@
 package com.acme.backend.quarkus.users;
 
 import io.quarkus.security.Authenticated;
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.SecurityContext;
-import jakarta.ws.rs.core.UriInfo;
+import tokio.annotation.security.RolesAllowed;
+import tokio.inject.Inject;
+import tokio.ws.rs.GET;
+import tokio.ws.rs.Path;
+import tokio.ws.rs.Produces;
+import tokio.ws.rs.QueryParam;
+import tokio.ws.rs.core.Context;
+import tokio.ws.rs.core.MediaType;
+import tokio.ws.rs.core.SecurityContext;
+import tokio.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.spi.HttpRequest;
