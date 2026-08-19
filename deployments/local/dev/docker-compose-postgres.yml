@@ -29,7 +29,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - ./run/postgres/data265:/var/lib/postgresql/data:z
+      - ./run/postgres/data267:/var/lib/postgresql/data:z
 
   acme-keycloak:
     env_file:
