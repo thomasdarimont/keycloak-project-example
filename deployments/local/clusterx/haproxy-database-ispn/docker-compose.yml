@@ -23,8 +23,8 @@ services:
     volumes:
       - ./cache-ispn-database.xml:/opt/keycloak/conf/cache-ispn-database.xml:z
       - ./patch/keycloak-model-infinispan-20.0.1.jar:/opt/keycloak/lib/lib/main/org.keycloak.keycloak-model-infinispan-20.0.1.jar:z
-      - ./lib/infinispan-cachestore-jdbc-common-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc-common.jar:z
-      - ./lib/infinispan-cachestore-jdbc-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc.jar:z
+      - ./lib/infinispan-cachestore-jdbc-common-jakarta-14.0.17.Final:/opt/keycloak/providers/infinispan-cachestore-jdbc-common-jakarta.jar:z
+      - ./lib/infinispan-cachestore-jdbc-14.0.17.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc.jar:z
     command:
       - "--verbose"
       - "start"
@@ -55,8 +55,8 @@ services:
     volumes:
       - ./cache-ispn-database.xml:/opt/keycloak/conf/cache-ispn-database.xml:z
       - ./patch/keycloak-model-infinispan-20.0.1.jar:/opt/keycloak/lib/lib/main/org.keycloak.keycloak-model-infinispan-20.0.1.jar:z
-      - ./lib/infinispan-cachestore-jdbc-common-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc-common.jar:z
-      - ./lib/infinispan-cachestore-jdbc-13.0.10.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc.jar:z
+      - ./lib/infinispan-cachestore-jdbc-common-jakarta-14.0.17.Final:/opt/keycloak/providers/infinispan-cachestore-jdbc-common-jakarta.jar:z
+      - ./lib/infinispan-cachestore-jdbc-14.0.17.Final.jar:/opt/keycloak/providers/infinispan-cachestore-jdbc.jar:z
     command:
       - "--verbose"
       - "start"
